@@ -21,7 +21,7 @@
 
     <form action="<?= base_url('login') ?>" method="post">
         <label>Email:</label>
-        <input type="email" name="email" required><br><br>
+        <input type="text" name="email" required><br><br>
 
         <label>Mot de passe:</label>
         <input type="password" name="password" required><br><br>
