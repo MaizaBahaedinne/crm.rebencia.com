@@ -34,10 +34,15 @@ class AuthController extends Controller
         $user = $userModel->verifyUser($email, $password);
 
         if ($user) {
+            // Récupérer les rôles WordPress
+            $roles = $userModel->getUserRoles($user['ID']);
+            $role = $roles ? implode(',', $roles) : null;
             $session->set([
-            'email' => $user['user_email'],
-            'isLoggedIn' => true,
-            'user_id' => $user['ID'],
+                'email' => $user['user_email'],
+                'user_login' => $user['user_login'],
+                'isLoggedIn' => true,
+                'user_id' => $user['ID'],
+                'role' => $role,
             ]);
             return redirect()->to('/dashboard');
         } else {
