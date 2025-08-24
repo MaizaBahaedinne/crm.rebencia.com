@@ -38,6 +38,7 @@ class AuthController extends Controller
             'email' => $user['user_email'],
             'isLoggedIn' => true,
             'user_id' => $user['ID'],
+            'role' => $user['role'], // Ajout du rôle utilisateur
             ]);
             return redirect()->to('/dashboard');
         } else {
