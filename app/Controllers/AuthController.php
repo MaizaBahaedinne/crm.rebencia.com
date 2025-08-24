@@ -1,28 +1,46 @@
-<?php namespace App\Controllers;
+<?php
+namespace App\Controllers;
 
-use App\Models\WordPressUserModel;
+use CodeIgniter\Controller;
 
-class AuthController extends BaseController
+class AuthController extends Controller
 {
     public function login()
     {
+        helper(['form']);
+        echo view('auth/login');
+    }
+
+    public function loginPost()
+    {
+        helper(['form']);
         $session = session();
-        $username = $this->request->getPost('username');
-        $password = $this->request->getPost('password');
 
-        $model = new WordPressUserModel();
-        $user = $model->verifyUser($username, $password);
+        $rules = [
+            'email'    => 'required|valid_email',
+            'password' => 'required|min_length[6]|max_length[255]',
+        ];
 
-        if ($user) {
-            $session->set([
-                'user_id' => $user['ID'],
-                'username' => $user['user_login'],
-                'isLoggedIn' => true
+        if (!$this->validate($rules)) {
+            return view('auth/login', [
+                'validation' => $this->validator
             ]);
-            return redirect()->to('/dashboard');
         }
 
-        return redirect()->back()->with('error', 'Invalid credentials');
+        $email = $this->request->getVar('email');
+        $password = $this->request->getVar('password');
+
+        // Exemple simple, tu peux remplacer par wp_users
+        if($email === 'admin@rebencia.com' && $password === 'Rebencia1402!!') {
+            $session->set([
+                'email' => $email,
+                'isLoggedIn' => true,
+            ]);
+            return redirect()->to('/dashboard');
+        } else {
+            $session->setFlashdata('error', 'Email ou mot de passe incorrect');
+            return redirect()->to('/login');
+        }
     }
 
     public function logout()
