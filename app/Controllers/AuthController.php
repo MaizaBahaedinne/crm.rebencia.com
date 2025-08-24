@@ -29,11 +29,15 @@ class AuthController extends Controller
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
 
-        // Exemple simple, tu peux remplacer par wp_users
-        if($email === 'admin@rebencia.com' && $password === 'Rebencia1402!!') {
+        // Utiliser WordPressUserModel pour vérifier l'utilisateur
+        $userModel = new \App\Models\WordPressUserModel();
+        $user = $userModel->verifyUser($email, $password);
+
+        if ($user) {
             $session->set([
-                'email' => $email,
-                'isLoggedIn' => true,
+            'email' => $user['user_email'],
+            'isLoggedIn' => true,
+            'user_id' => $user['ID'],
             ]);
             return redirect()->to('/dashboard');
         } else {
