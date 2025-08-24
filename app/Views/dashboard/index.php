@@ -1,7 +1,7 @@
 <?php
 // Récupération des infos utilisateur depuis la session
 $session = \Config\Services::session();
-$username = $session->get('user_login');
+$username = $session->get('user_email');
 $role = $session->get('role');
 ?>
 <div style="margin-bottom: 1em;">
