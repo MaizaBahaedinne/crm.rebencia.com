@@ -17,7 +17,6 @@ class AuthController extends Controller
         $session = session();
 
         $rules = [
-            'email'    => 'required|valid_email',
             'password' => 'required|min_length[6]|max_length[255]',
         ];
 
