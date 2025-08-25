@@ -23,7 +23,7 @@ class AuthController extends Controller
         if (!$this->validate($rules)) {
             return view('auth/login', [
                 'validation' => $this->validator
-            ]);
+            ]);s
         }
 
         $email = $this->request->getVar('email');
@@ -34,16 +34,15 @@ class AuthController extends Controller
         $user = $userModel->verifyUser($email, $password);
 
         if ($user) {
-            // Récupérer les rôles WordPress
-            $roles = $userModel->getUserRoles($user['ID']);
-            print_r($user) ;
+            // Récupérer les rôles WordPress depuis la meta wp_Hrg8P_capabilities
+            $roles = $userModel->getUserRolesFromMeta($user['ID'], 'wp_Hrg8P_scapabilities');
             $role = $roles ? implode(',', $roles) : null;
             $session->set([
-                'email' => $user['user_email'],
-                'user_login' => $user['user_login'],
-                'isLoggedIn' => true,
-                'user_id' => $user['ID'],
-                'role' => $role,
+            'email' => $user['user_email'],
+            'user_login' => $user['user_login'],
+            'isLoggedIn' => true,
+            'user_id' => $user['ID'],
+            'role' => $role,
             ]);
             return redirect()->to('/dashboard');
         } else {

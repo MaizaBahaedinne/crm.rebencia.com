@@ -22,16 +22,17 @@ class WordPressUserModel extends Model
         return $wp_hasher->CheckPassword($password, $user['user_pass']) ? $user : false;
     }
     /**
-     * Récupère le(s) rôle(s) WordPress d'un utilisateur par son ID
+     * Récupère le(s) rôle(s) WordPress d'un utilisateur par son ID et meta_key personnalisée
      * @param int $userId
+     * @param string $metaKey
      * @return array|null
      */
-    public function getUserRoles($userId)
+    public function getUserRolesFromMeta($userId, $metaKey = 'wp_capabilities')
     {
         $db = \Config\Database::connect();
         $builder = $db->table('wp_Hrg8P_usermeta');
         $row = $builder->where('user_id', $userId)
-            ->where('meta_key', 'wp_capabilities')
+            ->where('meta_key', $metaKey)
             ->get()->getRow();
         if (!$row) return null;
         $metaValue = $row->meta_value;
