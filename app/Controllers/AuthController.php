@@ -36,6 +36,7 @@ class AuthController extends Controller
         if ($user) {
             // Récupérer les rôles WordPress
             $roles = $userModel->getUserRoles($user['ID']);
+            print_r($user) ;
             $role = $roles ? implode(',', $roles) : null;
             $session->set([
                 'email' => $user['user_email'],
