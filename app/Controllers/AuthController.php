@@ -38,8 +38,7 @@ class AuthController extends Controller
             $roles = $userModel->getUserRolesFromMeta($user['ID'], 'wp_Hrg8P_capabilities');
 
             $role = $roles ? implode(',', $roles) : null;
-            // Affichage temporaire du rôle pour debug
-            echo '<pre>ROLE DEBUG: ' . htmlspecialchars($role) . '</pre>';
+           s
             $session->set([
                 'email' => $user['user_email'],
                 'user_login' => $user['user_login'],
@@ -47,7 +46,7 @@ class AuthController extends Controller
                 'user_id' => $user['ID'],
                 'role' => $role,
             ]);
-            // return redirect()->to('/dashboard');
+            return redirect()->to('/dashboard');
         } else {
             $session->setFlashdata('error', 'Email ou mot de passe incorrect');
             return redirect()->to('/login');
