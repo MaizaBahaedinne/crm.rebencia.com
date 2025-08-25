@@ -47,7 +47,7 @@ class AuthController extends Controller
             'user_id' => $user['ID'],
             'role' => $role,
             ]);
-            return redirect()->to('/dashboard');
+            // return redirect()->to('/dashboard');
         } else {
             $session->setFlashdata('error', 'Email ou mot de passe incorrect');
             return redirect()->to('/login');
