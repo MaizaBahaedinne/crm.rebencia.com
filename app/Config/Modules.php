@@ -4,12 +4,6 @@ namespace Config;
 
 use CodeIgniter\Modules\Modules as BaseModules;
 
-/**
- * Modules Configuration.
- *
- * NOTE: This class is required prior to Autoloader instantiation,
- *       and does not extend BaseConfig.
- */
 class Modules extends BaseModules
 {
     /**
@@ -38,29 +32,6 @@ class Modules extends BaseModules
     public $discoverInComposer = true;
 
     /**
-     * The Composer package list for Auto-Discovery
-     * This setting is optional.
-     *
-     * E.g.:
-     *   [
-     *       'only' => [
-     *           // List up all packages to auto-discover
-     *           'codeigniter4/shield',
-     *       ],
-     *   ]
-     *   or
-     *   [
-     *       'exclude' => [
-     *           // List up packages to exclude.
-     *           'pestphp/pest',
-     *       ],
-     *   ]
-     *
-     * @var array{only?: list<string>, exclude?: list<string>}
-     */
-    public $composerPackages = [];
-
-    /**
      * --------------------------------------------------------------------------
      * Auto-Discovery Rules
      * --------------------------------------------------------------------------
@@ -70,7 +41,7 @@ class Modules extends BaseModules
      *
      * If it is not listed, only the base application elements will be used.
      *
-     * @var list<string>
+     * @var string[]
      */
     public $aliases = [
         'events',
