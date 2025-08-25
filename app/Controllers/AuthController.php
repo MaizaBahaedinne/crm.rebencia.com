@@ -35,17 +35,17 @@ class AuthController extends Controller
 
         if ($user) {
             // Récupérer les rôles WordPress depuis la meta wp_Hrg8P_capabilities
-            $roles = $userModel->getUserRolesFromMeta($user['ID'], 'wp_Hrg8P_scapabilities');
+            $roles = $userModel->getUserRolesFromMeta($user['ID'], 'wp_Hrg8P_capabilities');
 
             $role = $roles ? implode(',', $roles) : null;
-                // Affichage temporaire du rôle pour debug
-                echo '<pre>ROLE DEBUG: ' . htmlspecialchars($role) . '</pre>';
+            // Affichage temporaire du rôle pour debug
+            echo '<pre>ROLE DEBUG: ' . htmlspecialchars($role) . '</pre>';
             $session->set([
-            'email' => $user['user_email'],
-            'user_login' => $user['user_login'],
-            'isLoggedIn' => true,
-            'user_id' => $user['ID'],
-            'role' => $role,
+                'email' => $user['user_email'],
+                'user_login' => $user['user_login'],
+                'isLoggedIn' => true,
+                'user_id' => $user['ID'],
+                'role' => $role,
             ]);
             // return redirect()->to('/dashboard');
         } else {
