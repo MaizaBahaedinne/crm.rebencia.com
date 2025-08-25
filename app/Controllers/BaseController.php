@@ -1,26 +1,6 @@
-    /**
-     * Charge une vue avec header et footer
-     * @param string $view
-     * @param array $data
-     */
-    public function loadViewWithLayout(string $view, array $data = [])
-    {
-        echo view('partials/header', $data);
-        echo view($view, $data);
-        echo view('partials/footer', $data);
-    }
+
 <?php
-    /**
-     * Charge une vue avec header et footer
-     * @param string $view
-     * @param array $data
-     */
-    public function loadViewWithLayout(string $view, array $data = [])
-    {
-        echo view('partials/header', $data);
-        echo view($view, $data);
-        echo view('partials/footer', $data);
-    }
+    
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
@@ -75,6 +55,18 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = service('session');
+    }
+
+    /**
+     * Charge une vue avec header et footer
+     * @param string $view
+     * @param array $data
+     */
+    public function loadViewWithLayout(string $view, array $data = [])
+    {
+        echo view('partials/header', $data);
+        echo view($view, $data);
+        echo view('partials/footer', $data);
     }
 
 
