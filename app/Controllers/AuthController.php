@@ -23,7 +23,7 @@ class AuthController extends Controller
         if (!$this->validate($rules)) {
             return view('auth/login', [
                 'validation' => $this->validator
-            ]);s
+            ]);
         }
 
         $email = $this->request->getVar('email');
