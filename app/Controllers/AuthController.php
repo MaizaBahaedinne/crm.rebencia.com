@@ -38,7 +38,7 @@ class AuthController extends Controller
             $roles = $userModel->getUserRolesFromMeta($user['ID'], 'wp_Hrg8P_capabilities');
 
             $role = $roles ? implode(',', $roles) : null;
-           s
+           
             $session->set([
                 'email' => $user['user_email'],
                 'user_login' => $user['user_login'],
