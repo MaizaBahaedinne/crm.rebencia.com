@@ -29,7 +29,7 @@ class AuthController extends Controller
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
 
-        // Utiliser WordPressUserModel pour vérifier l'utilisateur
+        // Utiliser WordPressUserModel pour vérifier l'utilisateurss
         $userModel = new \App\Models\WordPressUserModel();
         $user = $userModel->verifyUser($email, $password);
 
