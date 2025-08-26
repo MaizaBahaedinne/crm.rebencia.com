@@ -90,6 +90,18 @@ switch (ENVIRONMENT)
 		exit(1); // EXIT_ERROR
 }
 
+// Patch PHP 8.2 pour CodeIgniter 3
+if (PHP_VERSION_ID >= 80200) {
+    #[\AllowDynamicProperties]
+    class_alias('CI_Controller', '__CI_Controller');
+    #[\AllowDynamicProperties]
+    class_alias('CI_Model', '__CI_Model');
+    #[\AllowDynamicProperties]
+    class_alias('CI_Router', '__CI_Router');
+    #[\AllowDynamicProperties]
+    class_alias('CI_URI', '__CI_URI');
+}
+
 /*
  *---------------------------------------------------------------
  * SYSTEM DIRECTORY NAME
