@@ -21,7 +21,12 @@ class Login extends CI_Controller
 
         public function index()
         {
-            echo APPPATH; die; // Vérifie que CI voit bien le dossier application/
+            $view_file = APPPATH.'views/users/login.php';
+                if(file_exists($view_file)){
+                    echo "OK"; die;
+                } else {
+                    echo "Missing"; die;
+                }
             $this->isLoggedIn();
         }
    
