@@ -18,13 +18,13 @@ class Login extends CI_Controller
         $this->load->model('login_model');
     }
 
-    /**
-     * Index Page for this controller.
-     */
-    public function index()
-    {
-        $this->isLoggedIn();
-    }
+
+        public function index()
+        {
+            echo APPPATH; die; // Vérifie que CI voit bien le dossier application/
+            $this->isLoggedIn();
+        }
+   
     
     /**
      * This function used to check the user is logged in or not
