@@ -69,14 +69,18 @@ class Login extends CI_Controller {
 
         if (isset($apiResponse['token'])) {
             // Authentifié avec succès via l'API externe
-            // Vous pouvez stocker le token JWT si besoin
+            // Récupération du rôle et de l'avatar si disponibles
+            $role = isset($apiResponse['user_role']) ? $apiResponse['user_role'] : null;
+            $avatar = isset($apiResponse['avatar']) ? $apiResponse['avatar'] : null;
+
             $sessionData = [
                 'email' => $email,
                 'jwt_token' => $apiResponse['token'],
                 'user_email' => $apiResponse['user_email'],
                 'user_nicename' => $apiResponse['user_nicename'],
                 'name' => $apiResponse['user_display_name'],
-                'role' => $data['user_role'],  
+                'role' => $apiResponse['user_role'],
+                'avatar' => $apiResponse['avatar'],
                 'isLoggedIn' => TRUE
             ];
             $this->session->set_userdata($sessionData);
