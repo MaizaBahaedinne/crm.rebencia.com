@@ -63,7 +63,7 @@ class Login extends CI_Controller {
                 'wp_id'        => $user['id'],
                 'wp_login'     => $user['slug'],
                 'name'      => $user['name'],
-                'role'     => isset($user['roles']) ? $user['roles'] : [],
+                'role'     => 'role',
                 'wp_avatar'    => isset($user['avatar_urls']['96']) ? $user['avatar_urls']['96'] : null,
                 'isLoggedIn'   => TRUE,
                 'wp_url'       => isset($user['link']) ? $user['link'] : null
