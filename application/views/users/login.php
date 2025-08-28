@@ -86,7 +86,12 @@
 
                                         <div class="mt-4">
                                             <form action="<?php echo base_url() ?>login/loginMe" method="post">
-
+                                                    <?php if($this->session->flashdata('error')): ?>
+                                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                            <?php echo $this->session->flashdata('error'); ?>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                        </div>
+                                                    <?php endif; ?>
                                                 <div class="mb-3">
                                                     <label for="username" class="form-label">Username</label>
                                                     <input type="text" class="form-control" name="email" id="username" placeholder="Enter username">
