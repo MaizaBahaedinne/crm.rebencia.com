@@ -15,12 +15,9 @@ class Login extends CI_Controller {
     public function isLoggedIn() {
         $isLoggedIn = $this->session->userdata('isLoggedIn');
         if(empty($isLoggedIn)) {
-            $view = APPPATH.'views/users/login.php';
-            if(file_exists($view)){
+            
                 $this->load->view('users/login');
-            } else {
-                show_error("Vue introuvable: $view");
-            }
+            
         } else {
             redirect('dashboard');
         }
