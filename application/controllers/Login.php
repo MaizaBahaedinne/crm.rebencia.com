@@ -16,7 +16,7 @@ class Login extends CI_Controller {
 
     public function isLoggedIn() {
         $isLoggedIn = $this->session->userdata('isLoggedIn');
-        echo password_hash('99723620Ow?!', PASSWORD_BCRYPT);
+     
         if(empty($isLoggedIn)) {
             
                 $this->load->view('users/login');
