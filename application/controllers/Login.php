@@ -16,7 +16,7 @@ class Login extends CI_Controller {
     }
 
     public function index() {
-        $this->isLoggedIn();
+       // $this->isLoggedIn();
     }
 
     public function isLoggedIn() {
