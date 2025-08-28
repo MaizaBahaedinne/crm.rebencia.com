@@ -58,40 +58,40 @@ $route['translate_uri_dashes'] = FALSE;
 /*********** USER DEFINED ROUTES *******************/
 
 $route['loginMe'] = 'login/loginMe';
-$route['dashboard'] = 'user';
-$route['logout'] = 'user/logout';
-$route['userListing'] = 'user/userListing';
-$route['userListing/(:num)'] = "user/userListing/$1";
-$route['addNew'] = "user/addNew";
-$route['addNewUser'] = "user/addNewUser";
-$route['editOld'] = "user/editOld";
-$route['editOld/(:num)'] = "user/editOld/$1";
-$route['editUser'] = "user/editUser";
-$route['deleteUser'] = "user/deleteUser";
-$route['profile'] = "user/profile";
-$route['profile/(:any)'] = "user/profile/$1";
-$route['profileUpdate'] = "user/profileUpdate";
-$route['profileUpdate/(:any)'] = "user/profileUpdate/$1";
+$route['dashboard'] = 'User';
+$route['logout'] = 'User/logout';
+$route['userListing'] = 'User/userListing';
+$route['userListing/(:num)'] = "User/userListing/$1";
+$route['addNew'] = "User/addNew";
+$route['addNewUser'] = "User/addNewUser";
+$route['editOld'] = "User/editOld";
+$route['editOld/(:num)'] = "User/editOld/$1";
+$route['editUser'] = "User/editUser";
+$route['deleteUser'] = "User/deleteUser";
+$route['profile'] = "User/profile";
+$route['profile/(:any)'] = "User/profile/$1";
+$route['profileUpdate'] = "User/profileUpdate";
+$route['profileUpdate/(:any)'] = "User/profileUpdate/$1";
 
-$route['loadChangePass'] = "user/loadChangePass";
-$route['changePassword'] = "user/changePassword";
-$route['changePassword/(:any)'] = "user/changePassword/$1";
-$route['pageNotFound'] = "user/pageNotFound";
-$route['checkEmailExists'] = "user/checkEmailExists";
-$route['login-history'] = "user/loginHistoy";
-$route['login-history/(:num)'] = "user/loginHistoy/$1";
-$route['login-history/(:num)/(:num)'] = "user/loginHistoy/$1/$2";
+$route['loadChangePass'] = "User/loadChangePass";
+$route['changePassword'] = "User/changePassword";
+$route['changePassword/(:any)'] = "User/changePassword/$1";
+$route['pageNotFound'] = "User/pageNotFound";
+$route['checkEmailExists'] = "User/checkEmailExists";
+$route['login-history'] = "User/loginHistory";
+$route['login-history/(:num)'] = "User/loginHistory/$1";
+$route['login-history/(:num)/(:num)'] = "User/loginHistory/$1/$2";
 
-$route['forgotPassword'] = "login/forgotPassword";
-$route['resetPasswordUser'] = "login/resetPasswordUser";
-$route['resetPasswordConfirmUser'] = "login/resetPasswordConfirmUser";
-$route['resetPasswordConfirmUser/(:any)'] = "login/resetPasswordConfirmUser/$1";
-$route['resetPasswordConfirmUser/(:any)/(:any)'] = "login/resetPasswordConfirmUser/$1/$2";
-$route['createPasswordUser'] = "login/createPasswordUser";
+$route['forgotPassword'] = "Login/forgotPassword";
+$route['resetPasswordUser'] = "Login/resetPasswordUser";
+$route['resetPasswordConfirmUser'] = "Login/resetPasswordConfirmUser";
+$route['resetPasswordConfirmUser/(:any)'] = "Login/resetPasswordConfirmUser/$1";
+$route['resetPasswordConfirmUser/(:any)/(:any)'] = "Login/resetPasswordConfirmUser/$1/$2";
+$route['createPasswordUser'] = "Login/createPasswordUser";
 
-$route['roleListing'] = "roles/roleListing";
-$route['roleListing/(:num)'] = "roles/roleListing/$1";
-$route['roleListing/(:num)/(:num)'] = "roles/roleListing/$1/$2";
+$route['roleListing'] = "Roles/roleListing";
+$route['roleListing/(:num)'] = "Roles/roleListing/$1";
+$route['roleListing/(:num)/(:num)'] = "Roles/roleListing/$1/$2";
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
