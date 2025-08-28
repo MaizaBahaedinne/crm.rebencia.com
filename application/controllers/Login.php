@@ -32,8 +32,12 @@ class Login extends CI_Controller {
     }
 
     public function loginMe() {
+        // Load form_validation and session libraries if not autoloaded
         $this->load->library('form_validation');
-        
+        $this->load->library('session');
+
+        // Set validation rules
+        $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
         $this->form_validation->set_rules('password', 'Password', 'required|max_length[32]');
 
         if ($this->form_validation->run() == FALSE) {
@@ -41,7 +45,13 @@ class Login extends CI_Controller {
             return;
         }
 
+        // Get input values
         $username = $this->input->post('email');
+        $password = $this->input->post('password');
+
+        // Load WordPress database connection (add 'wordpress' config in application/config/database.php)
+        $wp_db = $this->load->database('wordpress', TRUE);
+
         // Get user by email from wp_Hrg8P_users
         $wp_db->where('user_login', $username);
         $user = $wp_db->get('wp_Hrg8P_users')->row();
@@ -52,11 +62,6 @@ class Login extends CI_Controller {
                 require_once(APPPATH . '../wp-includes/class-phpass.php');
             }
             if (!function_exists('maybe_unserialize')) {
-                require_once(APPPATH . '../wp-includes/functions.php');
-            }
-            $wp_hasher = new PasswordHash(8, TRUE);
-
-            if ($wp_hasher->CheckPassword($password, $user->user_pass)) {
                 require_once(APPPATH . '../wp-includes/functions.php');
             }
             $wp_hasher = new PasswordHash(8, TRUE);
