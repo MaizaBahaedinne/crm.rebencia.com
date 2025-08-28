@@ -722,7 +722,7 @@
                             <img class="rounded-circle header-profile-user" src="<?php echo base_url() ?>assets/images/users/avatar-1.jpg" alt="Header Avatar">
                             <span class="text-start ms-xl-2">
                                 <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text"><?php echo $name; ?></span>
-                                <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text"><?php echo $roleText; ?></span>
+                                <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text"><?php echo $role; ?></span>
                             </span>
                         </span>
                     </button>
@@ -801,7 +801,7 @@
                     <span class="d-flex align-items-center gap-2">
                         <img class="rounded header-profile-user" src="<?php echo base_url() ?>assets/images/users/avatar-1.jpg" alt="Header Avatar">
                         <span class="text-start">
-                            <span class="d-block fw-medium sidebar-user-name-text">Anna Adame</span>
+                            <span class="d-block fw-medium sidebar-user-name-text"><?php echo $name ?></span>
                             <span class="d-block fs-14 sidebar-user-name-sub-text"><i class="ri ri-circle-fill fs-10 text-success align-baseline"></i> <span class="align-middle">Online</span></span>
                         </span>
                     </span>
