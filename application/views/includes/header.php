@@ -835,14 +835,14 @@
                             <div class="collapse menu-dropdown" id="sidebarDashboards">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="<?php echo base_url(); ?>" class="nav-link"><span data-key="t-blog">Tableau de board</span> <span class="badge bg-success" data-key="t-new">New</span></a>
+                                        <a href="<?php echo base_url(); ?>" class="nav-link"><span data-key="t-blog">Tableau de board</span> </a>
                                     </li>
                                 </ul>
                             </div>
                         </li> <!-- end Dashboard Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarApps">
-                                <i class="ri-apps-2-line"></i> <span data-key="t-apps">Apps</span>
+                                <i class="ri-apps-2-line"></i> <span data-key="t-apps"></span>
                             </a>
                             <div class="collapse menu-dropdown" id="sidebarApps">
                                 <ul class="nav nav-sm flex-column">

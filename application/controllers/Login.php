@@ -39,22 +39,48 @@ class Login extends CI_Controller {
         $email = strtolower($this->security->xss_clean($this->input->post('email')));
         $password = $this->input->post('password');
 
-        $user = $this->login_model->loginMe($email, $password);
-        if(empty($user)) {
+        // Authentification via API externe
+        $url = 'https://rebencia.com/wp-json/jwt-auth/v1/token';
+        $data = [
+            "username" => $email,
+            "password" => $password
+        ];
+        $data_json = json_encode($data);
+
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/json\r\n",
+                'method'  => 'POST',
+                'content' => $data_json,
+                'timeout' => 10
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $result = @file_get_contents($url, false, $context);
+
+        if ($result === FALSE) {
+            $this->session->set_flashdata('error', 'Erreur de connexion au service distant');
+            redirect('login');
+            return;
+        }
+
+        $apiResponse = json_decode($result, true);
+
+        if (isset($apiResponse['token'])) {
+            // Authentifié avec succès via l'API externe
+            // Vous pouvez stocker le token JWT si besoin
+            $sessionData = [
+                'email' => $email,
+                'jwt_token' => $apiResponse['token'],
+                'isLoggedIn' => TRUE
+            ];
+            $this->session->set_userdata($sessionData);
+            redirect('dashboard');
+        } else {
             $this->session->set_flashdata('error', 'Email ou mot de passe incorrect');
             redirect('login');
         }
-
-        $sessionData = [
-            'userId' => $user->userId,
-            'role' => $user->roleId,
-            'roleText' => $user->role,
-            'name' => $user->name,
-            'isAdmin' => $user->isAdmin,
-            'isLoggedIn' => TRUE
-        ];
-        $this->session->set_userdata($sessionData);
-        redirect('dashboard');
     }
 
     // Fonctions forgot/reset password idem, ajoute check file_exists avant load->view
