@@ -1,8 +1,4 @@
 <?php
-
-error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT);
-
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
