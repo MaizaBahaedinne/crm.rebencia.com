@@ -29,59 +29,51 @@ class Login extends CI_Controller {
     public function loginMe() {
         $this->load->library('form_validation');
         
-        $this->form_validation->set_rules('password','Password','required|max_length[32]');
+        $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+        $this->form_validation->set_rules('password', 'Password', 'required|max_length[32]');
 
-        if($this->form_validation->run() == FALSE) {
+        if ($this->form_validation->run() == FALSE) {
             $this->index();
             return;
         }
 
-        $email = strtolower($this->security->xss_clean($this->input->post('email')));
-        $password = $this->input->post('password');
+        $username = $this->input->post('email'); // Utilisé comme username WordPress
+        $app_password = $this->input->post('password'); // Mot de passe applicatif
 
-        // Authentification via API externe
-        $url = 'https://rebencia.com/wp-json/jwt-auth/v1/token';
-        $data = [
-            "username" => $email,
-            "password" => $password
-        ];
-        $data_json = json_encode($data);
+        // Endpoint WordPress REST API
+        $url = 'https://rebencia.com/wp-json/wp/v2/users/me';
 
-        $options = [
-            'http' => [
-                'header'  => "Content-type: application/json\r\n",
-                'method'  => 'POST',
-                'content' => $data_json,
-                'timeout' => 10
-            ]
-        ];
+        // Encode en base64 pour Basic Auth
+        $auth = base64_encode("$username:$app_password");
 
-        $context = stream_context_create($options);
-        $result = @file_get_contents($url, false, $context);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Basic $auth"
+        ]);
 
-        if ($result === FALSE) {
-            $this->session->set_flashdata('error', 'Erreur de connexion au service distant');
-            redirect('login');
-            return;
-        }
+        $response = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        $apiResponse = json_decode($result, true);
+        if ($httpcode == 200) {
+            $user = json_decode($response, true);
 
-        if (isset($apiResponse['token'])) {
-            // Authentifié avec succès via l'API externe
-            // Vous pouvez stocker le token JWT si besoin
-            $sessionData = [
-                'email' => $email,
-                'jwt_token' => $apiResponse['token'],
-                'user_email' => $apiResponse['user_email'],
-                'name' => $apiResponse['user_nicename'],
-                'user_display_name' => $apiResponse['user_display_name'],
-                'isLoggedIn' => TRUE
-            ];
-            $this->session->set_userdata($sessionData);
+            // Stocker info dans la session CI3
+            $this->session->set_userdata([
+                'wp_logged_in' => true,
+                'wp_id'        => $user['id'],
+                'wp_login'     => $user['slug'],
+                'wp_name'      => $user['name'],
+                'wp_roles'     => $user['roles'],
+                'wp_avatar'    => isset($user['avatar_urls']['96']) ? $user['avatar_urls']['96'] : null,
+                'isLoggedIn'   => TRUE
+            ]);
+
             redirect('dashboard');
         } else {
-            $this->session->set_flashdata('error', 'Email ou mot de passe incorrect');
+            $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe applicatif.');
             redirect('login');
         }
     }
