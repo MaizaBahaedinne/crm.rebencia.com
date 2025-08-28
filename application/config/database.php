@@ -78,6 +78,29 @@ $db['default'] = array(
 	'hostname' => 'localhost',
 	'username' => 'rebencia_rebencia',
 	'password' => 'Rebencia1402!!',
+	'database' => 'rebencia_rebencia',
+	'dbdriver' => 'mysqli',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8',
+	'dbcollat' => 'utf8_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
+
+
+$db['wordpress'] = array(
+	'dsn'	=> '',
+	'hostname' => 'localhost',
+	'username' => 'rebencia_rebencia',
+	'password' => 'Rebencia1402!!',
 	'database' => 'rebencia_RebenciaBD',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
