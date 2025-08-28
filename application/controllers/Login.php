@@ -28,6 +28,7 @@ class Login extends CI_Controller {
 
     public function loginMe() {
         $this->load->library('form_validation');
+        
         $this->form_validation->set_rules('password','Password','required|max_length[32]');
 
         if($this->form_validation->run() == FALSE) {
@@ -38,31 +39,46 @@ class Login extends CI_Controller {
         $email = strtolower($this->security->xss_clean($this->input->post('email')));
         $password = $this->input->post('password');
 
-        // Authentification via Application Passwords (WordPress)
-        $url = 'https://rebencia.com/wp-json/wp/v2/users/me';
-        $auth = base64_encode("$email:$password");
+        // Authentification via API externe
+        $url = 'https://rebencia.com/wp-json/jwt-auth/v1/token';
+        $data = [
+            "username" => $email,
+            "password" => $password
+        ];
+        $data_json = json_encode($data);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Basic $auth"
-        ]);
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/json\r\n",
+                'method'  => 'POST',
+                'content' => $data_json,
+                'timeout' => 10
+            ]
+        ];
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $context = stream_context_create($options);
+        $result = @file_get_contents($url, false, $context);
 
-        $user = json_decode($response, true);
+        if ($result === FALSE) {
+            $this->session->set_flashdata('error', 'Erreur de connexion au service distant');
+            redirect('login');
+            return;
+        }
 
-        if(isset($user['id'])) {
-            // Authentifié avec succès
-            $role = isset($user['roles']) ? implode(',', $user['roles']) : null;
-            $avatar = isset($user['avatar_urls']['96']) ? $user['avatar_urls']['96'] : null;
+        $apiResponse = json_decode($result, true);
+
+        if (isset($apiResponse['token'])) {
+            // Authentifié avec succès via l'API externe
+            // Récupération du rôle et de l'avatar si disponibles
+            $role = isset($apiResponse['user_role']) ? $apiResponse['user_role'] : null;
+            $avatar = isset($apiResponse['avatar']) ? $apiResponse['avatar'] : null;
 
             $sessionData = [
                 'email' => $email,
-                'user_id' => $user['id'],
-                'name' => $user['name'],
+                'jwt_token' => $apiResponse['token'],
+                'user_email' => $apiResponse['user_email'],
+                'user_nicename' => $apiResponse['user_nicename'],
+                'name' => $apiResponse['user_display_name'],
                 'role' => $role,
                 'avatar' => $avatar,
                 'isLoggedIn' => TRUE
