@@ -37,13 +37,10 @@ class Login extends CI_Controller {
             return;
         }
 
-        $username = $this->input->post('email'); // Utilisé comme username WordPress
-        $app_password = $this->input->post('password'); // Mot de passe applicatif
+        $username = $this->input->post('email');
+        $app_password = $this->input->post('password');
 
-        // Endpoint WordPress REST API
         $url = 'https://rebencia.com/wp-json/wp/v2/users/me';
-
-        // Encode en base64 pour Basic Auth
         $auth = base64_encode("$username:$app_password");
 
         $ch = curl_init();
@@ -62,13 +59,14 @@ class Login extends CI_Controller {
 
             // Stocker info dans la session CI3
             $this->session->set_userdata([
-                'wp_logged_in' => true,
+                'logged_in' => true,
                 'wp_id'        => $user['id'],
                 'wp_login'     => $user['slug'],
-                'wp_name'      => $user['name'],
-                'wp_roles'     => $user['roles'],
+                'name'      => $user['name'],
+                'role'     => isset($user['roles']) ? $user['roles'] : [],
                 'wp_avatar'    => isset($user['avatar_urls']['96']) ? $user['avatar_urls']['96'] : null,
-                'isLoggedIn'   => TRUE
+                'isLoggedIn'   => TRUE,
+                'wp_url'       => isset($user['link']) ? $user['link'] : null
             ]);
 
             redirect('dashboard');
