@@ -73,6 +73,10 @@ class Login extends CI_Controller {
             $sessionData = [
                 'email' => $email,
                 'jwt_token' => $apiResponse['token'],
+                'user_email' => $apiResponse['user_email'],
+                'user_nicename' => $apiResponse['user_nicename'],
+                'name' => $apiResponse['user_display_name'],
+                'role' => $data['user_role'],  
                 'isLoggedIn' => TRUE
             ];
             $this->session->set_userdata($sessionData);
