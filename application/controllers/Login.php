@@ -81,6 +81,10 @@ class Login extends CI_Controller {
                     }
                 }
 
+                print_r($$user); 
+                
+                exit;
+
                 $this->session->set_userdata([
                     'logged_in'   => true,
                     'wp_id'       => $user->ID,
