@@ -29,7 +29,6 @@ class Login extends CI_Controller {
     public function loginMe() {
         $this->load->library('form_validation');
         
-        
         $this->form_validation->set_rules('password', 'Password', 'required|max_length[32]');
 
         if ($this->form_validation->run() == FALSE) {
@@ -38,42 +37,54 @@ class Login extends CI_Controller {
         }
 
         $username = $this->input->post('email');
-        $app_password = $this->input->post('password');
+        $password = $this->input->post('password');
 
-        $url = 'https://rebencia.com/wp-json/wp/v2/users/me';
-        $auth = base64_encode("$username:$app_password");
+        // Load WordPress database
+        $wp_db = $this->load->database('wordpress', TRUE);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Basic $auth"
-        ]);
+        // Get user by email from wp_Hrg8P_users
+        $wp_db->where('user_email', $username);
+        $user = $wp_db->get('wp_Hrg8P_users')->row();
 
-        $response = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        if ($user) {
+            // Verify password using WordPress hash
+            require_once(APPPATH . '../wp-includes/class-phpass.php');
+            if (!function_exists('maybe_unserialize')) {
+                require_once(APPPATH . '../wp-includes/functions.php');
+            }
+            $wp_hasher = new PasswordHash(8, TRUE);
 
-        if ($httpcode == 200) {
-            $user = json_decode($response, true);
+            if ($wp_hasher->CheckPassword($password, $user->user_pass)) {
+                // Get user meta for avatar and role from wp_Hrg8P_usermeta
+                $wp_db->where('user_id', $user->ID);
+                $meta = $wp_db->get('wp_Hrg8P_usermeta')->result();
 
-            // Stocker info dans la session CI3
-            $this->session->set_userdata([
-                'logged_in' => true,
-                'wp_id'        => $user['id'],
-                'wp_login'     => $user['slug'],
-                'name'      => $user['name'],
-                'role'     => 'role',
-                'wp_avatar'    => isset($user['avatar_urls']['96']) ? $user['avatar_urls']['96'] : null,
-                'isLoggedIn'   => TRUE,
-                'wp_url'       => isset($user['link']) ? $user['link'] : null
-            ]);
+                $role = 'subscriber';
+                foreach ($meta as $m) {
+                    if ($m->meta_key == $wp_db->dbprefix('capabilities')) {
+                        $roles = maybe_unserialize($m->meta_value);
+                        if (is_array($roles)) {
+                            $role = key($roles);
+                        }
+                    }
+                }
 
-            redirect('dashboard');
-        } else {
-            $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe applicatif.');
-            redirect('login');
+                $this->session->set_userdata([
+                    'logged_in'   => true,
+                    'wp_id'       => $user->ID,
+                    'wp_login'    => $user->user_login,
+                    'name'        => $user->display_name,
+                    'role'        => $role,
+                    'wp_avatar'   => null, // You can fetch avatar via Gravatar if needed
+                    'isLoggedIn'  => TRUE,
+                    'wp_url'      => null // Set if you store user URL
+                ]);
+                redirect('dashboard');
+            }
         }
+
+        $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe.');
+        redirect('login');
     }
 
     // Fonctions forgot/reset password idem, ajoute check file_exists avant load->view
