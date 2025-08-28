@@ -43,7 +43,7 @@ class Login extends CI_Controller {
         $wp_db = $this->load->database('wordpress', TRUE);
 
         // Get user by email from wp_Hrg8P_users
-        $wp_db->where('user_email', $username);
+        $wp_db->where('user_login', $username);
         $user = $wp_db->get('wp_Hrg8P_users')->row();
 
         if ($user) {
