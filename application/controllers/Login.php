@@ -8,6 +8,11 @@ class Login extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('login_model');
+        $this->load->library('form_validation');
+        $this->load->library('session');
+        $this->load->helper('url');
+        $this->load->helper('form');
+        // $this->input is available by default in CI_Controller, but you can ensure it's loaded
     }
 
     public function index() {
@@ -37,19 +42,21 @@ class Login extends CI_Controller {
         }
 
         $username = $this->input->post('email');
-        $password = $this->input->post('password');
-
-        // Load WordPress database
-        $wp_db = $this->load->database('wordpress', TRUE);
-
         // Get user by email from wp_Hrg8P_users
         $wp_db->where('user_login', $username);
         $user = $wp_db->get('wp_Hrg8P_users')->row();
 
         if ($user) {
             // Verify password using WordPress hash
-            require_once(APPPATH . '../wp-includes/class-phpass.php');
+            if (!class_exists('PasswordHash')) {
+                require_once(APPPATH . '../wp-includes/class-phpass.php');
+            }
             if (!function_exists('maybe_unserialize')) {
+                require_once(APPPATH . '../wp-includes/functions.php');
+            }
+            $wp_hasher = new PasswordHash(8, TRUE);
+
+            if ($wp_hasher->CheckPassword($password, $user->user_pass)) {
                 require_once(APPPATH . '../wp-includes/functions.php');
             }
             $wp_hasher = new PasswordHash(8, TRUE);
