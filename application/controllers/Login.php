@@ -100,7 +100,7 @@ class Login extends CI_Controller {
         }
 
         $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe.');
-        redirect('login');
+       // redirect('login');
     }
 
     // Fonctions forgot/reset password idem, ajoute check file_exists avant load->view
