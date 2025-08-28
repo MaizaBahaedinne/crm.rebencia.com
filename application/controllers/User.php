@@ -24,7 +24,8 @@ class User extends BaseController
         $this->global['pageTitle'] = 'Dashboard';
         $view = APPPATH.'views/general/dashboard.php';
         if(file_exists($view)) {
-            $this->load->view('general/dashboard', $this->global);
+           
+            $this->loadViews("general/dashboard", $this->global, $data, NULL);
         } else {
             show_error("Vue introuvable: $view");
         }
