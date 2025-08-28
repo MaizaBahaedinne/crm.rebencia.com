@@ -14,23 +14,21 @@ class User extends BaseController
     /**
      * This is default constructor of the class
      */
-    public function __construct()
-    {
+       public function __construct() {
         parent::__construct();
         $this->load->model('user_model');
         $this->isLoggedIn();
     }
-    
-    /**
-     * This function used to load the first screen of the user
-     */
-    public function index()
-    {
-        $this->global['pageTitle'] = 'CodeInsect : Dashboard';
-        
-        $this->loadViews("general/dashboard", $this->global, NULL , NULL);
+
+    public function index() {
+        $this->global['pageTitle'] = 'Dashboard';
+        $view = APPPATH.'views/general/dashboard.php';
+        if(file_exists($view)) {
+            $this->load->view('general/dashboard', $this->global);
+        } else {
+            show_error("Vue introuvable: $view");
+        }
     }
-    
     /**
      * This function is used to load the user list
      */
