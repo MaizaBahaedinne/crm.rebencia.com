@@ -117,7 +117,10 @@ class Login extends CI_Controller {
                     if ($m->meta_key == 'fave_author_custom_picture') {
                         $avatar_url = $m->meta_value;
                     }
+                    print_r($avatar_url);
                 }
+
+
 
                 $this->session->set_userdata([
                     'logged_in'   => true,
@@ -129,7 +132,7 @@ class Login extends CI_Controller {
                     'isLoggedIn'  => TRUE,
                     'wp_url'      => null // Set if you store user URL
                 ]);
-                redirect('dashboard');
+              //  redirect('dashboard');
             }
         }
 
