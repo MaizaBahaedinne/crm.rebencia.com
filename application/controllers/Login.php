@@ -131,9 +131,10 @@ class Login extends CI_Controller {
                 ]);
 
                 // Redirection selon le rôle
-                if ($role === 'administrator' || $role === 'admin') {
-                    redirect('dashboard/admin');
-                } elseif ($role === 'houzez_agency') {
+                if ($role === 'administrator' ) {
+                    redirect('Dashboard/admin');
+                } 
+                elseif ($role === 'houzez_agency') {
                     // Récupérer l'ID agence depuis usermeta si besoin
                     $agency_id = null;
                     foreach ($meta as $m) {
@@ -142,14 +143,13 @@ class Login extends CI_Controller {
                             break;
                         }
                     }
-                    if ($agency_id) {
-                        redirect('Dashboard/agency/' . $agency_id);
-                    } else {
-                        redirect('Dashboard');
-                    }
-                } elseif ($role === 'houzez_agent' || $role === 'agent') {
+                    redirect('Dashboard/agency/' . $agency_id);
+                }
+                elseif ($role === 'houzez_agent' || $role === 'agent') {
                     redirect('Dashboard/agent/' . $user->ID);
-                } else {
+                } 
+                else 
+                {
                     redirect('dashboard');
                 }
             }
