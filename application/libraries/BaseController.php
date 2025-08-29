@@ -17,6 +17,7 @@ class BaseController extends CI_Controller {
 	protected $global = array ();
 	protected $lastLogin = '';
 	protected $module = '';
+	protected $wp_avatar = '';
 
 	/**
 	 * This is default constructor
@@ -41,13 +42,15 @@ class BaseController extends CI_Controller {
 			$this->lastLogin = $this->session->userdata ( 'lastLogin' );
 			$this->isAdmin = $this->session->userdata ( 'isAdmin' );
 			$this->accessInfo = $this->session->userdata ( 'accessInfo' );
-			
+			$this->wp_avatar = $this->session->userdata ( 'wp_avatar' );
+
 			$this->global ['name'] = $this->name;
 			$this->global ['role'] = $this->role;
 			$this->global ['role_text'] = $this->roleText;
 			$this->global ['last_login'] = $this->lastLogin;
 			$this->global ['is_admin'] = $this->isAdmin;
 			$this->global ['access_info'] = $this->accessInfo;
+			$this->global ['wp_avatar'] = $this->wp_avatar;
 		}
 	}
 	
