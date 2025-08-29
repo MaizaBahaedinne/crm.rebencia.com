@@ -6,6 +6,7 @@ require APPPATH . '/libraries/BaseController.php';
 class Agent extends BaseController {
     public function __construct() {
         parent::__construct();
+        $this->load->model('agent_model');
     }
 
     // Liste des agents
