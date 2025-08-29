@@ -26,7 +26,7 @@
                 <div class="col">
                     <div class="card crm-widget">
                         <div class="card-body p-0">
-                            <div class="row row-cols-xxl-3 row-cols-md-3 row-cols-1 g-0">
+                            <div class="row row-cols-xxl-4 row-cols-md-4 row-cols-1 g-0">
                                 <div class="col">
                                     <div class="py-4 px-3">
                                         <h5 class="text-muted text-uppercase fs-13">Leads</h5>
@@ -62,6 +62,19 @@
                                             </div>
                                             <div class="flex-grow-1 ms-3">
                                                 <h2 class="mb-0 cfs-22"><?= $stats['sales']; ?></h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="py-4 px-3">
+                                        <h5 class="text-muted text-uppercase fs-13">Nombre d'agents</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <i class="ri-team-line display-6 text-muted cfs-22"></i>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h2 class="mb-0 cfs-22"><?= count($agents); ?></h2>
                                             </div>
                                         </div>
                                     </div>
@@ -113,6 +126,90 @@
                                     <li><?= $agent->display_name; ?> (ID: <?= $agent->ID; ?>)</li>
                                 <?php endforeach; ?>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deals (exemple tableau) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title mb-0">Deals</h4></div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-nowrap align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom du deal</th>
+                                            <th>Agent</th>
+                                            <th>Montant</th>
+                                            <th>Date de clôture</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (!empty($deals)): foreach($deals as $deal): ?>
+                                            <tr>
+                                                <td><?= $deal['name']; ?></td>
+                                                <td><?= $deal['agent']; ?></td>
+                                                <td><?= $deal['amount']; ?></td>
+                                                <td><?= $deal['close_date']; ?></td>
+                                            </tr>
+                                        <?php endforeach; else: ?>
+                                            <tr><td colspan="4">Aucun deal trouvé.</td></tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts (exemple section) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title mb-0">Contacts</h4></div>
+                        <div class="card-body">
+                            <ul>
+                                <?php if (!empty($contacts)): foreach($contacts as $contact): ?>
+                                    <li><?= $contact['name']; ?> - <?= $contact['email']; ?> - <?= $contact['phone']; ?></li>
+                                <?php endforeach; else: ?>
+                                    <li>Aucun contact trouvé.</li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classement des ventes par agence -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title mb-0">Classement des ventes par agence</h4></div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Agence</th>
+                                            <th>Nombre de ventes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (!empty($sales_by_agency)): foreach($sales_by_agency as $row): ?>
+                                            <tr>
+                                                <td><?= $row['agency_name']; ?></td>
+                                                <td><?= $row['sales_count']; ?></td>
+                                            </tr>
+                                        <?php endforeach; else: ?>
+                                            <tr><td colspan="2">Aucune donnée.</td></tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
