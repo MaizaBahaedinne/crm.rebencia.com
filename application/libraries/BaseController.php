@@ -24,10 +24,7 @@ class BaseController extends CI_Controller {
 	 */
 	public function __construct() {
 		parent::__construct();
-	// Chargement global des modèles principaux pour tous les contrôleurs enfants
-	$this->load->model('Agency_model');
-	$this->load->model('Agent_model');
-	$this->load->model('Property_model');
+
 	// Chargement global des librairies et helpers essentiels
 	$this->load->library('session');
 	$this->load->library('pagination');
