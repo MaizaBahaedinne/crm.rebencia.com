@@ -17,7 +17,45 @@
             </div>
             <div class="card mt-4">
                 <div class="card-body">
-                    <p>Affichage de la liste des agences ici.</p>
+                <?php if (!empty($agencies)) : ?>
+                    <div class="table-responsive">
+                        <table id="agenciesTable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                    <th>Adresse</th>
+                                    <th>Date de création</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($agencies as $index => $agency) : ?>
+                                    <tr>
+                                        <td><?php echo $index + 1; ?></td>
+                                        <td><?php echo htmlspecialchars($agency['name']); ?></td>
+                                        <td><?php echo htmlspecialchars($agency['email']); ?></td>
+                                        <td><?php echo htmlspecialchars($agency['phone']); ?></td>
+                                        <td><?php echo htmlspecialchars($agency['address']); ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($agency['created_at'])); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#agenciesTable').DataTable({
+                                "language": {
+                                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json"
+                                }
+                            });
+                        });
+                    </script>
+                <?php else : ?>
+                    <div class="alert alert-info">Aucune agence trouvée.</div>
+                <?php endif; ?>
                 </div>
             </div>
         </div>
