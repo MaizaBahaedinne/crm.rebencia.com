@@ -12,7 +12,7 @@ class Agent_model extends CI_Model {
         $this->wp_db->select('u.*')
             ->from('wp_Hrg8P_users u')
             ->join('wp_Hrg8P_usermeta m', 'u.ID = m.user_id')
-            ->where('m.meta_key', $this->wp_db->dbprefix('capabilities'))
+            ->where('m.meta_key', $this->wp_db->dbprefix('wp_Hrg8P_capabilities'))
             ->like('m.meta_value', 'houzez_agent');
         return $this->wp_db->get()->result();
     }
