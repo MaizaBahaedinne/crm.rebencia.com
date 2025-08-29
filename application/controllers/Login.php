@@ -120,7 +120,7 @@ class Login extends CI_Controller {
                     
                 }
 
-                print_r($avatar_url);
+                echo($avatar_url);
 
                 $this->session->set_userdata([
                     'logged_in'   => true,
