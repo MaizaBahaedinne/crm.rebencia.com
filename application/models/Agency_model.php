@@ -11,12 +11,43 @@ class Agency_model extends CI_Model {
     }
     // Toutes les agences (role = houzez_agency)
     public function get_all_agencies() {
+        // Récupère les agences (users avec le rôle houzez_agency)
         $this->wp_db->select('u.*')
             ->from('wp_Hrg8P_users u')
             ->join('wp_Hrg8P_usermeta m', 'u.ID = m.user_id')
             ->where('m.meta_key', $this->wp_db->dbprefix('wp_Hrg8P_capabilities'))
             ->like('m.meta_value', 'houzez_agency');
-        return $this->wp_db->get()->result();
+        $agencies = $this->wp_db->get()->result();
+
+        // Pour chaque agence, récupérer les métadonnées utiles
+        foreach ($agencies as &$agency) {
+            $meta = $this->wp_db->where('user_id', $agency->ID)
+                ->where_in('meta_key', [
+                    'agency_email',
+                    'agency_phone',
+                    'agency_address',
+                    'agency_logo',
+                    'agency_website',
+                    'agency_facebook',
+                    'agency_instagram',
+                    'agency_whatsapp',
+                    'agency_linkedin'
+                ])->get('wp_Hrg8P_usermeta')->result();
+            $meta_arr = [];
+            foreach ($meta as $m) {
+                $meta_arr[$m->meta_key] = $m->meta_value;
+            }
+            $agency->agency_email = $meta_arr['agency_email'] ?? '';
+            $agency->agency_phone = $meta_arr['agency_phone'] ?? '';
+            $agency->agency_address = $meta_arr['agency_address'] ?? '';
+            $agency->agency_logo = $meta_arr['agency_logo'] ?? '';
+            $agency->agency_website = $meta_arr['agency_website'] ?? '';
+            $agency->agency_facebook = $meta_arr['agency_facebook'] ?? '';
+            $agency->agency_instagram = $meta_arr['agency_instagram'] ?? '';
+            $agency->agency_whatsapp = $meta_arr['agency_whatsapp'] ?? '';
+            $agency->agency_linkedin = $meta_arr['agency_linkedin'] ?? '';
+        }
+        return $agencies;
     }
 
     // Une agence

@@ -23,22 +23,28 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Nom</th>
-                                    <th>Email</th>
+                                    <th>Nom affiché</th>
+                                    <th>Email WP</th>
+                                    <th>Email agence</th>
                                     <th>Téléphone</th>
                                     <th>Adresse</th>
-                                    <th>Date de création</th>
+                                    <th>Site web</th>
+                                    <th>Date d'inscription</th>
+                                    <th>Rôle</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($agencies as $index => $agency) : ?>
                                     <tr>
                                         <td><?php echo $index + 1; ?></td>
-                                        <td><?php echo htmlspecialchars($agency['name']); ?></td>
-                                        <td><?php echo htmlspecialchars($agency['email']); ?></td>
-                                        <td><?php echo htmlspecialchars($agency['phone']); ?></td>
-                                        <td><?php echo htmlspecialchars($agency['address']); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($agency['created_at'])); ?></td>
+                                        <td><?php echo htmlspecialchars($agency->display_name); ?></td>
+                                        <td><?php echo htmlspecialchars($agency->user_email); ?></td>
+                                        <td><?php echo htmlspecialchars($agency->agency_email); ?></td>
+                                        <td><?php echo htmlspecialchars($agency->agency_phone); ?></td>
+                                        <td><?php echo htmlspecialchars($agency->agency_address); ?></td>
+                                        <td><?php echo htmlspecialchars($agency->agency_website); ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($agency->user_registered)); ?></td>
+                                        <td>houzez_agency</td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
