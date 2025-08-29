@@ -9,7 +9,7 @@ class Property_model extends CI_Model {
     }
     // Toutes les propriétés (avec filtres)
     public function get_all_properties($filters = []) {
-        $this->wp_db->from('wp_posts');
+        $this->wp_db->from('wp_Hrg8P_posts');
         $this->wp_db->where('post_type', 'property');
         $this->wp_db->where('post_status', 'publish');
 
@@ -17,7 +17,7 @@ class Property_model extends CI_Model {
         if (!empty($filters)) {
             foreach ($filters as $key => $value) {
                 // Exemple: filtre par meta_key (ACF ou meta Houzez)
-                $this->wp_db->join('wp_postmeta as pm_' . $key, 'wp_posts.ID = pm_' . $key . '.post_id', 'left');
+                $this->wp_db->join('wp_Hrg8P_postmeta as pm_' . $key, 'wp_posts.ID = pm_' . $key . '.post_id', 'left');
                 $this->wp_db->where('pm_' . $key . '.meta_key', $key);
                 $this->wp_db->where('pm_' . $key . '.meta_value', $value);
             }
