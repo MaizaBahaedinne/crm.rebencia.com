@@ -33,12 +33,19 @@ class Login extends CI_Controller {
     }
 
     public function loginMe() {
-        // Load form_validation and session libraries if not autoloaded
-        $this->load->library('form_validation');
-        $this->load->library('session');
+        // Ensure form_validation, session, and input are loaded
+        if (!isset($this->form_validation)) {
+            $this->load->library('form_validation');
+        }
+        if (!isset($this->session)) {
+            $this->load->library('session');
+        }
+        if (!isset($this->input)) {
+            $this->load->library('input');
+        }
 
         // Set validation rules
-        $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+       
         $this->form_validation->set_rules('password', 'Password', 'required|max_length[32]');
 
         if ($this->form_validation->run() == FALSE) {
@@ -60,12 +67,12 @@ class Login extends CI_Controller {
         if ($user) {
             // Verify password using WordPress hash
             if (!class_exists('PasswordHash')) {
-                require_once(APPPATH . '../wp-includes/class-phpass.php');
+                require_once('/home/rebencia/web/rebencia.com/wp-includes/class-phpass.php');
             }
             if (!function_exists('maybe_unserialize')) {
-                require_once(APPPATH . '../wp-includes/functions.php');
+                require_once('/home/rebencia/web/rebencia.com/wp-includes/functions.php');
             }
-            $wp_hasher = new PasswordHash(8, TRUE);
+            $wp_hasher = new \PasswordHash(8, TRUE);
 
             if ($wp_hasher->CheckPassword($password, $user->user_pass)) {
                 // Get user meta for avatar and role from wp_Hrg8P_usermeta
@@ -82,9 +89,7 @@ class Login extends CI_Controller {
                     }
                 }
 
-                print_r($$user); 
-                
-                exit;
+                 print_r($user); // Uncomment for debugging if needed
 
                 $this->session->set_userdata([
                     'logged_in'   => true,
@@ -101,7 +106,7 @@ class Login extends CI_Controller {
         }
 
         $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe.');
-       // redirect('login');
+        redirect('login');
     }
 
     // Fonctions forgot/reset password idem, ajoute check file_exists avant load->view
