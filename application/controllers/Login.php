@@ -67,7 +67,7 @@ class Login extends CI_Controller {
         if ($user) {
             // Verify password using WordPress hash
             if (!class_exists('PasswordHash')) {
-                require_once('/home/rebencia/web/rebencia.com/wp-includes/class-phpass.php');
+                require_once(APPPATH . 'libraries/class-phpass.php');
             }
             if (!function_exists('maybe_unserialize')) {
                 require_once('/home/rebencia/web/rebencia.com/wp-includes/functions.php');
