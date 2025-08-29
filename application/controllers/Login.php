@@ -119,7 +119,6 @@ class Login extends CI_Controller {
                 }
 
                 print_r($avatar_url); // Uncomment for debugging if needed
-
                 $this->session->set_userdata([
                     'logged_in'   => true,
                     'wp_id'       => $user->ID,
@@ -130,7 +129,29 @@ class Login extends CI_Controller {
                     'isLoggedIn'  => TRUE,
                     'wp_url'      => null // Set if you store user URL
                 ]);
-                redirect('dashboard');
+
+                // Redirection selon le rôle
+                if ($role === 'administrator' || $role === 'admin') {
+                    redirect('dashboard/admin');
+                } elseif ($role === 'houzez_agency') {
+                    // Récupérer l'ID agence depuis usermeta si besoin
+                    $agency_id = null;
+                    foreach ($meta as $m) {
+                        if ($m->meta_key == 'houzez_agency_id') {
+                            $agency_id = $m->meta_value;
+                            break;
+                        }
+                    }
+                    if ($agency_id) {
+                        redirect('Dashboard/agency/' . $agency_id);
+                    } else {
+                        redirect('Dashboard');
+                    }
+                } elseif ($role === 'houzez_agent' || $role === 'agent') {
+                    redirect('Dashboard/agent/' . $user->ID);
+                } else {
+                    redirect('dashboard');
+                }
             }
         }
 
