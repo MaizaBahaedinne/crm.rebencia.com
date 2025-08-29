@@ -105,8 +105,8 @@ class Login extends CI_Controller {
                 // Get user meta for avatar and role from wp_Hrg8P_usermeta
                 $wp_db->where('user_id', $user->ID);
                 $meta = $wp_db->get('wp_Hrg8P_usermeta')->result();
-
                 $role = '';
+                $avatar_url = null;
                 foreach ($meta as $m) {
                     if ($m->meta_key == $wp_db->dbprefix('wp_Hrg8P_capabilities')) {
                         $roles = maybe_unserialize($m->meta_value);
@@ -114,9 +114,10 @@ class Login extends CI_Controller {
                             $role = key($roles);
                         }
                     }
+                    if ($m->meta_key == 'fave_author_custom_picture') {
+                        $avatar_url = $m->meta_value;
+                    }
                 }
-
-                 print_r($user); // Uncomment for debugging if needed
 
                 $this->session->set_userdata([
                     'logged_in'   => true,
@@ -124,7 +125,7 @@ class Login extends CI_Controller {
                     'wp_login'    => $user->user_login,
                     'name'        => $user->display_name,
                     'role'        => $role,
-                    'wp_avatar'   => null, // You can fetch avatar via Gravatar if needed
+                    'wp_avatar'   => $avatar_url,
                     'isLoggedIn'  => TRUE,
                     'wp_url'      => null // Set if you store user URL
                 ]);
