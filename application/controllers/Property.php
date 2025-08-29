@@ -7,6 +7,8 @@ class Property extends BaseController {
     public function __construct() {
         parent::__construct();
         $this->load->model('property_model');
+        $this->load->model('agency_model');
+        $this->load->model('agent_model');
     }
 
     // Liste des propriétés avec filtres
