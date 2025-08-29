@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+
+require APPPATH . '/libraries/BaseController.php';
 class Report extends BaseController {
     public function sales() {
         $this->loadViews('reports/sales', []);
