@@ -13,17 +13,17 @@ class Lead extends BaseController {
         $this->load->library('session');
         $this->load->helper('url');
     }
-    
+
     public function index() {
-        $this->loadViews('leads/list', []);
+        $this->loadViews('leads/list',  $this->global, NULL, NULL);
     }
     public function conversion() {
-        $this->loadViews('leads/conversion', []);
+        $this->loadViews('leads/conversion',  $this->global, NULL, NULL);
     }
     public function followup() {
-        $this->loadViews('leads/followup', []);
+        $this->loadViews('leads/followup',  $this->global, NULL, NULL);
     }
     public function status() {
-        $this->loadViews('leads/status', []);
+        $this->loadViews('leads/status',  $this->global, NULL, NULL);
     }
 }
