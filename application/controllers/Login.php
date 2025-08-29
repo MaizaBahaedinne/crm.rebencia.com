@@ -106,7 +106,7 @@ class Login extends CI_Controller {
                 $wp_db->where('user_id', $user->ID);
                 $meta = $wp_db->get('wp_Hrg8P_usermeta')->result();
                 $role = '';
-                $avatar_url = null;
+                $avatar_url = 'null';
                 foreach ($meta as $m) {
                     if ($m->meta_key == $wp_db->dbprefix('wp_Hrg8P_capabilities')) {
                         $roles = maybe_unserialize($m->meta_value);
@@ -118,6 +118,8 @@ class Login extends CI_Controller {
                         $avatar_url = $m->meta_value;
                     }
                 }
+
+                print_r($avatar_url); // Uncomment for debugging if needed
 
                 $this->session->set_userdata([
                     'logged_in'   => true,
