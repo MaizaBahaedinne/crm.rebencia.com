@@ -6,6 +6,7 @@ require APPPATH . '/libraries/BaseController.php';
 class Property extends BaseController {
     public function __construct() {
         parent::__construct();
+        $this->load->model('property_model');
     }
 
     // Liste des propriétés avec filtres
