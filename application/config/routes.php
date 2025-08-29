@@ -1,3 +1,50 @@
+/*********** ROUTES CRM REBENCIA (menu header) ***********/
+
+// Dashboard
+$route['dashboard'] = 'Dashboard/index';
+
+// Agences
+$route['agencies'] = 'Agency/index';
+$route['agencies/create'] = 'Agency/create';
+$route['agencies/stats'] = 'Agency/stats';
+$route['agency/info'] = 'Agency/info';
+$route['agency/agents'] = 'Agency/agents';
+
+// Agents
+$route['agents'] = 'Agent/index';
+$route['agents/create'] = 'Agent/create';
+$route['agents/performance'] = 'Agent/performance';
+
+// Propriétés
+$route['properties'] = 'Property/index';
+$route['properties/create'] = 'Property/create';
+$route['properties/status'] = 'Property/status';
+
+// Leads
+$route['leads'] = 'Lead/index';
+$route['leads/conversion'] = 'Lead/conversion';
+$route['leads/followup'] = 'Lead/followup';
+$route['leads/status'] = 'Lead/status';
+
+// Transactions
+$route['transactions'] = 'Transaction/index';
+$route['transactions/sales'] = 'Transaction/sales';
+$route['transactions/rentals'] = 'Transaction/rentals';
+
+// Rapports & Analytics
+$route['reports/sales'] = 'Report/sales';
+$route['reports/leads'] = 'Report/leads';
+$route['reports/agency-performance'] = 'Report/agency_performance';
+$route['reports/agency'] = 'Report/agency';
+
+// Paramètres
+$route['settings/roles'] = 'Settings/roles';
+$route['settings/wordpress'] = 'Settings/wordpress';
+$route['settings/crm'] = 'Settings/crm';
+
+// Profil
+$route['profile'] = 'Profile/index';
+$route['profile/avatar'] = 'Profile/avatar';
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 

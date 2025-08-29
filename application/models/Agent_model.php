@@ -9,8 +9,14 @@ class Agent_model extends CI_Model {
     }
     // Tous les agents
     public function get_all_agents() {
-        return $this->wp_db->where('user_status', 0)->get('wp_Hrg8P_users')->result();
+        $this->wp_db->select('u.*')
+            ->from('wp_Hrg8P_users u')
+            ->join('wp_Hrg8P_usermeta m', 'u.ID = m.user_id')
+            ->where('m.meta_key', $this->wp_db->dbprefix('capabilities'))
+            ->like('m.meta_value', 'houzez_agent');
+        return $this->wp_db->get()->result();
     }
+
     // Agents d'une agence
     public function get_agents_by_agency($agency_id) {
         $this->wp_db->select('u.*')
@@ -20,8 +26,38 @@ class Agent_model extends CI_Model {
             ->where('m.meta_value', $agency_id);
         return $this->wp_db->get()->result();
     }
+
     // Un agent
     public function get_agent($agent_id) {
         return $this->wp_db->where('ID', $agent_id)->get('wp_Hrg8P_users')->row();
     }
+
+    // Créer un agent
+    public function create_agent($data) {
+        $this->wp_db->insert('wp_Hrg8P_users', $data);
+        return $this->wp_db->insert_id();
+    }
+
+    // Mettre à jour un agent
+    public function update_agent($agent_id, $data) {
+        $this->wp_db->where('ID', $agent_id);
+        return $this->wp_db->update('wp_Hrg8P_users', $data);
+    }
+
+    // Supprimer un agent
+    public function delete_agent($agent_id) {
+        $this->wp_db->where('ID', $agent_id);
+        return $this->wp_db->delete('wp_Hrg8P_users');
+    }
+
+    // Statistiques agent (exemple)
+    public function get_agent_stats($agent_id) {
+        // À adapter selon structure
+        return [
+            'leads' => 0,
+            'properties' => 0,
+            'sales' => 0
+        ];
+    }
+
 }
