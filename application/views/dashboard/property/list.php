@@ -36,10 +36,10 @@
                                     <tr>
                                         <td><?php echo $index + 1; ?></td>
                                         <td><?php echo htmlspecialchars($property->post_title); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_type); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_status); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_price); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_city); ?></td>
+                                        <td><?php echo isset($property->property_type) ? htmlspecialchars($property->property_type) : '-'; ?></td>
+                                        <td><?php echo isset($property->property_status) ? htmlspecialchars($property->property_status) : '-'; ?></td>
+                                        <td><?php echo isset($property->property_price) ? htmlspecialchars($property->property_price) : '-'; ?></td>
+                                        <td><?php echo isset($property->property_city) ? htmlspecialchars($property->property_city) : '-'; ?></td>
                                         <td><?php echo date('d/m/Y', strtotime($property->post_date)); ?></td>
                                         <td>
                                             <a href="<?php echo base_url('property/details/' . $property->ID); ?>" class="btn btn-sm btn-primary">
