@@ -13,7 +13,7 @@ class Property_model extends CI_Model {
         $this->wp_db->where('post_type', 'property');
         // Ajout des filtres ici si besoin
         return $this->wp_db->get()->result();
-    }
+    } 
     // Une propriété
     public function get_property($property_id) {
         return $this->wp_db->where('ID', $property_id)->get('wp_Hrg8P_posts')->row();
