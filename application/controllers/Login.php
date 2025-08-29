@@ -106,9 +106,9 @@ class Login extends CI_Controller {
                 $wp_db->where('user_id', $user->ID);
                 $meta = $wp_db->get('wp_Hrg8P_usermeta')->result();
 
-                $role = 'subscriber';
+                $role = '';
                 foreach ($meta as $m) {
-                    if ($m->meta_key == $wp_db->dbprefix('capabilities')) {
+                    if ($m->meta_key == $wp_db->dbprefix('wp_Hrg8P_capabilities')) {
                         $roles = maybe_unserialize($m->meta_value);
                         if (is_array($roles)) {
                             $role = key($roles);
