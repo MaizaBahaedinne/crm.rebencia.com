@@ -793,7 +793,7 @@
                         // Example: $role = 'super_admin' | 'agency_admin' | 'agent'
                         // You should set $role in your controller/session logic
 
-                        if ($role === 'admin') : ?>
+                        if ($role === 'adminstrator') : ?>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
                                     <i class="ri-dashboard-2-line"></i> <span>Tableau de bord global</span>
