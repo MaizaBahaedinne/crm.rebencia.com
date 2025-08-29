@@ -30,7 +30,7 @@
                                     <th>Adresse</th>
                                     <th>Site web</th>
                                     <th>Date d'inscription</th>
-                                    <th>Rôle</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,7 +44,11 @@
                                         <td><?php echo htmlspecialchars($agency->agency_address); ?></td>
                                         <td><?php echo htmlspecialchars($agency->agency_website); ?></td>
                                         <td><?php echo date('d/m/Y', strtotime($agency->user_registered)); ?></td>
-                                        <td>houzez_agency</td>
+                                        <td>
+                                            <a href="<?php echo base_url('agency/details/' . $agency->ID); ?>" class="btn btn-sm btn-primary">
+                                                <i class="mdi mdi-eye"></i> Détails
+                                            </a>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
