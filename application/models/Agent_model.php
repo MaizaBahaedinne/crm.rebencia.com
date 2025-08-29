@@ -9,9 +9,11 @@ class Agent_model extends CI_Model {
     }
     // Tous les agents
     public function get_all_agents() {
-        $this->wp_db->select('u.*')
+        $this->wp_db->select('u.*, agency_meta.meta_value as agency_name')
             ->from('wp_Hrg8P_users u')
             ->join('wp_Hrg8P_usermeta m', 'u.ID = m.user_id')
+            ->join('wp_Hrg8P_usermeta agency_id_meta', 'u.ID = agency_id_meta.user_id AND agency_id_meta.meta_key = "houzez_agency_id"', 'left')
+            ->join('wp_Hrg8P_postmeta agency_meta', 'agency_id_meta.meta_value = agency_meta.post_id AND agency_meta.meta_key = "fave_agency_name"', 'left')
             ->where('m.meta_key', $this->wp_db->dbprefix('wp_Hrg8P_capabilities'))
             ->like('m.meta_value', 'houzez_agent');
         return $this->wp_db->get()->result();
