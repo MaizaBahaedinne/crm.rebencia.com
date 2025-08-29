@@ -14,12 +14,15 @@ class Transaction extends BaseController {
     }
 
     public function index() {
+        $this->isLoggedIn();
         $this->loadViews('transactions/list',  $this->global, NULL, NULL);
     }
     public function sales() {
+        $this->isLoggedIn();
         $this->loadViews('transactions/sales',  $this->global, NULL, NULL);
     }
     public function rentals() {
+        $this->isLoggedIn();
         $this->loadViews('transactions/rentals',  $this->global, NULL, NULL);
     }
 }
