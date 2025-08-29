@@ -13,13 +13,14 @@ class Property_model extends CI_Model {
         $this->wp_db->where('post_type', 'property');
         $this->wp_db->where('post_status', 'publish');
 
-        // Ajout des filtres dynamiques selon la structure Houzez
         if (!empty($filters)) {
+            $i = 0;
             foreach ($filters as $key => $value) {
-                // Exemple: filtre par meta_key (ACF ou meta Houzez)
-                $this->wp_db->join('wp_Hrg8P_postmeta as pm_' . $key, 'wp_posts.ID = pm_' . $key . '.post_id', 'left');
-                $this->wp_db->where('pm_' . $key . '.meta_key', $key);
-                $this->wp_db->where('pm_' . $key . '.meta_value', $value);
+                $alias = 'pm_' . $i;
+                $this->wp_db->join("wp_Hrg8P_postmeta as $alias", "wp_Hrg8P_posts.ID = $alias.post_id", 'left');
+                $this->wp_db->where("$alias.meta_key", $key);
+                $this->wp_db->where("$alias.meta_value", $value);
+                $i++;
             }
         }
 

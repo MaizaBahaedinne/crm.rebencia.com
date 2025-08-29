@@ -21,33 +21,33 @@
                         <table id="propertiesTable" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Titre</th>
-                                    <th>Type</th>
-                                    <th>Statut</th>
-                                    <th>Prix</th>
-                                    <th>Ville</th>
-                                    <th>Date de création</th>
-                                    <th>Action</th>
+                                    <th>meta_id</th>
+                                    <th>post_id</th>
+                                    <th>meta_key</th>
+                                    <th>meta_value</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($properties as $index => $property) : ?>
+                                <?php foreach ($properties as $meta) : ?>
                                     <tr>
-                                        <td><?php echo $index + 1; ?></td>
-                                        <td><?php echo htmlspecialchars($property->post_title); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_type); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_status); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_price); ?></td>
-                                        <td><?php echo htmlspecialchars($property->property_city); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($property->post_date)); ?></td>
+                                        <td><?php echo htmlspecialchars($meta->meta_id); ?></td>
+                                        <td><?php echo htmlspecialchars($meta->post_id); ?></td>
+                                        <td><?php echo htmlspecialchars($meta->meta_key); ?></td>
+                                        <td><?php echo htmlspecialchars($meta->meta_value); ?></td>
                                         <td>
-                                            <a href="<?php echo base_url('property/details/' . $property->ID); ?>" class="btn btn-sm btn-primary">
-                                                <i class="mdi mdi-eye"></i> Détails
-                                            </a>
+                                            <a href="<?php echo base_url('property/edit_meta/' . $meta->meta_id); ?>" class="btn btn-sm btn-warning">Éditer</a>
+                                            <a href="#" onclick="copyMeta('<?php echo addslashes($meta->meta_value); ?>')" class="btn btn-sm btn-info">Copier</a>
+                                            <a href="<?php echo base_url('property/delete_meta/' . $meta->meta_id); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette métadonnée ?');">Supprimer</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
+                                <script>
+                                function copyMeta(value) {
+                                    navigator.clipboard.writeText(value);
+                                    alert('Valeur copiée !');
+                                }
+                                </script>
                             </tbody>
                         </table>
                     </div>
