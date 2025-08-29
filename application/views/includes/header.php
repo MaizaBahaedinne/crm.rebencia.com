@@ -789,22 +789,232 @@
                     </div>
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Tableaux de board</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarDashboards">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="<?php echo base_url(); ?>" class="nav-link"><span data-key="t-blog">Tableau de board</span> </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li> <!-- end Dashboard Menu -->
-                        
+                        <?php
+                        // Example: $role = 'super_admin' | 'agency_admin' | 'agent'
+                        // You should set $role in your controller/session logic
 
-                        
-
+                        if ($role === 'super_admin') : ?>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
+                                    <i class="ri-dashboard-2-line"></i> <span>Tableau de bord global</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Agences</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agencies'); ?>">
+                                    <i class="ri-building-line"></i> <span>Liste des agences</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agencies/create'); ?>">
+                                    <i class="ri-add-line"></i> <span>Créer une agence</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agencies/stats'); ?>">
+                                    <i class="ri-bar-chart-line"></i> <span>Statistiques agences</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Agents</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agents'); ?>">
+                                    <i class="ri-user-3-line"></i> <span>Liste des agents</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agents/create'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Créer un agent</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agents/performance'); ?>">
+                                    <i class="ri-trophy-line"></i> <span>Performance agents</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Propriétés</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
+                                    <i class="ri-home-4-line"></i> <span>Liste des propriétés</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
+                                    <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties/status'); ?>">
+                                    <i class="ri-information-line"></i> <span>Statut (disponible, vendu, loué)</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Leads / Clients</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
+                                    <i class="ri-user-search-line"></i> <span>Liste des leads</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads/conversion'); ?>">
+                                    <i class="ri-exchange-line"></i> <span>Conversion & suivi</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Transactions</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/sales'); ?>">
+                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/rentals'); ?>">
+                                    <i class="ri-key-2-line"></i> <span>Locations</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Rapports & Analytics</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('reports/sales'); ?>">
+                                    <i class="ri-bar-chart-grouped-line"></i> <span>Ventes globales</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('reports/leads'); ?>">
+                                    <i class="ri-user-star-line"></i> <span>Leads globales</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('reports/agency-performance'); ?>">
+                                    <i class="ri-building-2-line"></i> <span>Performance par agence</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Paramètres</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('settings/roles'); ?>">
+                                    <i class="ri-shield-user-line"></i> <span>Gestion des rôles</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('settings/wordpress'); ?>">
+                                    <i class="ri-wordpress-line"></i> <span>Connexion WordPress</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('settings/crm'); ?>">
+                                    <i class="ri-settings-3-line"></i> <span>Config CRM</span>
+                                </a>
+                            </li>
+                        <?php elseif ($role === 'agency_admin') : ?>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
+                                    <i class="ri-dashboard-2-line"></i> <span>Tableau de bord agence</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Mon agence</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agency/info'); ?>">
+                                    <i class="ri-building-line"></i> <span>Infos agence</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agency/agents'); ?>">
+                                    <i class="ri-user-3-line"></i> <span>Agents de l’agence</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Agents</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agents'); ?>">
+                                    <i class="ri-user-3-line"></i> <span>Liste agents</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agents/performance'); ?>">
+                                    <i class="ri-trophy-line"></i> <span>Performance agents</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Propriétés</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
+                                    <i class="ri-home-4-line"></i> <span>Mes propriétés</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
+                                    <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Leads</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
+                                    <i class="ri-user-search-line"></i> <span>Leads assignés</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads/followup'); ?>">
+                                    <i class="ri-exchange-line"></i> <span>Suivi des prospects</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Transactions</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/sales'); ?>">
+                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes agence</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/rentals'); ?>">
+                                    <i class="ri-key-2-line"></i> <span>Locations agence</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Rapports agence</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('reports/agency'); ?>">
+                                    <i class="ri-bar-chart-grouped-line"></i> <span>Rapports agence</span>
+                                </a>
+                            </li>
+                        <?php elseif ($role === 'agent') : ?>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
+                                    <i class="ri-dashboard-2-line"></i> <span>Mon tableau de bord</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Mes propriétés</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
+                                    <i class="ri-home-4-line"></i> <span>Propriétés listées</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
+                                    <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Mes leads</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
+                                    <i class="ri-user-search-line"></i> <span>Leads assignés</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads/status'); ?>">
+                                    <i class="ri-exchange-line"></i> <span>Statut suivi</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Mes ventes & locations</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions'); ?>">
+                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes & Locations</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Mon profil</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('profile'); ?>">
+                                    <i class="ri-user-settings-line"></i> <span>Infos perso</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('profile/avatar'); ?>">
+                                    <i class="ri-image-edit-line"></i> <span>Avatar / Contact</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    
                     </ul>
                 </div>
                 <!-- Sidebar -->
