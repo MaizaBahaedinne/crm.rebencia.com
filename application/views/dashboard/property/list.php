@@ -16,7 +16,53 @@
             </div>
             <div class="card mt-4">
                 <div class="card-body">
-                    <p>Affichage de la liste des propriétés ici.</p>
+                    <?php if (!empty($properties)) : ?>
+                    <div class="table-responsive">
+                        <table id="propertiesTable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Titre</th>
+                                    <th>Type</th>
+                                    <th>Statut</th>
+                                    <th>Prix</th>
+                                    <th>Ville</th>
+                                    <th>Date de création</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($properties as $index => $property) : ?>
+                                    <tr>
+                                        <td><?php echo $index + 1; ?></td>
+                                        <td><?php echo htmlspecialchars($property->post_title); ?></td>
+                                        <td><?php echo htmlspecialchars($property->property_type); ?></td>
+                                        <td><?php echo htmlspecialchars($property->property_status); ?></td>
+                                        <td><?php echo htmlspecialchars($property->property_price); ?></td>
+                                        <td><?php echo htmlspecialchars($property->property_city); ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($property->post_date)); ?></td>
+                                        <td>
+                                            <a href="<?php echo base_url('property/details/' . $property->ID); ?>" class="btn btn-sm btn-primary">
+                                                <i class="mdi mdi-eye"></i> Détails
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#propertiesTable').DataTable({
+                                "language": {
+                                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json"
+                                }
+                            });
+                        });
+                    </script>
+                    <?php else : ?>
+                        <div class="alert alert-info">Aucune propriété trouvée.</div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
