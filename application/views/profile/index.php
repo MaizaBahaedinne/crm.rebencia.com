@@ -17,10 +17,10 @@
                             <!--end col-->
                             <div class="col">
                                 <div class="p-2">
-                                    <h3 class="text-white mb-1"><?php echo h($u['name']); ?></h3>
+                                    <h3 class="text-white mb-1"><?php echo $u['name']; ?></h3>
                                     <p class="text-white text-opacity-75">Owner & Founder</p>
                                     <div class="hstack text-white-50 gap-1">
-                                        <div class="me-2"><i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i><?php echo h($u['location']); ?></div>
+                                        <div class="me-2"><i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i><?php echo $u['location']; ?></div>
                                         <div>
                                             <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>Themesbrand
                                         </div>
@@ -105,19 +105,19 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Nom complet :</th>
-                                                                        <td class="text-muted"><?php echo h($u['name']); ?></td>
+                                                                        <td class="text-muted"><?php echo $u['name']; ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Mobile :</th>
-                                                                        <td class="text-muted"><?php echo h($u['mobile'] ?: $u['phone']); ?></td>
+                                                                        <td class="text-muted"><?php echo ($u['mobile'] ?: $u['phone']); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">E-mail :</th>
-                                                                        <td class="text-muted"><?php echo h($u['email']); ?></td>
+                                                                        <td class="text-muted"><?php echo $u['email']; ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Localisation :</th>
-                                                                        <td class="text-muted"><?php echo h($u['location']); ?>
+                                                                        <td class="text-muted"><?php echo $u['location']; ?>
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -312,7 +312,7 @@
                                                 <div class="card">
                                                     <div class="card-body">
                                                         <h5 class="card-title mb-3">About</h5>
-                                                        <p><?php echo h($u['bio'] ?: ""); ?></p>
+                                                        <p><?php echo ($u['bio'] ?: ""); ?></p>
                                                         <p>You always want to make sure that your fonts work well together and try to limit the number of fonts you use to three or less. Experiment and play around with the fonts that you already have in the software you’re working with reputable font websites. This may be the most commonly encountered tip I received from the designers I spoke with. They highly encourage that you use different fonts in one design, but do not over-exaggerate and go overboard.</p>
                                                         <div class="row">
                                                             <div class="col-6 col-md-4">
