@@ -18,7 +18,22 @@ class Agent extends BaseController {
 
     public function json() {
         $this->isLoggedIn();
-        $agents = $this->agent_model->get_all_agents();
+        $raw_agents = $this->agent_model->get_all_agents();
+        $agents = array_map(function($e) {
+            return [
+            'id' => $e->id,
+            'coverImg' => $e->coverImg ?? null,
+            'bookmark' => $e->bookmark ?? null,
+            'memberImg' => $e->memberImg ?? null,
+            'nickname' => $e->nickname ?? null,
+            'memberName' => $e->memberName ?? null,
+            'position' => $e->position ?? null,
+            'projects' => $this->input->post('project-input'),
+            'tasks' => $this->input->post('task-input'),
+            ];
+        }, $raw_agents);
+
+
         $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode($agents));

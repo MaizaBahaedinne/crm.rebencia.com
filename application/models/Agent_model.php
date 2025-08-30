@@ -11,6 +11,7 @@ class Agent_model extends CI_Model {
     public function get_all_agents() {
         return $this->wp_db->get('crm_agents')->result();
     }
+    
 
     // Agents d'une agence
     public function get_agents_by_agency($agency_id) {
