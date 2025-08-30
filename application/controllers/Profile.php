@@ -6,6 +6,7 @@ require APPPATH . '/libraries/BaseController.php';
 
 /**
  * @property User_model $user_model
+ * @property CI_Session $session
  */
 class Profile extends BaseController {
     
@@ -20,6 +21,7 @@ class Profile extends BaseController {
 
     public function index() {
         $this->isLoggedIn();
+    if(!isset($this->session)) { $this->load->library('session'); }
         // Récupération via vue optimisée si disponible
         $profile = $this->user_model->get_wp_user_profile($this->vendorId);
         if($profile){
@@ -41,7 +43,31 @@ class Profile extends BaseController {
                 ]
             ];
         } else {
-            $data['user'] = (array)$this->user_model->get_wp_user($this->vendorId);
+            $fallback = $this->user_model->get_wp_user($this->vendorId);
+            if($fallback){
+                $data['user'] = [
+                    'id' => $fallback->user_id ?? $this->vendorId,
+                    'login' => $fallback->user_login ?? '',
+                    'email' => $fallback->user_email ?? '',
+                    'name' => $fallback->display_name ?? ($fallback->user_login ?? ''),
+                    'roles' => isset($fallback->roles)? $fallback->roles : [],
+                    'mobile' => '',
+                    'location' => '',
+                    'joining_date' => isset($fallback->user_registered)? date('d/m/Y', strtotime($fallback->user_registered)) : '',
+                    'agence' => '',
+                    'avatar' => base_url('assets/images/users/avatar-1.jpg'),
+                    'meta' => [ 'biography' => '', 'description' => '' ]
+                ];
+            } else {
+                $data['user'] = [
+                    'id' => $this->vendorId,
+                    'login' => '', 'email' => '', 'name' => '', 'roles' => [],
+                    'mobile' => '', 'location' => '', 'joining_date' => '', 'agence' => '',
+                    'avatar' => base_url('assets/images/users/avatar-1.jpg'),
+                    'meta' => ['biography'=>'','description'=>'']
+                ];
+                $this->session->set_flashdata('error', 'Profil introuvable dans la base WordPress.');
+            }
         }
 
         $this->loadViews('profile/index', $this->global, $data, NULL);

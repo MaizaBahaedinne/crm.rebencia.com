@@ -9,403 +9,242 @@
  */
 class User_model extends CI_Model
 {
-    /** @var CI_DB_query_builder|null */
-    protected $wp_db = null;
-    /**
-     * This function is used to get the user listing count
-     * @param string $searchText : This is optional search text
-     * @return number $count : This is row count
-     */
-    function userListingCount($searchText)
-    {
-        $this->db->select('BaseTbl.userId, BaseTbl.email, BaseTbl.name, BaseTbl.mobile, BaseTbl.isAdmin, BaseTbl.createdDtm, Role.role');
-        $this->db->from('tbl_users as BaseTbl');
-        $this->db->join('tbl_roles as Role', 'Role.roleId = BaseTbl.roleId','left');
-        if(!empty($searchText)) {
-            $likeCriteria = "(BaseTbl.email  LIKE '%".$searchText."%'
-                            OR  BaseTbl.name  LIKE '%".$searchText."%'
-                            OR  BaseTbl.mobile  LIKE '%".$searchText."%')";
-            $this->db->where($likeCriteria);
-        }
-        $this->db->where('BaseTbl.isDeleted', 0);
-        // $this->db->where('BaseTbl.roleId !=', 1);
-        $query = $this->db->get();
-        
-        return $query->num_rows();
-    }
-    
-    /**
-     * This function is used to get the user listing count
-     * @param string $searchText : This is optional search text
-     * @param number $page : This is pagination offset
-     * @param number $segment : This is pagination limit
-     * @return array $result : This is result
-     */
-    function userListing($searchText, $page, $segment)
-    {
-        $this->db->select('BaseTbl.userId, BaseTbl.email, BaseTbl.name, BaseTbl.mobile, BaseTbl.isAdmin, BaseTbl.createdDtm, 
-        Role.role, Role.status as roleStatus');
-        $this->db->from('tbl_users as BaseTbl');
-        $this->db->join('tbl_roles as Role', 'Role.roleId = BaseTbl.roleId','left');
-        if(!empty($searchText)) {
-            $likeCriteria = "(BaseTbl.email  LIKE '%".$searchText."%'
-                            OR  BaseTbl.name  LIKE '%".$searchText."%'
-                            OR  BaseTbl.mobile  LIKE '%".$searchText."%')";
-            $this->db->where($likeCriteria);
-        }
-        $this->db->where('BaseTbl.isDeleted', 0);
-        // $this->db->where('BaseTbl.roleId !=', 1);
-        $this->db->order_by('BaseTbl.userId', 'DESC');
-        $this->db->limit($page, $segment);
-        $query = $this->db->get();
-        
-        $result = $query->result();        
-        return $result;
-    }
-    
-    /**
-     * This function is used to get the user roles information
-     * @return array $result : This is result of the query
-     */
-    function getUserRoles()
-    {
-        $this->db->select('roleId, role, status as roleStatus');
-        $this->db->from('tbl_roles');
-        $query = $this->db->get();
-        
-        return $query->result();
-    }
+	/** @var CI_DB_query_builder|null */
+	protected $wp_db = null;
 
-    /**
-     * This function is used to check whether email id is already exist or not
-     * @param {string} $email : This is email id
-     * @param {number} $userId : This is user id
-     * @return {mixed} $result : This is searched result
-     */
-    function checkEmailExists($email, $userId = 0)
-    {
-        $this->db->select("email");
-        $this->db->from("tbl_users");
-        $this->db->where("email", $email);   
-        $this->db->where("isDeleted", 0);
-        if($userId != 0){
-            $this->db->where("userId !=", $userId);
-        }
-        $query = $this->db->get();
+	/* ===================== UTILISATEURS APP ===================== */
 
-        return $query->result();
-    }
-    
-    
-    /**
-     * This function is used to add new user to system
-     * @return number $insert_id : This is last inserted id
-     */
-    function addNewUser($userInfo)
-    {
-        $this->db->trans_start();
-        $this->db->insert('tbl_users', $userInfo);
-        
-        $insert_id = $this->db->insert_id();
-        
-        $this->db->trans_complete();
-        
-        return $insert_id;
-    }
-    
-    /**
-     * This function used to get user information by id
-     * @param number $userId : This is user id
-     * @return array $result : This is user information
-     */
-    function getUserInfo($userId)
-    {
-        $this->db->select('userId, name, email, mobile, isAdmin, roleId');
-        $this->db->from('tbl_users');
-        $this->db->where('isDeleted', 0);
-        $this->db->where('userId', $userId);
-        $query = $this->db->get();
-        
-        return $query->row();
-    }
-    
-    
-    /**
-     * This function is used to update the user information
-     * @param array $userInfo : This is users updated information
-     * @param number $userId : This is user id
-     */
-    function editUser($userInfo, $userId)
-    {
-        $this->db->where('userId', $userId);
-        $this->db->update('tbl_users', $userInfo);
-        
-        return TRUE;
-    }
-    
-    
-    
-    /**
-     * This function is used to delete the user information
-     * @param number $userId : This is user id
-     * @return boolean $result : TRUE / FALSE
-     */
-    function deleteUser($userId, $userInfo)
-    {
-        $this->db->where('userId', $userId);
-        $this->db->update('tbl_users', $userInfo);
-        
-        return $this->db->affected_rows();
-    }
+	function userListingCount($searchText)
+	{
+		$this->db->select('BaseTbl.userId, BaseTbl.email, BaseTbl.name, BaseTbl.mobile, BaseTbl.isAdmin, BaseTbl.createdDtm, Role.role');
+		$this->db->from('tbl_users as BaseTbl');
+		$this->db->join('tbl_roles as Role', 'Role.roleId = BaseTbl.roleId','left');
+		if(!empty($searchText)) {
+			$likeCriteria = "(BaseTbl.email  LIKE '%".$searchText."%' OR  BaseTbl.name  LIKE '%".$searchText."%' OR  BaseTbl.mobile  LIKE '%".$searchText."%')";
+			$this->db->where($likeCriteria);
+		}
+		$this->db->where('BaseTbl.isDeleted', 0);
+		$query = $this->db->get();
+		return $query->num_rows();
+	}
 
+	function userListing($searchText, $page, $segment)
+	{
+		$this->db->select('BaseTbl.userId, BaseTbl.email, BaseTbl.name, BaseTbl.mobile, BaseTbl.isAdmin, BaseTbl.createdDtm, Role.role, Role.status as roleStatus');
+		$this->db->from('tbl_users as BaseTbl');
+		$this->db->join('tbl_roles as Role', 'Role.roleId = BaseTbl.roleId','left');
+		if(!empty($searchText)) {
+			$likeCriteria = "(BaseTbl.email  LIKE '%".$searchText."%' OR  BaseTbl.name  LIKE '%".$searchText."%' OR  BaseTbl.mobile  LIKE '%".$searchText."%')";
+			$this->db->where($likeCriteria);
+		}
+		$this->db->where('BaseTbl.isDeleted', 0);
+		$this->db->order_by('BaseTbl.userId', 'DESC');
+		$this->db->limit($page, $segment);
+		return $this->db->get()->result();
+	}
 
-    /**
-     * This function is used to match users password for change password
-     * @param number $userId : This is user id
-     */
-    function matchOldPassword($userId, $oldPassword)
-    {
-        $this->db->select('userId, password');
-        $this->db->where('userId', $userId);        
-        $this->db->where('isDeleted', 0);
-        $query = $this->db->get('tbl_users');
-        
-        $user = $query->result();
+	function getUserRoles()
+	{
+		$this->db->select('roleId, role, status as roleStatus');
+		$this->db->from('tbl_roles');
+		return $this->db->get()->result();
+	}
 
-        if(!empty($user)){
-            if(verifyHashedPassword($oldPassword, $user[0]->password)){
-                return $user;
-            } else {
-                return array();
-            }
-        } else {
-            return array();
-        }
-    }
-    
-    /**
-     * This function is used to change users password
-     * @param number $userId : This is user id
-     * @param array $userInfo : This is user updation info
-     */
-    function changePassword($userId, $userInfo)
-    {
-        $this->db->where('userId', $userId);
-        $this->db->where('isDeleted', 0);
-        $this->db->update('tbl_users', $userInfo);
-        
-        return $this->db->affected_rows();
-    }
+	function checkEmailExists($email, $userId = 0)
+	{
+		$this->db->select('email');
+		$this->db->from('tbl_users');
+		$this->db->where('email', $email);
+		$this->db->where('isDeleted', 0);
+		if($userId != 0){ $this->db->where('userId !=', $userId); }
+		return $this->db->get()->result();
+	}
 
+	function addNewUser($userInfo)
+	{
+		$this->db->trans_start();
+		$this->db->insert('tbl_users', $userInfo);
+		$insert_id = $this->db->insert_id();
+		$this->db->trans_complete();
+		return $insert_id;
+	}
 
-    /**
-     * This function is used to get user login history
-     * @param number $userId : This is user id
-     */
-    function loginHistoryCount($userId, $searchText, $fromDate, $toDate)
-    {
-        $this->db->select('BaseTbl.userId, BaseTbl.sessionData, BaseTbl.machineIp, BaseTbl.userAgent, BaseTbl.agentString, BaseTbl.platform, BaseTbl.createdDtm');
-        if(!empty($searchText)) {
-            $likeCriteria = "(BaseTbl.sessionData LIKE '%".$searchText."%')";
-            $this->db->where($likeCriteria);
-        }
-        if(!empty($fromDate)) {
-            $likeCriteria = "DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d' ) >= '".date('Y-m-d', strtotime($fromDate))."'";
-            $this->db->where($likeCriteria);
-        }
-        if(!empty($toDate)) {
-            $likeCriteria = "DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d' ) <= '".date('Y-m-d', strtotime($toDate))."'";
-            $this->db->where($likeCriteria);
-        }
-        if($userId >= 1){
-            $this->db->where('BaseTbl.userId', $userId);
-        }
-        $this->db->from('tbl_last_login as BaseTbl');
-        $query = $this->db->get();
-        
-        return $query->num_rows();
-    }
+	function getUserInfo($userId)
+	{
+		$this->db->select('userId, name, email, mobile, isAdmin, roleId');
+		$this->db->from('tbl_users');
+		$this->db->where('isDeleted', 0);
+		$this->db->where('userId', $userId);
+		return $this->db->get()->row();
+	}
 
-    /**
-     * This function is used to get user login history
-     * @param number $userId : This is user id
-     * @param number $page : This is pagination offset
-     * @param number $segment : This is pagination limit
-     * @return array $result : This is result
-     */
-    function loginHistory($userId, $searchText, $fromDate, $toDate, $page, $segment)
-    {
-        $this->db->select('BaseTbl.userId, BaseTbl.sessionData, BaseTbl.machineIp, BaseTbl.userAgent, BaseTbl.agentString, BaseTbl.platform, BaseTbl.createdDtm');
-        $this->db->from('tbl_last_login as BaseTbl');
-        if(!empty($searchText)) {
-            $likeCriteria = "(BaseTbl.sessionData  LIKE '%".$searchText."%')";
-            $this->db->where($likeCriteria);
-        }
-        if(!empty($fromDate)) {
-            $likeCriteria = "DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d' ) >= '".date('Y-m-d', strtotime($fromDate))."'";
-            $this->db->where($likeCriteria);
-        }
-        if(!empty($toDate)) {
-            $likeCriteria = "DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d' ) <= '".date('Y-m-d', strtotime($toDate))."'";
-            $this->db->where($likeCriteria);
-        }
-        if($userId >= 1){
-            $this->db->where('BaseTbl.userId', $userId);
-        }
-        $this->db->order_by('BaseTbl.id', 'DESC');
-        $this->db->limit($page, $segment);
-        $query = $this->db->get();
-        
-        $result = $query->result();        
-        return $result;
-    }
+	function editUser($userInfo, $userId)
+	{
+		$this->db->where('userId', $userId)->update('tbl_users', $userInfo);
+		return true;
+	}
 
-    /**
-     * This function used to get user information by id
-     * @param number $userId : This is user id
-     * @return array $result : This is user information
-     */
-    function getUserInfoById($userId)
-    {
-        $this->db->select('userId, name, email, mobile, roleId');
-        $this->db->from('tbl_users');
-        $this->db->where('isDeleted', 0);
-        $this->db->where('userId', $userId);
-        $query = $this->db->get();
-        
-        return $query->row();
-    }
+	function deleteUser($userId, $userInfo)
+	{
+		$this->db->where('userId', $userId)->update('tbl_users', $userInfo);
+		return $this->db->affected_rows();
+	}
 
-    /**
-     * This function used to get user information by id with role
-     * @param number $userId : This is user id
-     * @return aray $result : This is user information
-     */
-    function getUserInfoWithRole($userId)
-    {
-        $this->db->select('BaseTbl.userId, BaseTbl.email, BaseTbl.name, BaseTbl.mobile, BaseTbl.isAdmin, BaseTbl.roleId, Roles.role');
-        $this->db->from('tbl_users as BaseTbl');
-        $this->db->join('tbl_roles as Roles','Roles.roleId = BaseTbl.roleId');
-        $this->db->where('BaseTbl.userId', $userId);
-        $this->db->where('BaseTbl.isDeleted', 0);
-        $query = $this->db->get();
-        
-        return $query->row();
-    }
+	function matchOldPassword($userId, $oldPassword)
+	{
+		$this->db->select('userId, password');
+		$this->db->where('userId', $userId);
+		$this->db->where('isDeleted', 0);
+		$user = $this->db->get('tbl_users')->result();
+		if(!empty($user) && verifyHashedPassword($oldPassword, $user[0]->password)) return $user; 
+		return [];
+	}
 
+	function changePassword($userId, $userInfo)
+	{
+		$this->db->where('userId', $userId)->where('isDeleted', 0)->update('tbl_users', $userInfo);
+		return $this->db->affected_rows();
+	}
 
-    /**
-     * Get a WordPress Houzez user profile from the v_users_profile view
-     * @param int $user_id
-     * @return object|null
-     */
-    function get_wp_user($user_id)
-    {
-        // Connect to WordPress DB (config database.php => group 'wordpress')
-        $this->wp_db = $this->load->database('wordpress', TRUE);
-        $db = $this->wp_db;
+	function loginHistoryCount($userId, $searchText, $fromDate, $toDate)
+	{
+		$this->db->select('BaseTbl.userId, BaseTbl.sessionData, BaseTbl.machineIp, BaseTbl.userAgent, BaseTbl.agentString, BaseTbl.platform, BaseTbl.createdDtm');
+		if(!empty($searchText)) $this->db->where("(BaseTbl.sessionData LIKE '%".$searchText."%')");
+		if(!empty($fromDate)) $this->db->where("DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d') >=", date('Y-m-d', strtotime($fromDate)));
+		if(!empty($toDate)) $this->db->where("DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d') <=", date('Y-m-d', strtotime($toDate)));
+		if($userId >= 1) $this->db->where('BaseTbl.userId', $userId);
+		$this->db->from('tbl_last_login as BaseTbl');
+		return $this->db->get()->num_rows();
+	}
 
-        $db->select('*');
-        $db->from('v_users_profile');
-        $db->where('user_id', $user_id);
-        $query = $db->get();
+	function loginHistory($userId, $searchText, $fromDate, $toDate, $page, $segment)
+	{
+		$this->db->select('BaseTbl.userId, BaseTbl.sessionData, BaseTbl.machineIp, BaseTbl.userAgent, BaseTbl.agentString, BaseTbl.platform, BaseTbl.createdDtm');
+		$this->db->from('tbl_last_login as BaseTbl');
+		if(!empty($searchText)) $this->db->where("(BaseTbl.sessionData LIKE '%".$searchText."%')");
+		if(!empty($fromDate)) $this->db->where("DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d') >=", date('Y-m-d', strtotime($fromDate)));
+		if(!empty($toDate)) $this->db->where("DATE_FORMAT(BaseTbl.createdDtm, '%Y-%m-%d') <=", date('Y-m-d', strtotime($toDate)));
+		if($userId >= 1) $this->db->where('BaseTbl.userId', $userId);
+		$this->db->order_by('BaseTbl.id', 'DESC')->limit($page, $segment);
+		return $this->db->get()->result();
+	}
 
-        if ($query->num_rows() == 0) {
-            return null;
-        }
+	function getUserInfoById($userId)
+	{
+		$this->db->select('userId, name, email, mobile, roleId');
+		$this->db->from('tbl_users');
+		$this->db->where('isDeleted', 0)->where('userId', $userId);
+		return $this->db->get()->row();
+	}
 
-        $user = $query->row();
+	function getUserInfoWithRole($userId)
+	{
+		$this->db->select('BaseTbl.userId, BaseTbl.email, BaseTbl.name, BaseTbl.mobile, BaseTbl.isAdmin, BaseTbl.roleId, Roles.role');
+		$this->db->from('tbl_users as BaseTbl');
+		$this->db->join('tbl_roles as Roles','Roles.roleId = BaseTbl.roleId');
+		$this->db->where('BaseTbl.userId', $userId)->where('BaseTbl.isDeleted', 0);
+		return $this->db->get()->row();
+	}
 
-        // Optionally decode role_json if needed
-        if (!empty($user->role_json)) {
-            $capabilities = @unserialize($user->role_json);
-            if (is_array($capabilities)) {
-                $user->roles = array_keys(array_filter($capabilities));
-            } else {
-                $user->roles = [];
-            }
-        } else {
-            $user->roles = [];
-        }
+	/* ===================== PROFIL WORDPRESS ===================== */
 
-        return $user;
-    }
+	function get_wp_user($user_id)
+	{
+		$this->wp_db = $this->load->database('wordpress', TRUE);
+		$db = $this->wp_db;
+		if(method_exists($db,'table_exists') && !$db->table_exists('v_users_profile')) return null;
+		$db->select('*')->from('v_users_profile')->where('user_id', (int)$user_id);
+		$query = $db->get();
+		if($query->num_rows()==0) return null;
+		$user = $query->row();
+		// Roles via role_json/capabilities
+		$raw = $user->role_json ?? ($user->capabilities ?? '');
+		$user->roles = [];
+		if($raw){
+			$uns = @unserialize($raw);
+			if(is_array($uns)) $user->roles = array_keys(array_filter($uns));
+		}
+		return $user;
+	}
 
-    /**
-     * Récupère le profil utilisateur complet via la vue SQL v_users_profile (si disponible)
-     * @param int $user_id
-     * @return array|null
-     */
-    function get_wp_user_profile($user_id)
-    {
-        $db = $this->load->database('wordpress', TRUE);
-        // Construction requête avec fallback sur différentes colonnes id
-        $db->from('v_users_profile');
-        $db->group_start()
-            ->where('user_id', (int)$user_id)
-            ->or_where('ID', (int)$user_id)
-            ->group_end();
-        $query = $db->get();
-        if(!$query || $query->num_rows()===0) return null;
-        $row = $query->row_array();
+	/**
+	 * Récupère le profil via la vue agrégée (assume nom: v_users_profile)
+	 * Vue attendue (exemple colonnes): user_id,user_login,user_email,user_registered,user_status,first_name,last_name,nickname,capabilities
+	 */
+	function get_wp_user_profile($user_id)
+	{
+		$db = $this->load->database('wordpress', TRUE);
+		$view = 'v_users_profile';
+		if(method_exists($db,'table_exists') && !$db->table_exists($view)) return null;
+		$q = $db->get_where($view, ['user_id' => (int)$user_id]);
+		if(!$q || $q->num_rows()==0) return null;
+		$r = $q->row_array();
+		$roles = [];
+		$raw = $r['capabilities'] ?? '';
+		if($raw){
+			$uns = @unserialize($raw);
+			if(is_array($uns)) {
+				$roles = array_keys(array_filter($uns));
+			} else {
+				$json = json_decode($raw, true);
+				if(is_array($json)) $roles = array_keys(array_filter($json));
+			}
+		}
+		$first = $r['first_name'] ?? '';
+		$last = $r['last_name'] ?? '';
+		$nickname = $r['nickname'] ?? '';
+		$display = trim($first.' '.$last);
+		if($display==='') $display = $nickname ?: ($r['user_login'] ?? '');
+		$profile = [
+			'id' => (int)$r['user_id'],
+			'login' => $r['user_login'] ?? '',
+			'email' => $r['user_email'] ?? '',
+			'registration_date' => $r['user_registered'] ?? '',
+			'status' => $r['user_status'] ?? '',
+			'first_name' => $first,
+			'last_name' => $last,
+			'nickname' => $nickname,
+			'display_name' => $display,
+			'biography' => '',
+			'description' => '',
+			'phone' => '',
+			'mobile' => '',
+			'whatsapp' => '',
+			'skype' => '',
+			'agency_id' => '',
+			'agency_name' => '',
+			'agency_user_id' => '',
+			'roles' => $roles
+		];
 
-        // Helpers fallback
-        $val = function(array $r, $keys, $default=''){ foreach((array)$keys as $k){ if(isset($r[$k]) && $r[$k] !== '') return $r[$k]; } return $default; };
-
-        $id = (int)($row['user_id'] ?? $row['ID'] ?? 0);
-        $login = $val($row, ['identifiant','user_login','login']);
-        $email = $val($row, ['email','user_email']);
-        $registration_date = $val($row, ['registration_date','user_registered']);
-        $status = $val($row, ['user_status','status']);
-        $first_name = $val($row, ['first_name']);
-        $last_name = $val($row, ['last_name']);
-        $nickname = $val($row, ['nickname']);
-        $display_name = $val($row, ['display_name', 'nickname', 'identifiant','user_login']);
-        $biography = $val($row, ['biography','description']);
-        $phone = $val($row, ['phone','houzez_phone','mobile']);
-        $mobile = $val($row, ['mobile','houzez_mobile','phone','houzez_phone']);
-        $whatsapp = $val($row, ['whatsapp','houzez_whatsapp']);
-        $skype = $val($row, ['skype']);
-        $agency_id = $val($row, ['agency_id']);
-        $agency_name = $val($row, ['agency_name','agency_title']);
-        $agency_user_id = $val($row, ['agency_user_id']);
-
-        // Rôles: le champ peut être role_json ou wp_capabilities
-        $rolesRaw = $val($row, ['role_json','wp_capabilities']);
-        $roles = [];
-        if($rolesRaw){
-            $unser = @unserialize($rolesRaw);
-            if(is_array($unser)) {
-                $roles = array_keys(array_filter($unser));
-            } else {
-                $json = json_decode($rolesRaw, true);
-                if(is_array($json)) { $roles = array_keys(array_filter($json)); }
-            }
-        }
-
-        return [
-            'id' => $id,
-            'login' => $login,
-            'email' => $email,
-            'registration_date' => $registration_date,
-            'status' => $status,
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'nickname' => $nickname,
-            'display_name' => $display_name,
-            'biography' => $biography,
-            'description' => $biography, // alias
-            'phone' => $phone,
-            'mobile' => $mobile,
-            'whatsapp' => $whatsapp,
-            'skype' => $skype,
-            'agency_id' => $agency_id,
-            'agency_name' => $agency_name,
-            'agency_user_id' => $agency_user_id,
-            'roles' => $roles
-        ];
-    }
-
+		// Enrichissement meta manquantes (phone, mobile, description) si disponibles
+		$missingMeta = [];
+		if($profile['phone']==='') $missingMeta[] = 'phone';
+		if($profile['mobile']==='') $missingMeta[] = 'mobile';
+		if($profile['description']==='') $missingMeta[] = 'description';
+		// Recherche variantes possibles
+		$metaKeys = ['description','phone','mobile','houzez_phone','houzez_mobile','whatsapp','houzez_whatsapp'];
+		if(!empty($missingMeta)){
+			$uid = (int)$user_id;
+			// Préfixe WordPress (tel que dans ta vue) — adapter si différent
+			$umetaTable = 'wp_Hrg8P_usermeta';
+			if($db->table_exists($umetaTable)){
+				$db->where('user_id', $uid);
+				$db->where_in('meta_key', $metaKeys);
+				$m = $db->get($umetaTable)->result_array();
+				foreach($m as $rowM){
+					$k = $rowM['meta_key']; $v = $rowM['meta_value'];
+					if(in_array($k,['houzez_phone']) && $profile['phone']==='') $profile['phone']=$v;
+					if(in_array($k,['houzez_mobile']) && $profile['mobile']==='') $profile['mobile']=$v;
+					if($k==='phone' && $profile['phone']==='') $profile['phone']=$v;
+					if($k==='mobile' && $profile['mobile']==='') $profile['mobile']=$v;
+					if(in_array($k,['whatsapp','houzez_whatsapp']) && $profile['whatsapp']==='') $profile['whatsapp']=$v;
+					if($k==='description' && $profile['description']==='') $profile['description']=$v;
+				}
+			}
+		}
+		return $profile;
+	}
 }
 
   
