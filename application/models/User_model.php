@@ -167,84 +167,8 @@ class User_model extends CI_Model
 		return $user;
 	}
 
-	/**
-	 * Récupère le profil via la vue agrégée (assume nom: v_users_profile)
-	 * Vue attendue (exemple colonnes): user_id,user_login,user_email,user_registered,user_status,first_name,last_name,nickname,capabilities
-	 */
-	function get_wp_user_profile($user_id)
-	{
-		$db = $this->load->database('wordpress', TRUE);
-		$view = 'v_users_profile';
-		if(method_exists($db,'table_exists') && !$db->table_exists($view)) return null;
-		$q = $db->get_where($view, ['user_id' => (int)$user_id]);
-		if(!$q || $q->num_rows()==0) return null;
-		$r = $q->row_array();
-		$roles = [];
-		$raw = $r['capabilities'] ?? '';
-		if($raw){
-			$uns = @unserialize($raw);
-			if(is_array($uns)) {
-				$roles = array_keys(array_filter($uns));
-			} else {
-				$json = json_decode($raw, true);
-				if(is_array($json)) $roles = array_keys(array_filter($json));
-			}
-		}
-		$first = $r['first_name'] ?? '';
-		$last = $r['last_name'] ?? '';
-		$nickname = $r['nickname'] ?? '';
-		$display = trim($first.' '.$last);
-		if($display==='') $display = $nickname ?: ($r['user_login'] ?? '');
-		$profile = [
-			'id' => (int)$r['user_id'],
-			'login' => $r['user_login'] ?? '',
-			'email' => $r['user_email'] ?? '',
-			'registration_date' => $r['user_registered'] ?? '',
-			'status' => $r['user_status'] ?? '',
-			'first_name' => $first,
-			'last_name' => $last,
-			'nickname' => $nickname,
-			'display_name' => $display,
-			'biography' => '',
-			'description' => '',
-			'phone' => '',
-			'mobile' => '',
-			'whatsapp' => '',
-			'skype' => '',
-			'agency_id' => '',
-			'agency_name' => '',
-			'agency_user_id' => '',
-			'roles' => $roles
-		];
 
-		// Enrichissement meta manquantes (phone, mobile, description) si disponibles
-		$missingMeta = [];
-		if($profile['phone']==='') $missingMeta[] = 'phone';
-		if($profile['mobile']==='') $missingMeta[] = 'mobile';
-		if($profile['description']==='') $missingMeta[] = 'description';
-		// Recherche variantes possibles
-		$metaKeys = ['description','phone','mobile','houzez_phone','houzez_mobile','whatsapp','houzez_whatsapp'];
-		if(!empty($missingMeta)){
-			$uid = (int)$user_id;
-			// Préfixe WordPress (tel que dans ta vue) — adapter si différent
-			$umetaTable = 'wp_Hrg8P_usermeta';
-			if($db->table_exists($umetaTable)){
-				$db->where('user_id', $uid);
-				$db->where_in('meta_key', $metaKeys);
-				$m = $db->get($umetaTable)->result_array();
-				foreach($m as $rowM){
-					$k = $rowM['meta_key']; $v = $rowM['meta_value'];
-					if(in_array($k,['houzez_phone']) && $profile['phone']==='') $profile['phone']=$v;
-					if(in_array($k,['houzez_mobile']) && $profile['mobile']==='') $profile['mobile']=$v;
-					if($k==='phone' && $profile['phone']==='') $profile['phone']=$v;
-					if($k==='mobile' && $profile['mobile']==='') $profile['mobile']=$v;
-					if(in_array($k,['whatsapp','houzez_whatsapp']) && $profile['whatsapp']==='') $profile['whatsapp']=$v;
-					if($k==='description' && $profile['description']==='') $profile['description']=$v;
-				}
-			}
-		}
-		return $profile;
-	}
+	
 }
 
   
