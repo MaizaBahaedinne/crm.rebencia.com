@@ -152,18 +152,11 @@ class User_model extends CI_Model
 	{
 		$this->wp_db = $this->load->database('wordpress', TRUE);
 		$db = $this->wp_db;
-		if(method_exists($db,'table_exists') && !$db->table_exists('v_users_profile')) return null;
+        
 		$db->select('*')->from('v_users_profile')->where('user_id', (int)$user_id);
 		$query = $db->get();
-		if($query->num_rows()==0) return null;
-		$user = $query->row();
-		// Roles via role_json/capabilities
-		$raw = $user->role_json ?? ($user->capabilities ?? '');
-		$user->roles = [];
-		if($raw){
-			$uns = @unserialize($raw);
-			if(is_array($uns)) $user->roles = array_keys(array_filter($uns));
-		}
+	    $user = $query->row();
+		
 		return $user;
 	}
 

@@ -22,7 +22,9 @@ class Profile extends BaseController {
     public function index() {
         $this->isLoggedIn();
         $data['user'] = $this->user_model->get_wp_user($this->vendorId);
-        $this->loadViews('profile/index', $this->global, $data, NULL);
+
+        print_r($data['user']);
+     //   $this->loadViews('profile/index', $this->global, $data, NULL);
     }
    
 }
