@@ -48,6 +48,8 @@ class BaseController extends CI_Controller {
 			$this->lastLogin = $CI->session->userdata('lastLogin');
 			$this->isAdmin = $CI->session->userdata('isAdmin');
 			$this->accessInfo = $CI->session->userdata('accessInfo');
+			// Normalisation pour éviter warnings si null
+			if(!is_array($this->accessInfo)) { $this->accessInfo = []; }
 			$this->wp_avatar = $CI->session->userdata('wp_avatar');
 
 			$this->global['name'] = $this->name;
@@ -76,10 +78,9 @@ class BaseController extends CI_Controller {
 	 */
 	protected function hasListAccess() {
 		if ($this->isAdmin() ||
-			(array_key_exists($this->module, $this->accessInfo) 
-			&& ($this->accessInfo[$this->module]['list'] == 1 
-			|| $this->accessInfo[$this->module]['total_access'] == 1)))
-		{
+			(is_array($this->accessInfo) && array_key_exists($this->module, $this->accessInfo) 
+			&& (isset($this->accessInfo[$this->module]['list']) && $this->accessInfo[$this->module]['list'] == 1 
+			|| isset($this->accessInfo[$this->module]['total_access']) && $this->accessInfo[$this->module]['total_access'] == 1))) {
 			return true;
 		}
 		return false;
@@ -90,10 +91,9 @@ class BaseController extends CI_Controller {
 	 */
 	protected function hasCreateAccess() {
 		if ($this->isAdmin() ||
-			(array_key_exists($this->module, $this->accessInfo) 
-			&& ($this->accessInfo[$this->module]['create_records'] == 1 
-			|| $this->accessInfo[$this->module]['total_access'] == 1)))
-		{
+			(is_array($this->accessInfo) && array_key_exists($this->module, $this->accessInfo) 
+			&& (isset($this->accessInfo[$this->module]['create_records']) && $this->accessInfo[$this->module]['create_records'] == 1 
+			|| isset($this->accessInfo[$this->module]['total_access']) && $this->accessInfo[$this->module]['total_access'] == 1))) {
 			return true;
 		}
 		return false;
@@ -104,10 +104,9 @@ class BaseController extends CI_Controller {
 	 */
 	protected function hasUpdateAccess() {
 		if ($this->isAdmin() ||
-			(array_key_exists($this->module, $this->accessInfo) 
-			&& ($this->accessInfo[$this->module]['edit_records'] == 1 
-			|| $this->accessInfo[$this->module]['total_access'] == 1)))
-		{
+			(is_array($this->accessInfo) && array_key_exists($this->module, $this->accessInfo) 
+			&& (isset($this->accessInfo[$this->module]['edit_records']) && $this->accessInfo[$this->module]['edit_records'] == 1 
+			|| isset($this->accessInfo[$this->module]['total_access']) && $this->accessInfo[$this->module]['total_access'] == 1))) {
 			return true;
 		}
 		return false;
@@ -118,10 +117,9 @@ class BaseController extends CI_Controller {
 	 */
 	protected function hasDeleteAccess() {
 		if ($this->isAdmin() ||
-			(array_key_exists($this->module, $this->accessInfo) 
-			&& ($this->accessInfo[$this->module]['delete_records'] == 1 
-			|| $this->accessInfo[$this->module]['total_access'] == 1)))
-		{
+			(is_array($this->accessInfo) && array_key_exists($this->module, $this->accessInfo) 
+			&& (isset($this->accessInfo[$this->module]['delete_records']) && $this->accessInfo[$this->module]['delete_records'] == 1 
+			|| isset($this->accessInfo[$this->module]['total_access']) && $this->accessInfo[$this->module]['total_access'] == 1))) {
 			return true;
 		}
 		return false;
