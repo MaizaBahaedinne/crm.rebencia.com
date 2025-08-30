@@ -7,6 +7,10 @@ class Agent extends BaseController {
     public function __construct() {
         parent::__construct();
         $this->load->model('agent_model');
+        $this->load->model('agency_model');
+        $this->load->model('property_model');
+        $this->load->library('input');
+        $this->load->library('output');
     }
 
     // Liste des agents
