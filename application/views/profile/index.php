@@ -1,3 +1,26 @@
+<?php
+// Normalisation et sécurité: garantir $user tableau avec clés attendues pour éviter les notices
+if (!isset($user)) { $user = []; }
+if (is_object($user)) { $user = (array)$user; }
+if (!is_array($user)) { $user = []; }
+// Construire nom si absent
+if (empty($user['name'])) {
+    $dn = isset($user['display_name']) ? trim($user['display_name']) : '';
+    $fn = isset($user['first_name']) ? trim($user['first_name']) : '';
+    $ln = isset($user['last_name']) ? trim($user['last_name']) : '';
+    $combo = trim($fn.' '.$ln);
+    $user['name'] = $dn ?: ($combo ?: (isset($user['user_login']) ? $user['user_login'] : '')); 
+}
+// Valeurs par défaut sûres
+$defaults = [
+    'location' => '',
+    'mobile' => '',
+    'phone' => '',
+    'email' => isset($user['user_email']) ? $user['user_email'] : '',
+    'bio' => isset($user['description']) ? $user['description'] : '',
+];
+foreach ($defaults as $k=>$v) { if (!isset($user[$k])) $user[$k] = $v; }
+?>
  <div class="main-content">
 
             <div class="page-content">
