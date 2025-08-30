@@ -22,7 +22,7 @@ class Mail extends BaseController
         $this->load->library('form_validation');
         $this->load->library('user_agent');
         $this->isLoggedIn();
-        $this->module = 'Mail';
+      
     }
 
     public function index()
@@ -35,7 +35,7 @@ class Mail extends BaseController
      */
     public function inbox()
     {
-        if(!$this->hasListAccess()) { return $this->loadThis(); }
+   
         $page = (int)$this->input->get('page'); if($page<1) $page=1;
         $filter = $this->input->get('filter'); // all | unseen
         $criteria = ($filter==='unread' || $filter==='unseen') ? 'UNSEEN' : 'ALL';
