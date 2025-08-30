@@ -298,13 +298,13 @@ class User_model extends CI_Model
      * @param string $prefix (optional) - table prefix, default 'wp_'
      * @return object|null
      */
-    function get_wp_user($user_id, $prefix = 'wp_Hrg8P_')
+    function get_wp_user($user_id)
     {
         // Get user basic info from WordPress database
-        $this->wp_db = $this->load->database('wordpress', TRUE);
-        $this->db = $this->wp_db;
+        // Load the WordPress database connection (assumes 'wordpress' is defined in database config)
+        $wp_db = $this->load->database('wordpress', TRUE);
         $this->db->select('ID, user_login, user_email, display_name');
-        $this->db->from($prefix . 'users');
+        $this->db->from('wp_Hrg8P_users');
         $this->db->where('ID', $user_id);
         $query = $this->db->get();
 
@@ -316,9 +316,9 @@ class User_model extends CI_Model
 
         // Get user roles from usermeta
         $this->db->select('meta_value');
-        $this->db->from($prefix . 'usermeta');
+        $this->db->from('wp_Hrg8P_usermeta');
         $this->db->where('user_id', $user_id);
-        $this->db->where('meta_key', $prefix . 'capabilities');
+        $this->db->where('meta_key', 'wp_Hrg8P_capabilities');
         $role_query = $this->db->get();
         $roles = [];
         if ($role_query->num_rows() > 0) {
@@ -332,7 +332,7 @@ class User_model extends CI_Model
 
         // Get all user meta
         $this->db->select('meta_key, meta_value');
-        $this->db->from($prefix . 'usermeta');
+        $this->db->from('wp_Hrg8P_usermeta');
         $this->db->where('user_id', $user_id);
         $meta_query = $this->db->get();
         $meta = [];
