@@ -18,5 +18,4 @@ $config['moduleList'] = array(
 // Ajout module Mail pour gestion de la messagerie IMAP/SMTP
 // IMPORTANT : après ajout, exécuter la régénération de la matrice ou éditer chaque rôle pour accorder les droits
 // Champs : list (lecture inbox), create_records (composer/envoyer), edit_records (marquer lu/non lu), delete_records (supprimer futur), total_access (surclasse tout)
-$config['moduleList'][] = array('module'=>'Mail',
-	'total_access'=>0, 'list'=>1, 'create_records'=>1, 'edit_records'=>1, 'delete_records'=>0);
+// (Module Mail supprimé)
