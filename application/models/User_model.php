@@ -153,8 +153,8 @@ class User_model extends CI_Model
 
 	function get_wp_user($user_id)
 	{   
-		$wp_db->select('*')->from('v_users_profile')->where('user_id', (int)$user_id);
-		$query = $wp_db->get();
+		$this->wp_db->select('*')->from('v_users_profile')->where('user_id', (int)$user_id);
+		$query = $this->wp_db->get();
 	    $user = $query->row();
 		
 		return $user;
