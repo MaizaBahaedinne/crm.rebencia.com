@@ -1,4 +1,9 @@
-<?php
+
+
+
+ <div class="main-content">
+            <div class="page-content">
+                <?php
 // Helpers locaux
 if(!function_exists('h')){ function h($v){ return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); } }
 // Normalisation $user en tableau
@@ -26,8 +31,6 @@ if(!empty($u['meta']['description'])) { $aboutText = $u['meta']['description']; 
 elseif(!empty($u['name'])) { $aboutText = "Bonjour, je suis ".$u['name'].". Ceci est votre espace profil."; }
 else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."; }
 ?>
- <div class="main-content">
-            <div class="page-content">
                 <div class="container-fluid">
                     <div class="profile-foreground position-relative mx-n4 mt-n4">
                         <div class="profile-wid-bg">
