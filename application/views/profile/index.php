@@ -20,6 +20,14 @@ $defaults = [
     'bio' => isset($user['description']) ? $user['description'] : '',
 ];
 foreach ($defaults as $k=>$v) { if (!isset($user[$k])) $user[$k] = $v; }
+// Alias biographie
+if (!isset($user['biography']) && isset($user['description'])) { $user['biography'] = $user['description']; }
+// Rôles en chaîne
+if (isset($user['roles']) && is_array($user['roles'])) {
+    $user['roles_string'] = implode(', ', $user['roles']);
+} elseif (!isset($user['roles_string'])) {
+    $user['roles_string'] = '';
+}
 ?>
  <div class="main-content">
 
@@ -152,6 +160,35 @@ foreach ($defaults as $k=>$v) { if (!isset($user[$k])) $user[$k] = $v; }
                                                         </div>
                                                     </div><!-- end card body -->
                                                 </div><!-- end card -->
+
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title mb-3">Profil WordPress</h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-sm table-borderless mb-0">
+                                                                <tbody>
+                                                                    <tr><th class="ps-0" scope="row">Identifiant :</th><td class="text-muted"><?php echo isset($user['user_login']) ? $user['user_login'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">E-mail :</th><td class="text-muted"><?php echo isset($user['user_email']) ? $user['user_email'] : $user['email']; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Date d'inscription :</th><td class="text-muted"><?php echo isset($user['user_registered']) ? $user['user_registered'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Statut :</th><td class="text-muted"><?php echo isset($user['user_status']) ? $user['user_status'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Prénom :</th><td class="text-muted"><?php echo isset($user['first_name']) ? $user['first_name'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Nom :</th><td class="text-muted"><?php echo isset($user['last_name']) ? $user['last_name'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Surnom :</th><td class="text-muted"><?php echo isset($user['nickname']) ? $user['nickname'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Nom affiché :</th><td class="text-muted"><?php echo isset($user['display_name']) ? $user['display_name'] : $user['name']; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Biographie :</th><td class="text-muted"><?php echo isset($user['biography']) ? $user['biography'] : $user['bio']; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Téléphone :</th><td class="text-muted"><?php echo $user['phone']; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Mobile :</th><td class="text-muted"><?php echo $user['mobile']; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">WhatsApp :</th><td class="text-muted"><?php echo isset($user['whatsapp']) ? $user['whatsapp'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Skype :</th><td class="text-muted"><?php echo isset($user['skype']) ? $user['skype'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">ID Agence :</th><td class="text-muted"><?php echo isset($user['agency_id']) ? $user['agency_id'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Nom Agence :</th><td class="text-muted"><?php echo isset($user['agency_name']) ? $user['agency_name'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Utilisateur Agence ID :</th><td class="text-muted"><?php echo isset($user['agency_user_id']) ? $user['agency_user_id'] : ''; ?></td></tr>
+                                                                    <tr><th class="ps-0" scope="row">Rôles :</th><td class="text-muted"><?php echo $user['roles_string']; ?></td></tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 <div class="card">
                                                     <div class="card-body">
