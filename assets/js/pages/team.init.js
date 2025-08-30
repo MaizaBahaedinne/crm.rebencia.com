@@ -28,7 +28,7 @@ function bookmarkBtn() {
 		})
 	})
 }
-fetch(url + "Agent/json_list").then(e => e.json()).then(e => {
+fetch(url + "team-member-list.json").then(e => e.json()).then(e => {
 	loadTeamData(allmemberlist = e)
 }).catch(e => console.error(e)), bookmarkBtn();
 var editlist = !1;

@@ -12,32 +12,8 @@ class Agent extends BaseController {
     // Liste des agents
     public function index() {
         $this->isLoggedIn();
-       
-
-        $this->loadViews('dashboard/agent/list', $this->global, null, NULL);
-    }
-
-
-    public function json_list() {
-        $this->isLoggedIn();
         $data['agents'] = $this->agent_model->get_all_agents();
-        $data['agents_js'] = array_map(function($agent) {
-            return [
-                'id' => $agent->id,
-                'coverImg' => $agent->coverImg ?? '',
-                'bookmark' => false,
-                'memberImg' => $agent->memberImg ?? '',
-                'nickname' => $agent->agent_name ?? '',
-                'memberName' => $agent->agent_name ?? '',
-                'position' => $agent->role ?? '',
-                'projects' => isset($agent->projects) ? (string)$agent->projects : "0",
-                'tasks' => isset($agent->tasks) ? (string)$agent->tasks : "0"
-            ];
-        }, $data['agents']);
-
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($data['agents']));
+        $this->loadViews('dashboard/agent/list', $this->global, $data, NULL);
     }
 
     // Formulaire ajout/modif agent
