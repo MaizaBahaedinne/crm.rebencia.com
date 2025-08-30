@@ -971,56 +971,56 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">4 hr Ago</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-warning-subtle text-warning fs-10"> Inprogress</div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="d-flex mt-4">
-                                                                                <div class="flex-grow-1">
-                                                                                    <div class="d-flex align-items-center gap-2">
-                                                                                        <div>
-                                                                                            <h5 class="fs-12 text-muted mb-0"> Members :</h5>
-                                                                                        </div>
-                                                                                        <div class="avatar-group">
-                                                                                            <div class="avatar-group-item material-shadow">
-                                                                                                <div class="avatar-xs">
-                                                                                                    <img src="assets/images/users/avatar-4.jpg" alt="" class="rounded-circle img-fluid" />
-                                                                                                </div>
-                                                                                            </div>
-                                                                                            <div class="avatar-group-item material-shadow">
-                                                                                                <div class="avatar-xs">
-                                                                                                    <img src="assets/images/users/avatar-5.jpg" alt="" class="rounded-circle img-fluid" />
-                                                                                                </div>
-                                                                                            </div>
-                                                                                            <div class="avatar-group-item material-shadow">
-                                                                                                <div class="avatar-xs">
-                                                                                                    <div class="avatar-title rounded-circle bg-light text-primary">
-                                                                                                        A
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                            <div class="avatar-group-item material-shadow">
-                                                                                                <div class="avatar-xs">
-                                                                                                    <img src="assets/images/users/avatar-2.jpg" alt="" class="rounded-circle img-fluid" />
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <!-- end card body -->
-                                                                    </div>
-                                                                    <!-- end card -->
-                                                                </div>
-                                                                <!-- end slide item -->
-                                                                <div class="swiper-slide">
-                                                                    <div class="card profile-project-card shadow-none profile-project-danger mb-0 material-shadow">
-                                                                        <div class="card-body p-4">
-                                                                            <div class="d-flex">
-                                                                                <div class="flex-grow-1 text-muted overflow-hidden">
-                                                                                    <h5 class="fs-14 text-truncate mb-1">
-                                                                                        <a href="#" class="text-body">Client - John</a>
-                                                                                    </h5>
+                                                                                    <div class="badge bg-primary-subtle text-primary fs-10"> En cours</div>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 h</span></p>
+                                                                                    <div class="badge bg-success-subtle text-success fs-10">Terminé</div>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 min</span></p>
+                                                                                    <div class="badge bg-warning-subtle text-warning fs-10">En cours</div>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 48 min</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 30 min</span></p>
+                                                                                    <div class="badge bg-primary-subtle text-primary fs-10">En traitement</div>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 7 mois</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 mois</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 mois</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 29 min</span></p>
+                                                                        <a href="javascript:void(0);" class="text-success"><i class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i> Charger plus </a>
+                                                                    <label for="formFile" class="btn btn-danger"><i class="ri-upload-2-fill me-1 align-bottom"></i> Importer un fichier</label>
+                                                                                    <th scope="col">Nom du fichier</th>
+                                                                                    <th scope="col">Type</th>
+                                                                                    <th scope="col">Taille</th>
+                                                                                    <th scope="col">Date d'envoi</th>
+                                                                                    <th scope="col">Action</th>
+                                                                                    <td>Fichier ZIP</td>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
+                                                                                    <td>Fichier PDF</td>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
+                                                                                                <li class="dropdown-divider"></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
+                                                                                    <td>Fichier MP4</td>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
+                                                                                                <li class="dropdown-divider"></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
+                                                                                    <td>Fichier XSL</td>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
+                                                                                                <li class="dropdown-divider"></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
+                                                                                    <td>Dossier</td>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>Voir</a></li>
+                                                                                                <li>
+                                                                                                    <a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Télécharger</a>
+                                                                                                </li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Supprimer</a></li>
+                                                                                    <td>Fichier PNG</td>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>Voir</a></li>
+                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Télécharger</a></li>
+                                                                                                <li>
+                                                                                                    <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Supprimer</a>
+                                                                                                </li>
                                                                                     <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">1 hr Ago</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
