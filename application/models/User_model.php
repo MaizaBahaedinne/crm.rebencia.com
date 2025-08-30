@@ -339,32 +339,39 @@ class User_model extends CI_Model
     function get_wp_user_profile($user_id)
     {
         $db = $this->load->database('wordpress', TRUE);
-        // Vérifie existence de la vue (simple tentative de requête LIMIT 1)
-        $query = $db->get_where('v_users_profile', ['user_id' => (int)$user_id]);
+        // Construction requête avec fallback sur différentes colonnes id
+        $db->from('v_users_profile');
+        $db->group_start()
+            ->where('user_id', (int)$user_id)
+            ->or_where('ID', (int)$user_id)
+            ->group_end();
+        $query = $db->get();
         if(!$query || $query->num_rows()===0) return null;
         $row = $query->row_array();
-        // Normalisation noms clés
-        $profile = [
-            'id' => (int)$row['user_id'],
-            'login' => $row['identifiant'] ?? '',
-            'email' => $row['email'] ?? '',
-            'registration_date' => $row['registration_date'] ?? '',
-            'status' => $row['user_status'] ?? '',
-            'first_name' => $row['first_name'] ?? '',
-            'last_name' => $row['last_name'] ?? '',
-            'nickname' => $row['nickname'] ?? '',
-            'display_name' => $row['display_name'] ?? '',
-            'biography' => $row['biography'] ?? '',
-            'phone' => $row['phone'] ?? '',
-            'mobile' => $row['mobile'] ?? '',
-            'whatsapp' => $row['whatsapp'] ?? '',
-            'skype' => $row['skype'] ?? '',
-            'agency_id' => $row['agency_id'] ?? '',
-            'agency_name' => $row['agency_name'] ?? '',
-            'agency_user_id' => $row['agency_user_id'] ?? ''
-        ];
-        // Rôles: meta sérialisée ou JSON
-        $rolesRaw = $row['role_json'] ?? '';
+
+        // Helpers fallback
+        $val = function(array $r, $keys, $default=''){ foreach((array)$keys as $k){ if(isset($r[$k]) && $r[$k] !== '') return $r[$k]; } return $default; };
+
+        $id = (int)($row['user_id'] ?? $row['ID'] ?? 0);
+        $login = $val($row, ['identifiant','user_login','login']);
+        $email = $val($row, ['email','user_email']);
+        $registration_date = $val($row, ['registration_date','user_registered']);
+        $status = $val($row, ['user_status','status']);
+        $first_name = $val($row, ['first_name']);
+        $last_name = $val($row, ['last_name']);
+        $nickname = $val($row, ['nickname']);
+        $display_name = $val($row, ['display_name', 'nickname', 'identifiant','user_login']);
+        $biography = $val($row, ['biography','description']);
+        $phone = $val($row, ['phone','houzez_phone','mobile']);
+        $mobile = $val($row, ['mobile','houzez_mobile','phone','houzez_phone']);
+        $whatsapp = $val($row, ['whatsapp','houzez_whatsapp']);
+        $skype = $val($row, ['skype']);
+        $agency_id = $val($row, ['agency_id']);
+        $agency_name = $val($row, ['agency_name','agency_title']);
+        $agency_user_id = $val($row, ['agency_user_id']);
+
+        // Rôles: le champ peut être role_json ou wp_capabilities
+        $rolesRaw = $val($row, ['role_json','wp_capabilities']);
         $roles = [];
         if($rolesRaw){
             $unser = @unserialize($rolesRaw);
@@ -375,8 +382,28 @@ class User_model extends CI_Model
                 if(is_array($json)) { $roles = array_keys(array_filter($json)); }
             }
         }
-        $profile['roles'] = $roles;
-        return $profile;
+
+        return [
+            'id' => $id,
+            'login' => $login,
+            'email' => $email,
+            'registration_date' => $registration_date,
+            'status' => $status,
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'nickname' => $nickname,
+            'display_name' => $display_name,
+            'biography' => $biography,
+            'description' => $biography, // alias
+            'phone' => $phone,
+            'mobile' => $mobile,
+            'whatsapp' => $whatsapp,
+            'skype' => $skype,
+            'agency_id' => $agency_id,
+            'agency_name' => $agency_name,
+            'agency_user_id' => $agency_user_id,
+            'roles' => $roles
+        ];
     }
 
 }

@@ -36,7 +36,8 @@ class Profile extends BaseController {
                 'agence' => $profile['agency_name'] ?? '',
                 'avatar' => base_url('assets/images/users/avatar-1.jpg'),
                 'meta' => [
-                    'biography' => $profile['biography']
+                    'biography' => $profile['biography'],
+                    'description' => $profile['description'] ?? $profile['biography']
                 ]
             ];
         } else {
