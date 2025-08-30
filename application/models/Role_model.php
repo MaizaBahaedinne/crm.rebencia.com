@@ -260,6 +260,37 @@ class Role_model extends CI_Model
 
         return $this->db->affected_rows();
     }
+
+    /**
+     * Injecte un nouveau module (ex: Mail) dans toutes les matrices d'accès existantes s'il n'existe pas déjà.
+     * $defaultRights doit être un tableau associatif identique aux entrées de config modules.php
+     */
+    public function injectModuleIfMissing($moduleName, array $defaultRights)
+    {
+        // Récupère toutes les matrices
+        $query = $this->db->select('roleId, access')->from('tbl_access_matrix')->get();
+        $matrices = $query->result();
+        if(empty($matrices)) return 0;
+        $updated = 0;
+        foreach($matrices as $row) {
+            $accessArr = json_decode($row->access, true);
+            if(!is_array($accessArr)) continue;
+            $exists = false;
+            foreach($accessArr as $mod) {
+                if(isset($mod['module']) && $mod['module'] === $moduleName) { $exists = true; break; }
+            }
+            if(!$exists) {
+                $accessArr[] = $defaultRights + ['module'=>$moduleName];
+                $this->db->where('roleId', $row->roleId)->update('tbl_access_matrix', [
+                    'access' => json_encode($accessArr),
+                    'updatedBy' => 1,
+                    'updatedDtm' => date('Y-m-d H:i:s')
+                ]);
+                $updated += $this->db->affected_rows();
+            }
+        }
+        return $updated;
+    }
 }
 
   

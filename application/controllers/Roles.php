@@ -268,6 +268,26 @@ class Roles extends BaseController
 
         redirect('roles/edit/'.$roleId);
     }
+
+    /**
+     * Action utilitaire : injecte le module Mail dans toutes les matrices si manquant.
+     * URL : roles/injectMailModule (réservé admin)
+     */
+    public function injectMailModule()
+    {
+        if(!$this->isAdmin()) { return $this->loadThis(); }
+        // Modèle déjà chargé en __construct
+        $default = [
+            'total_access'=>0,
+            'list'=>1,
+            'create_records'=>1,
+            'edit_records'=>1,
+            'delete_records'=>0
+        ];
+        $updated = $this->rm->injectModuleIfMissing('Mail', $default);
+        $this->session->set_flashdata('success', 'Module Mail injecté dans '. $updated .' rôle(s) (0 = déjà présent).');
+        redirect('roles/roleListing');
+    }
 }
 
 
