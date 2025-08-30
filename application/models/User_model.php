@@ -303,10 +303,10 @@ class User_model extends CI_Model
         // Get user basic info from WordPress database
         // Load the WordPress database connection (assumes 'wordpress' is defined in database config)
         $wp_db = $this->load->database('wordpress', TRUE);
-        $this->db->select('ID, user_login, user_email, display_name');
-        $this->db->from('wp_Hrg8P_users');
-        $this->db->where('ID', $user_id);
-        $query = $this->db->get();
+        $this->wp_db->select('ID, user_login, user_email, display_name');
+        $this->wp_db->from('wp_Hrg8P_users');
+        $this->wp_db->where('ID', $user_id);
+        $query = $this->wp_db->get();
 
         if ($query->num_rows() == 0) {
             return null;
@@ -315,11 +315,11 @@ class User_model extends CI_Model
         $user = $query->row();
 
         // Get user roles from usermeta
-        $this->db->select('meta_value');
-        $this->db->from('wp_Hrg8P_usermeta');
-        $this->db->where('user_id', $user_id);
-        $this->db->where('meta_key', 'wp_Hrg8P_capabilities');
-        $role_query = $this->db->get();
+        $this->wp_db->select('meta_value');
+        $this->wp_db->from('wp_Hrg8P_usermeta');
+        $this->wp_db->where('user_id', $user_id);
+        $this->wp_db->where('meta_key', 'wp_Hrg8P_capabilities');
+        $role_query = $this->wp_db->get();
         $roles = [];
         if ($role_query->num_rows() > 0) {
             $meta_value = $role_query->row()->meta_value;
@@ -331,10 +331,10 @@ class User_model extends CI_Model
         $user->roles = $roles;
 
         // Get all user meta
-        $this->db->select('meta_key, meta_value');
-        $this->db->from('wp_Hrg8P_usermeta');
-        $this->db->where('user_id', $user_id);
-        $meta_query = $this->db->get();
+        $this->wp_db->select('meta_key, meta_value');
+        $this->wp_db->from('wp_Hrg8P_usermeta');
+        $this->wp_db->where('user_id', $user_id);
+        $meta_query = $this->wp_db->get();
         $meta = [];
         foreach ($meta_query->result() as $row) {
             $meta[$row->meta_key] = $row->meta_value;
