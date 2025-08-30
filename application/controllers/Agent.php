@@ -44,9 +44,9 @@ class Agent extends BaseController {
         }, $raw_agents);
 
 
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($agents));
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($agents);
+    return;
     }
 
     // Formulaire ajout/modif agent
