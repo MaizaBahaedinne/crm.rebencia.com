@@ -108,24 +108,33 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Full Name :</th>
-                                                                        <td class="text-muted">Anna Adame</td>
+                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['name'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Mobile :</th>
-                                                                        <td class="text-muted">+(1) 987 6543</td>
+                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['mobile'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">E-mail :</th>
-                                                                        <td class="text-muted">daveadame@velzon.com</td>
+                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Location :</th>
-                                                                        <td class="text-muted">California, United States
-                                                                        </td>
+                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['location'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Joining Date</th>
-                                                                        <td class="text-muted">24 Nov 2021</td>
+                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['joining_date'] ?? ''); ?></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="ps-0" scope="row">Role(s)</th>
+                                                                        <td class="text-muted">
+                                                                            <?php
+                                                                            if (!empty($user['roles']) && is_array($user['roles'])) {
+                                                                                echo htmlspecialchars(implode(', ', $user['roles']));
+                                                                            }
+                                                                            ?>
+                                                                        </td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
