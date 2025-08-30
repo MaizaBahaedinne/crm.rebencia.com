@@ -19,8 +19,10 @@ class Profile extends BaseController {
         $this->isLoggedIn();
        
         $data['user'] = $this->user_model->get_wp_user($this->vendorId,'wp_Hrg8P_');
-       
-        $this->loadViews('profile/index', $this->global, $data, NULL);
+
+        print_r($data['user']);
+
+       // $this->loadViews('profile/index', $this->global, $data, NULL);
     }
    
 }
