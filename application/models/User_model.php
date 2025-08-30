@@ -9,8 +9,11 @@
  */
 class User_model extends CI_Model
 {
-	/** @var CI_DB_query_builder|null */
-	protected $wp_db = null;
+	    protected $wp_db;
+    public function __construct() {
+        parent::__construct();
+        $this->wp_db = $this->load->database('wordpress', TRUE);
+    }
 
 	/* ===================== UTILISATEURS APP ===================== */
 
@@ -149,10 +152,7 @@ class User_model extends CI_Model
 	/* ===================== PROFIL WORDPRESS ===================== */
 
 	function get_wp_user($user_id)
-	{
-		$this->wp_db = $this->load->database('wordpress', TRUE);
-		$db = $this->wp_db;
-        
+	{   
 		$db->select('*')->from('v_users_profile')->where('user_id', (int)$user_id);
 		$query = $db->get();
 	    $user = $query->row();
