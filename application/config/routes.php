@@ -89,6 +89,16 @@ $route['settings/roles'] = 'Settings/roles';
 $route['settings/wordpress'] = 'Settings/wordpress';
 $route['settings/crm'] = 'Settings/crm';
 
+/*********** MAIL *******************/
+$route['mail'] = 'Mail/index';
+$route['mail/inbox'] = 'Mail/inbox';
+$route['mail/compose'] = 'Mail/compose';
+$route['mail/send'] = 'Mail/send';
+$route['mail/view/(:num)'] = 'Mail/view/$1';
+$route['mail/read/(:num)'] = 'Mail/markRead/$1';
+$route['mail/unread/(:num)'] = 'Mail/markUnread/$1';
+$route['mail/download/(:num)/(:num)'] = 'Mail/download/$1/$2';
+
 /*********** PROFILE *******************/
 $route['profile'] = 'Profile/index';
 $route['profile/avatar'] = 'Profile/avatar';
