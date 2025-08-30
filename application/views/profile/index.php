@@ -10,18 +10,22 @@
                         <div class="row g-4">
                             <div class="col-auto">
                                 <div class="avatar-lg">
-                                    <img src="assets/images/users/avatar-1.jpg" alt="user-img" class="img-thumbnail rounded-circle" />
+                                    <img src="<?php echo $user['avatar'] ?? 'assets/images/users/avatar-1.jpg'; ?>" alt="user-img" class="img-thumbnail rounded-circle" />
                                 </div>
                             </div>
                             <!--end col-->
                             <div class="col">
                                 <div class="p-2">
-                                    <h3 class="text-white mb-1">Anna Adame</h3>
-                                    <p class="text-white text-opacity-75">Owner & Founder</p>
+                                    <h3 class="text-white mb-1"><?php echo htmlspecialchars($user['name'] ?? ''); ?></h3>
+                                    <p class="text-white text-opacity-75"><?php echo htmlspecialchars($user['role'] ?? ''); ?></p>
                                     <div class="hstack text-white-50 gap-1">
-                                        <div class="me-2"><i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>California, United States</div>
+                                        <div class="me-2">
+                                            <i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
+                                            <?php echo htmlspecialchars($user['location'] ?? ''); ?>
+                                        </div>
                                         <div>
-                                            <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>Themesbrand
+                                            <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
+                                            <?php echo htmlspecialchars($user['agence'] ?? ''); ?>
                                         </div>
                                     </div>
                                 </div>
