@@ -299,7 +299,7 @@ class User_model extends CI_Model
      * @param int $user_id
      * @return object|null
      */
-    function get_wp_user_profile($user_id)
+    function get_wp_user($user_id)
     {
         // Connect to WordPress DB (config database.php => group 'wordpress')
         $this->wp_db = $this->load->database('wordpress', TRUE);
