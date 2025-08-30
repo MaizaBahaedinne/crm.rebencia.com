@@ -1,62 +1,28 @@
-
-
-
  <div class="main-content">
+
             <div class="page-content">
-                <?php
-// Helpers locaux
-if(!function_exists('h')){ function h($v){ return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); } }
-// Normalisation $user en tableau
-if(isset($user)){
-    if(is_object($user)) { $user = (array)$user; }
-    // Roles éventuellement chaîne => array
-    if(isset($user['roles']) && !is_array($user['roles'])){
-        if(is_string($user['roles'])){
-            $try = @json_decode($user['roles'], true);
-            if(is_array($try)) $user['roles']=$try; else $user['roles'] = [$user['roles']];
-        } else {
-            $user['roles'] = (array)$user['roles'];
-        }
-    }
-}
-$u = isset($user)? $user : [];
-// Accès sûr clé
-if(!function_exists('uget')){ function uget($u,$k,$d=''){ if(is_array($u)&&array_key_exists($k,$u)) return $u[$k]; return $d; } }
-$fieldsForCompletion = ['name','email','mobile','location','agence'];
-$filled = 0; foreach($fieldsForCompletion as $f){ if(!empty(uget($u,$f))) $filled++; }
-$completion = count($fieldsForCompletion) ? (int) round($filled * 100 / count($fieldsForCompletion)) : 0;
-if($completion < 10) $completion = 10; // minimum barre visible
-$aboutText = '';
-if(!empty($u['meta']['description'])) { $aboutText = $u['meta']['description']; }
-elseif(!empty($u['name'])) { $aboutText = "Bonjour, je suis ".$u['name'].". Ceci est votre espace profil."; }
-else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."; }
-?>
                 <div class="container-fluid">
                     <div class="profile-foreground position-relative mx-n4 mt-n4">
                         <div class="profile-wid-bg">
-                            <img src="<?php echo base_url('assets/images/profile-bg.jpg'); ?>" alt="" class="profile-wid-img" />
+                            <img src="assets/images/profile-bg.jpg" alt="" class="profile-wid-img" />
                         </div>
                     </div>
                     <div class="pt-4 mb-4 mb-lg-3 pb-lg-4 profile-wrapper">
                         <div class="row g-4">
                             <div class="col-auto">
                                 <div class="avatar-lg">
-                                    <img src="<?php echo isset($user['avatar'])? $user['avatar'] : base_url('assets/images/users/avatar-1.jpg'); ?>" alt="user-img" class="img-thumbnail rounded-circle" />
+                                    <img src="assets/images/users/avatar-1.jpg" alt="user-img" class="img-thumbnail rounded-circle" />
                                 </div>
                             </div>
                             <!--end col-->
                             <div class="col">
                                 <div class="p-2">
-                                    <h3 class="text-white mb-1"><?php echo htmlspecialchars($user['name'] ?? ''); ?></h3>
-                                    <p class="text-white text-opacity-75"><?php echo h(isset($u['roles'])? implode(', ',$u['roles']) : ''); ?></p>
+                                    <h3 class="text-white mb-1"><?php echo h($u['name']); ?></h3>
+                                    <p class="text-white text-opacity-75">Owner & Founder</p>
                                     <div class="hstack text-white-50 gap-1">
-                                        <div class="me-2">
-                                            <i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
-                                            <?php echo htmlspecialchars($user['location'] ?? ''); ?>
-                                        </div>
+                                        <div class="me-2"><i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i><?php echo h($u['location']); ?></div>
                                         <div>
-                                            <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
-                                            <?php echo htmlspecialchars($user['agence'] ?? ''); ?>
+                                            <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>Themesbrand
                                         </div>
                                     </div>
                                 </div>
@@ -67,13 +33,13 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                     <div class="col-lg-6 col-4">
                                         <div class="p-2">
                                             <h4 class="text-white mb-1">24.3K</h4>
-                                            <p class="fs-14 mb-0">Abonnés</p>
+                                            <p class="fs-14 mb-0">Followers</p>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-4">
                                         <div class="p-2">
                                             <h4 class="text-white mb-1">1.3K</h4>
-                                            <p class="fs-14 mb-0">Abonnements</p>
+                                            <p class="fs-14 mb-0">Following</p>
                                         </div>
                                     </div>
                                 </div>
@@ -124,8 +90,8 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                     <div class="card-body">
                                                         <h5 class="card-title mb-5">Complétez votre profil</h5>
                                                         <div class="progress animated-progress custom-progress progress-label">
-                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: <?php echo $completion; ?>%" aria-valuenow="<?php echo $completion; ?>" aria-valuemin="0" aria-valuemax="100">
-                                                                <div class="label"><?php echo $completion; ?>%</div>
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
+                                                                <div class="label">30%</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -139,35 +105,24 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <tbody>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Nom complet :</th>
-                                                                        <td class="text-muted"><?php echo h($u['name'] ?? ''); ?></td>
+                                                                        <td class="text-muted"><?php echo h($u['name']); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Mobile :</th>
-                                                                        <td class="text-muted"><?php echo h($u['mobile'] ?? ''); ?></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">Téléphone :</th>
-                                                                        <td class="text-muted"><?php echo h($u['phone'] ?? ''); ?></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">WhatsApp :</th>
-                                                                        <td class="text-muted"><?php echo h($u['whatsapp'] ?? ''); ?></td>
+                                                                        <td class="text-muted"><?php echo h($u['mobile'] ?: $u['phone']); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">E-mail :</th>
-                                                                        <td class="text-muted"><?php echo h($u['email'] ?? ''); ?></td>
+                                                                        <td class="text-muted"><?php echo h($u['email']); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Localisation :</th>
-                                                                        <td class="text-muted"><?php echo h($u['location'] ?? ''); ?></td>
+                                                                        <td class="text-muted"><?php echo h($u['location']); ?>
+                                                                        </td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <th class="ps-0" scope="row">Date d'inscription :</th>
-                                                                        <td class="text-muted"><?php echo h($u['joining_date'] ?? ''); ?></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">Rôle(s)</th>
-                                                                        <td class="text-muted"><?php echo h(isset($u['roles'])? implode(', ',$u['roles']):''); ?></td>
+                                                                        <th class="ps-0" scope="row">Joining Date</th>
+                                                                        <td class="text-muted">24 Nov 2021</td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
@@ -213,7 +168,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
 
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-4">Compétences</h5>
+                                                        <h5 class="card-title mb-4">Skills</h5>
                                                         <div class="d-flex flex-wrap gap-2 fs-15">
                                                             <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">Photoshop</a>
                                                             <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">illustrator</a>
@@ -239,9 +194,9 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     </a>
 
                                                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink2">
-                                                                        <li><a class="dropdown-item" href="#">View</a></li>
+                                                                        <li><a class="dropdown-item" href="#">Voir</a></li>
                                                                         <li><a class="dropdown-item" href="#">Edit</a></li>
-                                                                        <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                                        <li><a class="dropdown-item" href="#">Supprimer</a></li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
@@ -298,7 +253,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                     <div class="card-body">
                                                         <div class="d-flex align-items-center mb-4">
                                                             <div class="flex-grow-1">
-                                                                <h5 class="card-title mb-0">Articles populaires</h5>
+                                                                <h5 class="card-title mb-0">Popular Posts</h5>
                                                             </div>
                                                             <div class="flex-shrink-0">
                                                                 <div class="dropdown">
@@ -307,9 +262,9 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     </a>
 
                                                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink1">
-                                                                        <li><a class="dropdown-item" href="#">View</a></li>
+                                                                        <li><a class="dropdown-item" href="#">Voir</a></li>
                                                                         <li><a class="dropdown-item" href="#">Edit</a></li>
-                                                                        <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                                        <li><a class="dropdown-item" href="#">Supprimer</a></li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
@@ -356,8 +311,9 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                             <div class="col-xxl-9">
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-3">À propos</h5>
-                                                        <p><?php echo nl2br(h($aboutText)); ?></p>
+                                                        <h5 class="card-title mb-3">About</h5>
+                                                        <p><?php echo h($u['bio'] ?: ""); ?></p>
+                                                        <p>You always want to make sure that your fonts work well together and try to limit the number of fonts you use to three or less. Experiment and play around with the fonts that you already have in the software you’re working with reputable font websites. This may be the most commonly encountered tip I received from the designers I spoke with. They highly encourage that you use different fonts in one design, but do not over-exaggerate and go overboard.</p>
                                                         <div class="row">
                                                             <div class="col-6 col-md-4">
                                                                 <div class="d-flex mt-4">
@@ -367,8 +323,8 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                         </div>
                                                                     </div>
                                                                     <div class="flex-grow-1 overflow-hidden">
-                                                                        <p class="mb-1">Fonction :</p>
-                                                                        <h6 class="text-truncate mb-0">Lead Designer / Développeur</h6>
+                                                                        <p class="mb-1">Designation :</p>
+                                                                        <h6 class="text-truncate mb-0">Lead Designer / Developer</h6>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -381,8 +337,8 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                         </div>
                                                                     </div>
                                                                     <div class="flex-grow-1 overflow-hidden">
-                                                                        <p class="mb-1">Site web :</p>
-                                                                        <a href="#" class="fw-semibold">www.exemple.com</a>
+                                                                        <p class="mb-1">Website :</p>
+                                                                        <a href="#" class="fw-semibold">www.velzon.com</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -397,22 +353,22 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                     <div class="col-lg-12">
                                                         <div class="card">
                                                             <div class="card-header align-items-center d-flex">
-                                                                <h4 class="card-title mb-0  me-2">Activité récente</h4>
+                                                                <h4 class="card-title mb-0  me-2">Recent Activity</h4>
                                                                 <div class="flex-shrink-0 ms-auto">
                                                                     <ul class="nav justify-content-end nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
                                                                         <li class="nav-item">
                                                                             <a class="nav-link active" data-bs-toggle="tab" href="#today" role="tab">
-                                                                                Aujourd'hui
+                                                                                Today
                                                                             </a>
                                                                         </li>
                                                                         <li class="nav-item">
                                                                             <a class="nav-link" data-bs-toggle="tab" href="#weekly" role="tab">
-                                                                                Semaine
+                                                                                Weekly
                                                                             </a>
                                                                         </li>
                                                                         <li class="nav-item">
                                                                             <a class="nav-link" data-bs-toggle="tab" href="#monthly" role="tab">
-                                                                                Mois
+                                                                                Monthly
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -563,7 +519,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     </div>
                                                                                     <div id="collapseFive" class="accordion-collapse collapse show" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
                                                                                         <div class="accordion-body ms-2 ps-5">
-                                                                                            <p class="text-muted mb-2"> Every team project can have a velzon. Use the velzon to share information with your team to understand and contribute to your project.</p>
+                                                                                            <p class="text-muted mb-2"> Chaque projet d'équipe peut avoir un espace. Utilisez-le pour partager des informations avec votre équipe afin de comprendre et contribuer au projet.</p>
                                                                                             <div class="avatar-group">
                                                                                                 <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Christi">
                                                                                                     <img src="assets/images/users/avatar-4.jpg" alt="" class="rounded-circle avatar-xs material-shadow">
@@ -703,7 +659,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                                 </div>
                                                                                                 <div class="flex-grow-1 ms-3">
                                                                                                     <h6 class="fs-14 mb-1">
-                                                                                                        New ticket created <span class="badge bg-info-subtle text-info align-middle">Inprogress</span>
+                                                                                                        Nouveau ticket créé <span class="badge bg-info-subtle text-info align-middle">En cours</span>
                                                                                                     </h6>
                                                                                                     <small class="text-muted mb-2">User <span class="text-secondary">Jack365</span> submitted a ticket - 2 week Ago</small>
                                                                                                 </div>
@@ -970,7 +926,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
 
                                                 <div class="card">
                                                     <div class="card-body">
-                                                                    <h5 class="card-title">Projets</h5>
+                                                        <h5 class="card-title">Projets</h5>
                                                         <!-- Swiper -->
                                                         <div class="swiper project-swiper mt-n4">
                                                             <div class="d-flex justify-content-end gap-2 mb-2">
@@ -997,60 +953,60 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <p class="text-muted text-truncate mb-0"> Dernière mise à jour : <span class="fw-semibold text-body">il y a 4 h</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-primary-subtle text-primary fs-10">En cours</div>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 h</span></p>
-                                                                                    <div class="badge bg-success-subtle text-success fs-10">Terminé</div>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 min</span></p>
-                                                                                    <div class="badge bg-warning-subtle text-warning fs-10">En cours</div>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 48 min</span></p>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 30 min</span></p>
-                                                                                    <div class="badge bg-primary-subtle text-primary fs-10">En traitement</div>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 7 mois</span></p>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 mois</span></p>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 mois</span></p>
-                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 29 min</span></p>
-                                                                        <a href="javascript:void(0);" class="text-success"><i class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i> Charger plus </a>
-                                                                    <label for="formFile" class="btn btn-danger"><i class="ri-upload-2-fill me-1 align-bottom"></i> Importer un fichier</label>
-                                                                                    <th scope="col">Nom du fichier</th>
-                                                                                    <th scope="col">Type</th>
-                                                                                    <th scope="col">Taille</th>
-                                                                                    <th scope="col">Date d'envoi</th>
-                                                                                    <th scope="col">Action</th>
-                                                                                    <td>Fichier ZIP</td>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
-                                                                                    <td>Fichier PDF</td>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
-                                                                                                <li class="dropdown-divider"></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
-                                                                                    <td>Fichier MP4</td>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
-                                                                                                <li class="dropdown-divider"></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
-                                                                                    <td>Fichier XSL</td>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
-                                                                                                <li class="dropdown-divider"></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
-                                                                                    <td>Dossier</td>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>Voir</a></li>
-                                                                                                <li>
-                                                                                                    <a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Télécharger</a>
-                                                                                                </li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Supprimer</a></li>
-                                                                                    <td>Fichier PNG</td>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>Voir</a></li>
-                                                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Télécharger</a></li>
-                                                                                                <li>
-                                                                                                    <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Supprimer</a>
-                                                                                                </li>
-                                                                                    <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">1 hr Ago</span></p>
+                                                                                    <div class="badge bg-warning-subtle text-warning fs-10"> En cours</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="d-flex mt-4">
+                                                                                <div class="flex-grow-1">
+                                                                                    <div class="d-flex align-items-center gap-2">
+                                                                                        <div>
+                                                                                            <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
+                                                                                        </div>
+                                                                                        <div class="avatar-group">
+                                                                                            <div class="avatar-group-item material-shadow">
+                                                                                                <div class="avatar-xs">
+                                                                                                    <img src="assets/images/users/avatar-4.jpg" alt="" class="rounded-circle img-fluid" />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="avatar-group-item material-shadow">
+                                                                                                <div class="avatar-xs">
+                                                                                                    <img src="assets/images/users/avatar-5.jpg" alt="" class="rounded-circle img-fluid" />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="avatar-group-item material-shadow">
+                                                                                                <div class="avatar-xs">
+                                                                                                    <div class="avatar-title rounded-circle bg-light text-primary">
+                                                                                                        A
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="avatar-group-item material-shadow">
+                                                                                                <div class="avatar-xs">
+                                                                                                    <img src="assets/images/users/avatar-2.jpg" alt="" class="rounded-circle img-fluid" />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- end card body -->
+                                                                    </div>
+                                                                    <!-- end card -->
+                                                                </div>
+                                                                <!-- end slide item -->
+                                                                <div class="swiper-slide">
+                                                                    <div class="card profile-project-card shadow-none profile-project-danger mb-0 material-shadow">
+                                                                        <div class="card-body p-4">
+                                                                            <div class="d-flex">
+                                                                                <div class="flex-grow-1 text-muted overflow-hidden">
+                                                                                    <h5 class="fs-14 text-truncate mb-1">
+                                                                                        <a href="#" class="text-body">Client - John</a>
+                                                                                    </h5>
+                                                                                    <p class="text-muted text-truncate mb-0"> Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 h</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-success-subtle text-success fs-10">Terminé</div>
+                                                                                    <div class="badge bg-success-subtle text-success fs-10"> Completed</div>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="d-flex mt-4">
@@ -1087,17 +1043,17 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <h5 class="fs-14 text-truncate mb-1">
                                                                                         <a href="#" class="text-body">Brand logo Design</a>
                                                                                     </h5>
-                                                                                    <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">2 hr Ago</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 2 h</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-warning-subtle text-warning fs-10"> Inprogress</div>
+                                                                                    <div class="badge bg-warning-subtle text-warning fs-10"> En cours</div>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="d-flex mt-4">
                                                                                 <div class="flex-grow-1">
                                                                                     <div class="d-flex align-items-center gap-2">
                                                                                         <div>
-                                                                                            <h5 class="fs-12 text-muted mb-0"> Members :</h5>
+                                                                                            <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
                                                                                         </div>
                                                                                         <div class="avatar-group">
                                                                                             <div class="avatar-group-item material-shadow">
@@ -1120,7 +1076,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <h5 class="fs-14 text-truncate mb-1">
                                                                                         <a href="#" class="text-body">Project update</a>
                                                                                     </h5>
-                                                                                    <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">4 hr Ago</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0"> Dernière mise à jour : <span class="fw-semibold text-body">il y a 4 h</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
                                                                                     <div class="badge bg-success-subtle text-success fs-10"> Completed</div>
@@ -1131,7 +1087,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 <div class="flex-grow-1">
                                                                                     <div class="d-flex align-items-center gap-2">
                                                                                         <div>
-                                                                                            <h5 class="fs-12 text-muted mb-0"> Members :</h5>
+                                                                                            <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
                                                                                         </div>
                                                                                         <div class="avatar-group">
                                                                                             <div class="avatar-group-item material-shadow">
@@ -1162,10 +1118,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <h5 class="fs-14 text-truncate mb-1">
                                                                                         <a href="#" class="text-body">Chat App</a>
                                                                                     </h5>
-                                                                                    <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">1 hr Ago</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0"> Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 h</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-warning-subtle text-warning fs-10"> Inprogress</div>
+                                                                                    <div class="badge bg-warning-subtle text-warning fs-10"> En cours</div>
                                                                                 </div>
                                                                             </div>
 
@@ -1173,7 +1129,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 <div class="flex-grow-1">
                                                                                     <div class="d-flex align-items-center gap-2">
                                                                                         <div>
-                                                                                            <h5 class="fs-12 text-muted mb-0"> Members :</h5>
+                                                                                            <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
                                                                                         </div>
                                                                                         <div class="avatar-group">
                                                                                             <div class="avatar-group-item material-shadow">
@@ -1219,14 +1175,14 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                     <div class="tab-pane fade" id="activities" role="tabpanel">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="card-title mb-3">Activities</h5>
+                                                <h5 class="card-title mb-3">Activités</h5>
                                                 <div class="acitivity-timeline">
                                                     <div class="acitivity-item d-flex">
                                                         <div class="flex-shrink-0">
                                                             <img src="assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle acitivity-avatar material-shadow" />
                                                         </div>
                                                         <div class="flex-grow-1 ms-3">
-                                                            <h6 class="mb-1">Oliver Phillips <span class="badge bg-primary-subtle text-primary align-middle">New</span></h6>
+                                                            <h6 class="mb-1">Oliver Phillips <span class="badge bg-primary-subtle text-primary align-middle">Nouveau</span></h6>
                                                             <p class="text-muted mb-2">We talked about a project on linkedin.</p>
                                                             <small class="mb-0 text-muted">Today</small>
                                                         </div>
@@ -1374,10 +1330,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Chat App Update</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">2 year Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 2 ans</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-warning-subtle text-warning fs-10">Inprogress</div>
+                                                                        <div class="badge bg-warning-subtle text-warning fs-10">En cours</div>
                                                                     </div>
                                                                 </div>
 
@@ -1385,7 +1341,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1421,7 +1377,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">ABC Project Customization</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">2 month Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 2 mois</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
                                                                         <div class="badge bg-primary-subtle text-primary fs-10"> Progress</div>
@@ -1432,7 +1388,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1473,10 +1429,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Client - Frank Hook</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">1 hr Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 h</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-info-subtle text-info fs-10">New</div>
+                                                                        <div class="badge bg-info-subtle text-info fs-10">Nouveau</div>
                                                                     </div>
                                                                 </div>
 
@@ -1484,7 +1440,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0"> Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1520,7 +1476,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Velzon Project</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">11 hr Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 11 h</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
                                                                         <div class="badge bg-success-subtle text-success fs-10">Completed</div>
@@ -1531,7 +1487,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1560,10 +1516,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Brand Logo Design</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">10 min Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 min</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-info-subtle text-info fs-10">New</div>
+                                                                        <div class="badge bg-info-subtle text-info fs-10">Nouveau</div>
                                                                     </div>
                                                                 </div>
 
@@ -1571,7 +1527,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1607,10 +1563,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Chat App</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">8 hr Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 8 h</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-warning-subtle text-warning fs-10">Inprogress</div>
+                                                                        <div class="badge bg-warning-subtle text-warning fs-10">En cours</div>
                                                                     </div>
                                                                 </div>
 
@@ -1618,7 +1574,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1654,10 +1610,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Project Update</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">48 min Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 48 min</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-warning-subtle text-warning fs-10">Inprogress</div>
+                                                                        <div class="badge bg-warning-subtle text-warning fs-10">En cours</div>
                                                                     </div>
                                                                 </div>
 
@@ -1665,7 +1621,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1699,7 +1655,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Client - Jennifer</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">30 min Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 30 min</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
                                                                         <div class="badge bg-primary-subtle text-primary fs-10">Process</div>
@@ -1710,7 +1666,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0"> Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1734,7 +1690,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Bsuiness Template - UI/UX design</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">7 month Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 7 mois</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
                                                                         <div class="badge bg-success-subtle text-success fs-10">Completed</div>
@@ -1744,7 +1700,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1785,17 +1741,17 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Update Project</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">1 month Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 mois</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-info-subtle text-info fs-10">New</div>
+                                                                        <div class="badge bg-info-subtle text-info fs-10">Nouveau</div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="d-flex mt-4">
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1824,7 +1780,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">Bank Management System</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">10 month Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 mois</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
                                                                         <div class="badge bg-success-subtle text-success fs-10">Completed</div>
@@ -1834,7 +1790,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1873,17 +1829,17 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                 <div class="d-flex">
                                                                     <div class="flex-grow-1 text-muted overflow-hidden">
                                                                         <h5 class="fs-14 text-truncate"><a href="#" class="text-body">PSD to HTML Convert</a></h5>
-                                                                        <p class="text-muted text-truncate mb-0">Last Update : <span class="fw-semibold text-body">29 min Ago</span></p>
+                                                                        <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 29 min</span></p>
                                                                     </div>
                                                                     <div class="flex-shrink-0 ms-2">
-                                                                        <div class="badge bg-info-subtle text-info fs-10">New</div>
+                                                                        <div class="badge bg-info-subtle text-info fs-10">Nouveau</div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="d-flex mt-4">
                                                                     <div class="flex-grow-1">
                                                                         <div class="d-flex align-items-center gap-2">
                                                                             <div>
-                                                                                <h5 class="fs-12 text-muted mb-0">Members :</h5>
+                                                                                <h5 class="fs-12 text-muted mb-0">Membres :</h5>
                                                                             </div>
                                                                             <div class="avatar-group">
                                                                                 <div class="avatar-group-item material-shadow">
@@ -1941,7 +1897,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                     <h5 class="card-title flex-grow-1 mb-0">Documents</h5>
                                                     <div class="flex-shrink-0">
                                                         <input class="form-control d-none" type="file" id="formFile">
-                                                        <label for="formFile" class="btn btn-danger"><i class="ri-upload-2-fill me-1 align-bottom"></i> Upload File</label>
+                                                        <label for="formFile" class="btn btn-danger"><i class="ri-upload-2-fill me-1 align-bottom"></i> Importer un fichier</label>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1950,10 +1906,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                             <table class="table table-borderless align-middle mb-0">
                                                                 <thead class="table-light">
                                                                     <tr>
-                                                                        <th scope="col">File Name</th>
+                                                                        <th scope="col">Nom du fichier</th>
                                                                         <th scope="col">Type</th>
-                                                                        <th scope="col">Size</th>
-                                                                        <th scope="col">Upload Date</th>
+                                                                        <th scope="col">Taille</th>
+                                                                        <th scope="col">Date d'import</th>
                                                                         <th scope="col">Action</th>
                                                                     </tr>
                                                                 </thead>
@@ -1972,7 +1928,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 </div>
                                                                             </div>
                                                                         </td>
-                                                                        <td>Zip File</td>
+                                                                        <td>Fichier Zip</td>
                                                                         <td>4.57 MB</td>
                                                                         <td>12 Dec 2021</td>
                                                                         <td>
@@ -1981,10 +1937,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <i class="ri-equalizer-fill"></i>
                                                                                 </a>
                                                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink15">
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>View</a></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Download</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
                                                                                     <li class="dropdown-divider"></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Delete</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
                                                                                 </ul>
                                                                             </div>
                                                                         </td>
@@ -2002,7 +1958,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 </div>
                                                                             </div>
                                                                         </td>
-                                                                        <td>PDF File</td>
+                                                                        <td>Fichier PDF</td>
                                                                         <td>8.89 MB</td>
                                                                         <td>24 Nov 2021</td>
                                                                         <td>
@@ -2011,10 +1967,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <i class="ri-equalizer-fill"></i>
                                                                                 </a>
                                                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink3">
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>View</a></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Download</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
                                                                                     <li class="dropdown-divider"></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Delete</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
                                                                                 </ul>
                                                                             </div>
                                                                         </td>
@@ -2032,7 +1988,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 </div>
                                                                             </div>
                                                                         </td>
-                                                                        <td>MP4 File</td>
+                                                                        <td>Fichier MP4</td>
                                                                         <td>14.62 MB</td>
                                                                         <td>19 Nov 2021</td>
                                                                         <td>
@@ -2041,10 +1997,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <i class="ri-equalizer-fill"></i>
                                                                                 </a>
                                                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink4">
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>View</a></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Download</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
                                                                                     <li class="dropdown-divider"></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Delete</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
                                                                                 </ul>
                                                                             </div>
                                                                         </td>
@@ -2062,7 +2018,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 </div>
                                                                             </div>
                                                                         </td>
-                                                                        <td>XSL File</td>
+                                                                        <td>Fichier XSL</td>
                                                                         <td>2.38 KB</td>
                                                                         <td>14 Nov 2021</td>
                                                                         <td>
@@ -2071,10 +2027,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <i class="ri-equalizer-fill"></i>
                                                                                 </a>
                                                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink5">
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>View</a></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Download</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle text-muted"></i>Voir</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle text-muted"></i>Télécharger</a></li>
                                                                                     <li class="dropdown-divider"></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Delete</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle text-muted"></i>Supprimer</a></li>
                                                                                 </ul>
                                                                             </div>
                                                                         </td>
@@ -2092,7 +2048,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                 </div>
                                                                             </div>
                                                                         </td>
-                                                                        <td>Floder File</td>
+                                                                        <td>Dossier</td>
                                                                         <td>87.24 MB</td>
                                                                         <td>08 Nov 2021</td>
                                                                         <td>
@@ -2101,11 +2057,11 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <i class="ri-equalizer-fill"></i>
                                                                                 </a>
                                                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink6">
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>View</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>Voir</a></li>
                                                                                     <li>
-                                                                                        <a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Download</a>
+                                                                                        <a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Télécharger</a>
                                                                                     </li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Delete</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Supprimer</a></li>
                                                                                 </ul>
                                                                             </div>
                                                                         </td>
@@ -2134,10 +2090,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <i class="ri-equalizer-fill"></i>
                                                                                 </a>
                                                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink7">
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>View</a></li>
-                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Download</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-eye-fill me-2 align-middle"></i>Voir</a></li>
+                                                                                    <li><a class="dropdown-item" href="javascript:void(0);"><i class="ri-download-2-fill me-2 align-middle"></i>Télécharger</a></li>
                                                                                     <li>
-                                                                                        <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Delete</a>
+                                                                                        <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-5-line me-2 align-middle"></i>Supprimer</a>
                                                                                     </li>
                                                                                 </ul>
                                                                             </div>
