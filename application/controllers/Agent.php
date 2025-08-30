@@ -23,8 +23,8 @@ class Agent extends BaseController {
     public function json() {
         $this->isLoggedIn();
         $raw_agents = $this->agent_model->get_all_agents();
-        $projectInput = $this->input->post('project-input');
-        $taskInput = $this->input->post('task-input');
+        $projectInput = "" ;
+        $taskInput = "" ;
         $agents = array_map(function($e) use ($projectInput, $taskInput) {
             return [
             'id' => $e->id,
