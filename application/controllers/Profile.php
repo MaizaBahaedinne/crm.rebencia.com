@@ -16,6 +16,7 @@ class Profile extends BaseController {
     }
 
     public function index() {
+        $this->isLoggedIn();
         $data = [];
         $data["userInfo"] = $this->session->userdata('wp_user');
         $data["active"] = isset($active) ? $active : null;
