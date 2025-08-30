@@ -300,7 +300,9 @@ class User_model extends CI_Model
      */
     function get_wp_user($user_id, $prefix = 'wp_Hrg8P_')
     {
-        // Get user basic info
+        // Get user basic info from WordPress database
+        $this->wp_db = $this->load->database('wordpress', TRUE);
+        $this->db = $this->wp_db;
         $this->db->select('ID, user_login, user_email, display_name');
         $this->db->from($prefix . 'users');
         $this->db->where('ID', $user_id);
