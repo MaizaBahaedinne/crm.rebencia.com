@@ -1,4 +1,4 @@
-<!-- ============================================================== -->
+   <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
@@ -204,14 +204,7 @@
 
                                         </div>
                                         <div class="col-auto">
-                                            <?php
-                                                $emails = isset($emails)? $emails : [];
-                                                $pagination = isset($pagination)? $pagination : ['page'=>1,'limit'=>count($emails),'total'=>count($emails),'pages'=>1];
-                                                $totalEmails = (int)$pagination['total'];
-                                                $startIndex = $totalEmails ? (($pagination['page']-1)*$pagination['limit'] + 1) : 0;
-                                                $endIndex = $totalEmails ? min($startIndex + $pagination['limit'] - 1, $totalEmails) : 0;
-                                            ?>
-                                            <div class="text-muted mb-2"><?php echo $totalEmails ? $startIndex.'-'.$endIndex.' / '.$totalEmails : '0'; ?></div>
+                                            <div class="text-muted mb-2">1-50 of 154</div>
                                         </div>
                                     </div>
                                 </div>
@@ -224,42 +217,18 @@
                                                     <span class="visually-hidden">Loading...</span>
                                                 </div>
                                             </div>
-                                            <ul class="message-list" id="mail-list">
-                                                <?php if(!empty($emails)): foreach($emails as $m): ?>
-                                                    <li class="message-item <?php echo empty($m['seen']) ? 'unread' : ''; ?>">
-                                                        <div class="d-flex align-items-start">
-                                                            <div class="form-check mb-0"> <input class="form-check-input" type="checkbox"> </div>
-                                                            <div class="ms-2 flex-grow-1 overflow-hidden">
-                                                                <div class="d-flex align-items-center">
-                                                                    <h6 class="mb-0 me-2 text-truncate" style="max-width:160px;">"<?php echo htmlspecialchars($m['from']); ?>"</h6>
-                                                                    <?php if(!empty($m['attachments'])): ?><span title="Pièce jointe">📎</span><?php endif; ?>
-                                                                </div>
-                                                                <a class="d-block text-decoration-none" href="<?php echo base_url('mail/view/'.$m['uid']); ?>">
-                                                                    <span class="fw-semibold text-truncate" style="max-width:280px; display:inline-block;">"<?php echo htmlspecialchars($m['subject'] ?: '(Sans sujet)'); ?>"</span>
-                                                                    <span class="text-muted"> - <?php echo htmlspecialchars($m['snippet']); ?></span>
-                                                                </a>
-                                                                <div class="small mt-1">
-                                                                    <?php if(empty($m['seen'])): ?>
-                                                                        <a href="<?php echo base_url('mail/read/'.$m['uid']); ?>" class="me-2">Marquer lu</a>
-                                                                    <?php else: ?>
-                                                                        <a href="<?php echo base_url('mail/unread/'.$m['uid']); ?>" class="me-2">Marquer non lu</a>
-                                                                    <?php endif; ?>
-                                                                </div>
-                                                            </div>
-                                                            <div class="text-nowrap ms-2 small text-muted" style="min-width:90px;">"<?php echo htmlspecialchars($m['date']); ?>"</div>
-                                                        </div>
-                                                    </li>
-                                                <?php endforeach; else: ?>
-                                                    <li class="text-center py-4 text-muted">Aucun email</li>
-                                                <?php endif; ?>
-                                            </ul>
+                                            <ul class="message-list" id="mail-list"></ul>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="pills-social" role="tabpanel" aria-labelledby="pills-social-tab">
-                                        <div class="message-list-content mx-n4 px-4 message-list-scroll text-center text-muted py-4">(Vide)</div>
+                                        <div class="message-list-content mx-n4 px-4 message-list-scroll">
+                                            <ul class="message-list" id="social-mail-list"></ul>
+                                        </div>
                                     </div>
                                     <div class="tab-pane fade" id="pills-promotions" role="tabpanel" aria-labelledby="pills-promotions-tab">
-                                        <div class="message-list-content mx-n4 px-4 message-list-scroll text-center text-muted py-4">(Vide)</div>
+                                        <div class="message-list-content mx-n4 px-4 message-list-scroll">
+                                            <ul class="message-list" id="promotions-mail-list"></ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -270,9 +239,101 @@
                             <div class="p-4 d-flex flex-column h-100">
                                 <div class="pb-4 border-bottom border-bottom-dashed">
                                     <div class="row">
-                                        <div class="email-detail-content minimal-border d-none d-lg-block">
-                                            <div class="p-5 text-center text-muted">Sélectionnez un email pour l'afficher (ou cliquez sur le sujet).</div>
+                                        <div class="col">
+                                            <div class="">
+                                                    <button type="button" class="btn btn-soft-danger btn-icon btn-sm fs-16 close-btn-email material-shadow-none" id="close-btn-email">
+                                                    <i class="ri-close-fill align-bottom"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        <div class="col-auto">
+                                            <div class="hstack gap-sm-1 align-items-center flex-wrap email-topbar-link">
+                                                <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm fs-16 favourite-btn active material-shadow-none">
+                                                    <i class="ri-star-fill align-bottom"></i>
+                                                </button>
+                                                <button class="btn btn-ghost-secondary btn-icon btn-sm fs-16 material-shadow-none">
+                                                    <i class="ri-printer-fill align-bottom"></i>
+                                                </button>
+                                                    <button class="btn btn-ghost-secondary btn-icon btn-sm fs-16 material-shadow-none remove-mail" data-remove-id=""  data-bs-toggle="modal" data-bs-target="#removeItemModal">
+                                                    <i class="ri-delete-bin-5-fill align-bottom"></i>
+                                                </button>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-ghost-secondary btn-icon btn-sm fs-16 material-shadow-none" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="ri-more-2-fill align-bottom"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">Mark as Unread</a>
+                                                        <a class="dropdown-item" href="#">Mark as Important</a>
+                                                        <a class="dropdown-item" href="#">Add to Tasks</a>
+                                                        <a class="dropdown-item" href="#">Add Star</a>
+                                                        <a class="dropdown-item" href="#">Mute</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mx-n4 px-4 email-detail-content-scroll" data-simplebar>
+                                    <div class="mt-4 mb-3">
+                                        <h5 class="fw-bold email-subject-title">New updates for Skote Theme</h5>
+                                    </div>
+
+                                    <div class="accordion accordion-flush">
+                                        <div class="accordion-item border-dashed left">
+                                            <div class="accordion-header">
+                                                <a role="button" class="btn w-100 text-start px-0 bg-transparent shadow-none collapsed" data-bs-toggle="collapse" href="#email-collapseOne" aria-expanded="true" aria-controls="email-collapseOne">
+                                                    <div class="d-flex align-items-center text-muted">
+                                                        <div class="flex-shrink-0 avatar-xs me-3">
+                                                            <img src="assets/images/users/avatar-3.jpg" alt="" class="img-fluid rounded-circle">
+                                                        </div>
+                                                        <div class="flex-grow-1 overflow-hidden">
+                                                            <h5 class="fs-14 text-truncate email-user-name mb-0">Jack Davis</h5>
+                                                            <div class="text-truncate fs-12">to: me</div>
+                                                        </div>
+                                                        <div class="flex-shrink-0 align-self-start">
+                                                            <div class="text-muted fs-12">09 Jan 2022, 11:12 AM</div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+
+                                            <div id="email-collapseOne" class="accordion-collapse collapse">
+                                                <div class="accordion-body text-body px-0">
+                                                    <div>
+                                                        <p>Hi,</p>
+                                                        <p>Praesent dui ex, dapibus eget mauris ut, finibus vestibulum enim. Quisque arcu leo, facilisis in fringilla id, luctus in tortor.</p>
+                                                        <p>Sed elementum turpis eu lorem interdum, sed porttitor eros commodo. Nam eu venenatis tortor, id lacinia diam. Sed aliquam in dui et porta. Sed bibendum orci non tincidunt ultrices.</p>
+                                                        <p>Sincerly,</p>
+
+                                                        <div class="d-flex gap-3">
+                                                            <div class="border rounded avatar-xl h-auto">
+                                                                <img src="assets/images/small/img-2.jpg" alt="" class="img-fluid rouned-top">
+                                                                <div class="py-2 text-center">
+                                                                    <a href="#" class="d-block fw-semibold">Download</a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="border rounded avatar-xl h-auto">
+                                                                <img src="assets/images/small/img-6.jpg" alt="" class="img-fluid rouned-top">
+                                                                <div class="py-2 text-center">
+                                                                    <a href="#" class="d-block fw-semibold">Download</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end accordion-item -->
+
+                                        <div class="accordion-item border-dashed right">
+                                            <div class="accordion-header">
+                                                <a role="button" class="btn w-100 text-start px-0 bg-transparent shadow-none collapsed" data-bs-toggle="collapse" href="#email-collapseTwo" aria-expanded="true" aria-controls="email-collapseTwo">
+                                                    <div class="d-flex align-items-center text-muted">
+                                                        <div class="flex-shrink-0 avatar-xs me-3">
+                                                            <img src="assets/images/users/avatar-1.jpg" alt="" class="img-fluid rounded-circle">
+                                                        </div>
+                                                        <div class="flex-grow-1 overflow-hidden">
                                                             <h5 class="fs-14 text-truncate email-user-name-right mb-0">Anna Adame</h5>
                                                             <div class="text-truncate fs-12">to: jackdavis@email.com</div>
                                                         </div>
@@ -630,5 +691,11 @@
             <div class="spinner-border text-primary avatar-sm" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
+        </div>
+    </div>
+
+    <div class="customizer-setting d-none d-md-block">
+        <div class="btn-info rounded-pill shadow-lg btn btn-icon btn-lg p-2" data-bs-toggle="offcanvas" data-bs-target="#theme-settings-offcanvas" aria-controls="theme-settings-offcanvas">
+            <i class='mdi mdi-spin mdi-cog-outline fs-22'></i>
         </div>
     </div>
