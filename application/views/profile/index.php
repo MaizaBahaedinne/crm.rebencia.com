@@ -1,3 +1,16 @@
+<?php
+// Helpers locaux
+if(!function_exists('h')){ function h($v){ return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); } }
+$u = isset($user)? $user : [];
+$fieldsForCompletion = ['name','email','mobile','location','agence'];
+$filled = 0; foreach($fieldsForCompletion as $f){ if(!empty($u[$f])) $filled++; }
+$completion = count($fieldsForCompletion) ? (int) round($filled * 100 / count($fieldsForCompletion)) : 0;
+if($completion < 10) $completion = 10; // minimum barre visible
+$aboutText = '';
+if(!empty($u['meta']['description'])) { $aboutText = $u['meta']['description']; }
+elseif(!empty($u['name'])) { $aboutText = "Bonjour, je suis ".$u['name'].". Ceci est votre espace profil."; }
+else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."; }
+?>
  <div class="main-content">
             <div class="page-content">
                 <div class="container-fluid">
@@ -17,7 +30,7 @@
                             <div class="col">
                                 <div class="p-2">
                                     <h3 class="text-white mb-1"><?php echo htmlspecialchars($user['name'] ?? ''); ?></h3>
-                                    <p class="text-white text-opacity-75"><?php echo htmlspecialchars($user['role'] ?? ''); ?></p>
+                                    <p class="text-white text-opacity-75"><?php echo h(isset($u['roles'])? implode(', ',$u['roles']) : ''); ?></p>
                                     <div class="hstack text-white-50 gap-1">
                                         <div class="me-2">
                                             <i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
@@ -61,17 +74,17 @@
                                     <ul class="nav nav-pills animation-nav profile-nav gap-2 gap-lg-3 flex-grow-1" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link fs-14 active" data-bs-toggle="tab" href="#overview-tab" role="tab">
-                                                <i class="ri-airplay-fill d-inline-block d-md-none"></i> <span class="d-none d-md-inline-block">Overview</span>
+                                                <i class="ri-airplay-fill d-inline-block d-md-none"></i> <span class="d-none d-md-inline-block">Aperçu</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link fs-14" data-bs-toggle="tab" href="#activities" role="tab">
-                                                <i class="ri-list-unordered d-inline-block d-md-none"></i> <span class="d-none d-md-inline-block">Activities</span>
+                                                <i class="ri-list-unordered d-inline-block d-md-none"></i> <span class="d-none d-md-inline-block">Activités</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link fs-14" data-bs-toggle="tab" href="#projects" role="tab">
-                                                <i class="ri-price-tag-line d-inline-block d-md-none"></i> <span class="d-none d-md-inline-block">Projects</span>
+                                                <i class="ri-price-tag-line d-inline-block d-md-none"></i> <span class="d-none d-md-inline-block">Projets</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -81,7 +94,7 @@
                                         </li>
                                     </ul>
                                     <div class="flex-shrink-0">
-                                        <a href="pages-profile-settings.html" class="btn btn-success"><i class="ri-edit-box-line align-bottom"></i> Edit Profile</a>
+                                        <a href="pages-profile-settings.html" class="btn btn-success"><i class="ri-edit-box-line align-bottom"></i> Modifier le profil</a>
                                     </div>
                                 </div>
                                 <!-- Tab panes -->
@@ -91,10 +104,10 @@
                                             <div class="col-xxl-3">
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-5">Complete Your Profile</h5>
+                                                        <h5 class="card-title mb-5">Complétez votre profil</h5>
                                                         <div class="progress animated-progress custom-progress progress-label">
-                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
-                                                                <div class="label">30%</div>
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: <?php echo $completion; ?>%" aria-valuenow="<?php echo $completion; ?>" aria-valuemin="0" aria-valuemax="100">
+                                                                <div class="label"><?php echo $completion; ?>%</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -102,39 +115,33 @@
 
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-3">Info</h5>
+                                                        <h5 class="card-title mb-3">Informations</h5>
                                                         <div class="table-responsive">
                                                             <table class="table table-borderless mb-0">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <th class="ps-0" scope="row">Full Name :</th>
-                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['name'] ?? ''); ?></td>
+                                                                        <th class="ps-0" scope="row">Nom complet :</th>
+                                                                        <td class="text-muted"><?php echo h($u['name'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">Mobile :</th>
-                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['mobile'] ?? ''); ?></td>
+                                                                        <td class="text-muted"><?php echo h($u['mobile'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th class="ps-0" scope="row">E-mail :</th>
-                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
+                                                                        <td class="text-muted"><?php echo h($u['email'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <th class="ps-0" scope="row">Location :</th>
-                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['location'] ?? ''); ?></td>
+                                                                        <th class="ps-0" scope="row">Localisation :</th>
+                                                                        <td class="text-muted"><?php echo h($u['location'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <th class="ps-0" scope="row">Joining Date</th>
-                                                                        <td class="text-muted"><?php echo htmlspecialchars($user['joining_date'] ?? ''); ?></td>
+                                                                        <th class="ps-0" scope="row">Date d'inscription :</th>
+                                                                        <td class="text-muted"><?php echo h($u['joining_date'] ?? ''); ?></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <th class="ps-0" scope="row">Role(s)</th>
-                                                                        <td class="text-muted">
-                                                                            <?php
-                                                                            if (!empty($user['roles']) && is_array($user['roles'])) {
-                                                                                echo htmlspecialchars(implode(', ', $user['roles']));
-                                                                            }
-                                                                            ?>
-                                                                        </td>
+                                                                        <th class="ps-0" scope="row">Rôle(s)</th>
+                                                                        <td class="text-muted"><?php echo h(isset($u['roles'])? implode(', ',$u['roles']):''); ?></td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
@@ -180,7 +187,7 @@
 
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-4">Skills</h5>
+                                                        <h5 class="card-title mb-4">Compétences</h5>
                                                         <div class="d-flex flex-wrap gap-2 fs-15">
                                                             <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">Photoshop</a>
                                                             <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">illustrator</a>
@@ -265,7 +272,7 @@
                                                     <div class="card-body">
                                                         <div class="d-flex align-items-center mb-4">
                                                             <div class="flex-grow-1">
-                                                                <h5 class="card-title mb-0">Popular Posts</h5>
+                                                                <h5 class="card-title mb-0">Articles populaires</h5>
                                                             </div>
                                                             <div class="flex-shrink-0">
                                                                 <div class="dropdown">
@@ -323,9 +330,8 @@
                                             <div class="col-xxl-9">
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-3">About</h5>
-                                                        <p>Hi I'm Anna Adame, It will be as simple as Occidental; in fact, it will be Occidental. To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is European languages are members of the same family.</p>
-                                                        <p>You always want to make sure that your fonts work well together and try to limit the number of fonts you use to three or less. Experiment and play around with the fonts that you already have in the software you’re working with reputable font websites. This may be the most commonly encountered tip I received from the designers I spoke with. They highly encourage that you use different fonts in one design, but do not over-exaggerate and go overboard.</p>
+                                                        <h5 class="card-title mb-3">À propos</h5>
+                                                        <p><?php echo nl2br(h($aboutText)); ?></p>
                                                         <div class="row">
                                                             <div class="col-6 col-md-4">
                                                                 <div class="d-flex mt-4">
