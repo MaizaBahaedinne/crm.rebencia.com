@@ -22,29 +22,35 @@ class Profile extends BaseController {
     public function index() {
         $this->isLoggedIn();
 
-        // Ensure userId is set in $this->global from session
-        if (!isset($this->global['userId'])) {
-            $userId = $this->session->userdata('userId');
-            if ($userId) {
-                $this->global['userId'] = $userId;
-            } else {
-                echo "Error: userId is not set in global or session.";
-                return;
-            }
-        }
-
-        $data['user'] = $this->user_model->get_wp_user($this->global['userId']);
-
-        // Debug: Check if user data is returned
-        if (empty($data['user'])) {
-            echo "No user found for userID: " . $this->global['userId'];
+        // Récupération fiable de l'identifiant utilisateur
+        $userId = $this->global['userId'] ?? $this->vendorId ?? $this->session->userdata('userId');
+        if (empty($userId)) {
+            // Pas d'ID -> retour login
+            redirect('login');
             return;
         }
+        // Synchroniser global si manquant
+        $this->global['userId'] = $userId;
 
-        echo "userID : " . $this->global['userId'];
-        echo '<pre>';
-        print_r($data['user']);
-        echo '</pre>';
-        // $this->loadViews('profile/index', $this->global, $data, NULL);
+        // Récupération du profil WP
+        $user = $this->user_model->get_wp_user($userId);
+
+        if (empty($user)) {
+            // Préparer structure minimale pour la vue (évite notices)
+            $data['user'] = [
+                'name' => $this->global['name'] ?? 'Utilisateur',
+                'user_email' => '',
+                'email' => '',
+                'mobile' => '',
+                'phone' => '',
+                'location' => '',
+                'bio' => '',
+            ];
+            $this->global['flash_error'] = "Profil introuvable.";
+        } else {
+            $data['user'] = $user; // objet accepté (la vue normalise en tableau)
+        }
+
+        $this->loadViews('profile/index', $this->global, $data, NULL);
     }
 }
