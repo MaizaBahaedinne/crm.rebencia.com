@@ -30,16 +30,22 @@ class Agent extends BaseController {
         $projectInput = "" ;
         $taskInput = "" ;
         $agents = array_map(function($e) use ($projectInput, $taskInput) {
+            // Normalisation des champs depuis la vue crm_agents supposée (adapte si noms réels diffèrent)
+            $arr = is_object($e) ? (array)$e : (array)$e; // cast léger
+            $id = $arr['ID'] ?? ($arr['id'] ?? null);
+            $nickname = $arr['nickname'] ?? ($arr['display_name'] ?? ($arr['first_name'] ?? ''));
+            $fullName = trim(($arr['first_name'] ?? '').' '.($arr['last_name'] ?? ''));
+            if ($fullName === '') $fullName = $arr['display_name'] ?? $nickname;
             return [
-            'id' => $e->id,
-            'coverImg' => $e->coverImg ?? null,
-            'bookmark' => $e->bookmark ?? null,
-            'memberImg' => $e->memberImg ?? null,
-            'nickname' => $e->nickname ?? null,
-            'memberName' => $e->memberName ?? null,
-            'position' => $e->position ?? null,
-            'projects' => $projectInput,
-            'tasks' => $taskInput,
+                'id' => $id,
+                'coverImg' => $arr['coverImg'] ?? null,
+                'bookmark' => $arr['bookmark'] ?? null,
+                'memberImg' => $arr['avatar'] ?? ($arr['memberImg'] ?? null),
+                'nickname' => $nickname,
+                'memberName' => $fullName,
+                'position' => $arr['position'] ?? ($arr['role'] ?? null),
+                'projects' => $projectInput,
+                'tasks' => $taskInput,
             ];
         }, $raw_agents);
 
