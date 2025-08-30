@@ -117,53 +117,11 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                     <div class="tab-pane active" id="overview-tab" role="tabpanel">
                                         <div class="row">
                                             <div class="col-xxl-3">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title mb-5">Complétez votre profil</h5>
-                                                        <div class="progress animated-progress custom-progress progress-label">
-                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
-                                                                <div class="label">30%</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                
 
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title mb-3">Informations</h5>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-borderless mb-0">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">Nom complet :</th>
-                                                                        <td class="text-muted"><?php echo $user['name']; ?></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">Mobile :</th>
-                                                                        <td class="text-muted"><?php echo ($user['mobile'] ?: $user['phone']); ?></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">E-mail :</th>
-                                                                        <td class="text-muted"><?php echo $user['email']; ?></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">Localisation :</th>
-                                                                        <td class="text-muted"><?php echo $user['location']; ?>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="ps-0" scope="row">Joining Date</th>
-                                                                        <td class="text-muted">24 Nov 2021</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div><!-- end card body -->
-                                                </div><!-- end card -->
-
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title mb-3">Profil WordPress</h5>
+                                                        <h5 class="card-title mb-3">Profil Rebencia</h5>
                                                         <div class="table-responsive">
                                                             <table class="table table-sm table-borderless mb-0">
                                                                 <tbody>
@@ -226,20 +184,7 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                     </div><!-- end card body -->
                                                 </div><!-- end card -->
 
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title mb-4">Skills</h5>
-                                                        <div class="d-flex flex-wrap gap-2 fs-15">
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">Photoshop</a>
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">illustrator</a>
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">HTML</a>
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">CSS</a>
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">Javascript</a>
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">Php</a>
-                                                            <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary">Python</a>
-                                                        </div>
-                                                    </div><!-- end card body -->
-                                                </div><!-- end card -->
+                                                
 
                                                 <div class="card">
                                                     <div class="card-body">
