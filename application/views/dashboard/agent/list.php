@@ -35,13 +35,13 @@
                                 <?php foreach ($agents as $index => $agent) : ?>
                                     <tr>
                                         <td><?php echo $index + 1; ?></td>
-                                        <td><?php echo htmlspecialchars($agent->display_name); ?></td>
+                                        <td><?php echo htmlspecialchars($agent->agent_name ?? $agent->display_name ?? ''); ?></td>
                                         <td><?php echo htmlspecialchars($agent->agency_name ?? ''); ?></td>
-                                        <td><?php echo htmlspecialchars($agent->user_email); ?></td>
+                                        <td><?php echo htmlspecialchars($agent->user_email ?? $agent->agent_email ?? ''); ?></td>
                                         <td><?php echo htmlspecialchars($agent->agent_phone ?? ''); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($agent->user_registered)); ?></td>
+                                        <td><?php echo isset($agent->registration_date) ? date('d/m/Y', strtotime($agent->registration_date)) : (isset($agent->user_registered) ? date('d/m/Y', strtotime($agent->user_registered)) : ''); ?></td>
                                         <td>
-                                            <a href="<?php echo base_url('agent/details/' . $agent->ID); ?>" class="btn btn-sm btn-primary">
+                                            <a href="<?php echo base_url('agent/details/' . ($agent->user_id ?? $agent->ID)); ?>" class="btn btn-sm btn-primary">
                                                 <i class="mdi mdi-eye"></i> Détails
                                             </a>
                                         </td>
