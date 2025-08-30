@@ -3,14 +3,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 require APPPATH . '/libraries/BaseController.php';
+/**
+ * @property Agent_model $agent_model
+ * @property Agency_model $agency_model
+ * @property Property_model $property_model
+ */
 class Agent extends BaseController {
     public function __construct() {
         parent::__construct();
         $this->load->model('agent_model');
         $this->load->model('agency_model');
         $this->load->model('property_model');
-        $this->load->library('input');
-        $this->load->library('output');
+    // $this->input et $this->output sont fournis par CI par défaut, pas besoin de load->library()
     }
 
     // Liste des agents
