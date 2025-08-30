@@ -1,9 +1,24 @@
 <?php
 // Helpers locaux
 if(!function_exists('h')){ function h($v){ return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); } }
+// Normalisation $user en tableau
+if(isset($user)){
+    if(is_object($user)) { $user = (array)$user; }
+    // Roles éventuellement chaîne => array
+    if(isset($user['roles']) && !is_array($user['roles'])){
+        if(is_string($user['roles'])){
+            $try = @json_decode($user['roles'], true);
+            if(is_array($try)) $user['roles']=$try; else $user['roles'] = [$user['roles']];
+        } else {
+            $user['roles'] = (array)$user['roles'];
+        }
+    }
+}
 $u = isset($user)? $user : [];
+// Accès sûr clé
+if(!function_exists('uget')){ function uget($u,$k,$d=''){ if(is_array($u)&&array_key_exists($k,$u)) return $u[$k]; return $d; } }
 $fieldsForCompletion = ['name','email','mobile','location','agence'];
-$filled = 0; foreach($fieldsForCompletion as $f){ if(!empty($u[$f])) $filled++; }
+$filled = 0; foreach($fieldsForCompletion as $f){ if(!empty(uget($u,$f))) $filled++; }
 $completion = count($fieldsForCompletion) ? (int) round($filled * 100 / count($fieldsForCompletion)) : 0;
 if($completion < 10) $completion = 10; // minimum barre visible
 $aboutText = '';
@@ -49,13 +64,13 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                     <div class="col-lg-6 col-4">
                                         <div class="p-2">
                                             <h4 class="text-white mb-1">24.3K</h4>
-                                            <p class="fs-14 mb-0">Followers</p>
+                                            <p class="fs-14 mb-0">Abonnés</p>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-4">
                                         <div class="p-2">
                                             <h4 class="text-white mb-1">1.3K</h4>
-                                            <p class="fs-14 mb-0">Following</p>
+                                            <p class="fs-14 mb-0">Abonnements</p>
                                         </div>
                                     </div>
                                 </div>
@@ -341,8 +356,8 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                         </div>
                                                                     </div>
                                                                     <div class="flex-grow-1 overflow-hidden">
-                                                                        <p class="mb-1">Designation :</p>
-                                                                        <h6 class="text-truncate mb-0">Lead Designer / Developer</h6>
+                                                                        <p class="mb-1">Fonction :</p>
+                                                                        <h6 class="text-truncate mb-0">Lead Designer / Développeur</h6>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -355,8 +370,8 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                         </div>
                                                                     </div>
                                                                     <div class="flex-grow-1 overflow-hidden">
-                                                                        <p class="mb-1">Website :</p>
-                                                                        <a href="#" class="fw-semibold">www.velzon.com</a>
+                                                                        <p class="mb-1">Site web :</p>
+                                                                        <a href="#" class="fw-semibold">www.exemple.com</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -371,22 +386,22 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                     <div class="col-lg-12">
                                                         <div class="card">
                                                             <div class="card-header align-items-center d-flex">
-                                                                <h4 class="card-title mb-0  me-2">Recent Activity</h4>
+                                                                <h4 class="card-title mb-0  me-2">Activité récente</h4>
                                                                 <div class="flex-shrink-0 ms-auto">
                                                                     <ul class="nav justify-content-end nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
                                                                         <li class="nav-item">
                                                                             <a class="nav-link active" data-bs-toggle="tab" href="#today" role="tab">
-                                                                                Today
+                                                                                Aujourd'hui
                                                                             </a>
                                                                         </li>
                                                                         <li class="nav-item">
                                                                             <a class="nav-link" data-bs-toggle="tab" href="#weekly" role="tab">
-                                                                                Weekly
+                                                                                Semaine
                                                                             </a>
                                                                         </li>
                                                                         <li class="nav-item">
                                                                             <a class="nav-link" data-bs-toggle="tab" href="#monthly" role="tab">
-                                                                                Monthly
+                                                                                Mois
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -944,7 +959,7 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
 
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <h5 class="card-title">Projects</h5>
+                                                                    <h5 class="card-title">Projets</h5>
                                                         <!-- Swiper -->
                                                         <div class="swiper project-swiper mt-n4">
                                                             <div class="d-flex justify-content-end gap-2 mb-2">
@@ -968,10 +983,10 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <h5 class="fs-14 text-truncate mb-1">
                                                                                         <a href="#" class="text-body">ABC Project Customization</a>
                                                                                     </h5>
-                                                                                    <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">4 hr Ago</span></p>
+                                                                                    <p class="text-muted text-truncate mb-0"> Dernière mise à jour : <span class="fw-semibold text-body">il y a 4 h</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-primary-subtle text-primary fs-10"> En cours</div>
+                                                                                    <div class="badge bg-primary-subtle text-primary fs-10">En cours</div>
                                                                                     <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 1 h</span></p>
                                                                                     <div class="badge bg-success-subtle text-success fs-10">Terminé</div>
                                                                                     <p class="text-muted text-truncate mb-0">Dernière mise à jour : <span class="fw-semibold text-body">il y a 10 min</span></p>
@@ -1024,14 +1039,14 @@ else { $aboutText = "Ceci est votre espace profil. Complétez vos informations."
                                                                                     <p class="text-muted text-truncate mb-0"> Last Update : <span class="fw-semibold text-body">1 hr Ago</span></p>
                                                                                 </div>
                                                                                 <div class="flex-shrink-0 ms-2">
-                                                                                    <div class="badge bg-success-subtle text-success fs-10"> Completed</div>
+                                                                                    <div class="badge bg-success-subtle text-success fs-10">Terminé</div>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="d-flex mt-4">
                                                                                 <div class="flex-grow-1">
                                                                                     <div class="d-flex align-items-center gap-2">
                                                                                         <div>
-                                                                                            <h5 class="fs-12 text-muted mb-0"> Members :</h5>
+                                                                                            <h5 class="fs-12 text-muted mb-0"> Membres :</h5>
                                                                                         </div>
                                                                                         <div class="avatar-group">
                                                                                             <div class="avatar-group-item material-shadow">

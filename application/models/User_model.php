@@ -331,6 +331,54 @@ class User_model extends CI_Model
         return $user;
     }
 
+    /**
+     * Récupère le profil utilisateur complet via la vue SQL v_users_profile (si disponible)
+     * @param int $user_id
+     * @return array|null
+     */
+    function get_wp_user_profile($user_id)
+    {
+        $db = $this->load->database('wordpress', TRUE);
+        // Vérifie existence de la vue (simple tentative de requête LIMIT 1)
+        $query = $db->get_where('v_users_profile', ['user_id' => (int)$user_id]);
+        if(!$query || $query->num_rows()===0) return null;
+        $row = $query->row_array();
+        // Normalisation noms clés
+        $profile = [
+            'id' => (int)$row['user_id'],
+            'login' => $row['identifiant'] ?? '',
+            'email' => $row['email'] ?? '',
+            'registration_date' => $row['registration_date'] ?? '',
+            'status' => $row['user_status'] ?? '',
+            'first_name' => $row['first_name'] ?? '',
+            'last_name' => $row['last_name'] ?? '',
+            'nickname' => $row['nickname'] ?? '',
+            'display_name' => $row['display_name'] ?? '',
+            'biography' => $row['biography'] ?? '',
+            'phone' => $row['phone'] ?? '',
+            'mobile' => $row['mobile'] ?? '',
+            'whatsapp' => $row['whatsapp'] ?? '',
+            'skype' => $row['skype'] ?? '',
+            'agency_id' => $row['agency_id'] ?? '',
+            'agency_name' => $row['agency_name'] ?? '',
+            'agency_user_id' => $row['agency_user_id'] ?? ''
+        ];
+        // Rôles: meta sérialisée ou JSON
+        $rolesRaw = $row['role_json'] ?? '';
+        $roles = [];
+        if($rolesRaw){
+            $unser = @unserialize($rolesRaw);
+            if(is_array($unser)) {
+                $roles = array_keys(array_filter($unser));
+            } else {
+                $json = json_decode($rolesRaw, true);
+                if(is_array($json)) { $roles = array_keys(array_filter($json)); }
+            }
+        }
+        $profile['roles'] = $roles;
+        return $profile;
+    }
+
 }
 
   
