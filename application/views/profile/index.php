@@ -40,7 +40,7 @@ foreach ($defaults as $k=>$v) { if (!isset($user[$k])) $user[$k] = $v; }
                             <!--end col-->
                             <div class="col">
                                 <div class="p-2">
-                                    <h3 class="text-white mb-1"><?php echo $user['name']; ?></h3>
+                                    <h3 class="text-white mb-1"><?php echo $user->name; ?></h3>
                                     <p class="text-white text-opacity-75">Owner & Founder</p>
                                     <div class="hstack text-white-50 gap-1">
                                         <div class="me-2"><i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i><?php echo $user['location']; ?></div>
