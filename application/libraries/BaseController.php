@@ -42,7 +42,7 @@ class BaseController extends CI_Controller {
 			redirect('login');
 		} else {
 			$this->role = $CI->session->userdata('role');
-			$this->vendorId = $CI->session->userdata('userId');
+			$this->vendorId = $CI->session->userdata('wp_id');
 			$this->name = $CI->session->userdata('name');
 			$this->roleText = $CI->session->userdata('roleText');
 			$this->lastLogin = $CI->session->userdata('lastLogin');
