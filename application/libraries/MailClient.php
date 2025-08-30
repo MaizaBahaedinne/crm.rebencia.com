@@ -6,15 +6,47 @@
  * @property CI_Email $email
  */
 class MailClient {
+    /** @var CI_Controller */
     protected $CI;
     protected $cfg;
+    protected $agentId = null;
+    /** @var CI_Email */
+    protected $email;
 
     public function __construct() {
         $this->CI =& get_instance();
         // Charger fichier config/mail.php puis récupérer tableau complet
-        $this->CI->load->config('mail');
-        $this->cfg = $this->CI->config->config; // récupère toutes les clés, on va en extraire celles du mail
+    $this->CI->load->config('mail');
+    $keys = ['imap_host','imap_port','imap_flags','imap_folder','imap_user','imap_pass','smtp_protocol','smtp_host','smtp_port','smtp_user','smtp_pass','smtp_crypto','from_email','from_name','mailtype','charset','newline','crlf'];
+    $c = [];
+    foreach($keys as $k){ $c[$k] = config_item($k); }
+    $this->cfg = $c;
         // Filtrer uniquement les clés mail.* si nécessaire sinon garder variables individuelles
+    }
+
+    /**
+     * Spécifie un agent pour utiliser ses identifiants personnalisés (table agent_mail_credentials)
+     */
+    public function setAgent($agentId): self {
+        $this->agentId = (int)$agentId;
+        $this->hydrateAgentCredentials();
+        return $this;
+    }
+
+    protected function hydrateAgentCredentials(): void {
+        if(!$this->agentId) return;
+        if(!function_exists('agent_mail_config')) {
+            $this->CI->load->helper('agent_mail');
+        }
+        if(function_exists('agent_mail_config')) {
+            $cred = agent_mail_config($this->agentId);
+            // ne remplacer que si valeurs présentes
+            foreach($cred as $k=>$v) {
+                if($v !== null && $v !== '') {
+                    $this->cfg[$k] = $v;
+                }
+            }
+        }
     }
 
     protected function mailboxString(): string {
@@ -24,6 +56,10 @@ class MailClient {
     protected function open() {
         if(!function_exists('imap_open')) {
             throw new Exception('Extension PHP IMAP non activée');
+        }
+        // si agent défini mais pas encore hydraté (appel direct) tenter hydratation
+        if($this->agentId && (!isset($this->cfg['imap_user']) || $this->cfg['imap_user']==='user@votre-domaine.tld')) {
+            $this->hydrateAgentCredentials();
         }
         $mb = @imap_open($this->mailboxString(), $this->cfg['imap_user'], $this->cfg['imap_pass']);
         if(!$mb) {
@@ -113,16 +149,15 @@ class MailClient {
             'newline' => $this->cfg['newline'],
             'crlf' => $this->cfg['crlf']
         ];
-        $this->CI->load->library('email', $config);
-        $email = $this->CI->email; // variable locale pour IDE
-        $email->from($this->cfg['from_email'], $this->cfg['from_name']);
-        $email->to($to);
-        $email->subject($subject);
-        $email->message($message);
-        foreach($attachmentsPaths as $p) {
-            if(is_file($p)) $email->attach($p);
-        }
-        return $email->send();
+    // Charger la classe puis instancier directement (évite propriété dynamique inconnue de l'analyseur)
+    $this->CI->load->library('email');
+    $this->email = new CI_Email($config);
+    $this->email->from($this->cfg['from_email'], $this->cfg['from_name']);
+    $this->email->to($to);
+    $this->email->subject($subject);
+    $this->email->message($message);
+    foreach($attachmentsPaths as $p) { if(is_file($p)) $this->email->attach($p); }
+    return $this->email->send();
     }
 
     protected function decodeHeader(string $str): string {
