@@ -22,7 +22,7 @@ class Profile extends BaseController {
     public function index() {
         $this->isLoggedIn();
         $data['user'] = $this->user_model->get_wp_user($this->global['userId'] );
-        echo($this->vendorId);
+        echo("userID : ".$this->vendorId);
         echo '<pre>';
         print_r($data['user']);
         echo '</pre>';
