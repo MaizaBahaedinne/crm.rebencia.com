@@ -16,6 +16,14 @@ class Agent extends BaseController {
         $this->loadViews('dashboard/agent/list', $this->global, $data, NULL);
     }
 
+    public function json() {
+        $this->isLoggedIn();
+        $agents = $this->agent_model->get_all_agents();
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($agents));
+    }
+
     // Formulaire ajout/modif agent
     public function form($id = null) {
         $this->isLoggedIn();
