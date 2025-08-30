@@ -22,10 +22,15 @@ class Profile extends BaseController {
     public function index() {
         $this->isLoggedIn();
 
-        // Debug: Check if userId is set
+        // Ensure userId is set in $this->global from session
         if (!isset($this->global['userId'])) {
-            echo "Error: userId is not set in global.";
-            return;
+            $userId = $this->session->userdata('userId');
+            if ($userId) {
+                $this->global['userId'] = $userId;
+            } else {
+                echo "Error: userId is not set in global or session.";
+                return;
+            }
         }
 
         $data['user'] = $this->user_model->get_wp_user($this->global['userId']);
