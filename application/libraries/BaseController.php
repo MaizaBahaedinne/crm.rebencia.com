@@ -51,7 +51,7 @@ class BaseController extends CI_Controller {
 			// Normalisation pour éviter warnings si null
 			if(!is_array($this->accessInfo)) { $this->accessInfo = []; }
 			$this->wp_avatar = $CI->session->userdata('wp_avatar');
-			$this->global['userId'] = $this->vendorId
+			$this->global['userId'] = $this->vendorId ;
 			$this->global['name'] = $this->name;
 			$this->global['role'] = $this->role;
 			$this->global['role_text'] = $this->roleText;
