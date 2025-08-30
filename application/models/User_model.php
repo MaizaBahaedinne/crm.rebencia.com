@@ -295,20 +295,19 @@ class User_model extends CI_Model
 
 
     /**
-     * Get a WordPress Houzez user by ID, including roles and meta
+     * Get a WordPress Houzez user profile from the v_users_profile view
      * @param int $user_id
-     * @param string $prefix (optional) - table prefix, default 'wp_'
      * @return object|null
      */
-    function get_wp_user($user_id)
+    function get_wp_user_profile($user_id)
     {
-        // Connexion DB WordPress (config database.php => groupe 'wordpress')
-        $this->wp_db = $this->load->database('wordpress', TRUE); // stockée pour réutilisation
+        // Connect to WordPress DB (config database.php => group 'wordpress')
+        $this->wp_db = $this->load->database('wordpress', TRUE);
         $db = $this->wp_db;
-        // Infos de base utilisateur (on ajoute user_registered)
-        $db->select('ID, user_login, user_email, display_name, user_registered');
-        $db->from('wp_Hrg8P_users');
-        $db->where('ID', $user_id);
+
+        $db->select('*');
+        $db->from('v_users_profile');
+        $db->where('user_id', $user_id);
         $query = $db->get();
 
         if ($query->num_rows() == 0) {
@@ -317,32 +316,17 @@ class User_model extends CI_Model
 
         $user = $query->row();
 
-        // Get user roles from usermeta
-    $db->select('meta_value');
-    $db->from('wp_Hrg8P_usermeta');
-    $db->where('user_id', $user_id);
-    $db->where('meta_key', 'wp_Hrg8P_capabilities');
-    $role_query = $db->get();
-        $roles = [];
-        if ($role_query->num_rows() > 0) {
-            $meta_value = $role_query->row()->meta_value;
-            $capabilities = @unserialize($meta_value);
+        // Optionally decode role_json if needed
+        if (!empty($user->role_json)) {
+            $capabilities = @unserialize($user->role_json);
             if (is_array($capabilities)) {
-                $roles = array_keys(array_filter($capabilities));
+                $user->roles = array_keys(array_filter($capabilities));
+            } else {
+                $user->roles = [];
             }
+        } else {
+            $user->roles = [];
         }
-        $user->roles = $roles;
-
-        // Get all user meta
-    $db->select('meta_key, meta_value');
-    $db->from('wp_Hrg8P_usermeta');
-    $db->where('user_id', $user_id);
-    $meta_query = $db->get();
-        $meta = [];
-        foreach ($meta_query->result() as $row) {
-            $meta[$row->meta_key] = $row->meta_value;
-        }
-        $user->meta = $meta;
 
         return $user;
     }
