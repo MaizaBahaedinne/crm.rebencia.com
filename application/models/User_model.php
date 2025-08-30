@@ -291,6 +291,57 @@ class User_model extends CI_Model
         return $query->row();
     }
 
+
+    /**
+     * Get a WordPress Houzez user by ID, including roles and meta
+     * @param int $user_id
+     * @param string $prefix (optional) - table prefix, default 'wp_'
+     * @return object|null
+     */
+    function get_wp_user($user_id, $prefix = 'wp_Hrg8P_')
+    {
+        // Get user basic info
+        $this->db->select('ID, user_login, user_email, display_name');
+        $this->db->from($prefix . 'users');
+        $this->db->where('ID', $user_id);
+        $query = $this->db->get();
+
+        if ($query->num_rows() == 0) {
+            return null;
+        }
+
+        $user = $query->row();
+
+        // Get user roles from usermeta
+        $this->db->select('meta_value');
+        $this->db->from($prefix . 'usermeta');
+        $this->db->where('user_id', $user_id);
+        $this->db->where('meta_key', $prefix . 'capabilities');
+        $role_query = $this->db->get();
+        $roles = [];
+        if ($role_query->num_rows() > 0) {
+            $meta_value = $role_query->row()->meta_value;
+            $capabilities = @unserialize($meta_value);
+            if (is_array($capabilities)) {
+                $roles = array_keys(array_filter($capabilities));
+            }
+        }
+        $user->roles = $roles;
+
+        // Get all user meta
+        $this->db->select('meta_key, meta_value');
+        $this->db->from($prefix . 'usermeta');
+        $this->db->where('user_id', $user_id);
+        $meta_query = $this->db->get();
+        $meta = [];
+        foreach ($meta_query->result() as $row) {
+            $meta[$row->meta_key] = $row->meta_value;
+        }
+        $user->meta = $meta;
+
+        return $user;
+    }
+
 }
 
   
