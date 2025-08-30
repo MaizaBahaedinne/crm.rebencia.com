@@ -19,7 +19,9 @@ class Agent extends BaseController {
     public function json() {
         $this->isLoggedIn();
         $raw_agents = $this->agent_model->get_all_agents();
-        $agents = array_map(function($e) {
+        $projectInput = $this->input->post('project-input');
+        $taskInput = $this->input->post('task-input');
+        $agents = array_map(function($e) use ($projectInput, $taskInput) {
             return [
             'id' => $e->id,
             'coverImg' => $e->coverImg ?? null,
@@ -28,8 +30,8 @@ class Agent extends BaseController {
             'nickname' => $e->nickname ?? null,
             'memberName' => $e->memberName ?? null,
             'position' => $e->position ?? null,
-            'projects' => $this->input->post('project-input'),
-            'tasks' => $this->input->post('task-input'),
+            'projects' => $projectInput,
+            'tasks' => $taskInput,
             ];
         }, $raw_agents);
 
