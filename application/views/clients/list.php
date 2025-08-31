@@ -12,11 +12,11 @@
 <table class="table table-hover align-middle"><thead class="table-light"><tr><th>Nom complet</th><th>Email</th><th>Téléphone</th><th>Rôle</th><th>Statut</th></tr></thead><tbody>
 <?php if(!empty($clients)): foreach($clients as $c): ?>
 <tr>
-  <td><?= htmlspecialchars(trim(($c['prenom']??'').' '.($c['nom']??'')));?></td>
+  <td><?= htmlspecialchars($c['full_name'] ?? ''); ?></td>
   <td><?= htmlspecialchars($c['user_email']??$c['email']??''); ?></td>
-  <td><?= htmlspecialchars($c['telephone']??''); ?></td>
-  <td><span class="badge bg-info-subtle text-info"><?= htmlspecialchars($c['role_houzez']??'—'); ?></span></td>
-  <td><span class="badge bg-<?= (isset($c['statut_compte']) && $c['statut_compte']==='actif')?'success':'secondary'; ?>"><?= htmlspecialchars($c['statut_compte']??''); ?></span></td>
+  <td><?= $c['telephone']?'<a href="tel:'.htmlspecialchars($c['telephone']).'">'.htmlspecialchars($c['telephone']).'</a>':'—'; ?></td>
+  <td><span class="badge bg-info-subtle text-info"><?= htmlspecialchars($c['role_label'] ?? '—'); ?></span></td>
+  <td><span class="badge bg-<?= (isset($c['statut_label']) && $c['statut_label']==='actif')?'success':'secondary'; ?>"><?= htmlspecialchars($c['statut_label']??''); ?></span></td>
 </tr>
 <?php endforeach; else: ?>
 <tr><td colspan="5" class="text-center text-muted">Aucun client</td></tr>
