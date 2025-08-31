@@ -16,7 +16,7 @@ class Client extends BaseController {
     private function _filters(){
         return [
             'q'=>$this->input->get('q',TRUE),
-            'type'=>$this->input->get('type',TRUE),
+            'role'=>$this->input->get('role',TRUE),
             'statut'=>$this->input->get('statut',TRUE)
         ];
     }
