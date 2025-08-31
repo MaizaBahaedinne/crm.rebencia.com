@@ -11,6 +11,7 @@ class Transaction extends BaseController {
     }
 
     public function index() {
+        $this->isLoggedIn();
         $data = $this->global;
         $data['zones'] = $this->estim->get_zones();
         $data['pageTitle'] = 'Nouvelle estimation';
@@ -18,6 +19,7 @@ class Transaction extends BaseController {
     }
 
     public function calculate() {
+        $this->isLoggedIn();
         $post = $this->input->post();
         if(!$post) { redirect('estimation'); }
         $zone = NULL;
@@ -68,6 +70,7 @@ class Transaction extends BaseController {
     }
 
     public function result($id) {
+        $this->isLoggedIn();
         $data = $this->global;
         $data['pageTitle'] = 'Résultat estimation';
         $data['property'] = $this->estim->get_property($id);
@@ -76,6 +79,7 @@ class Transaction extends BaseController {
     }
 
     public function liste() {
+        $this->isLoggedIn();
         $data = $this->global;
         $data['pageTitle'] = 'Estimations';
         $filters = [];
@@ -88,6 +92,7 @@ class Transaction extends BaseController {
     }
 
     public function statut($id, $new) {
+        $this->isLoggedIn();
         if(!$id || !$new) redirect('estimations');
         $ok = $this->estim->update_status($id, $new);
         redirect('estimations');
