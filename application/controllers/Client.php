@@ -20,11 +20,12 @@ class Client extends BaseController {
             'statut'=>$this->input->get('statut',TRUE)
         ];
     }
+    
     public function index(){
         $this->isLoggedIn();
         $filters=$this->_filters();
         $data=$this->global;
-    $data['pageTitle']='Clients (Houzez)';
+        $data['pageTitle']='Clients (Houzez)';
         $data['filters']=$filters;
         $data['clients']=$this->client_model->all(200,0,$filters);
         $this->loadViews('clients/list',$data,$data,NULL);
