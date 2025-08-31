@@ -2,11 +2,11 @@
 
 
 require APPPATH . '/libraries/BaseController.php';
-class Transaction extends BaseController {
+class Estimation extends BaseController {
 
     public function __construct() {
         parent::__construct();
-    $this->load->model('Estimation_model','estim'); // $this->estim
+        $this->load->model('Estimation_model','estim'); // $this->estim
         $this->isLoggedIn();
     }
 
