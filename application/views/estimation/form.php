@@ -1,8 +1,13 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <h4 class="mb-3">Nouvelle estimation immobilière</h4>
+<div class="main-content">
+  <div class="page-content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+            <h4 class="mb-0">Nouvelle estimation immobilière</h4>
+            <span class="badge bg-primary-subtle text-primary">Formulaire</span>
+          </div>
       <form id="estimation-form" class="needs-validation" method="post" action="<?= base_url('estimation/calcul'); ?>" enctype="multipart/form-data" novalidate>
         <div class="card mb-3">
           <div class="card-header">Localisation & Zone</div>
@@ -146,6 +151,8 @@
           <button class="btn btn-primary" type="submit">Calculer l'estimation</button>
         </div>
       </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

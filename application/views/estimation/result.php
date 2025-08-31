@@ -1,10 +1,15 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <h4 class="mb-3">Résultat estimation</h4>
+<div class="main-content">
+  <div class="page-content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+            <h4 class="mb-0">Résultat estimation</h4>
+            <span class="badge bg-success-subtle text-success">Calcul</span>
+          </div>
       <a href="<?= base_url('estimation'); ?>" class="btn btn-outline-secondary btn-sm mb-3">Nouvelle estimation</a>
-      <div class="row g-3">
+  <div class="row g-3">
         <div class="col-md-4">
           <div class="card border-success">
             <div class="card-body">
@@ -82,6 +87,8 @@
         </div>
       </div>
 
+        </div>
+      </div>
     </div>
   </div>
 </div>

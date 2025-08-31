@@ -1,11 +1,16 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Estimations</h4>
-    <div>
-      <a href="<?= base_url('estimation'); ?>" class="btn btn-primary btn-sm">Nouvelle estimation</a>
-    </div>
-  </div>
+<div class="main-content">
+  <div class="page-content">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <h4 class="mb-0">Estimations</h4>
+          <span class="badge bg-info-subtle text-info">Liste</span>
+        </div>
+        <div>
+          <a href="<?= base_url('estimation'); ?>" class="btn btn-primary btn-sm"><i class="ri-add-line me-1"></i>Nouvelle estimation</a>
+        </div>
+      </div>
 
   <form class="row g-2 mb-3" method="get">
     <div class="col-md-3">
@@ -57,7 +62,13 @@
               <td><?= number_format($e['valeur_estimee'],0,'',' '); ?></td>
               <td><?= number_format($e['loyer_potentiel'],0,'',' '); ?></td>
               <td><?= number_format($e['rentabilite'],2,',',' '); ?></td>
-              <td><span class="badge bg-secondary"><?= $e['statut_dossier']; ?></span></td>
+              <?php 
+                $b='secondary';
+                if($e['statut_dossier']==='valide') $b='success';
+                elseif($e['statut_dossier']==='rejete') $b='danger';
+                elseif($e['statut_dossier']==='en_cours') $b='warning';
+              ?>
+              <td><span class="badge bg-<?= $b; ?>"><?= $e['statut_dossier']; ?></span></td>
               <td class="text-end">
                 <div class="btn-group btn-group-sm">
                   <a class="btn btn-outline-success" href="<?= base_url('estimation/statut/'.$e['id'].'/valide'); ?>" title="Valider">✔</a>
@@ -68,6 +79,8 @@
           <?php endforeach; endif; ?>
         </tbody>
       </table>
+    </div>
+  </div>
     </div>
   </div>
 </div>
