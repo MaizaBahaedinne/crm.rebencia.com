@@ -1,12 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-/**
- * Contrôleur d'estimation immobilière
- * @property Estimation_model $estim
- * @property CI_Upload $upload
- * @property CI_Input $input
- */
-class Estimation extends BaseController {
+
+require APPPATH . '/libraries/BaseController.php';
+class Transaction extends BaseController {
+
     public function __construct() {
         parent::__construct();
     $this->load->model('Estimation_model','estim'); // $this->estim
