@@ -73,6 +73,14 @@ $route['leads/conversion'] = 'Lead/conversion';
 $route['leads/followup'] = 'Lead/followup';
 $route['leads/status'] = 'Lead/status';
 
+/*********** CLIENTS *******************/
+$route['clients'] = 'Client/index';
+$route['clients/nouveau'] = 'Client/form';
+$route['clients/edit/(:num)'] = 'Client/form/$1';
+$route['clients/save'] = 'Client/save';
+$route['clients/save/(:num)'] = 'Client/save/$1';
+$route['clients/delete/(:num)'] = 'Client/delete/$1';
+
 /*********** TRANSACTIONS *******************/
 $route['transactions'] = 'Transaction/index';
 $route['transactions/sales'] = 'Transaction/sales';

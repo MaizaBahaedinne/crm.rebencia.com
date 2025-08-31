@@ -70,7 +70,7 @@ $config['migration_auto_latest'] = FALSE;
 |
 */
 // Version cible : timestamp du fichier de migration estimation
-$config['migration_version'] = 20250831161000;
+$config['migration_version'] = 20250831162000;
 
 /*
 |--------------------------------------------------------------------------

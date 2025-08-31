@@ -724,6 +724,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('clients'); ?>">
+                                    <i class="ri-group-line"></i> <span>Clients</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('leads/conversion'); ?>">
                                     <i class="ri-exchange-line"></i> <span>Conversion & suivi</span>
                                 </a>
