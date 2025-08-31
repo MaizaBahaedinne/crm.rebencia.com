@@ -77,6 +77,12 @@ $route['leads/status'] = 'Lead/status';
 $route['transactions'] = 'Transaction/index';
 $route['transactions/sales'] = 'Transaction/sales';
 $route['transactions/rentals'] = 'Transaction/rentals';
+$route['transactions/nouveau'] = 'Transaction/form';
+$route['transactions/edit/(:num)'] = 'Transaction/form/$1';
+$route['transactions/save'] = 'Transaction/save';
+$route['transactions/save/(:num)'] = 'Transaction/save/$1';
+$route['transactions/delete/(:num)'] = 'Transaction/delete/$1';
+$route['transactions/sync/houzez'] = 'Transaction/sync_houzez';
 
 /*********** REPORTS & ANALYTICS *******************/
 $route['reports/sales'] = 'Report/sales';
