@@ -631,6 +631,16 @@
 
                     <div id="two-column-menu">
                     </div>
+                    <?php 
+                        // Détection segments URL pour classe active
+                        $seg1 = $this->uri->segment(1);
+                        $seg2 = $this->uri->segment(2);
+                        $isTransactions = ($seg1 === 'transactions');
+                        $isSales = ($seg1 === 'transactions' && ($seg2 === 'sales' || $this->uri->uri_string() === 'transactions/sales'));
+                        $isRentals = ($seg1 === 'transactions' && ($seg2 === 'rentals' || $this->uri->uri_string() === 'transactions/rentals'));
+                        $isTransactionsRoot = ($seg1 === 'transactions' && !$seg2);
+                        $role = isset($role) ? $role : ($this->session->userdata('role') ?? 'agent');
+                    ?>
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
                         <?php
@@ -720,13 +730,23 @@
                             </li>
                             <li class="menu-title"><span>Transactions</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/sales'); ?>">
+                                <a class="nav-link menu-link <?php echo $isTransactionsRoot ? 'active' : ''; ?>" href="<?php echo base_url('transactions'); ?>">
+                                    <i class="ri-exchange-dollar-line"></i> <span>Toutes les transactions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link <?php echo $isSales ? 'active' : ''; ?>" href="<?php echo base_url('transactions/sales'); ?>">
                                     <i class="ri-shopping-bag-3-line"></i> <span>Ventes</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/rentals'); ?>">
+                                <a class="nav-link menu-link <?php echo $isRentals ? 'active' : ''; ?>" href="<?php echo base_url('transactions/rentals'); ?>">
                                     <i class="ri-key-2-line"></i> <span>Locations</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/sync/houzez'); ?>">
+                                    <i class="ri-refresh-line"></i> <span>Sync Houzez</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Rapports & Analytics</span></li>
@@ -824,13 +844,18 @@
                             </li>
                             <li class="menu-title"><span>Transactions</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/sales'); ?>">
-                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes agence</span>
+                                <a class="nav-link menu-link <?php echo $isTransactionsRoot ? 'active' : ''; ?>" href="<?php echo base_url('transactions'); ?>">
+                                    <i class="ri-exchange-dollar-line"></i> <span>Transactions agence</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/rentals'); ?>">
-                                    <i class="ri-key-2-line"></i> <span>Locations agence</span>
+                                <a class="nav-link menu-link <?php echo $isSales ? 'active' : ''; ?>" href="<?php echo base_url('transactions/sales'); ?>">
+                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link <?php echo $isRentals ? 'active' : ''; ?>" href="<?php echo base_url('transactions/rentals'); ?>">
+                                    <i class="ri-key-2-line"></i> <span>Locations</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Rapports agence</span></li>
@@ -880,7 +905,7 @@
                             </li>
                             <li class="menu-title"><span>Mes ventes & locations</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('transactions'); ?>">
+                                <a class="nav-link menu-link <?php echo $isTransactions ? 'active' : ''; ?>" href="<?php echo base_url('transactions'); ?>">
                                     <i class="ri-shopping-bag-3-line"></i> <span>Ventes & Locations</span>
                                 </a>
                             </li>
