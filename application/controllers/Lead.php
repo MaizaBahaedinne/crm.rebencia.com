@@ -78,11 +78,21 @@ class Lead extends BaseController {
             'notes_interne' => $this->input->post('notes_interne',TRUE),
             'lead_score' => (int)$this->input->post('lead_score',TRUE),
         ];
+        $tag_ids = $this->input->post('tag_ids');
+        $ptype_ids = $this->input->post('property_type_ids');
         if($id) {
             $ok = $this->lead_model->update($id,$payload);
+            if($ok) {
+                if(is_array($tag_ids)) $this->lead_model->set_tags($id,$tag_ids);
+                if(is_array($ptype_ids)) $this->lead_model->set_property_types($id,$ptype_ids);
+            }
             $this->session->set_flashdata($ok? 'success':'error',$ok? 'Lead mis à jour':'Erreur mise à jour');
         } else {
             $newId = $this->lead_model->create($payload);
+            if($newId) {
+                if(is_array($tag_ids)) $this->lead_model->set_tags($newId,$tag_ids);
+                if(is_array($ptype_ids)) $this->lead_model->set_property_types($newId,$ptype_ids);
+            }
             $this->session->set_flashdata($newId? 'success':'error',$newId? 'Lead créé':'Création impossible');
         }
         redirect('leads');
