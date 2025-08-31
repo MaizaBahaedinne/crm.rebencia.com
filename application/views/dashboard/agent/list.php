@@ -1,3 +1,4 @@
+<script src="<?php echo base_url('assets/js/pages/team.init.js'); ?>"></script>
 
 <div class="main-content">
     <div class="page-content">
