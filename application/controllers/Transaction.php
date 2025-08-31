@@ -63,7 +63,7 @@ class Transaction extends BaseController {
         $data['pageTitle'] = $id ? 'Modifier transaction' : 'Nouvelle transaction';
     // Charger propriétés Houzez pour sélection
     $this->load->model('Wp_property_model','wp_property_model');
-    $data['properties'] = $this->wp_property_model->list_simple(150);
+    $data['properties'] = $this->wp_property_model->list_with_meta(150);
         $this->loadViews('transactions/form', $data, $data, NULL);
     }
 

@@ -21,13 +21,18 @@
           <div class="card-body row g-3">
             <div class="col-md-5">
               <label class="form-label">Propriété (Houzez)</label>
-              <select name="property_id" class="form-select" data-choices data-choices-search-false>
+              <select name="property_id" id="property-select" class="form-select" data-choices data-choices-search-false>
                 <option value="">-- Sélectionner --</option>
                 <?php if(!empty($properties)):
-                  foreach($properties as $p): $sel = (!empty($transaction['property_id']) && (int)$transaction['property_id']===(int)$p['ID']) ? 'selected' : ''; ?>
-                    <option value="<?= $p['ID']; ?>" <?= $sel; ?>>#<?= $p['ID']; ?> - <?= htmlspecialchars(mb_strimwidth($p['post_title'],0,70,'…','UTF-8')); ?></option>
+                  foreach($properties as $p): 
+                    $sel = (!empty($transaction['property_id']) && (int)$transaction['property_id']===(int)$p['ID']) ? 'selected' : ''; 
+                    $price = isset($p['price']) ? preg_replace('/[^0-9.,]/','',$p['price']) : '';
+                    $status = isset($p['wp_status']) ? $p['wp_status'] : '';
+                  ?>
+                    <option value="<?= $p['ID']; ?>" <?= $sel; ?> data-price="<?= htmlspecialchars($price); ?>" data-wp-status="<?= htmlspecialchars($status); ?>">#<?= $p['ID']; ?> - <?= htmlspecialchars(mb_strimwidth($p['post_title'],0,60,'…','UTF-8')); ?><?= $price? ' ('.$price.')':''; ?></option>
                 <?php endforeach; endif; ?>
               </select>
+              <div id="property-meta" class="form-text text-muted mt-1"></div>
             </div>
             <div class="col-md-4">
               <label class="form-label">Titre *</label>
@@ -72,6 +77,26 @@
           </div>
         </div>
       </form>
+      <script>
+      (function(){
+        function parsePrice(str){ if(!str) return ''; var n=str.replace(/[^0-9.,]/g,'').replace(/,/g,'.'); return n; }
+        var select=document.getElementById('property-select');
+        var montant=document.querySelector('input[name="montant"]');
+        var meta=document.getElementById('property-meta');
+        if(select){
+          select.addEventListener('change',function(){
+            var opt=select.options[select.selectedIndex];
+            if(!opt || !opt.value){ meta.textContent=''; return; }
+            var price=parsePrice(opt.getAttribute('data-price'));
+            var status=opt.getAttribute('data-wp-status')||'';
+            meta.textContent = (price?('Prix WP: '+price+' € '):'') + (status?('| Statut: '+status):'');
+            if(price && (!montant.value || montant.value==='')) montant.value=price.replace(/[^0-9.]/g,'');
+          });
+          // Trigger initial if editing
+          if(select.value){ var event=new Event('change'); select.dispatchEvent(event); }
+        }
+      })();
+      </script>
     </div>
   </div>
 </div>

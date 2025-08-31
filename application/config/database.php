@@ -103,7 +103,7 @@ $db['wordpress'] = array(
 	'password' => 'Rebencia1402!!',
 	'database' => 'rebencia_RebenciaBD',
 	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
+	'dbprefix' => 'wp_Hrg8P_',
 	'pconnect' => FALSE,
 	'db_debug' => (ENVIRONMENT !== 'production'),
 	'cache_on' => FALSE,

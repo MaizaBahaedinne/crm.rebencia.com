@@ -10,22 +10,37 @@ class Wp_property_model extends CI_Model {
         $this->wp_db = $this->load->database('wordpress', TRUE);
     }
 
-    public function list_simple($limit = 100) {
+    public function list_simple($limit = 100) { return $this->list_with_meta($limit); }
+
+    public function list_with_meta($limit = 100) {
         if(!$this->wp_db) return [];
-        $this->wp_db->select('ID, post_title');
-        $this->wp_db->where('post_type','property');
-        $this->wp_db->where_in('post_status',['publish','pending']);
-        $this->wp_db->order_by('post_date','DESC');
-        $this->wp_db->limit($limit);
-        return $this->wp_db->get('wp_posts')->result_array();
+        $posts = $this->wp_db->dbprefix('posts');
+        $meta  = $this->wp_db->dbprefix('postmeta');
+        $sql = "SELECT p.ID, p.post_title,
+                MAX(CASE WHEN m.meta_key='fave_property_price' THEN m.meta_value END) AS price,
+                MAX(CASE WHEN m.meta_key='fave_property_status' THEN m.meta_value END) AS wp_status
+                FROM {$posts} p
+                LEFT JOIN {$meta} m ON m.post_id=p.ID AND m.meta_key IN ('fave_property_price','fave_property_status')
+                WHERE p.post_type='property' AND p.post_status IN ('publish','pending')
+                GROUP BY p.ID
+                ORDER BY p.post_date DESC
+                LIMIT ?";
+        return $this->wp_db->query($sql, [(int)$limit])->result_array();
     }
 
     public function search($q, $limit=50) {
         if(!$this->wp_db) return [];
-        $this->wp_db->select('ID, post_title');
-        $this->wp_db->where('post_type','property');
-        $this->wp_db->like('post_title', $q);
-        $this->wp_db->limit($limit);
-        return $this->wp_db->get('wp_posts')->result_array();
+    $posts = $this->wp_db->dbprefix('posts');
+    $meta  = $this->wp_db->dbprefix('postmeta');
+    $sql = "SELECT p.ID, p.post_title,
+        MAX(CASE WHEN m.meta_key='fave_property_price' THEN m.meta_value END) AS price,
+        MAX(CASE WHEN m.meta_key='fave_property_status' THEN m.meta_value END) AS wp_status
+        FROM {$posts} p
+        LEFT JOIN {$meta} m ON m.post_id=p.ID AND m.meta_key IN ('fave_property_price','fave_property_status')
+        WHERE p.post_type='property' AND p.post_title LIKE ?
+        GROUP BY p.ID
+        ORDER BY p.post_date DESC
+        LIMIT ?";
+    return $this->wp_db->query($sql, ['%'.$q.'%', (int)$limit])->result_array();
     }
 }
