@@ -187,78 +187,73 @@ function removeItem() {
 }
 
 function memberDetailShow() {
-	Array.from(document.querySelectorAll(".team-box")).forEach(function (a) {
-		a.querySelector(".member-name").addEventListener("click", function () {
-			var e = a.querySelector(".member-name h5").innerHTML,
-				t = a.querySelector(".member-designation").innerHTML,
-				r = a.querySelector(".member-img") ? a.querySelector(".member-img").src : "assets/images/users/user-dummy-img.jpg",
-				m = a.querySelector(".team-cover img").src,
-				i = a.querySelector(".projects-num").innerHTML,
-				n = a.querySelector(".tasks-num").innerHTML;
-			// Mise à jour des éléments principaux
-			var ov = document.querySelector("#member-overview");
-			ov && (ov.querySelector(".profile-img").src = r,
-				ov.querySelector(".team-cover img").src = m,
-				ov.querySelector(".profile-name").innerHTML = e,
-				ov.querySelector(".profile-designation").innerHTML = t,
-				ov.querySelector(".profile-project").innerHTML = i,
-				ov.querySelector(".profile-task").innerHTML = n);
+    Array.from(document.querySelectorAll(".team-box")).forEach(function (a) {
+        a.querySelector(".member-name").addEventListener("click", function () {
+            // Récupération des données de l'agent depuis le dataset
+            var data = a.dataset;
 
-			// Détails supplémentaires de l'agent (data-*)
-			var labels = {
-				userId: "ID utilisateur",
-				userLogin: "Identifiant",
-				userEmail: "E-mail",
-				userStatus: "Statut utilisateur",
-				registrationDate: "Date d'inscription",
-				agentPostId: "ID fiche agent",
-				agentName: "Nom de l'agent",
-				postStatus: "Statut de la fiche",
-				agentEmail: "Email agent",
-				agencyId: "ID agence",
-				agencyName: "Nom de l'agence",
-				position: "Poste / Fonction",
-				agentAvatar: "Avatar",
-				phone: "Téléphone",
-				mobile: "Mobile",
-				whatsapp: "WhatsApp",
-				skype: "Skype",
-				website: "Site web",
-				facebook: "Facebook",
-				twitter: "Twitter",
-				linkedin: "LinkedIn",
-				googleplus: "Google+",
-				youtube: "YouTube",
-				tiktok: "TikTok",
-				instagram: "Instagram",
-				pinterest: "Pinterest",
-				vimeo: "Vimeo",
-				postalCode: "Code postal"
-			};
-			var extraData = a.closest('.team-box').dataset;
-			var rows = '';
-			Object.keys(labels).forEach(function(k){
-				// Conversion camelCase label -> dataset attribute (data-*)
-				var attrName = k.replace(/([A-Z])/g, function(m){ return '-' + m.toLowerCase(); });
-				if(k === 'postalCode') attrName = 'postal-code';
-				var val = extraData[k] || extraData[attrName];
-				if(typeof val === 'undefined' || val === '') return; // n'affiche pas les vides
-				rows += '<tr><th class="text-muted fw-normal" style="width:40%">'+labels[k]+'</th><td>'+val+'</td></tr>';
-			});
-			if(rows){
-				var target = ov ? (ov.querySelector('.agent-extra') || (function(){
-					var body = ov.querySelector('.offcanvas-body') || ov;
-					var d = document.createElement('div');
-					d.className = 'agent-extra mt-3';
-					body.appendChild(d);
-					return d;
-				})()) : null;
-				if(target){
-					target.innerHTML = '<h6 class="mb-2">Informations détaillées</h6><div class="table-responsive"><table class="table table-sm table-borderless mb-0">'+rows+'</table></div>';
-				}
-			}
-		})
-	})
+            // Mise à jour des éléments principaux
+            var ov = document.querySelector("#member-overview");
+            if (ov) {
+                ov.querySelector(".profile-img").src = data.agentAvatar || data.memberImg || "assets/images/users/user-dummy-img.jpg";
+                ov.querySelector(".team-cover img").src = data.coverImg || "assets/images/small/img-9.jpg";
+                ov.querySelector(".profile-name").innerHTML = data.agentName || data.memberName || "Sans nom";
+                ov.querySelector(".profile-designation").innerHTML = data.position || data.role || "";
+                ov.querySelector(".profile-project").innerHTML = data.projects || data.properties || "0";
+                ov.querySelector(".profile-task").innerHTML = data.tasks || data.transactions || "0";
+            }
+
+            // Détails supplémentaires de l'agent (data-*)
+            var labels = {
+                userId: "ID utilisateur",
+                userLogin: "Identifiant",
+                userEmail: "E-mail",
+                userStatus: "Statut utilisateur",
+                registrationDate: "Date d'inscription",
+                agentPostId: "ID fiche agent",
+                agentName: "Nom de l'agent",
+                postStatus: "Statut de la fiche",
+                agentEmail: "Email agent",
+                agencyId: "ID agence",
+                agencyName: "Nom de l'agence",
+                position: "Poste / Fonction",
+                agentAvatar: "Avatar",
+                phone: "Téléphone",
+                mobile: "Mobile",
+                whatsapp: "WhatsApp",
+                skype: "Skype",
+                website: "Site web",
+                facebook: "Facebook",
+                twitter: "Twitter",
+                linkedin: "LinkedIn",
+                googleplus: "Google+",
+                youtube: "YouTube",
+                tiktok: "TikTok",
+                instagram: "Instagram",
+                pinterest: "Pinterest",
+                vimeo: "Vimeo",
+                postalCode: "Code postal"
+            };
+            var rows = '';
+            Object.keys(labels).forEach(function(k){
+                var val = data[k] || data[k.replace(/([A-Z])/g, function(m){ return '-' + m.toLowerCase(); })];
+                if(typeof val === 'undefined' || val === '') return;
+                rows += '<tr><th class="text-muted fw-normal" style="width:40%">'+labels[k]+'</th><td>'+val+'</td></tr>';
+            });
+            if(rows){
+                var target = ov ? (ov.querySelector('.agent-extra') || (function(){
+                    var body = ov.querySelector('.offcanvas-body') || ov;
+                    var d = document.createElement('div');
+                    d.className = 'agent-extra mt-3';
+                    body.appendChild(d);
+                    return d;
+                })()) : null;
+                if(target){
+                    target.innerHTML = '<h6 class="mb-2">Informations détaillées</h6><div class="table-responsive"><table class="table table-sm table-borderless mb-0">'+rows+'</table></div>';
+                }
+            }
+        })
+    })
 }
 document.querySelector("#member-image-input").addEventListener("change", function () {
 		var e = document.querySelector("#member-img"),
