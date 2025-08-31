@@ -11,7 +11,7 @@ require APPPATH.'libraries/BaseController.php';
  */
 class Lead extends BaseController {
     /** @var Lead_model */
-    protected $lead_model;
+    public $lead_model; // doit être public pour l'injection CI
 
     public function __construct() {
         parent::__construct();
