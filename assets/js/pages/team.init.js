@@ -43,7 +43,7 @@ function loadTeamData(e) {
 			'data-skype="' + (agent.skype || '') + '"',
 			'data-website="' + (agent.website || '') + '"',
 			'data-agent-avatar="' + (agent.agent_avatar || '') + '"',
-			'data-position="' + (agent.position || agent.role || '') + '"',
+			'data-position="' + (agent.position || agent.role || '') + 'à' + (agent.agency_name || '') + '"',
 			'data-facebook="' + (agent.facebook || '') + '"',
 			'data-twitter="' + (agent.twitter || '') + '"',
 			'data-linkedin="' + (agent.linkedin || '') + '"',
@@ -86,7 +86,7 @@ function loadTeamData(e) {
             + '            <a class="member-name" data-bs-toggle="offcanvas" href="#member-overview" aria-controls="member-overview">'
             + '              <h5 class="fs-16 mb-1">' + (agent.memberName || agent.agent_name || 'Sans nom') + '</h5>'
             + '            </a>'
-            + '            <p class="text-muted member-designation mb-0">' + (agent.position || agent.role || '') + '</p>'
+            + '            <p class="text-muted member-designation mb-0">' + (agent.position || agent.role || '') + ' à ' + (agent.agency_name || '') + '</p>'
             + '          </div>'
             + '        </div>'
             + '      </div>'
@@ -147,7 +147,7 @@ function editMemberList() {
 				document.getElementById("cover-img").src = e.coverImg,
 				document.getElementById("memberid-input").value = e.id,
 				document.getElementById("teammembersName").value = e.memberName,
-				document.getElementById("designation").value = e.position  + ' à ' + (e.agencyName || 'Rebencia GROUP'),
+				document.getElementById("designation").value = e.position  + ' à ' + (e.agency_name || 'Rebencia GROUP'),
 				document.getElementById("project-input").value = e.projects,
 				document.getElementById("task-input").value = e.tasks,
 				document.getElementById("memberlist-form").classList.remove("was-validated")), e
