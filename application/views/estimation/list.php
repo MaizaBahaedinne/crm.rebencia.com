@@ -43,7 +43,9 @@
             <th>Date</th>
             <th>Zone</th>
             <th>Surface (m²)</th>
-            <th>Valeur estimée (TND)</th>
+            <th>Valeur min</th>
+            <th>Valeur moy</th>
+            <th>Valeur max</th>
             <th>Loyer (TND/mois)</th>
             <th>Rentabilité (%)</th>
             <th>Statut</th>
@@ -59,7 +61,9 @@
               <td><?= date('d/m/Y', strtotime($e['created_at'])); ?></td>
               <td><?= $e['zone_nom']; ?></td>
               <td><?= $e['surface_habitable']; ?></td>
+              <td><?= isset($e['valeur_min_estimee'])?number_format($e['valeur_min_estimee'],0,'',' '):'-'; ?></td>
               <td><?= number_format($e['valeur_estimee'],0,'',' '); ?></td>
+              <td><?= isset($e['valeur_max_estimee'])?number_format($e['valeur_max_estimee'],0,'',' '):'-'; ?></td>
               <td><?= number_format($e['loyer_potentiel'],0,'',' '); ?></td>
               <td><?= number_format($e['rentabilite'],2,',',' '); ?></td>
               <?php 

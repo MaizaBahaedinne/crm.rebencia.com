@@ -57,6 +57,13 @@
               <input type="number" name="etage" class="form-control" min="0">
             </div>
             <div class="col-md-3">
+              <label class="form-label">Ascenseur</label>
+              <select name="ascenseur" class="form-select">
+                <option value="">Non</option>
+                <option value="oui">Oui</option>
+              </select>
+            </div>
+            <div class="col-md-3">
               <label class="form-label">Orientation</label>
               <select name="orientation" class="form-select">
                 <option value="">--</option>
@@ -104,6 +111,30 @@
               <input type="text" name="type_propriete" class="form-control">
             </div>
             <div class="col-md-3">
+              <label class="form-label">Type de bien</label>
+              <select name="type_bien" class="form-select">
+                <option value="">--</option>
+                <option value="appartement">Appartement</option>
+                <option value="maison">Maison</option>
+                <option value="villa">Villa</option>
+                <option value="terrain">Terrain</option>
+                <option value="bureau">Bureau</option>
+                <option value="local_commercial">Local commercial</option>
+                <option value="immeuble">Immeuble</option>
+                <option value="parking">Parking</option>
+                <option value="entrepot">Entrepôt</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Classe énergie</label>
+              <select name="energie_classe" class="form-select">
+                <option value="">--</option>
+                <?php foreach(['A','B','C','D','E','F','G'] as $c): ?>
+                  <option value="<?= $c; ?>"><?= $c; ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-md-3">
               <label class="form-label">Titre foncier</label>
               <select name="titre_foncier" class="form-select">
                 <option value="">--</option>
@@ -122,6 +153,30 @@
             <div class="col-md-3">
               <label class="form-label">Prix demandé (TND)</label>
               <input type="number" step="0.01" name="prix_demande" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Piscine</label>
+              <select name="piscine" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Sécurité</label>
+              <select name="securite" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Syndic</label>
+              <select name="syndic" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Jardin</label>
+              <select name="jardin" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Proximité transports (0-5)</label>
+              <input type="number" min="0" max="5" name="proximite_transports_score" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Proximité commodités (0-5)</label>
+              <input type="number" min="0" max="5" name="proximite_commodites_score" class="form-control">
             </div>
           </div>
         </div>

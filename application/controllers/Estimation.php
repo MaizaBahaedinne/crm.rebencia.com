@@ -66,7 +66,9 @@ class Estimation extends BaseController {
         $estim = $this->estim->compute_estimation($post, $zone);
 
         $save = $post;
-        $save['valeur_estimee'] = $estim['valeur_estimee'];
+    $save['valeur_min_estimee'] = $estim['valeur_min_estimee'];
+    $save['valeur_estimee'] = $estim['valeur_estimee'];
+    $save['valeur_max_estimee'] = $estim['valeur_max_estimee'];
         $save['loyer_potentiel'] = $estim['loyer_potentiel'];
         $save['rentabilite'] = $estim['rentabilite'];
         $save['coef_global'] = $estim['coef_global'];

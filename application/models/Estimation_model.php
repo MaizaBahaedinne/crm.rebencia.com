@@ -21,8 +21,15 @@ class Estimation_model extends CI_Model {
     public function create_zone($data) {
         $row = [
             'nom' => trim($data['nom'] ?? ''),
+            'prix_m2_min' => isset($data['prix_m2_min']) ? (float)$data['prix_m2_min'] : null,
+            'prix_m2_max' => isset($data['prix_m2_max']) ? (float)$data['prix_m2_max'] : null,
             'prix_m2_moyen' => (float)($data['prix_m2_moyen'] ?? 0),
             'rendement_locatif_moyen' => (float)($data['rendement_locatif_moyen'] ?? 0),
+            'transport_score' => isset($data['transport_score']) ? (int)$data['transport_score'] : null,
+            'commodites_score' => isset($data['commodites_score']) ? (int)$data['commodites_score'] : null,
+            'securite_score' => isset($data['securite_score']) ? (int)$data['securite_score'] : null,
+            'transport_description' => $data['transport_description'] ?? null,
+            'commodites_description' => $data['commodites_description'] ?? null,
             'latitude' => $data['latitude'] !== '' ? $data['latitude'] : null,
             'longitude' => $data['longitude'] !== '' ? $data['longitude'] : null,
             'created_at' => date('Y-m-d H:i:s'),
@@ -35,8 +42,15 @@ class Estimation_model extends CI_Model {
     public function update_zone($id, $data) {
         $row = [
             'nom' => trim($data['nom'] ?? ''),
+            'prix_m2_min' => isset($data['prix_m2_min']) ? (float)$data['prix_m2_min'] : null,
+            'prix_m2_max' => isset($data['prix_m2_max']) ? (float)$data['prix_m2_max'] : null,
             'prix_m2_moyen' => (float)($data['prix_m2_moyen'] ?? 0),
             'rendement_locatif_moyen' => (float)($data['rendement_locatif_moyen'] ?? 0),
+            'transport_score' => isset($data['transport_score']) ? (int)$data['transport_score'] : null,
+            'commodites_score' => isset($data['commodites_score']) ? (int)$data['commodites_score'] : null,
+            'securite_score' => isset($data['securite_score']) ? (int)$data['securite_score'] : null,
+            'transport_description' => $data['transport_description'] ?? null,
+            'commodites_description' => $data['commodites_description'] ?? null,
             'latitude' => $data['latitude'] !== '' ? $data['latitude'] : null,
             'longitude' => $data['longitude'] !== '' ? $data['longitude'] : null,
             'updated_at' => date('Y-m-d H:i:s')
@@ -73,7 +87,7 @@ class Estimation_model extends CI_Model {
     }
 
     public function get_property($id) {
-        $this->db->select("p.*, z.nom as zone_nom, z.prix_m2_moyen, z.rendement_locatif_moyen");
+    $this->db->select("p.*, z.nom as zone_nom, z.prix_m2_min, z.prix_m2_max, z.prix_m2_moyen, z.rendement_locatif_moyen, z.transport_score, z.commodites_score, z.securite_score");
         $this->db->from($this->propertiesTable.' p');
         $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
         $this->db->where('p.id',$id);
@@ -87,7 +101,7 @@ class Estimation_model extends CI_Model {
      * Liste paginée des estimations
      */
     public function list_estimations($limit = 100, $offset = 0, $filters = []) {
-        $this->db->select("p.id, p.zone_id, z.nom as zone_nom, p.surface_habitable, p.valeur_estimee, p.loyer_potentiel, p.rentabilite, p.statut_dossier, p.created_at");
+    $this->db->select("p.id, p.zone_id, z.nom as zone_nom, p.surface_habitable, p.valeur_min_estimee, p.valeur_estimee, p.valeur_max_estimee, p.loyer_potentiel, p.rentabilite, p.statut_dossier, p.created_at");
         $this->db->from($this->propertiesTable.' p');
         $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
         if(!empty($filters['statut'])) { $this->db->where('p.statut_dossier', $filters['statut']); }
@@ -125,8 +139,12 @@ class Estimation_model extends CI_Model {
         $terrain = (float)($input['surface_terrain'] ?? 0);
         $prixM2Zone = $zone ? (float)$zone->prix_m2_moyen : 0; // colonne prix moyen
         $rendementMoyen = $zone ? (float)$zone->rendement_locatif_moyen : 0;
+        $prixM2Min = $zone && isset($zone->prix_m2_min) && $zone->prix_m2_min>0 ? (float)$zone->prix_m2_min : ($prixM2Zone*0.9);
+        $prixM2Max = $zone && isset($zone->prix_m2_max) && $zone->prix_m2_max>0 ? (float)$zone->prix_m2_max : ($prixM2Zone*1.1);
 
         $baseValeur = $surface * $prixM2Zone;
+        $baseValeurMin = $surface * $prixM2Min;
+        $baseValeurMax = $surface * $prixM2Max;
 
         $coef = 1.0;
         // Etat
@@ -140,18 +158,35 @@ class Estimation_model extends CI_Model {
         // Etage (ex: plus haut étage valeur +2% par étage > 3 limité à +10%)
         $etage = (int)($input['etage'] ?? 0);
         if($etage > 3) { $coef *= min(1 + (($etage-3)*0.02), 1.10); }
+        // Ascenseur bonus / malus
+        $ascenseur = $input['ascenseur'] ?? '';
+        if($etage >=3) {
+            if($ascenseur === 'oui') $coef *= 1.03; else $coef *= 0.95;
+        }
         // Extérieur
         $exterieur = $input['type_exterieur'] ?? '';
         if(in_array($exterieur, ['balcon','terrasse'])) $coef *= 1.03;
         if($exterieur === 'jardin') $coef *= 1.06;
+        // Jardin flag (éviter double si déjà type_exterieur=jardin)
+        if(($input['jardin'] ?? '') === 'oui' && $exterieur !== 'jardin') $coef *= 1.04;
         // Parking / garage
         if(($input['parking'] ?? '') === 'oui') $coef *= 1.04;
+        // Piscine
+        if(($input['piscine'] ?? '') === 'oui') $coef *= 1.07;
+        // Sécurité
+        if(($input['securite'] ?? '') === 'oui') $coef *= 1.02;
+        // Syndic (léger malus coûts)
+        if(($input['syndic'] ?? '') === 'oui') $coef *= 0.98;
         // Année construction (obsolescence simplifiée)
         $annee = (int)($input['annee_construction'] ?? 0);
         if($annee > 0) {
             $age = date('Y') - $annee;
             if($age < 5) $coef *= 1.05; elseif($age > 40) $coef *= 0.90;
         }
+        // Classe énergie A..G
+        $energie = strtoupper(trim($input['energie_classe'] ?? ''));
+        $mapEnergie = [ 'A'=>0.03, 'B'=>0.02, 'C'=>0.01, 'D'=>0, 'E'=>-0.02, 'F'=>-0.04, 'G'=>-0.06 ];
+        if(isset($mapEnergie[$energie])) $coef *= (1 + $mapEnergie[$energie]);
         // Equipements bonus
         $equipements = $input['equipements'] ?? [];
         if(is_string($equipements)) { $equipements = explode(',', $equipements); }
@@ -169,8 +204,21 @@ class Estimation_model extends CI_Model {
         // Orientation (exposition soleil)
         $orientation = $input['orientation'] ?? '';
         if(in_array($orientation,['sud','sud-est','sud-ouest'])) $coef *= 1.02;
+        // Scores zone (transports / commodités)
+        $transportScore = $zone->transport_score ?? null;
+        $commodScore = $zone->commodites_score ?? null;
+        if($transportScore !== null) {
+            if($transportScore > 3) $coef *= 1 + min(($transportScore-3)*0.01, 0.03);
+            elseif($transportScore < 2) $coef *= 1 - min((2-$transportScore)*0.01, 0.02);
+        }
+        if($commodScore !== null) {
+            if($commodScore > 3) $coef *= 1 + min(($commodScore-3)*0.01, 0.03);
+            elseif($commodScore < 2) $coef *= 1 - min((2-$commodScore)*0.01, 0.02);
+        }
 
         $valeurEstimee = round($baseValeur * $coef, 0);
+        $valeurMin = round($baseValeurMin * $coef, 0);
+        $valeurMax = round($baseValeurMax * $coef, 0);
 
         // Loyer potentiel approx : rendement moyen zone * valeur / 12
         $loyerPotentiel = 0;
@@ -183,10 +231,22 @@ class Estimation_model extends CI_Model {
             $rentabilite = round((($loyerPotentiel*12) / $valeurEstimee) * 100, 2);
         }
         return [
+            'valeur_min_estimee' => $valeurMin,
             'valeur_estimee' => $valeurEstimee,
+            'valeur_max_estimee' => $valeurMax,
             'loyer_potentiel' => $loyerPotentiel,
             'rentabilite' => $rentabilite,
             'coef_global' => round($coef,4)
         ];
+    }
+
+    public function update_proposition($id, $data) {
+        $row = [];
+        if(isset($data['proposition_agence']) && $data['proposition_agence']!=='') $row['proposition_agence'] = (float)$data['proposition_agence'];
+        if(isset($data['proposition_commentaire'])) $row['proposition_commentaire'] = $data['proposition_commentaire'];
+        if(empty($row)) return false;
+        $row['updated_at'] = date('Y-m-d H:i:s');
+        $this->db->where('id',$id)->update($this->propertiesTable,$row);
+        return $this->db->affected_rows()>0;
     }
 }

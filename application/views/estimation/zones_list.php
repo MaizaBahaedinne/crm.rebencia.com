@@ -12,7 +12,7 @@
           <table class="table table-striped align-middle">
             <thead>
               <tr>
-                <th>#</th><th>Nom</th><th>Prix m² moyen</th><th>Rend. locatif %</th><th>Latitude</th><th>Longitude</th><th>Actions</th>
+                <th>#</th><th>Nom</th><th>Prix m² min</th><th>Prix m² moy</th><th>Prix m² max</th><th>Rend %</th><th>Transp</th><th>Commo</th><th>Sécu</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -20,13 +20,16 @@
                 <tr>
                   <td><?= $z->id; ?></td>
                   <td><?= htmlspecialchars($z->nom); ?></td>
-                  <td><?= number_format($z->prix_m2_moyen,0,'',' '); ?> €</td>
+                  <td><?= $z->prix_m2_min ? number_format($z->prix_m2_min,0,'',' ') : '-'; ?></td>
+                  <td><?= number_format($z->prix_m2_moyen,0,'',' '); ?></td>
+                  <td><?= $z->prix_m2_max ? number_format($z->prix_m2_max,0,'',' ') : '-'; ?></td>
                   <td><?= number_format($z->rendement_locatif_moyen,2,',',' '); ?>%</td>
-                  <td><?= $z->latitude; ?></td>
-                  <td><?= $z->longitude; ?></td>
-                  <td>
+                  <td><?= $z->transport_score; ?></td>
+                  <td><?= $z->commodites_score; ?></td>
+                  <td><?= $z->securite_score; ?></td>
+                  <td class="text-nowrap">
                     <a href="<?= base_url('zones/edit/'.$z->id); ?>" class="btn btn-sm btn-outline-secondary">Éditer</a>
-                    <a href="<?= base_url('zones/delete/'.$z->id); ?>" onclick="return confirm('Supprimer cette zone ?');" class="btn btn-sm btn-outline-danger">Supprimer</a>
+                    <a href="<?= base_url('zones/delete/'.$z->id); ?>" onclick="return confirm('Supprimer cette zone ?');" class="btn btn-sm btn-outline-danger">✖</a>
                   </td>
                 </tr>
               <?php endforeach; else: ?>

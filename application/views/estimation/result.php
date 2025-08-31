@@ -10,12 +10,13 @@
           </div>
       <a href="<?= base_url('estimation'); ?>" class="btn btn-outline-secondary btn-sm mb-3">Nouvelle estimation</a>
   <div class="row g-3">
-        <div class="col-md-4">
+    <div class="col-md-4">
           <div class="card border-success">
             <div class="card-body">
-              <h6 class="text-muted text-uppercase">Valeur estimée</h6>
-              <h3><?= number_format($property['valeur_estimee'],0,'',' '); ?> TND</h3>
-              <small class="text-muted">Coefficient global: <?= $property['coef_global']; ?></small>
+      <h6 class="text-muted text-uppercase">Valeur estimée (moyenne)</h6>
+      <h3><?= number_format($property['valeur_estimee'],0,'',' '); ?> TND</h3>
+      <small class="text-muted d-block">Fourchette: <?= number_format($property['valeur_min_estimee'],0,'',' '); ?> - <?= number_format($property['valeur_max_estimee'],0,'',' '); ?> TND</small>
+      <small class="text-muted">Coef global: <?= $property['coef_global']; ?></small>
             </div>
           </div>
         </div>
@@ -44,22 +45,33 @@
             <tbody>
               <tr><th style="width:30%">Zone</th><td><?= $property['zone_nom']; ?> (ID <?= $property['zone_id']; ?>)</td></tr>
               <tr><th>Surface habitable</th><td><?= $property['surface_habitable']; ?> m²</td></tr>
+              <tr><th>Valeur min estimée</th><td><?= number_format($property['valeur_min_estimee'],0,'',' '); ?> TND</td></tr>
+              <tr><th>Valeur max estimée</th><td><?= number_format($property['valeur_max_estimee'],0,'',' '); ?> TND</td></tr>
               <tr><th>Surface terrain</th><td><?= $property['surface_terrain']; ?> m²</td></tr>
               <tr><th>Pièces / Chambres</th><td><?= $property['nb_pieces']; ?></td></tr>
               <tr><th>Étage</th><td><?= $property['etage']; ?></td></tr>
+              <tr><th>Ascenseur</th><td><?= $property['ascenseur']; ?></td></tr>
               <tr><th>Orientation</th><td><?= $property['orientation']; ?></td></tr>
               <tr><th>État</th><td><?= $property['etat_general']; ?></td></tr>
               <tr><th>Extérieur</th><td><?= $property['type_exterieur']; ?></td></tr>
               <tr><th>Parking</th><td><?= $property['parking']; ?></td></tr>
               <tr><th>Année construction</th><td><?= $property['annee_construction']; ?></td></tr>
               <tr><th>Type propriété</th><td><?= $property['type_propriete']; ?></td></tr>
+              <tr><th>Type de bien</th><td><?= $property['type_bien']; ?></td></tr>
+              <tr><th>Classe énergie</th><td><?= $property['energie_classe']; ?></td></tr>
               <tr><th>Titre foncier</th><td><?= $property['titre_foncier']; ?></td></tr>
               <tr><th>Charges</th><td><?= number_format($property['charges'],0,'',' '); ?> TND</td></tr>
               <tr><th>Taxes</th><td><?= number_format($property['taxes'],0,'',' '); ?> TND</td></tr>
               <tr><th>Prix demandé</th><td><?= number_format($property['prix_demande'],0,'',' '); ?> TND</td></tr>
+              <tr><th>Piscine</th><td><?= $property['piscine']; ?></td></tr>
+              <tr><th>Sécurité</th><td><?= $property['securite']; ?></td></tr>
+              <tr><th>Syndic</th><td><?= $property['syndic']; ?></td></tr>
+              <tr><th>Jardin</th><td><?= $property['jardin']; ?></td></tr>
               <tr><th>Latitude</th><td><?= $property['latitude']; ?></td></tr>
               <tr><th>Longitude</th><td><?= $property['longitude']; ?></td></tr>
               <tr><th>Équipements</th><td><?= $property['equipements']; ?></td></tr>
+              <tr><th>Proposition agence</th><td><?= isset($property['proposition_agence'])?number_format($property['proposition_agence'],0,'',' '):''; ?> TND</td></tr>
+              <tr><th>Commentaire agence</th><td><?= $property['proposition_commentaire'] ?? ''; ?></td></tr>
               <?php
                 $badge = 'secondary';
                 if($property['statut_dossier']==='valide') $badge='success';
