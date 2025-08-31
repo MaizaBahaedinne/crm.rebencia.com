@@ -3,6 +3,8 @@
 class Estimation_model extends CI_Model {
     protected $zonesTable = 'crm_zones';
     protected $propertiesTable = 'crm_properties';
+    protected $photosTable = 'crm_property_photos';
+    protected $allowedStatus = ['en_cours','valide','rejete'];
 
     public function __construct() {
         parent::__construct();
@@ -34,11 +36,46 @@ class Estimation_model extends CI_Model {
     }
 
     public function get_property($id) {
-        $prop = $this->db->get_where($this->propertiesTable, ['id'=>$id])->row_array();
+        $this->db->select("p.*, z.nom as zone_nom, z.prix_m2_moyen, z.rendement_locatif_moyen");
+        $this->db->from($this->propertiesTable.' p');
+        $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
+        $this->db->where('p.id',$id);
+        $prop = $this->db->get()->row_array();
         if(!$prop) return null;
-        $prop['photos'] = $this->db->get_where('crm_property_photos',['property_id'=>$id])->result_array();
+        $prop['photos'] = $this->db->get_where($this->photosTable,['property_id'=>$id])->result_array();
         return $prop;
     }
+
+    /**
+     * Liste paginée des estimations
+     */
+    public function list_estimations($limit = 100, $offset = 0, $filters = []) {
+        $this->db->select("p.id, p.zone_id, z.nom as zone_nom, p.surface_habitable, p.valeur_estimee, p.loyer_potentiel, p.rentabilite, p.statut_dossier, p.created_at");
+        $this->db->from($this->propertiesTable.' p');
+        $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
+        if(!empty($filters['statut'])) { $this->db->where('p.statut_dossier', $filters['statut']); }
+        if(!empty($filters['zone_id'])) { $this->db->where('p.zone_id', $filters['zone_id']); }
+        $this->db->order_by('p.id','DESC');
+        $this->db->limit($limit,$offset);
+        return $this->db->get()->result_array();
+    }
+
+    public function count_estimations($filters = []) {
+        if(!empty($filters['statut'])) { $this->db->where('statut_dossier', $filters['statut']); }
+        if(!empty($filters['zone_id'])) { $this->db->where('zone_id', $filters['zone_id']); }
+        return (int)$this->db->count_all_results($this->propertiesTable);
+    }
+
+    public function update_status($id, $status) {
+        if(!in_array($status, $this->allowedStatus)) return false;
+        $this->db->where('id',$id)->update($this->propertiesTable,[
+            'statut_dossier' => $status,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+        return $this->db->affected_rows() > 0;
+    }
+
+    public function get_allowed_status() { return $this->allowedStatus; }
 
     /**
      * Calcule estimation valeur vente, loyer et rentabilité

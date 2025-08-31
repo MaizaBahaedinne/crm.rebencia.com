@@ -77,4 +77,22 @@ class Estimation extends BaseController {
         if(!$data['property']) { redirect('estimation'); }
         $this->loadViews('estimation/result', $data, $data, NULL);
     }
+
+    public function liste() {
+        $data = $this->global;
+        $data['pageTitle'] = 'Estimations';
+        $filters = [];
+        if($this->input->get('statut')) $filters['statut'] = $this->input->get('statut');
+        if($this->input->get('zone_id')) $filters['zone_id'] = $this->input->get('zone_id');
+        $data['allowed_status'] = $this->estim->get_allowed_status();
+        $data['zones'] = $this->estim->get_zones();
+        $data['estimations'] = $this->estim->list_estimations(200,0,$filters);
+        $this->loadViews('estimation/list', $data, $data, NULL);
+    }
+
+    public function statut($id, $new) {
+        if(!$id || !$new) redirect('estimations');
+        $ok = $this->estim->update_status($id, $new);
+        redirect('estimations');
+    }
 }
