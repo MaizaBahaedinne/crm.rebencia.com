@@ -101,16 +101,16 @@
                         <div class="col-xxl-3 col-md-6">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Sales Forecast</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Prévisions des ventes</h4>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown card-header-dropdown">
                                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="fw-semibold text-uppercase fs-12">Sort by: </span><span class="text-muted">Nov 2021<i class="mdi mdi-chevron-down ms-1"></i></span>
+                                                <span class="fw-semibold text-uppercase fs-12">Trier par : </span><span class="text-muted">Nov 2021<i class="mdi mdi-chevron-down ms-1"></i></span>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 <a class="dropdown-item" href="#">Oct 2021</a>
                                                 <a class="dropdown-item" href="#">Nov 2021</a>
-                                                <a class="dropdown-item" href="#">Dec 2021</a>
+                                                <a class="dropdown-item" href="#">Déc 2021</a>
                                                 <a class="dropdown-item" href="#">Jan 2022</a>
                                             </div>
                                         </div>
@@ -125,17 +125,17 @@
                         <div class="col-xxl-3 col-md-6">
                             <div class="card card-height-100">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Deal Type</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Type de transaction</h4>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown card-header-dropdown">
                                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="fw-semibold text-uppercase fs-12">Sort by: </span><span class="text-muted">Monthly<i class="mdi mdi-chevron-down ms-1"></i></span>
+                                                <span class="fw-semibold text-uppercase fs-12">Trier par : </span><span class="text-muted">Mensuel<i class="mdi mdi-chevron-down ms-1"></i></span>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="#">Today</a>
-                                                <a class="dropdown-item" href="#">Weekly</a>
-                                                <a class="dropdown-item" href="#">Monthly</a>
-                                                <a class="dropdown-item" href="#">Yearly</a>
+                                                <a class="dropdown-item" href="#">Aujourd'hui</a>
+                                                <a class="dropdown-item" href="#">Hebdo</a>
+                                                <a class="dropdown-item" href="#">Mensuel</a>
+                                                <a class="dropdown-item" href="#">Annuel</a>
                                             </div>
                                         </div>
                                     </div>
@@ -149,17 +149,17 @@
                         <div class="col-xxl-6">
                             <div class="card card-height-100">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Balance Overview</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Synthèse financière</h4>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown card-header-dropdown">
                                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="fw-semibold text-uppercase fs-12">Sort by: </span><span class="text-muted">Current Year<i class="mdi mdi-chevron-down ms-1"></i></span>
+                                                <span class="fw-semibold text-uppercase fs-12">Trier par : </span><span class="text-muted">Année en cours<i class="mdi mdi-chevron-down ms-1"></i></span>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="#">Today</a>
-                                                <a class="dropdown-item" href="#">Last Week</a>
-                                                <a class="dropdown-item" href="#">Last Month</a>
-                                                <a class="dropdown-item" href="#">Current Year</a>
+                                                <a class="dropdown-item" href="#">Aujourd'hui</a>
+                                                <a class="dropdown-item" href="#">Semaine passée</a>
+                                                <a class="dropdown-item" href="#">Mois dernier</a>
+                                                <a class="dropdown-item" href="#">Année en cours</a>
                                             </div>
                                         </div>
                                     </div>
@@ -167,14 +167,14 @@
                                 <div class="card-body px-0">
                                     <ul class="list-inline main-chart text-center mb-0">
                                         <li class="list-inline-item chart-border-left me-0 border-0">
-                                            <h4 class="text-primary">$584k <span class="text-muted d-inline-block fs-13 align-middle ms-2">Revenue</span></h4>
+                                            <h4 class="text-primary">$584k <span class="text-muted d-inline-block fs-13 align-middle ms-2">Recettes</span></h4>
                                         </li>
                                         <li class="list-inline-item chart-border-left me-0">
-                                            <h4>$497k<span class="text-muted d-inline-block fs-13 align-middle ms-2">Expenses</span>
+                                            <h4>$497k<span class="text-muted d-inline-block fs-13 align-middle ms-2">Dépenses</span>
                                             </h4>
                                         </li>
                                         <li class="list-inline-item chart-border-left me-0">
-                                            <h4><span data-plugin="counterup">3.6</span>%<span class="text-muted d-inline-block fs-13 align-middle ms-2">Profit Ratio</span></h4>
+                                            <h4><span data-plugin="counterup">3.6</span>%<span class="text-muted d-inline-block fs-13 align-middle ms-2">Marge</span></h4>
                                         </li>
                                     </ul>
 
@@ -209,11 +209,11 @@
                                         <table class="table table-borderless table-hover table-nowrap align-middle mb-0">
                                             <thead class="table-light">
                                                 <tr class="text-muted">
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col" style="width: 20%;">Last Contacted</th>
-                                                    <th scope="col">Sales Representative</th>
-                                                    <th scope="col" style="width: 16%;">Status</th>
-                                                    <th scope="col" style="width: 12%;">Deal Value</th>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col" style="width: 20%;">Dernier contact</th>
+                                                    <th scope="col">Commercial</th>
+                                                    <th scope="col" style="width: 16%;">Statut</th>
+                                                    <th scope="col" style="width: 12%;">Valeur</th>
                                                 </tr>
                                             </thead>
 
@@ -224,7 +224,7 @@
                                                     <td><img src="assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
                                                         <a href="#javascript: void(0);" class="text-body fw-medium">Donald Risher</a>
                                                     </td>
-                                                    <td><span class="badge bg-success-subtle text-success p-2">Deal Won</span></td>
+                                                    <td><span class="badge bg-success-subtle text-success p-2">Gagné</span></td>
                                                     <td>
                                                         <div class="text-nowrap">$100.1K</div>
                                                     </td>
@@ -235,7 +235,7 @@
                                                     <td><img src="assets/images/users/avatar-2.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
                                                         <a href="#javascript: void(0);" class="text-body fw-medium">Sofia Cunha</a>
                                                     </td>
-                                                    <td><span class="badge bg-warning-subtle text-warning p-2">Intro Call</span></td>
+                                                    <td><span class="badge bg-warning-subtle text-warning p-2">Appel intro</span></td>
                                                     <td>
                                                         <div class="text-nowrap">$150K</div>
                                                     </td>
@@ -246,7 +246,7 @@
                                                     <td><img src="assets/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
                                                         <a href="#javascript: void(0);" class="text-body fw-medium">Luis Rocha</a>
                                                     </td>
-                                                    <td><span class="badge bg-danger-subtle text-danger p-2">Stuck</span></td>
+                                                    <td><span class="badge bg-danger-subtle text-danger p-2">Bloqué</span></td>
                                                     <td>
                                                         <div class="text-nowrap">$78.18K</div>
                                                     </td>
@@ -257,7 +257,7 @@
                                                     <td><img src="assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
                                                         <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
                                                     </td>
-                                                    <td><span class="badge bg-success-subtle text-success p-2">Deal Won</span></td>
+                                                    <td><span class="badge bg-success-subtle text-success p-2">Gagné</span></td>
                                                     <td>
                                                         <div class="text-nowrap">$180K</div>
                                                     </td>
@@ -268,7 +268,7 @@
                                                     <td><img src="assets/images/users/avatar-6.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
                                                         <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
                                                     </td>
-                                                    <td><span class="badge bg-info-subtle text-info p-2">New Lead</span></td>
+                                                    <td><span class="badge bg-info-subtle text-info p-2">Nouveau lead</span></td>
                                                     <td>
                                                         <div class="text-nowrap">$78.9K</div>
                                                     </td>
@@ -287,7 +287,7 @@
                                     <div class="flex-shrink-0">
                                         <div class="dropdown card-header-dropdown">
                                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="text-muted"><i class="ri-settings-4-line align-bottom me-1 fs-15"></i>Settings</span>
+                                                <span class="text-muted"><i class="ri-settings-4-line align-bottom me-1 fs-15"></i>Paramètres</span>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 <a class="dropdown-item" href="#">Edit</a>
@@ -301,9 +301,9 @@
 
                                     <div class="align-items-center p-3 justify-content-between d-flex">
                                         <div class="flex-shrink-0">
-                                            <div class="text-muted"><span class="fw-semibold">4</span> of <span class="fw-semibold">10</span> remaining</div>
+                                            <div class="text-muted"><span class="fw-semibold">4</span> sur <span class="fw-semibold">10</span> restantes</div>
                                         </div>
-                                        <button type="button" class="btn btn-sm btn-success"><i class="ri-add-line align-middle me-1"></i> Add Task</button>
+                                        <button type="button" class="btn btn-sm btn-success"><i class="ri-add-line align-middle me-1"></i> Ajouter tâche</button>
                                     </div><!-- end card header -->
 
                                     <div data-simplebar style="max-height: 219px;">
@@ -389,7 +389,7 @@
                                         </ul><!-- end ul -->
                                     </div>
                                     <div class="p-3 pt-2">
-                                        <a href="javascript:void(0);" class="text-muted text-decoration-underline">Show more...</a>
+                                        <a href="javascript:void(0);" class="text-muted text-decoration-underline">Voir plus...</a>
                                     </div>
                                 </div><!-- end card body -->
                             </div><!-- end card -->
@@ -400,7 +400,7 @@
                         <div class="col-xxl-5">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Upcoming Activities</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Activités à venir</h4>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown card-header-dropdown">
                                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -415,195 +415,35 @@
                                 </div><!-- end card header -->
                                 <div class="card-body pt-0">
                                     <ul class="list-group list-group-flush border-dashed">
-                                        <li class="list-group-item ps-0">
-                                            <div class="row align-items-center g-3">
-                                                <div class="col-auto">
-                                                    <div class="avatar-sm p-1 py-2 h-auto bg-light rounded-3 material-shadow">
-                                                        <div class="text-center">
-                                                            <h5 class="mb-0">25</h5>
-                                                            <div class="text-muted">Tue</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <h5 class="text-muted mt-0 mb-1 fs-13">12:00am - 03:30pm</h5>
-                                                    <a href="#" class="text-reset fs-14 mb-0">Meeting for campaign with sales team</a>
-                                                </div>
-                                                <div class="col-sm-auto">
-                                                    <div class="avatar-group">
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Stine Nielsen">
-                                                                <img src="assets/images/users/avatar-1.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Jansh Brown">
-                                                                <img src="assets/images/users/avatar-2.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Dan Gibson">
-                                                                <img src="assets/images/users/avatar-3.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);">
-                                                                <div class="avatar-xxs">
-                                                                    <span class="avatar-title rounded-circle bg-info text-white">
-                                                                        5
-                                                                    </span>
+                                        <?php if(!empty($upcoming_tasks)): ?>
+                                            <?php foreach($upcoming_tasks as $task): ?>
+                                                <li class="list-group-item ps-0">
+                                                    <div class="row align-items-center g-3">
+                                                        <div class="col-auto">
+                                                            <div class="avatar-sm p-1 py-2 h-auto bg-light rounded-3 material-shadow">
+                                                                <div class="text-center">
+                                                                    <h5 class="mb-0"><?= date('d', strtotime($task['createdDtm'])) ?></h5>
+                                                                    <div class="text-muted"><?= strftime('%a', strtotime($task['createdDtm'])) ?></div>
                                                                 </div>
-                                                            </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <h5 class="text-muted mt-0 mb-1 fs-13">&nbsp;</h5>
+                                                            <a href="#" class="text-reset fs-14 mb-0"><?= htmlspecialchars($task['taskTitle']) ?></a>
+                                                        </div>
+                                                        <div class="col-sm-auto">
+                                                            <span class="badge bg-info-subtle text-info">Tâche</span>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <!-- end row -->
-                                        </li><!-- end -->
-                                        <li class="list-group-item ps-0">
-                                            <div class="row align-items-center g-3">
-                                                <div class="col-auto">
-                                                    <div class="avatar-sm p-1 py-2 h-auto bg-light rounded-3 material-shadow">
-                                                        <div class="text-center">
-                                                            <h5 class="mb-0">20</h5>
-                                                            <div class="text-muted">Wed</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <h5 class="text-muted mt-0 mb-1 fs-13">02:00pm - 03:45pm</h5>
-                                                    <a href="#" class="text-reset fs-14 mb-0">Adding a new event with attachments</a>
-                                                </div>
-                                                <div class="col-sm-auto">
-                                                    <div class="avatar-group">
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Frida Bang">
-                                                                <img src="assets/images/users/avatar-4.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Malou Silva">
-                                                                <img src="assets/images/users/avatar-5.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Simon Schmidt">
-                                                                <img src="assets/images/users/avatar-6.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Tosh Jessen">
-                                                                <img src="assets/images/users/avatar-7.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);">
-                                                                <div class="avatar-xxs">
-                                                                    <span class="avatar-title rounded-circle bg-success text-white">
-                                                                        3
-                                                                    </span>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- end row -->
-                                        </li><!-- end -->
-                                        <li class="list-group-item ps-0">
-                                            <div class="row align-items-center g-3">
-                                                <div class="col-auto">
-                                                    <div class="avatar-sm p-1 py-2 h-auto bg-light rounded-3 material-shadow">
-                                                        <div class="text-center">
-                                                            <h5 class="mb-0">17</h5>
-                                                            <div class="text-muted">Wed</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <h5 class="text-muted mt-0 mb-1 fs-13">04:30pm - 07:15pm</h5>
-                                                    <a href="#" class="text-reset fs-14 mb-0">Create new project Bundling Product</a>
-                                                </div>
-                                                <div class="col-sm-auto">
-                                                    <div class="avatar-group">
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Nina Schmidt">
-                                                                <img src="assets/images/users/avatar-8.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Stine Nielsen">
-                                                                <img src="assets/images/users/avatar-1.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Jansh Brown">
-                                                                <img src="assets/images/users/avatar-2.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);">
-                                                                <div class="avatar-xxs">
-                                                                    <span class="avatar-title rounded-circle bg-primary text-white">
-                                                                        4
-                                                                    </span>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- end row -->
-                                        </li><!-- end -->
-                                        <li class="list-group-item ps-0">
-                                            <div class="row align-items-center g-3">
-                                                <div class="col-auto">
-                                                    <div class="avatar-sm p-1 py-2 h-auto bg-light rounded-3 material-shadow">
-                                                        <div class="text-center">
-                                                            <h5 class="mb-0">12</h5>
-                                                            <div class="text-muted">Tue</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <h5 class="text-muted mt-0 mb-1 fs-13">10:30am - 01:15pm</h5>
-                                                    <a href="#" class="text-reset fs-14 mb-0">Weekly closed sales won checking with sales team</a>
-                                                </div>
-                                                <div class="col-sm-auto">
-                                                    <div class="avatar-group">
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Stine Nielsen">
-                                                                <img src="assets/images/users/avatar-1.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Jansh Brown">
-                                                                <img src="assets/images/users/avatar-5.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);" class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Dan Gibson">
-                                                                <img src="assets/images/users/avatar-2.jpg" alt="" class="rounded-circle avatar-xxs">
-                                                            </a>
-                                                        </div>
-                                                        <div class="avatar-group-item material-shadow">
-                                                            <a href="javascript: void(0);">
-                                                                <div class="avatar-xxs">
-                                                                    <span class="avatar-title rounded-circle bg-warning text-white">
-                                                                        9
-                                                                    </span>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- end row -->
-                                        </li><!-- end -->
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li class="list-group-item ps-0 text-center text-muted">Aucune activité à venir</li>
+                                        <?php endif; ?>
                                     </ul><!-- end -->
                                     <div class="align-items-center mt-2 row g-3 text-center text-sm-start">
                                         <div class="col-sm">
-                                            <div class="text-muted">Showing<span class="fw-semibold">4</span> of <span class="fw-semibold">125</span> Results
+                                            <div class="text-muted">Affichage de <span class="fw-semibold">4</span> sur <span class="fw-semibold">125</span> résultats
                                             </div>
                                         </div>
                                         <div class="col-sm-auto">
@@ -633,13 +473,13 @@
                         <div class="col-xxl-7">
                             <div class="card card-height-100">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Closing Deals</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Transactions clôturées</h4>
                                     <div class="flex-shrink-0">
                                         <select class="form-select form-select-sm" aria-label=".form-select-sm example">
-                                            <option selected="">Closed Deals</option>
-                                            <option value="1">Active Deals</option>
-                                            <option value="2">Paused Deals</option>
-                                            <option value="3">Canceled Deals</option>
+                                            <option selected="">Clôturées</option>
+                                            <option value="1">Actives</option>
+                                            <option value="2">En pause</option>
+                                            <option value="3">Annulées</option>
                                         </select>
                                     </div>
                                 </div><!-- end card header -->
@@ -649,54 +489,40 @@
                                         <table class="table table-bordered table-nowrap align-middle mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col" style="width: 30%;">Deal Name</th>
-                                                    <th scope="col" style="width: 30%;">Sales Rep</th>
-                                                    <th scope="col" style="width: 20%;">Amount</th>
-                                                    <th scope="col" style="width: 20%;">Close Date</th>
+                                                    <th scope="col" style="width: 30%;">Transaction</th>
+                                                    <th scope="col" style="width: 30%;">Commercial</th>
+                                                    <th scope="col" style="width: 20%;">Montant</th>
+                                                    <th scope="col" style="width: 20%;">Date clôture</th>
                                                 </tr>
                                             </thead>
 
                                             <tbody>
+                                            <?php if(!empty($recent_transactions)): ?>
+                                                <?php foreach($recent_transactions as $t): ?>
+                                                    <tr>
+                                                        <td><?= htmlspecialchars($t['titre'] ?? ($t['libelle'] ?? 'Transaction')); ?></td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="flex-grow-1">
+                                                                    <span class="text-body fw-medium"><?= htmlspecialchars($t['commercial'] ?? '—'); ?></span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td><?= isset($t['montant']) ? number_format((float)$t['montant'], 0, ',', ' ') . ' €' : '—'; ?></td>
+                                                        <td>
+                                                            <?php if(!empty($t['date_cloture'])): ?>
+                                                                <?= date('d/m/Y', strtotime($t['date_cloture'])); ?>
+                                                            <?php else: ?>
+                                                                —
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
                                                 <tr>
-                                                    <td>Acme Inc Install</td>
-                                                    <td><img src="assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Donald Risher</a>
-                                                    </td>
-                                                    <td>$96k</td>
-                                                    <td>Today</td>
+                                                    <td colspan="4" class="text-center text-muted">Aucune transaction récente</td>
                                                 </tr>
-                                                <tr>
-                                                    <td>Save lots Stores</td>
-                                                    <td><img src="assets/images/users/avatar-2.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Jansh Brown</a>
-                                                    </td>
-                                                    <td>$55.7k</td>
-                                                    <td>30 Dec 2021</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>William PVT</td>
-                                                    <td><img src="assets/images/users/avatar-7.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Ayaan Hudda</a>
-                                                    </td>
-                                                    <td>$102k</td>
-                                                    <td>25 Nov 2021</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Raitech Soft</td>
-                                                    <td><img src="assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Julia William</a>
-                                                    </td>
-                                                    <td>$89.5k</td>
-                                                    <td>20 Sep 2021</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Absternet LLC</td>
-                                                    <td><img src="assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
-                                                    </td>
-                                                    <td>$89.5k</td>
-                                                    <td>20 Sep 2021</td>
-                                                </tr>
+                                            <?php endif; ?>
                                             </tbody><!-- end tbody -->
                                         </table><!-- end table -->
                                     </div><!-- end table responsive -->
