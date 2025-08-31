@@ -5,14 +5,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/BaseController.php';
 
-
-
+/**
+ * @property Agent_model $agent_model
+ * @property Agency_model $agency_model
+ * @property Activity_model $activity_model
+ * @property Transaction_model $transaction_model
+ * @property Task_model $task_model
+ * @property CI_DB_query_builder $db
+ * @property CI_Session $session
+ */
 class Dashboard extends BaseController {
     public function __construct() {
         parent::__construct();
     $this->load->model('Agent_model','agent_model');
     $this->load->model('Agency_model','agency_model');
     $this->load->model('Activity_model','activity_model');
+    $this->load->model('Transaction_model','transaction_model');
+    $this->load->model('Task_model','task_model');
         $this->load->library('session');
         $this->load->helper('url');
     }
@@ -51,6 +60,14 @@ class Dashboard extends BaseController {
             $data['count_estimations'] = (int)$this->db->count_all('crm_properties');
         } else {
             $data['count_estimations'] = 0;
+        }
+        // Transactions récentes
+        $data['recent_transactions'] = $this->transaction_model->recent(5);
+        // RDV / tâches (on réutilise tbl_task comme agenda simple)
+        if ($this->db->table_exists('tbl_task')) {
+            $data['upcoming_tasks'] = $this->db->order_by('createdDtm','DESC')->limit(6)->get('tbl_task')->result_array();
+        } else {
+            $data['upcoming_tasks'] = [];
         }
         $this->loadViews('dashboard/admin', $this->global, $data, NULL);
     }
