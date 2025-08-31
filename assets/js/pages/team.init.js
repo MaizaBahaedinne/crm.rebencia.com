@@ -28,7 +28,7 @@ function bookmarkBtn() {
 		})
 	})
 }
-fetch(https://crm.rebencia.com/Agent/json").then(e => e.json()).then(e => {
+fetch("https://crm.rebencia.com/Agent/json").then(e => e.json()).then(e => {
 	loadTeamData(allmemberlist = e)
 }).catch(e => console.error(e)), bookmarkBtn();
 var editlist = !1;
