@@ -213,70 +213,67 @@
                                                     <th scope="col" style="width: 20%;">Dernier contact</th>
                                                     <th scope="col">Commercial</th>
                                                     <th scope="col" style="width: 16%;">Statut</th>
-                                                    <th scope="col" style="width: 12%;">Valeur</th>
+                                                    <th scope="col" style="width: 12%;" class="text-end">Valeur</th>
                                                 </tr>
                                             </thead>
-
                                             <tbody>
-                                                <tr>
-                                                    <td>Absternet LLC</td>
-                                                    <td>Sep 20, 2021</td>
-                                                    <td><img src="assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Donald Risher</a>
-                                                    </td>
-                                                    <td><span class="badge bg-success-subtle text-success p-2">Gagné</span></td>
-                                                    <td>
-                                                        <div class="text-nowrap">$100.1K</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Raitech Soft</td>
-                                                    <td>Sep 23, 2021</td>
-                                                    <td><img src="assets/images/users/avatar-2.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Sofia Cunha</a>
-                                                    </td>
-                                                    <td><span class="badge bg-warning-subtle text-warning p-2">Appel intro</span></td>
-                                                    <td>
-                                                        <div class="text-nowrap">$150K</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>William PVT</td>
-                                                    <td>Sep 27, 2021</td>
-                                                    <td><img src="assets/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Luis Rocha</a>
-                                                    </td>
-                                                    <td><span class="badge bg-danger-subtle text-danger p-2">Bloqué</span></td>
-                                                    <td>
-                                                        <div class="text-nowrap">$78.18K</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Loiusee LLP</td>
-                                                    <td>Sep 30, 2021</td>
-                                                    <td><img src="assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
-                                                    </td>
-                                                    <td><span class="badge bg-success-subtle text-success p-2">Gagné</span></td>
-                                                    <td>
-                                                        <div class="text-nowrap">$180K</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Apple Inc.</td>
-                                                    <td>Sep 30, 2021</td>
-                                                    <td><img src="assets/images/users/avatar-6.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                                        <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
-                                                    </td>
-                                                    <td><span class="badge bg-info-subtle text-info p-2">Nouveau lead</span></td>
-                                                    <td>
-                                                        <div class="text-nowrap">$78.9K</div>
-                                                    </td>
-                                                </tr>
-                                            </tbody><!-- end tbody -->
-                                        </table><!-- end table -->
-                                    </div><!-- end table responsive -->
-                                </div><!-- end card body -->
+                                            <?php
+                                                if(!function_exists('tx_badge_class')){
+                                                    function tx_badge_class($s){
+                                                        $s = mb_strtolower(trim($s));
+                                                        $map = [
+                                                            'gagné'=>'success','won'=>'success','closed'=>'success',
+                                                            'nouveau lead'=>'info','lead'=>'info','nouveau'=>'info',
+                                                            'appel intro'=>'warning','en cours'=>'warning','open'=>'warning','actif'=>'warning',
+                                                            'bloqué'=>'danger','perdu'=>'danger','lost'=>'danger','annulé'=>'secondary','cancelled'=>'secondary'
+                                                        ];
+                                                        return isset($map[$s]) ? $map[$s] : 'secondary';
+                                                    }
+                                                }
+                                            ?>
+                                            <?php if(!empty($recent_transactions)): ?>
+                                                <?php foreach($recent_transactions as $tr): ?>
+                                                    <?php
+                                                        $titre = $tr['titre'] ?? '—';
+                                                        $commercial = $tr['commercial'] ?? '—';
+                                                        $statut = $tr['statut'] ?? '—';
+                                                        $montant = isset($tr['montant']) ? number_format((float)$tr['montant'], 0, ',', ' ').' €' : '—';
+                                                        // Dernier contact : date_cloture si existe sinon updated_at sinon created_at
+                                                        $date_src = $tr['date_cloture'] ?? ($tr['updated_at'] ?? ($tr['created_at'] ?? null));
+                                                        $dernier = $date_src ? date('d/m/Y', strtotime($date_src)) : '—';
+                                                        $badgeClass = 'bg-'.tx_badge_class($statut).'-subtle text-'.tx_badge_class($statut);
+                                                    ?>
+                                                    <tr>
+                                                        <td class="fw-medium"><?= htmlspecialchars($titre); ?></td>
+                                                        <td><?= $dernier; ?></td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="flex-grow-1">
+                                                                    <span class="text-body fw-medium"><?= htmlspecialchars($commercial); ?></span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td><span class="badge <?= $badgeClass; ?> p-2" style="min-width:90px; display:inline-block;"><?= htmlspecialchars($statut); ?></span></td>
+                                                        <td class="text-end"><div class="text-nowrap"><?= $montant; ?></div></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <tr><td colspan="5" class="text-center text-muted py-4">Aucune transaction trouvée</td></tr>
+                                            <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <?php if(!empty($recent_transactions_total) && $recent_transactions_pages>1): ?>
+                                        <div class="d-flex justify-content-between align-items-center pt-3">
+                                            <small class="text-muted">Page <?= (int)$recent_transactions_page; ?> / <?= (int)$recent_transactions_pages; ?> (<?= (int)$recent_transactions_total; ?>)</small>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <?php for($p=1;$p<=$recent_transactions_pages;$p++): ?>
+                                                    <a class="btn btn-outline-secondary <?= $p==$recent_transactions_page?'active':''; ?>" href="?tpage=<?= $p; ?>#transactions"><?= $p; ?></a>
+                                                <?php endfor; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </div><!-- end card -->
                         </div><!-- end col -->
 
