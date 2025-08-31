@@ -702,6 +702,11 @@
                                     <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('zones'); ?>">
+                                    <i class="ri-map-pin-line"></i> <span>Gestion des zones</span>
+                                </a>
+                            </li>
                             <li class="menu-title"><span>Leads / Clients</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
