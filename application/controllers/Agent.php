@@ -67,7 +67,8 @@ class Agent extends BaseController {
     // Statistiques agent
     public function stats($agent_id) {
         $this->isLoggedIn();
-        $data['stats'] = $this->agent_model->get_agent_stats($agent_id);
-        $this->loadViews('dashboard/agent/stats', $this->global, $data, NULL);
+    $data['stats'] = $this->agent_model->get_agent_stats($agent_id);
+    $data['agent'] = $this->agent_model->get_agent($agent_id);
+    $this->loadViews('dashboard/agent/stats', $this->global, $data, NULL);
     }
 }

@@ -61,6 +61,9 @@ $route['agency/agents'] = 'Agency/agents';
 $route['agents'] = 'Agent/index';
 $route['agents/create'] = 'Agent/create';
 $route['agents/performance'] = 'Agent/performance';
+$route['agents/(:num)'] = 'Agent/stats/$1';
+$route['agents/(:num)/stats'] = 'Agent/stats/$1';
+$route['agents/(:num)/proprietes'] = 'Agent/properties/$1';
 
 /*********** PROPERTIES *******************/
 $route['properties'] = 'Property/index';
@@ -98,15 +101,7 @@ $route['settings/roles'] = 'Settings/roles';
 $route['settings/wordpress'] = 'Settings/wordpress';
 $route['settings/crm'] = 'Settings/crm';
 
-/*********** MAIL *******************/
-$route['mail'] = 'Mail/index';
-$route['mail/inbox'] = 'Mail/inbox';
-$route['mail/compose'] = 'Mail/compose';
-$route['mail/send'] = 'Mail/send';
-$route['mail/view/(:num)'] = 'Mail/view/$1';
-$route['mail/read/(:num)'] = 'Mail/markRead/$1';
-$route['mail/unread/(:num)'] = 'Mail/markUnread/$1';
-$route['mail/download/(:num)/(:num)'] = 'Mail/download/$1/$2';
+
 
 /*********** PROFILE *******************/
 $route['profile'] = 'Profile/index';

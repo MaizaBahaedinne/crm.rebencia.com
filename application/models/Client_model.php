@@ -2,6 +2,7 @@
 
 class Client_model extends CI_Model {
     protected $table = 'crm_clients';
+    
     public function all($limit=100,$offset=0,$filters=[]) {
         if(!$this->db->table_exists($this->table)) return [];
         if(!empty($filters['q'])) {
@@ -14,6 +15,7 @@ class Client_model extends CI_Model {
         if(!empty($filters['statut'])) $this->db->where('statut',$filters['statut']);
         return $this->db->order_by('created_at','DESC')->limit($limit,$offset)->get($this->table)->result_array();
     }
+
     public function count($filters=[]) {
         if(!$this->db->table_exists($this->table)) return 0;
         if(!empty($filters['q'])) {
