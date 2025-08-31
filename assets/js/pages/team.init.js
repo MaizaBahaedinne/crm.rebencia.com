@@ -104,7 +104,7 @@ function loadTeamData(e) {
             + '      </div>'
             + '      <div class="col-lg-2 col">'
             + '        <div class="text-end">'
-            + '          <a href="/Prolfile/agent/' + (agent.ID || agent.id || '') + '" class="btn btn-light view-btn">Voir Profil</a>'
+            + '          <a href="/Agent/stats/' + (agent.ID || agent.id || '') + '" class="btn btn-light view-btn">Voir Profil</a>'
             + '        </div>'
             + '      </div>'
             + '    </div>'
