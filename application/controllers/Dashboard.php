@@ -13,6 +13,10 @@ require APPPATH . '/libraries/BaseController.php';
  * @property Task_model $task_model
  * @property CI_DB_query_builder $db
  * @property CI_Session $session
+ * @property CI_Input $input
+ */
+/**
+ * @property CI_Input $input
  */
 class Dashboard extends BaseController {
     public function __construct() {
@@ -47,22 +51,28 @@ class Dashboard extends BaseController {
     // Vue Admin : toutes les agences, agents, stats globales
     public function admin() {
         $this->isLoggedIn();
-        $data['agencies'] = $this->agency_model->get_all_agencies();
-        $data['agents'] = $this->agent_model->get_all_agents();
-        $data['stats'] = $this->activity_model->get_global_stats();
+    $perPage = 10; // pagination simple transactions récentes
+    $page = isset($_GET['tpage']) ? max(1,(int)$_GET['tpage']) : 1;
+    $data['agencies'] = $this->agency_model->get_all_agencies();
+    $data['agents'] = $this->agent_model->get_all_agents();
+    $data['stats'] = $this->activity_model->get_global_stats();
         // Compteurs supplémentaires
         $data['count_agencies'] = count($data['agencies']);
         $data['count_agents'] = count($data['agents']);
-        $data['count_clients'] = $this->activity_model->get_clients_count();
-        $data['count_transactions'] = $this->activity_model->get_transactions_count();
+    $data['count_clients'] = $this->activity_model->get_clients_count();
+    $data['count_transactions'] = $this->activity_model->get_transactions_count();
         // Estimations : compter dans crm_properties si table existe
         if ($this->db->table_exists('crm_properties')) {
             $data['count_estimations'] = (int)$this->db->count_all('crm_properties');
         } else {
             $data['count_estimations'] = 0;
         }
-        // Transactions récentes
-        $data['recent_transactions'] = $this->transaction_model->recent(5);
+        // Transactions récentes (pagination simple)
+        $offset = ($page-1)*$perPage;
+        $data['recent_transactions'] = $this->transaction_model->filter([], $perPage, $offset);
+        $data['recent_transactions_total'] = $this->transaction_model->count();
+        $data['recent_transactions_page'] = $page;
+        $data['recent_transactions_pages'] = (int)ceil($data['recent_transactions_total'] / $perPage);
         // RDV / tâches (on réutilise tbl_task comme agenda simple)
         if ($this->db->table_exists('tbl_task')) {
             $data['upcoming_tasks'] = $this->db->order_by('createdDtm','DESC')->limit(6)->get('tbl_task')->result_array();
