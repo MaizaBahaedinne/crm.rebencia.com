@@ -691,6 +691,17 @@
                                     <i class="ri-information-line"></i> <span>Statut (disponible, vendu, loué)</span>
                                 </a>
                             </li>
+                            <li class="menu-title"><span>Estimations des biens</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimations'); ?>">
+                                    <i class="ri-file-list-3-line"></i> <span>Liste des estimations</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimation'); ?>">
+                                    <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
+                                </a>
+                            </li>
                             <li class="menu-title"><span>Leads / Clients</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
@@ -784,6 +795,17 @@
                                     <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
                                 </a>
                             </li>
+                            <li class="menu-title"><span>Estimations</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimations'); ?>">
+                                    <i class="ri-file-list-3-line"></i> <span>Estimations</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimation'); ?>">
+                                    <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
+                                </a>
+                            </li>
                             <li class="menu-title"><span>Leads</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
@@ -827,6 +849,17 @@
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
                                     <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Estimations</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimations'); ?>">
+                                    <i class="ri-file-list-3-line"></i> <span>Mes estimations</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimation'); ?>">
+                                    <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Mes leads</span></li>
