@@ -27,31 +27,10 @@ class Agent extends BaseController {
     public function json() {
         $this->isLoggedIn();
         $raw_agents = $this->agent_model->get_all_agents();
-        $projectInput = "" ;
-        $taskInput = "" ;
-        $agents = array_map(function($e) use ($projectInput, $taskInput) {
-            // Normalisation des champs depuis la vue crm_agents supposée (adapte si noms réels diffèrent)
-            $arr = is_object($e) ? (array)$e : (array)$e; // cast léger
-            $id = $arr['ID'] ?? ($arr['id'] ?? null);
-            $nickname = $arr['nickname'] ?? ($arr['display_name'] ?? ($arr['first_name'] ?? ''));
-            $fullName = trim(($arr['first_name'] ?? '').' '.($arr['last_name'] ?? ''));
-            if ($fullName === '') $fullName = $arr['display_name'] ?? $nickname;
-            return [
-                'id' => $id,
-                'coverImg' => $arr['coverImg'] ?? null,
-                'bookmark' => $arr['bookmark'] ?? null,
-                'memberImg' => $arr['avatar'] ?? ($arr['memberImg'] ?? null),
-                'nickname' => $nickname,
-                'memberName' => $fullName,
-                'position' => $arr['position'] ?? ($arr['role'] ?? null),
-                'projects' => $projectInput,
-                'tasks' => $taskInput,
-            ];
-        }, $raw_agents);
 
 
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($agents);
+    echo json_encode($raw_agents);
     return;
     }
 
