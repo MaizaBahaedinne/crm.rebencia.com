@@ -103,5 +103,11 @@ $route['mail/download/(:num)/(:num)'] = 'Mail/download/$1/$2';
 $route['profile'] = 'Profile/index';
 $route['profile/avatar'] = 'Profile/avatar';
 
+/*********** ESTIMATION IMMOBILIERE *******************/
+$route['estimation'] = 'Estimation/index';
+$route['estimation/nouveau'] = 'Estimation/index';
+$route['estimation/calcul'] = 'Estimation/calculate';
+$route['estimation/resultat/(:num)'] = 'Estimation/result/$1';
+
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
