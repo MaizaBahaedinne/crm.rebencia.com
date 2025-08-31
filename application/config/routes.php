@@ -110,6 +110,10 @@ $route['estimation/calcul'] = 'Estimation/calculate';
 $route['estimation/resultat/(:num)'] = 'Estimation/result/$1';
 $route['estimations'] = 'Estimation/liste';
 $route['estimation/statut/(:num)/(:any)'] = 'Estimation/statut/$1/$2';
+$route['zones'] = 'Estimation/zones';
+$route['zones/create'] = 'Estimation/zone_create';
+$route['zones/edit/(:num)'] = 'Estimation/zone_edit/$1';
+$route['zones/delete/(:num)'] = 'Estimation/zone_delete/$1';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

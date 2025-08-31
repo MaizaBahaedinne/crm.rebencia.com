@@ -18,6 +18,43 @@ class Estimation_model extends CI_Model {
         return $this->db->get_where($this->zonesTable, ['id' => $id])->row();
     }
 
+    public function create_zone($data) {
+        $row = [
+            'nom' => trim($data['nom'] ?? ''),
+            'prix_m2_moyen' => (float)($data['prix_m2_moyen'] ?? 0),
+            'rendement_locatif_moyen' => (float)($data['rendement_locatif_moyen'] ?? 0),
+            'latitude' => $data['latitude'] !== '' ? $data['latitude'] : null,
+            'longitude' => $data['longitude'] !== '' ? $data['longitude'] : null,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        $this->db->insert($this->zonesTable, $row);
+        return $this->db->insert_id();
+    }
+
+    public function update_zone($id, $data) {
+        $row = [
+            'nom' => trim($data['nom'] ?? ''),
+            'prix_m2_moyen' => (float)($data['prix_m2_moyen'] ?? 0),
+            'rendement_locatif_moyen' => (float)($data['rendement_locatif_moyen'] ?? 0),
+            'latitude' => $data['latitude'] !== '' ? $data['latitude'] : null,
+            'longitude' => $data['longitude'] !== '' ? $data['longitude'] : null,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        $this->db->where('id', $id)->update($this->zonesTable, $row);
+        return $this->db->affected_rows() > 0;
+    }
+
+    public function zone_has_properties($id) {
+        return (int)$this->db->where('zone_id',$id)->count_all_results($this->propertiesTable) > 0;
+    }
+
+    public function delete_zone($id) {
+        if($this->zone_has_properties($id)) return false; // sécurité : ne supprime pas si liée
+        $this->db->where('id',$id)->delete($this->zonesTable);
+        return $this->db->affected_rows() > 0;
+    }
+
     public function save_property($data, $photos = []) {
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['updated_at'] = date('Y-m-d H:i:s');

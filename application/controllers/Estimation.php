@@ -2,12 +2,19 @@
 
 
 require APPPATH . '/libraries/BaseController.php';
+/**
+ * Contrôleur Estimation
+ * @property Estimation_model $estim
+ * @property CI_Input $input
+ * @property CI_Upload $upload
+ */
 class Estimation extends BaseController {
 
     public function __construct() {
         parent::__construct();
         $this->load->model('Estimation_model','estim'); // $this->estim
-        $this->isLoggedIn();
+    // Input library est chargée par défaut dans CI; model alias estim disponible
+    $this->isLoggedIn();
     }
 
     public function index() {
@@ -96,5 +103,52 @@ class Estimation extends BaseController {
         if(!$id || !$new) redirect('estimations');
         $ok = $this->estim->update_status($id, $new);
         redirect('estimations');
+    }
+
+    /* ================== ZONES ================== */
+    public function zones() {
+        $this->isLoggedIn();
+        $data = $this->global;
+        $data['pageTitle'] = 'Zones';
+        $data['zones'] = $this->estim->get_zones();
+        $this->loadViews('estimation/zones_list', $data, $data, NULL);
+    }
+
+    public function zone_create() {
+        $this->isLoggedIn();
+        if($this->input->method()==='post') {
+            $post = $this->input->post();
+            // Normalisation pour % (s'il vient sans conversion)
+            if(isset($post['rendement_locatif_moyen'])) {
+                $post['rendement_locatif_moyen'] = (float)$post['rendement_locatif_moyen'];
+            }
+            $this->estim->create_zone($post);
+            redirect('zones');
+        }
+        $data = $this->global; $data['pageTitle'] = 'Créer zone';
+        $this->loadViews('estimation/zones_form', $data, $data, NULL);
+    }
+
+    public function zone_edit($id) {
+        $this->isLoggedIn();
+        $zone = $this->estim->get_zone($id);
+        if(!$zone) redirect('zones');
+        if($this->input->method()==='post') {
+            $post = $this->input->post();
+            if(isset($post['rendement_locatif_moyen'])) {
+                $post['rendement_locatif_moyen'] = (float)$post['rendement_locatif_moyen'];
+            }
+            $this->estim->update_zone($id, $post);
+            redirect('zones');
+        }
+        $data = $this->global; $data['pageTitle'] = 'Modifier zone';
+        $data['zone'] = $zone;
+        $this->loadViews('estimation/zones_form', $data, $data, NULL);
+    }
+
+    public function zone_delete($id) {
+        $this->isLoggedIn();
+        if($id) { $this->estim->delete_zone($id); }
+        redirect('zones');
     }
 }
