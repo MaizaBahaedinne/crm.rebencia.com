@@ -10,9 +10,9 @@ require APPPATH . '/libraries/BaseController.php';
 class Dashboard extends BaseController {
     public function __construct() {
         parent::__construct();
-        $this->load->model('agent_model');
-        $this->load->model('agency_model');
-        $this->load->model('activity_model');
+    $this->load->model('Agent_model','agent_model');
+    $this->load->model('Agency_model','agency_model');
+    $this->load->model('Activity_model','activity_model');
         $this->load->library('session');
         $this->load->helper('url');
     }
@@ -41,6 +41,17 @@ class Dashboard extends BaseController {
         $data['agencies'] = $this->agency_model->get_all_agencies();
         $data['agents'] = $this->agent_model->get_all_agents();
         $data['stats'] = $this->activity_model->get_global_stats();
+        // Compteurs supplémentaires
+        $data['count_agencies'] = count($data['agencies']);
+        $data['count_agents'] = count($data['agents']);
+        $data['count_clients'] = $this->activity_model->get_clients_count();
+        $data['count_transactions'] = $this->activity_model->get_transactions_count();
+        // Estimations : compter dans crm_properties si table existe
+        if ($this->db->table_exists('crm_properties')) {
+            $data['count_estimations'] = (int)$this->db->count_all('crm_properties');
+        } else {
+            $data['count_estimations'] = 0;
+        }
         $this->loadViews('dashboard/admin', $this->global, $data, NULL);
     }
 

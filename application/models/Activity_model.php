@@ -52,4 +52,8 @@ class Activity_model extends CI_Model {
         // TODO: filtrer par agence/agent si besoin
         return $this->wp_db->count_all_results();
     }
+
+    /* === Expositions publiques simplifiées === */
+    public function get_clients_count() { return $this->count_leads(); }
+    public function get_transactions_count() { return $this->count_sales(); }
 }
