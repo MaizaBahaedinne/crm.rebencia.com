@@ -639,6 +639,7 @@
                         $isSales = ($seg1 === 'transactions' && ($seg2 === 'sales' || $this->uri->uri_string() === 'transactions/sales'));
                         $isRentals = ($seg1 === 'transactions' && ($seg2 === 'rentals' || $this->uri->uri_string() === 'transactions/rentals'));
                         $isTransactionsRoot = ($seg1 === 'transactions' && !$seg2);
+                        $isClients = ($seg1 === 'clients');
                         $role = isset($role) ? $role : ($this->session->userdata('role') ?? 'agent');
                     ?>
                     <ul class="navbar-nav" id="navbar-nav">
@@ -724,8 +725,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('clients'); ?>">
-                                    <i class="ri-group-line"></i> <span>Clients</span>
+                                <a class="nav-link menu-link <?= $isClients ? 'active' : ''; ?>" href="<?php echo base_url('clients'); ?>">
+                                    <i class="ri-group-line"></i> <span>Clients (Houzez)</span>
                                 </a>
                             </li>
                             <li class="nav-item">
