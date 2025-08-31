@@ -147,7 +147,7 @@ function editMemberList() {
 				document.getElementById("cover-img").src = e.coverImg,
 				document.getElementById("memberid-input").value = e.id,
 				document.getElementById("teammembersName").value = e.memberName,
-				document.getElementById("designation").value = e.position,
+				document.getElementById("designation").value = e.position  + ' l\'agence ' + (e.agencyName || ''),
 				document.getElementById("project-input").value = e.projects,
 				document.getElementById("task-input").value = e.tasks,
 				document.getElementById("memberlist-form").classList.remove("was-validated")), e
