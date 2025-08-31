@@ -9,6 +9,7 @@ require APPPATH . '/libraries/BaseController.php';
  * @property CI_Session $session
  * @property Transaction_model $transaction_model
  * @property Wp_property_model $wp_property_model
+ * @property Agent_model $agent_model
  */
 class Transaction extends BaseController {
     public function __construct() {
@@ -63,7 +64,13 @@ class Transaction extends BaseController {
         $data['pageTitle'] = $id ? 'Modifier transaction' : 'Nouvelle transaction';
     // Charger propriétés Houzez pour sélection
     $this->load->model('Wp_property_model','wp_property_model');
-    $data['properties'] = $this->wp_property_model->list_with_meta(150);
+    $currentType = $data['transaction']['type'] ?? $this->input->get('type');
+    $data['properties'] = $this->wp_property_model->list_with_meta(150, $currentType);
+    // Agents (commerciaux)
+    $this->load->model('Agent_model','agent_model');
+    $data['agents'] = $this->agent_model->get_all_agents();
+    // Leads (placeholder : à remplacer par vrai modèle quand disponible)
+    $data['leads'] = []; // si un Lead_model existe plus tard
         $this->loadViews('transactions/form', $data, $data, NULL);
     }
 
@@ -83,7 +90,9 @@ class Transaction extends BaseController {
             'statut' => $this->input->post('statut', TRUE),
             'date_cloture' => $this->input->post('date_cloture', TRUE) ?: null,
             'notes' => $this->input->post('notes', TRUE),
-            'property_id' => $this->input->post('property_id', TRUE) ? (int)$this->input->post('property_id', TRUE) : null
+            'property_id' => $this->input->post('property_id', TRUE) ? (int)$this->input->post('property_id', TRUE) : null,
+            'agent_id' => $this->input->post('agent_id', TRUE) ? (int)$this->input->post('agent_id', TRUE) : null,
+            'lead_id' => $this->input->post('lead_id', TRUE) ? (int)$this->input->post('lead_id', TRUE) : null
         ];
         if($id) {
             $this->transaction_model->update($id,$payload);
@@ -104,5 +113,14 @@ class Transaction extends BaseController {
         // Placeholder: future integration with WP Houzez
         $this->session->set_flashdata('success','Synchronisation Houzez lancée (placeholder).');
         redirect('transactions');
+    }
+
+    public function properties_by_type() {
+        $this->isLoggedIn();
+        $type = $this->input->get('type');
+        $this->load->model('Wp_property_model','wp_property_model');
+        $list = $this->wp_property_model->list_with_meta(150, $type ?: null);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($list);
     }
 }

@@ -47,12 +47,27 @@
               </select>
             </div>
             <div class="col-md-3">
-              <label class="form-label">Commercial</label>
-              <input name="commercial" class="form-control" value="<?= htmlspecialchars($transaction['commercial'] ?? '') ?>">
+              <label class="form-label">Commercial (Agent)</label>
+              <select name="agent_id" class="form-select" data-choices data-choices-search="true">
+                <option value="">-- Sélectionner --</option>
+                <?php if(!empty($agents)): foreach($agents as $ag): $aid=(int)$ag->ID; ?>
+                  <option value="<?= $aid; ?>" <?= (!empty($transaction['agent_id']) && (int)$transaction['agent_id']===$aid)?'selected':''; ?>><?= htmlspecialchars($ag->display_name ?? $ag->user_login); ?></option>
+                <?php endforeach; endif; ?>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Lead</label>
+              <select name="lead_id" class="form-select" data-choices data-choices-search="true">
+                <option value="">-- Sélectionner --</option>
+                <?php if(!empty($leads)): foreach($leads as $ld): $lid=(int)($ld['id'] ?? 0); ?>
+                  <option value="<?= $lid; ?>" <?= (!empty($transaction['lead_id']) && (int)$transaction['lead_id']===$lid)?'selected':''; ?>><?= htmlspecialchars($ld['nom'] ?? ('Lead #'.$lid)); ?></option>
+                <?php endforeach; endif; ?>
+              </select>
             </div>
             <div class="col-md-3">
               <label class="form-label">Montant (€)</label>
               <input type="number" step="0.01" name="montant" class="form-control" value="<?= htmlspecialchars($transaction['montant'] ?? '') ?>">
+              <input type="hidden" name="commercial" id="commercial-text" value="<?= htmlspecialchars($transaction['commercial'] ?? '') ?>">
             </div>
             <div class="col-md-3">
               <label class="form-label">Statut *</label>
@@ -80,9 +95,34 @@
       <script>
       (function(){
         function parsePrice(str){ if(!str) return ''; var n=str.replace(/[^0-9.,]/g,'').replace(/,/g,'.'); return n; }
-        var select=document.getElementById('property-select');
+  var select=document.getElementById('property-select');
         var montant=document.querySelector('input[name="montant"]');
         var meta=document.getElementById('property-meta');
+        var agentSelect=document.querySelector('select[name="agent_id"]');
+        var commercialHidden=document.getElementById('commercial-text');
+  var typeSelect=document.getElementById('tx-type');
+        function reloadPropertiesByType(){
+          if(!typeSelect || !select) return;
+            var t = typeSelect.value;
+            fetch('<?= base_url('transactions/properties/by-type'); ?>?type='+encodeURIComponent(t))
+              .then(r=>r.json())
+              .then(list=>{
+                  var current = select.value;
+                  select.innerHTML = '<option value="">-- Sélectionner --</option>';
+                  list.forEach(function(p){
+                      var price = p.price? p.price.replace(/[^0-9.,]/g,'') : '';
+                      var opt = document.createElement('option');
+                      opt.value = p.ID;
+                      opt.textContent = '#'+p.ID+' - '+(p.post_title.length>60 ? p.post_title.substring(0,57)+'…':p.post_title)+(price?(' ('+price+')'):'');
+                      if(price) opt.setAttribute('data-price', price);
+                      if(p.wp_status) opt.setAttribute('data-wp-status', p.wp_status);
+                      select.appendChild(opt);
+                  });
+                  meta.textContent='';
+              })
+              .catch(err=>{ console.error('Property load error',err); });
+        }
+        if(typeSelect){ typeSelect.addEventListener('change', reloadPropertiesByType); }
         if(select){
           select.addEventListener('change',function(){
             var opt=select.options[select.selectedIndex];
@@ -94,6 +134,13 @@
           });
           // Trigger initial if editing
           if(select.value){ var event=new Event('change'); select.dispatchEvent(event); }
+        }
+        if(agentSelect && commercialHidden){
+          agentSelect.addEventListener('change',function(){
+            var opt=agentSelect.options[agentSelect.selectedIndex];
+            commercialHidden.value = opt && opt.value ? opt.text.trim() : '';
+          });
+          if(agentSelect.value){ var e2=new Event('change'); agentSelect.dispatchEvent(e2); }
         }
       })();
       </script>

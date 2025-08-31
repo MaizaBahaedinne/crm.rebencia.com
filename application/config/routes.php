@@ -89,6 +89,7 @@ $route['transactions/save'] = 'Transaction/save';
 $route['transactions/save/(:num)'] = 'Transaction/save/$1';
 $route['transactions/delete/(:num)'] = 'Transaction/delete/$1';
 $route['transactions/sync/houzez'] = 'Transaction/sync_houzez';
+$route['transactions/properties/by-type'] = 'Transaction/properties_by_type';
 
 /*********** REPORTS & ANALYTICS *******************/
 $route['reports/sales'] = 'Report/sales';
