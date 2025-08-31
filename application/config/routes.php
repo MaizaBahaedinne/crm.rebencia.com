@@ -72,6 +72,12 @@ $route['properties/status'] = 'Property/status';
 
 /*********** LEADS *******************/
 $route['leads'] = 'Lead/index';
+$route['leads/page/(:num)'] = 'Lead/index/$1';
+$route['leads/nouveau'] = 'Lead/form';
+$route['leads/edit/(:num)'] = 'Lead/form/$1';
+$route['leads/save'] = 'Lead/save';
+$route['leads/save/(:num)'] = 'Lead/save/$1';
+$route['leads/delete/(:num)'] = 'Lead/delete/$1';
 $route['leads/conversion'] = 'Lead/conversion';
 $route['leads/followup'] = 'Lead/followup';
 $route['leads/status'] = 'Lead/status';

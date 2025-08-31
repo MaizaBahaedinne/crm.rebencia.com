@@ -640,6 +640,7 @@
                         $isRentals = ($seg1 === 'transactions' && ($seg2 === 'rentals' || $this->uri->uri_string() === 'transactions/rentals'));
                         $isTransactionsRoot = ($seg1 === 'transactions' && !$seg2);
                         $isClients = ($seg1 === 'clients');
+                        $isLeads = ($seg1 === 'leads');
                         $role = isset($role) ? $role : ($this->session->userdata('role') ?? 'agent');
                     ?>
                     <ul class="navbar-nav" id="navbar-nav">
@@ -720,8 +721,13 @@
                             </li>
                             <li class="menu-title"><span>Leads / Clients</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
+                                <a class="nav-link menu-link <?php echo $isLeads ? 'active' : ''; ?>" href="<?php echo base_url('leads'); ?>">
                                     <i class="ri-user-search-line"></i> <span>Liste des leads</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads/nouveau'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Nouveau lead</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -839,8 +845,13 @@
                             </li>
                             <li class="menu-title"><span>Leads</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
+                                <a class="nav-link menu-link <?php echo $isLeads ? 'active' : ''; ?>" href="<?php echo base_url('leads'); ?>">
                                     <i class="ri-user-search-line"></i> <span>Leads assignés</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads/nouveau'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Ajouter lead</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -900,8 +911,13 @@
                             </li>
                             <li class="menu-title"><span>Mes leads</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads'); ?>">
+                                <a class="nav-link menu-link <?php echo $isLeads ? 'active' : ''; ?>" href="<?php echo base_url('leads'); ?>">
                                     <i class="ri-user-search-line"></i> <span>Leads assignés</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('leads/nouveau'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Nouveau lead</span>
                                 </a>
                             </li>
                             <li class="nav-item">
