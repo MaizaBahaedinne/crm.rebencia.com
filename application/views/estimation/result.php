@@ -70,6 +70,28 @@
               <tr><th>Latitude</th><td><?= $property['latitude']; ?></td></tr>
               <tr><th>Longitude</th><td><?= $property['longitude']; ?></td></tr>
               <tr><th>Équipements</th><td><?= $property['equipements']; ?></td></tr>
+              <tr><th>Cave</th><td><?= $property['cave'] ?? ''; ?></td></tr>
+              <tr><th>Cheminée</th><td><?= $property['cheminee'] ?? ''; ?></td></tr>
+              <tr><th>Meublé</th><td><?= $property['meuble'] ?? ''; ?></td></tr>
+              <tr><th>SDB type</th><td><?= $property['sdb_type'] ?? ''; ?></td></tr>
+              <tr><th>Sol</th><td><?= $property['sol_type'] ?? ''; ?></td></tr>
+              <tr><th>Portail auto</th><td><?= $property['portail_auto'] ?? ''; ?></td></tr>
+              <tr><th>Gardien</th><td><?= $property['gardien'] ?? ''; ?></td></tr>
+              <tr><th>Vidéo-surveillance</th><td><?= $property['videosurveillance'] ?? ''; ?></td></tr>
+              <tr><th>Interphone</th><td><?= $property['interphone'] ?? ''; ?></td></tr>
+              <tr><th>Alarme</th><td><?= $property['alarme'] ?? ''; ?></td></tr>
+              <tr><th>Fibre</th><td><?= $property['fibre'] ?? ''; ?></td></tr>
+              <tr><th>Lave-linge</th><td><?= $property['lave_linge'] ?? ''; ?></td></tr>
+              <tr><th>Sèche-linge</th><td><?= $property['seche_linge'] ?? ''; ?></td></tr>
+              <tr><th>Chauffe-eau</th><td><?= $property['chauffe_eau'] ?? ''; ?></td></tr>
+              <tr><th>Gaz</th><td><?= $property['gaz_type'] ?? ''; ?></td></tr>
+              <tr><th>Score transports (form)</th><td><?= $property['proximite_transports_score'] ?? ''; ?></td></tr>
+              <tr><th>Score commodités (form)</th><td><?= $property['proximite_commodites_score'] ?? ''; ?></td></tr>
+              <tr><th>Score écoles</th><td><?= $property['proximite_ecoles_score'] ?? ''; ?></td></tr>
+              <tr><th>Score santé</th><td><?= $property['proximite_sante_score'] ?? ''; ?></td></tr>
+              <tr><th>Score commerces</th><td><?= $property['proximite_commerces_score'] ?? ''; ?></td></tr>
+              <tr><th>Score espaces verts</th><td><?= $property['proximite_espaces_verts_score'] ?? ''; ?></td></tr>
+              <tr><th>Score plage</th><td><?= $property['proximite_plage_score'] ?? ''; ?></td></tr>
               <tr><th>Proposition agence</th><td><?= isset($property['proposition_agence'])?number_format($property['proposition_agence'],0,'',' '):''; ?> TND</td></tr>
               <tr><th>Commentaire agence</th><td><?= $property['proposition_commentaire'] ?? ''; ?></td></tr>
               <?php
@@ -96,6 +118,25 @@
               <p class="text-muted mb-0">Aucune photo.</p>
             <?php endif; ?>
           </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">Proposition agence</div>
+        <div class="card-body">
+          <form method="post" action="<?= base_url('estimation/proposition/'.$property['id']); ?>" class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Montant proposé (TND)</label>
+              <input type="number" step="0.01" name="proposition_agence" class="form-control" value="<?= htmlspecialchars($property['proposition_agence'] ?? '', ENT_QUOTES); ?>">
+            </div>
+            <div class="col-md-9">
+              <label class="form-label">Commentaire</label>
+              <textarea name="proposition_commentaire" class="form-control" rows="2"><?= htmlspecialchars($property['proposition_commentaire'] ?? ''); ?></textarea>
+            </div>
+            <div class="col-12 text-end">
+              <button class="btn btn-primary" type="submit">Enregistrer la proposition</button>
+            </div>
+          </form>
         </div>
       </div>
 

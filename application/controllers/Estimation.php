@@ -153,4 +153,15 @@ class Estimation extends BaseController {
         if($id) { $this->estim->delete_zone($id); }
         redirect('zones');
     }
+
+    public function proposition($id) {
+        $this->isLoggedIn();
+        if($this->input->method() !== 'post') redirect('estimation/resultat/'.$id);
+        $data = [
+            'proposition_agence' => $this->input->post('proposition_agence'),
+            'proposition_commentaire' => $this->input->post('proposition_commentaire')
+        ];
+        $this->estim->update_proposition($id, $data);
+        redirect('estimation/resultat/'.$id);
+    }
 }

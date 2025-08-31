@@ -108,6 +108,7 @@ $route['estimation'] = 'Estimation/index';
 $route['estimation/nouveau'] = 'Estimation/index';
 $route['estimation/calcul'] = 'Estimation/calculate';
 $route['estimation/resultat/(:num)'] = 'Estimation/result/$1';
+$route['estimation/proposition/(:num)'] = 'Estimation/proposition/$1';
 $route['estimations'] = 'Estimation/liste';
 $route['estimation/statut/(:num)/(:any)'] = 'Estimation/statut/$1/$2';
 $route['zones'] = 'Estimation/zones';

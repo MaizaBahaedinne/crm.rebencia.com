@@ -183,10 +183,36 @@ class Estimation_model extends CI_Model {
             $age = date('Y') - $annee;
             if($age < 5) $coef *= 1.05; elseif($age > 40) $coef *= 0.90;
         }
+    // Cave / débarras
+    if(($input['cave'] ?? '') === 'oui') $coef *= 1.015;
+    // Cheminée
+    if(($input['cheminee'] ?? '') === 'oui') $coef *= 1.01;
+    // Meublé
+    if(($input['meuble'] ?? '') === 'oui') $coef *= 1.015;
+    // Salle de bain type
+    $sdbType = $input['sdb_type'] ?? '';
+    if($sdbType==='baignoire') $coef *= 1.005; elseif($sdbType==='mixte') $coef *= 1.01;
+    // Sols
+    $sol = strtolower($input['sol_type'] ?? '');
+    if($sol==='marbre') $coef *= 1.02; elseif($sol==='parquet') $coef *= 1.015; // carrelage neutre
         // Classe énergie A..G
         $energie = strtoupper(trim($input['energie_classe'] ?? ''));
         $mapEnergie = [ 'A'=>0.03, 'B'=>0.02, 'C'=>0.01, 'D'=>0, 'E'=>-0.02, 'F'=>-0.04, 'G'=>-0.06 ];
         if(isset($mapEnergie[$energie])) $coef *= (1 + $mapEnergie[$energie]);
+    // Sécurité additions
+    if(($input['portail_auto'] ?? '') === 'oui') $coef *= 1.005;
+    if(($input['gardien'] ?? '') === 'oui') $coef *= 1.01;
+    if(($input['videosurveillance'] ?? '') === 'oui') $coef *= 1.01;
+    if(($input['interphone'] ?? '') === 'oui') $coef *= 1.005;
+    if(($input['alarme'] ?? '') === 'oui') $coef *= 1.015;
+    // Services
+    if(($input['fibre'] ?? '') === 'oui') $coef *= 1.01;
+    if(($input['lave_linge'] ?? '') === 'oui') $coef *= 1.003;
+    if(($input['seche_linge'] ?? '') === 'oui') $coef *= 1.003;
+    $chauffe = strtolower($input['chauffe_eau'] ?? '');
+    if($chauffe==='solaire') $coef *= 1.01; elseif($chauffe==='gaz') $coef *= 1.005;
+    $gaz = strtolower($input['gaz_type'] ?? '');
+    if($gaz==='ville') $coef *= 1.01; elseif($gaz==='propane') $coef *= 1.003;
         // Equipements bonus
         $equipements = $input['equipements'] ?? [];
         if(is_string($equipements)) { $equipements = explode(',', $equipements); }
@@ -214,6 +240,17 @@ class Estimation_model extends CI_Model {
         if($commodScore !== null) {
             if($commodScore > 3) $coef *= 1 + min(($commodScore-3)*0.01, 0.03);
             elseif($commodScore < 2) $coef *= 1 - min((2-$commodScore)*0.01, 0.02);
+        }
+        // Proximités spécifiques (si fournis dans input 0-5)
+        $proximites = [
+            'proximite_transports_score','proximite_commodites_score','proximite_ecoles_score','proximite_sante_score','proximite_commerces_score','proximite_espaces_verts_score','proximite_plage_score'
+        ];
+        foreach($proximites as $pKey){
+            if(isset($input[$pKey]) && $input[$pKey] !== '') {
+                $val = (int)$input[$pKey];
+                if($val > 3) $coef *= 1 + min(($val-3)*0.005, 0.02); // +0.5% par point >3 limité 2%
+                elseif($val < 2) $coef *= 1 - min((2-$val)*0.005, 0.01); // petit malus
+            }
         }
 
         $valeurEstimee = round($baseValeur * $coef, 0);

@@ -195,6 +195,99 @@
         </div>
 
         <div class="card mb-3">
+          <div class="card-header">Confort & Commodités générales</div>
+          <div class="card-body row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Cave / Débarras</label>
+              <select name="cave" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Cheminée</label>
+              <select name="cheminee" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Meublé</label>
+              <select name="meuble" class="form-select"><option value="">Non</option><option value="oui">Oui</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Salle de bain</label>
+              <select name="sdb_type" class="form-select">
+                <option value="">Standard</option>
+                <option value="baignoire">Baignoire</option>
+                <option value="douche">Douche</option>
+                <option value="mixte">Bain + Douche</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Sol principal</label>
+              <select name="sol_type" class="form-select">
+                <option value="">Carrelage</option>
+                <option value="marbre">Marbre</option>
+                <option value="parquet">Parquet</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">Sécurité</div>
+          <div class="card-body row g-3">
+            <?php $sec = [ 'portail_auto'=>'Portail automatique', 'gardien'=>'Gardien / Concierge', 'videosurveillance'=>'Vidéo-surveillance', 'interphone'=>'Interphone / Digicode', 'alarme'=>'Alarme' ];
+            foreach($sec as $k=>$lbl): ?>
+              <div class="col-md-3 form-check">
+                <input type="checkbox" class="form-check-input" id="sec_<?= $k; ?>" name="<?= $k; ?>" value="oui">
+                <label class="form-check-label" for="sec_<?= $k; ?>"><?= $lbl; ?></label>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">Services & Équipements</div>
+          <div class="card-body row g-3">
+            <div class="col-md-3 form-check">
+              <input type="checkbox" class="form-check-input" id="srv_fibre" name="fibre" value="oui">
+              <label class="form-check-label" for="srv_fibre">Fibre / Haut débit</label>
+            </div>
+            <div class="col-md-3 form-check">
+              <input type="checkbox" class="form-check-input" id="srv_lave" name="lave_linge" value="oui">
+              <label class="form-check-label" for="srv_lave">Lave-linge</label>
+            </div>
+            <div class="col-md-3 form-check">
+              <input type="checkbox" class="form-check-input" id="srv_seche" name="seche_linge" value="oui">
+              <label class="form-check-label" for="srv_seche">Sèche-linge</label>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Chauffe-eau</label>
+              <select name="chauffe_eau" class="form-select"><option value="">Électrique</option><option value="gaz">Gaz</option><option value="solaire">Solaire</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Gaz</label>
+              <select name="gaz_type" class="form-select"><option value="">Aucun</option><option value="ville">Gaz de ville</option><option value="propane">Propane</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">Proximités (0-5)</div>
+          <div class="card-body row g-3">
+            <?php $prox = [
+              'proximite_ecoles_score'=>'Écoles / Universités',
+              'proximite_sante_score'=>'Hôpitaux / Pharmacies',
+              'proximite_commerces_score'=>'Commerces / Supermarchés',
+              'proximite_espaces_verts_score'=>'Parcs / Espaces verts',
+              'proximite_plage_score'=>'Plage / Mer (si applicable)'
+            ];
+            foreach($prox as $k=>$lbl): ?>
+              <div class="col-md-3">
+                <label class="form-label"><?= $lbl; ?></label>
+                <input type="number" min="0" max="5" name="<?= $k; ?>" class="form-control">
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+        <div class="card mb-3">
           <div class="card-header">Photos</div>
           <div class="card-body">
             <input type="file" name="photos[]" multiple accept="image/*" class="form-control" />
