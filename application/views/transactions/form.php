@@ -34,10 +34,6 @@
               </select>
               <div id="property-meta" class="form-text text-muted mt-1"></div>
             </div>
-            <div class="col-md-4">
-              <label class="form-label">Titre *</label>
-              <input name="titre" required class="form-control" value="<?= htmlspecialchars($transaction['titre'] ?? '') ?>">
-            </div>
             <div class="col-md-2">
               <label class="form-label">Type *</label>
               <select name="type" class="form-select" required id="tx-type">
@@ -45,6 +41,10 @@
                   <option value="<?= $k; ?>" <?= (($transaction['type'] ?? '')===$k)?'selected':''; ?>><?= $v; ?></option>
                 <?php endforeach; ?>
               </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Titre *</label>
+              <input name="titre" required class="form-control" value="<?= htmlspecialchars($transaction['titre'] ?? '') ?>">
             </div>
             <div class="col-md-3">
               <label class="form-label">Commercial (Agent)</label>
