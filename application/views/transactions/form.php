@@ -19,6 +19,16 @@
       <form method="post" action="<?= isset($transaction)? base_url('transactions/save/'.$transaction['id']) : base_url('transactions/save'); ?>" class="needs-validation" novalidate>
         <div class="card">
           <div class="card-body row g-3">
+            <div class="col-md-5">
+              <label class="form-label">Propriété (Houzez)</label>
+              <select name="property_id" class="form-select" data-choices data-choices-search-false>
+                <option value="">-- Sélectionner --</option>
+                <?php if(!empty($properties)):
+                  foreach($properties as $p): $sel = (!empty($transaction['property_id']) && (int)$transaction['property_id']===(int)$p['ID']) ? 'selected' : ''; ?>
+                    <option value="<?= $p['ID']; ?>" <?= $sel; ?>>#<?= $p['ID']; ?> - <?= htmlspecialchars(mb_strimwidth($p['post_title'],0,70,'…','UTF-8')); ?></option>
+                <?php endforeach; endif; ?>
+              </select>
+            </div>
             <div class="col-md-4">
               <label class="form-label">Titre *</label>
               <input name="titre" required class="form-control" value="<?= htmlspecialchars($transaction['titre'] ?? '') ?>">

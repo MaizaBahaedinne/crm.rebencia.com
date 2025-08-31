@@ -53,6 +53,7 @@ class Transaction_model extends CI_Model {
         if(!empty($f['type'])) $this->db->where('type',$f['type']);
         if(!empty($f['statut'])) $this->db->where('statut',$f['statut']);
         if(!empty($f['q'])) $this->db->like('titre',$f['q']);
+    if(!empty($f['property_id'])) $this->db->where('property_id',(int)$f['property_id']);
         if(!empty($f['date_min'])) $this->db->where('date_cloture >=',$f['date_min']);
         if(!empty($f['date_max'])) $this->db->where('date_cloture <=',$f['date_max']);
         return $this->db->order_by('created_at','DESC')->limit($limit,$offset)->get($this->table)->result_array();

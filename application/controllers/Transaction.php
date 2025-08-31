@@ -6,7 +6,9 @@ require APPPATH . '/libraries/BaseController.php';
 /**
  * @property CI_Input $input
  * @property CI_Form_validation $form_validation
+ * @property CI_Session $session
  * @property Transaction_model $transaction_model
+ * @property Wp_property_model $wp_property_model
  */
 class Transaction extends BaseController {
     public function __construct() {
@@ -59,6 +61,9 @@ class Transaction extends BaseController {
         $data = $this->global;
         $data['transaction'] = $id ? $this->transaction_model->get($id) : null;
         $data['pageTitle'] = $id ? 'Modifier transaction' : 'Nouvelle transaction';
+    // Charger propriétés Houzez pour sélection
+    $this->load->model('Wp_property_model','wp_property_model');
+    $data['properties'] = $this->wp_property_model->list_simple(150);
         $this->loadViews('transactions/form', $data, $data, NULL);
     }
 
@@ -77,7 +82,8 @@ class Transaction extends BaseController {
             'montant' => $this->input->post('montant', TRUE) !== '' ? (float)$this->input->post('montant', TRUE) : null,
             'statut' => $this->input->post('statut', TRUE),
             'date_cloture' => $this->input->post('date_cloture', TRUE) ?: null,
-            'notes' => $this->input->post('notes', TRUE)
+            'notes' => $this->input->post('notes', TRUE),
+            'property_id' => $this->input->post('property_id', TRUE) ? (int)$this->input->post('property_id', TRUE) : null
         ];
         if($id) {
             $this->transaction_model->update($id,$payload);
