@@ -310,44 +310,70 @@
 <!-- Leaflet JS -->
 <script src="<?= base_url('assets/libs/leaflet/leaflet.js'); ?>"></script>
 <script>
-// Initialisation carte Leaflet
+// Attendre la géolocalisation avant d'afficher la carte
 (function(){
   var mapDiv = document.getElementById('map');
   if(!mapDiv) return;
-  // Nettoie le placeholder texte
-  mapDiv.innerHTML = '';
-  var defaultLat = 34.0, defaultLng = 9.0; // centre Tunisie approximatif
-  var map = L.map('map').setView([defaultLat, defaultLng], 6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
-
+  var defaultLat = 34.0, defaultLng = 9.0; // centre Tunisie
   var latInput = document.getElementById('latitude');
   var lngInput = document.getElementById('longitude');
-  function setLatLng(lat,lng, move){
+  var map, marker;
+  var mapReady = false;
+  function setLatLng(lat, lng, move) {
     if(latInput) latInput.value = lat.toFixed(6);
     if(lngInput) lngInput.value = lng.toFixed(6);
-    if(move) {
-      marker.setLatLng([lat,lng]);
-      map.panTo([lat,lng]);
+    if(marker && move) {
+      marker.setLatLng([lat, lng]);
+      map.panTo([lat, lng]);
     }
   }
-  var marker = L.marker([defaultLat, defaultLng], {draggable:true}).addTo(map);
-  marker.on('dragend', function(e){ var p = e.target.getLatLng(); setLatLng(p.lat, p.lng, false); });
-
-  // Clic sur la carte pour repositionner
-  map.on('click', function(e){ setLatLng(e.latlng.lat, e.latlng.lng, true); });
-
-  // Géolocalisation navigateur
-  if(navigator.geolocation){
+  function showMap(lat, lng, zoom) {
+    mapDiv.innerHTML = '';
+    map = L.map('map').setView([lat, lng], zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    marker = L.marker([lat, lng], {draggable:true}).addTo(map);
+    marker.on('dragend', function(e){
+      var p = e.target.getLatLng();
+      setLatLng(p.lat, p.lng, false);
+    });
+    map.on('click', function(e){ setLatLng(e.latlng.lat, e.latlng.lng, true); });
+    setLatLng(lat, lng, false);
+    mapReady = true;
+  }
+  function showError(msg) {
+    mapDiv.innerHTML = '<span class="text-danger">' + msg + '</span>';
+  }
+  // Essayer la géoloc, timeout 3s
+  var geoTimeout = setTimeout(function(){
+    if(!mapReady) {
+      showMap(defaultLat, defaultLng, 6);
+      showError("Géolocalisation indisponible ou refusée. Carte centrée sur la Tunisie.");
+    }
+  }, 3000);
+  if(navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(pos){
-      setLatLng(pos.coords.latitude, pos.coords.longitude, true);
-      map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+      clearTimeout(geoTimeout);
+      showMap(pos.coords.latitude, pos.coords.longitude, 14);
     }, function(err){
-      console.warn('Geoloc refusée', err);
-      // Laisse la position par défaut
-    }, { enableHighAccuracy:true, timeout:8000 });
+      clearTimeout(geoTimeout);
+      showMap(defaultLat, defaultLng, 6);
+      if(window.isSecureContext === false || location.protocol !== 'https:') {
+        showError("Géolocalisation refusée ou impossible (HTTPS requis sur mobile). Carte centrée sur la Tunisie.");
+      } else {
+        showError("Géolocalisation refusée ou impossible. Carte centrée sur la Tunisie.");
+      }
+    }, { enableHighAccuracy:true, timeout:2500 });
+  } else {
+    // Pas de support geoloc
+    setTimeout(function(){
+      if(!mapReady) {
+        showMap(defaultLat, defaultLng, 6);
+        showError("Géolocalisation non supportée par ce navigateur.");
+      }
+    }, 1000);
   }
 })();
 
