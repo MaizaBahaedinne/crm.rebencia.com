@@ -99,18 +99,37 @@
                     <label class="form-label">Date d'expiration</label>
                     <input type="date" name="client_identite_date_expiration" class="form-control" value="<?= htmlspecialchars($lead['client_identite_date_expiration'] ?? ''); ?>">
                   </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Pièce jointe scannée (identité)</label>
-                    <input type="file" name="piece_identite_scan" class="form-control" accept="image/*,application/pdf">
-                    <?php if(!empty($lead['id'])): ?>
-                      <?php // Affichage de la pièce jointe existante (si présente)
-                        if(!empty($lead['piece_identite_url'])): ?>
-                        <div class="mt-2">
-                          <a href="<?= htmlspecialchars($lead['piece_identite_url']); ?>" target="_blank" class="btn btn-outline-primary btn-sm"><i class="ri-eye-line"></i> Voir la pièce jointe</a>
-                        </div>
-                      <?php endif; ?>
+                  <div class="col-md-12">
+                    <label class="form-label">Pièces jointes identité (PDF, images)</label>
+                    <input type="file" name="piece_identite_scan[]" class="form-control" multiple accept="image/*,application/pdf">
+                    <?php if (!empty($lead_files)): ?>
+                      <div class="row mt-2">
+                        <?php foreach ($lead_files as $f): ?>
+                          <div class="col-md-3 mb-2">
+                            <div class="card">
+                              <?php if (strpos($f['mime_type'], 'image/') === 0): ?>
+                                <img src="<?= base_url('uploads/leads/'.$f['filename']); ?>" class="card-img-top" style="max-height:120px;object-fit:contain;">
+                              <?php else: ?>
+                                <div class="p-3 text-center"><i class="ri-file-pdf-line" style="font-size:2rem"></i></div>
+                              <?php endif; ?>
+                              <div class="card-body p-2">
+                                <div class="small"><?= htmlspecialchars($f['original_name']); ?></div>
+                                <a href="<?= base_url('uploads/leads/'.$f['filename']); ?>" target="_blank" class="btn btn-sm btn-outline-primary w-100 mt-1">Voir</a>
+                                <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-1" onclick="deleteLeadFile(<?= $f['id']; ?>)">Supprimer</button>
+                              </div>
+                            </div>
+                          </div>
+                        <?php endforeach; ?>
+                      </div>
                     <?php endif; ?>
                   </div>
+<script>
+function deleteLeadFile(id) {
+  if(confirm('Supprimer ce fichier ?')) {
+    // AJAX à implémenter côté back
+  }
+}
+</script>
                 </div>
               </div>
             </div>

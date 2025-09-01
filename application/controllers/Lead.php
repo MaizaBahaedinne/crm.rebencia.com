@@ -44,12 +44,10 @@ class Lead extends BaseController {
         $data = $this->global;
         $data['lead'] = $id ? $this->lead_model->get($id) : null;
         // Récupérer la pièce jointe identité si existante
-        $data['lead']['piece_identite_url'] = null;
+        // Récupérer toutes les pièces jointes identité existantes
+        $data['lead_files'] = [];
         if($id && !empty($data['lead']['id'])) {
-            $file = $this->lead_model->db->where(['lead_id'=>$id,'categorie'=>'id'])->order_by('uploaded_at','DESC')->get('crm_lead_files')->row_array();
-            if($file && !empty($file['filename'])) {
-                $data['lead']['piece_identite_url'] = base_url('uploads/leads/'.$file['filename']);
-            }
+            $data['lead_files'] = $this->lead_model->db->where(['lead_id'=>$id,'categorie'=>'id'])->order_by('uploaded_at','DESC')->get('crm_lead_files')->result_array();
         }
         $data['wp_clients'] = $this->wp_client_model->all(300,0,['role'=>null]);
         $data['pageTitle'] = $id? 'Modifier lead':'Nouveau lead';
@@ -122,25 +120,27 @@ class Lead extends BaseController {
             $this->session->set_flashdata($lead_id? 'success':'error',$lead_id? 'Lead créé':'Création impossible');
         }
 
-        // Upload fichier si présent
-        if($lead_id && isset($_FILES['piece_identite_scan']) && is_uploaded_file($_FILES['piece_identite_scan']['tmp_name'])) {
+        // Upload de plusieurs fichiers si présents
+        if($lead_id && isset($_FILES['piece_identite_scan']) && !empty($_FILES['piece_identite_scan']['name'][0])) {
             $upload_dir = FCPATH.'uploads/leads/';
             if(!is_dir($upload_dir)) @mkdir($upload_dir,0775,true);
-            $ext = pathinfo($_FILES['piece_identite_scan']['name'], PATHINFO_EXTENSION);
-            $filename = 'lead_'.$lead_id.'_id_'.date('YmdHis').'.'.strtolower($ext);
-            $dest = $upload_dir.$filename;
-            if(move_uploaded_file($_FILES['piece_identite_scan']['tmp_name'],$dest)) {
-                // Enregistrement en base
-                $this->lead_model->db->insert('crm_lead_files', [
-                    'lead_id'=>$lead_id,
-                    'filename'=>$filename,
-                    'original_name'=>$_FILES['piece_identite_scan']['name'],
-                    'mime_type'=>$_FILES['piece_identite_scan']['type'],
-                    'taille'=>$_FILES['piece_identite_scan']['size'],
-                    'categorie'=>'id',
-                    'uploaded_by'=>($this->session->userdata('userId') ?? null),
-                    'uploaded_at'=>date('Y-m-d H:i:s')
-                ]);
+            foreach ($_FILES['piece_identite_scan']['name'] as $i => $name) {
+                if (!is_uploaded_file($_FILES['piece_identite_scan']['tmp_name'][$i])) continue;
+                $ext = pathinfo($name, PATHINFO_EXTENSION);
+                $filename = 'lead_'.$lead_id.'_id_'.uniqid().'_'.date('YmdHis').'.'.strtolower($ext);
+                $dest = $upload_dir.$filename;
+                if (move_uploaded_file($_FILES['piece_identite_scan']['tmp_name'][$i], $dest)) {
+                    $this->lead_model->db->insert('crm_lead_files', [
+                        'lead_id' => $lead_id,
+                        'filename' => $filename,
+                        'original_name' => $name,
+                        'mime_type' => $_FILES['piece_identite_scan']['type'][$i],
+                        'taille' => $_FILES['piece_identite_scan']['size'][$i],
+                        'categorie' => 'id',
+                        'uploaded_by' => ($this->session->userdata('userId') ?? null),
+                        'uploaded_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
             }
         }
 
