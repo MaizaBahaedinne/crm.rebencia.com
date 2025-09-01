@@ -16,7 +16,47 @@
 
       <?php if(validation_errors()): ?><div class="alert alert-danger small mb-3"><?= validation_errors(); ?></div><?php endif; ?>
 
-      <form method="post" action="<?= isset($lead)? base_url('leads/save/'.$lead['id']) : base_url('leads/save'); ?>" class="needs-validation" novalidate>
+  <form method="post" action="<?= isset($lead)? base_url('leads/save/'.$lead['id']) : base_url('leads/save'); ?>" class="needs-validation" id="leadForm" novalidate>
+<script>
+// Validation en temps réel sur les champs requis
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('leadForm');
+  const requiredFields = [
+    'client_type',
+    'client_identite_type',
+    'client_identite_numero',
+    'wp_user_autocomplete',
+    'type',
+    'status'
+  ];
+  requiredFields.forEach(function(name) {
+    const el = document.getElementsByName(name)[0] || document.getElementById(name);
+    if(el) {
+      el.addEventListener('input', function() {
+        if(el.value.trim() === '') {
+          el.classList.add('is-invalid');
+        } else {
+          el.classList.remove('is-invalid');
+        }
+      });
+    }
+  });
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    requiredFields.forEach(function(name) {
+      const el = document.getElementsByName(name)[0] || document.getElementById(name);
+      if(el && el.value.trim() === '') {
+        el.classList.add('is-invalid');
+        valid = false;
+      }
+    });
+    if(!valid) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+});
+</script>
         <div class="card">
           <div class="card-body row g-3">
             <div class="col-md-4">
