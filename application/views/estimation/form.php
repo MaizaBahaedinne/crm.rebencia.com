@@ -35,6 +35,27 @@
             <div class="col-12">
               <div id="map" style="height:300px;background:#f5f5f5;" class="rounded border d-flex align-items-center justify-content-center text-muted">Carte (auto localiser)</div>
             </div>
+            <!-- Champs adresse manuelle -->
+            <div class="col-md-2">
+              <label class="form-label">N°</label>
+              <input type="text" name="adresse_numero" class="form-control" placeholder="N°">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Rue</label>
+              <input type="text" name="adresse_rue" class="form-control" placeholder="Rue">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Ville</label>
+              <input type="text" name="adresse_ville" class="form-control" placeholder="Ville">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Code postal</label>
+              <input type="text" name="adresse_cp" class="form-control" placeholder="Code postal">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Pays</label>
+              <input type="text" name="adresse_pays" class="form-control" placeholder="Pays">
+            </div>
           </div>
         </div>
 
