@@ -32,6 +32,7 @@ class Estimation_model extends CI_Model {
             'commodites_description' => $data['commodites_description'] ?? null,
             'latitude' => $data['latitude'] !== '' ? $data['latitude'] : null,
             'longitude' => $data['longitude'] !== '' ? $data['longitude'] : null,
+            'geometry' => isset($data['geometry']) ? $data['geometry'] : null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -53,6 +54,7 @@ class Estimation_model extends CI_Model {
             'commodites_description' => $data['commodites_description'] ?? null,
             'latitude' => $data['latitude'] !== '' ? $data['latitude'] : null,
             'longitude' => $data['longitude'] !== '' ? $data['longitude'] : null,
+            'geometry' => isset($data['geometry']) ? $data['geometry'] : null,
             'updated_at' => date('Y-m-d H:i:s')
         ];
         $this->db->where('id', $id)->update($this->zonesTable, $row);

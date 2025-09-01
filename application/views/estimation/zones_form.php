@@ -60,10 +60,63 @@
                 <textarea name="commodites_description" class="form-control" rows="2"><?= isset($zone)?htmlspecialchars($zone->commodites_description):''; ?></textarea>
               </div>
             </div>
+            <div class="row mt-3">
+              <div class="col-12">
+                <label class="form-label">Délimitation sur la carte (optionnel)</label>
+                <div id="zone-map" style="height:300px;background:#f5f5f5;" class="rounded border mb-2"></div>
+                <textarea name="geometry" id="geometry" class="form-control d-none"><?= isset($zone)&&isset($zone->geometry)?htmlspecialchars($zone->geometry):''; ?></textarea>
+                <small class="text-muted">Dessinez le contour de la zone (polygone). Les coordonnées seront enregistrées en GeoJSON.</small>
+              </div>
+            </div>
             <div class="mt-4">
               <button class="btn btn-primary" type="submit">Enregistrer</button>
             </div>
           </form>
+          <!-- Leaflet + Leaflet.draw -->
+          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+          <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+          <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+          <script>
+          (function(){
+            var map = L.map('zone-map').setView([36.8, 10.2], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            var geometryInput = document.getElementById('geometry');
+            // Si déjà une géométrie, l'afficher
+            if(geometryInput.value) {
+              try {
+                var geo = JSON.parse(geometryInput.value);
+                var layer = L.geoJSON(geo).getLayers()[0];
+                if(layer) {
+                  drawnItems.addLayer(layer);
+                  map.fitBounds(layer.getBounds());
+                }
+              } catch(e) {}
+            }
+            var drawControl = new L.Control.Draw({
+              edit: { featureGroup: drawnItems },
+              draw: { polygon: true, polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false }
+            });
+            map.addControl(drawControl);
+            map.on(L.Draw.Event.CREATED, function (e) {
+              drawnItems.clearLayers();
+              drawnItems.addLayer(e.layer);
+              geometryInput.value = JSON.stringify(e.layer.toGeoJSON().geometry);
+            });
+            map.on(L.Draw.Event.EDITED, function (e) {
+              var layers = e.layers.getLayers();
+              if(layers.length>0) geometryInput.value = JSON.stringify(layers[0].toGeoJSON().geometry);
+            });
+            map.on(L.Draw.Event.DELETED, function (e) {
+              geometryInput.value = '';
+            });
+          })();
+          </script>
         </div>
       </div>
     </div>
