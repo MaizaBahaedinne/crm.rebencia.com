@@ -69,6 +69,12 @@
               <tr><th>Jardin</th><td><?= $property['jardin']; ?></td></tr>
               <tr><th>Latitude</th><td><?= $property['latitude']; ?></td></tr>
               <tr><th>Longitude</th><td><?= $property['longitude']; ?></td></tr>
+              <tr><th>Adresse</th><td>
+                <?= ($property['adresse_numero'] ? $property['adresse_numero'].' ' : '') ?>
+                <?= $property['adresse_rue']; ?><br>
+                <?= $property['adresse_cp']; ?> <?= $property['adresse_ville']; ?><br>
+                <?= $property['adresse_pays']; ?>
+              </td></tr>
               <tr><th>Équipements</th><td><?= $property['equipements']; ?></td></tr>
               <tr><th>Cave</th><td><?= $property['cave'] ?? ''; ?></td></tr>
               <tr><th>Cheminée</th><td><?= $property['cheminee'] ?? ''; ?></td></tr>
@@ -106,6 +112,33 @@
         </div>
       </div>
 
+
+      <!-- Carte Leaflet -->
+      <div class="card mt-4">
+        <div class="card-header">Localisation sur la carte</div>
+        <div class="card-body">
+          <div id="map-result" style="height:300px;background:#f5f5f5;" class="rounded border mb-2"></div>
+          <script src="<?= base_url('assets/libs/leaflet/leaflet.js'); ?>"></script>
+          <link rel="stylesheet" href="<?= base_url('assets/libs/leaflet/leaflet.css'); ?>" />
+          <script>
+          (function(){
+            var lat = parseFloat('<?= $property['latitude'] ?>');
+            var lng = parseFloat('<?= $property['longitude'] ?>');
+            if(!isNaN(lat) && !isNaN(lng) && lat && lng) {
+              var map = L.map('map-result').setView([lat, lng], 15);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+              }).addTo(map);
+              L.marker([lat, lng]).addTo(map);
+            } else {
+              document.getElementById('map-result').innerHTML = '<span class="text-danger">Coordonnées non renseignées</span>';
+            }
+          })();
+          </script>
+        </div>
+      </div>
+
       <div class="card mt-4">
         <div class="card-header">Photos</div>
         <div class="card-body">
@@ -121,8 +154,9 @@
         </div>
       </div>
 
+
       <div class="card mt-4">
-        <div class="card-header">Proposition agence</div>
+        <div class="card-header">Proposition agence & Statut</div>
         <div class="card-body">
           <form method="post" action="<?= base_url('estimation/proposition/'.$property['id']); ?>" class="row g-3">
             <div class="col-md-3">
@@ -133,7 +167,11 @@
               <label class="form-label">Commentaire</label>
               <textarea name="proposition_commentaire" class="form-control" rows="2"><?= htmlspecialchars($property['proposition_commentaire'] ?? ''); ?></textarea>
             </div>
-            <div class="col-12 text-end">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+              <div>
+                <a href="<?= base_url('estimation/statut/'.$property['id'].'/valide'); ?>" class="btn btn-success me-2" onclick="return confirm('Valider cette estimation ?');">Accepter</a>
+                <a href="<?= base_url('estimation/statut/'.$property['id'].'/rejete'); ?>" class="btn btn-danger" onclick="return confirm('Rejeter cette estimation ?');">Rejeter</a>
+              </div>
               <button class="btn btn-primary" type="submit">Enregistrer la proposition</button>
             </div>
           </form>

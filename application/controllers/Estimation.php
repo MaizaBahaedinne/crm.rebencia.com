@@ -66,15 +66,18 @@ class Estimation extends BaseController {
         $estim = $this->estim->compute_estimation($post, $zone);
 
         $save = $post;
-    $save['valeur_min_estimee'] = $estim['valeur_min_estimee'];
-    $save['valeur_estimee'] = $estim['valeur_estimee'];
-    $save['valeur_max_estimee'] = $estim['valeur_max_estimee'];
+        $save['valeur_min_estimee'] = $estim['valeur_min_estimee'];
+        $save['valeur_estimee'] = $estim['valeur_estimee'];
+        $save['valeur_max_estimee'] = $estim['valeur_max_estimee'];
         $save['loyer_potentiel'] = $estim['loyer_potentiel'];
         $save['rentabilite'] = $estim['rentabilite'];
         $save['coef_global'] = $estim['coef_global'];
         $save['statut_dossier'] = 'en_cours';
+        // Champs adresse : s'assurer qu'ils existent même si vides
+        foreach(['adresse_numero','adresse_rue','adresse_ville','adresse_cp','adresse_pays'] as $f) {
+            if(!isset($save[$f])) $save[$f] = null;
+        }
         $property_id = $this->estim->save_property($save, $uploaded);
-
         redirect('estimation/resultat/'.$property_id);
     }
 

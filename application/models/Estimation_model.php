@@ -72,6 +72,10 @@ class Estimation_model extends CI_Model {
     public function save_property($data, $photos = []) {
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['updated_at'] = date('Y-m-d H:i:s');
+        // Champs adresse : s'assurer qu'ils existent même si vides
+        foreach(['adresse_numero','adresse_rue','adresse_ville','adresse_cp','adresse_pays'] as $f) {
+            if(!isset($data[$f])) $data[$f] = null;
+        }
         $this->db->insert($this->propertiesTable, $data);
         $id = $this->db->insert_id();
         if(!empty($photos)) {
@@ -87,13 +91,17 @@ class Estimation_model extends CI_Model {
     }
 
     public function get_property($id) {
-    $this->db->select("p.*, z.nom as zone_nom, z.prix_m2_min, z.prix_m2_max, z.prix_m2_moyen, z.rendement_locatif_moyen, z.transport_score, z.commodites_score, z.securite_score");
+        $this->db->select("p.*, z.nom as zone_nom, z.prix_m2_min, z.prix_m2_max, z.prix_m2_moyen, z.rendement_locatif_moyen, z.transport_score, z.commodites_score, z.securite_score");
         $this->db->from($this->propertiesTable.' p');
         $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
         $this->db->where('p.id',$id);
         $prop = $this->db->get()->row_array();
         if(!$prop) return null;
         $prop['photos'] = $this->db->get_where($this->photosTable,['property_id'=>$id])->result_array();
+        // Champs adresse toujours présents (évite undefined)
+        foreach(['adresse_numero','adresse_rue','adresse_ville','adresse_cp','adresse_pays'] as $f) {
+            if(!isset($prop[$f])) $prop[$f] = '';
+        }
         return $prop;
     }
 
