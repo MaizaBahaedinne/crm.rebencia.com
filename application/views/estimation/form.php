@@ -1,3 +1,6 @@
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="main-content">
   <div class="page-content">
@@ -34,6 +37,9 @@
             </div>
             <div class="col-12">
               <div id="map" style="height:300px;background:#f5f5f5;" class="rounded border d-flex align-items-center justify-content-center text-muted">Carte (auto localiser)</div>
+            </div>
+            <div class="col-12 mb-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" id="btn-geoloc-map"><i class="bi bi-crosshair"></i> Aller à ma position</button>
             </div>
             <!-- Champs adresse manuelle -->
             <div class="col-md-2">
@@ -335,7 +341,7 @@
 (function(){
   var mapDiv = document.getElementById('map');
   if(!mapDiv) return;
-  var defaultLat = 20.0, defaultLng = 0.0; // centre monde (Afrique/Europe/Atlantique)
+  var defaultLat = 20.0, defaultLng = 0.0; // centre monde
   var latInput = document.getElementById('latitude');
   var lngInput = document.getElementById('longitude');
   var map, marker;
@@ -363,6 +369,35 @@
     map.on('click', function(e){ setLatLng(e.latlng.lat, e.latlng.lng, true); });
     setLatLng(lat, lng, false);
     mapReady = true;
+    // Bouton "Aller à ma position"
+    var btn = document.getElementById('btn-geoloc-map');
+    if(btn) {
+      btn.onclick = function(){
+        if(navigator.geolocation) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Localisation...';
+          navigator.geolocation.getCurrentPosition(function(pos){
+            setLatLng(pos.coords.latitude, pos.coords.longitude, true);
+            map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-crosshair"></i> Aller à ma position';
+          }, function(){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-crosshair"></i> Aller à ma position';
+            if(window.Swal){
+              Swal.fire({
+                icon: 'error',
+                title: 'Erreur de géolocalisation',
+                text: 'Impossible de récupérer votre position.',
+                confirmButtonText: 'OK'
+              });
+            } else {
+              alert('Impossible de récupérer votre position.');
+            }
+          }, { enableHighAccuracy:true, timeout:4000 });
+        }
+      };
+    }
   }
   function showError(msg) {
     // Message désactivé : ne rien faire pour une UX plus neutre
@@ -370,8 +405,8 @@
   // Essayer la géoloc, timeout 3s
   var geoTimeout = setTimeout(function(){
     if(!mapReady) {
-  showMap(defaultLat, defaultLng, 2);
-  // showError désactivé
+      showMap(defaultLat, defaultLng, 2);
+      // showError désactivé
     }
   }, 3000);
   if(navigator.geolocation) {
@@ -380,15 +415,15 @@
       showMap(pos.coords.latitude, pos.coords.longitude, 14);
     }, function(err){
       clearTimeout(geoTimeout);
-  showMap(defaultLat, defaultLng, 2);
-  // showError désactivé
+      showMap(defaultLat, defaultLng, 2);
+      // showError désactivé
     }, { enableHighAccuracy:true, timeout:2500 });
   } else {
     // Pas de support geoloc
     setTimeout(function(){
       if(!mapReady) {
-  showMap(defaultLat, defaultLng, 2);
-  // showError désactivé
+        showMap(defaultLat, defaultLng, 2);
+        // showError désactivé
       }
     }, 1000);
   }
