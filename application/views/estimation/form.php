@@ -8,6 +8,8 @@
             <h4 class="mb-0">Nouvelle estimation immobilière</h4>
             <span class="badge bg-primary-subtle text-primary">Formulaire</span>
           </div>
+  <!-- Leaflet CSS (spécifique à cette vue) -->
+  <link rel="stylesheet" href="<?= base_url('assets/libs/leaflet/leaflet.css'); ?>" />
       <form id="estimation-form" class="needs-validation" method="post" action="<?= base_url('estimation/calcul'); ?>" enctype="multipart/form-data" novalidate>
         <div class="card mb-3">
           <div class="card-header">Localisation & Zone</div>
@@ -305,18 +307,50 @@
   </div>
 </div>
 
+<!-- Leaflet JS -->
+<script src="<?= base_url('assets/libs/leaflet/leaflet.js'); ?>"></script>
 <script>
-// Géolocalisation
-if(navigator.geolocation){
-  navigator.geolocation.getCurrentPosition(function(pos){
-    document.getElementById('latitude').value = pos.coords.latitude.toFixed(6);
-    document.getElementById('longitude').value = pos.coords.longitude.toFixed(6);
-    document.getElementById('map').innerHTML = 'Lat: '+pos.coords.latitude.toFixed(5)+' / Lng: '+pos.coords.longitude.toFixed(5);
-  }, function(err){
-    console.warn('Geoloc refusée', err);
-    document.getElementById('map').innerHTML = 'Géolocalisation non disponible';
-  });
-}
+// Initialisation carte Leaflet
+(function(){
+  var mapDiv = document.getElementById('map');
+  if(!mapDiv) return;
+  // Nettoie le placeholder texte
+  mapDiv.innerHTML = '';
+  var defaultLat = 34.0, defaultLng = 9.0; // centre Tunisie approximatif
+  var map = L.map('map').setView([defaultLat, defaultLng], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  var latInput = document.getElementById('latitude');
+  var lngInput = document.getElementById('longitude');
+  function setLatLng(lat,lng, move){
+    if(latInput) latInput.value = lat.toFixed(6);
+    if(lngInput) lngInput.value = lng.toFixed(6);
+    if(move) {
+      marker.setLatLng([lat,lng]);
+      map.panTo([lat,lng]);
+    }
+  }
+  var marker = L.marker([defaultLat, defaultLng], {draggable:true}).addTo(map);
+  marker.on('dragend', function(e){ var p = e.target.getLatLng(); setLatLng(p.lat, p.lng, false); });
+
+  // Clic sur la carte pour repositionner
+  map.on('click', function(e){ setLatLng(e.latlng.lat, e.latlng.lng, true); });
+
+  // Géolocalisation navigateur
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(function(pos){
+      setLatLng(pos.coords.latitude, pos.coords.longitude, true);
+      map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+    }, function(err){
+      console.warn('Geoloc refusée', err);
+      // Laisse la position par défaut
+    }, { enableHighAccuracy:true, timeout:8000 });
+  }
+})();
+
 // Validation bootstrap
 (function(){
   var forms = document.querySelectorAll('.needs-validation');
