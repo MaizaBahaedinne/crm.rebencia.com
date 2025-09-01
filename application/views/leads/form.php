@@ -99,6 +99,18 @@
                     <label class="form-label">Date d'expiration</label>
                     <input type="date" name="client_identite_date_expiration" class="form-control" value="<?= htmlspecialchars($lead['client_identite_date_expiration'] ?? ''); ?>">
                   </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Pièce jointe scannée (identité)</label>
+                    <input type="file" name="piece_identite_scan" class="form-control" accept="image/*,application/pdf">
+                    <?php if(!empty($lead['id'])): ?>
+                      <?php // Affichage de la pièce jointe existante (si présente)
+                        if(!empty($lead['piece_identite_url'])): ?>
+                        <div class="mt-2">
+                          <a href="<?= htmlspecialchars($lead['piece_identite_url']); ?>" target="_blank" class="btn btn-outline-primary btn-sm"><i class="ri-eye-line"></i> Voir la pièce jointe</a>
+                        </div>
+                      <?php endif; ?>
+                    <?php endif; ?>
+                  </div>
                 </div>
               </div>
             </div>

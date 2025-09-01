@@ -43,6 +43,14 @@ class Lead extends BaseController {
         $this->isLoggedIn();
         $data = $this->global;
         $data['lead'] = $id ? $this->lead_model->get($id) : null;
+        // Récupérer la pièce jointe identité si existante
+        $data['lead']['piece_identite_url'] = null;
+        if($id && !empty($data['lead']['id'])) {
+            $file = $this->lead_model->db->where(['lead_id'=>$id,'categorie'=>'id'])->order_by('uploaded_at','DESC')->get('crm_lead_files')->row_array();
+            if($file && !empty($file['filename'])) {
+                $data['lead']['piece_identite_url'] = base_url('uploads/leads/'.$file['filename']);
+            }
+        }
         $data['wp_clients'] = $this->wp_client_model->all(300,0,['role'=>null]);
         $data['pageTitle'] = $id? 'Modifier lead':'Nouveau lead';
         $this->loadViews('leads/form',$data,$data,NULL);
@@ -93,6 +101,10 @@ class Lead extends BaseController {
         ];
         $tag_ids = $this->input->post('tag_ids');
         $ptype_ids = $this->input->post('property_type_ids');
+
+        // Gestion upload pièce jointe identité
+        $lead_id = $id;
+        $is_new = false;
         if($id) {
             $ok = $this->lead_model->update($id,$payload);
             if($ok) {
@@ -101,13 +113,37 @@ class Lead extends BaseController {
             }
             $this->session->set_flashdata($ok? 'success':'error',$ok? 'Lead mis à jour':'Erreur mise à jour');
         } else {
-            $newId = $this->lead_model->create($payload);
-            if($newId) {
-                if(is_array($tag_ids)) $this->lead_model->set_tags($newId,$tag_ids);
-                if(is_array($ptype_ids)) $this->lead_model->set_property_types($newId,$ptype_ids);
+            $lead_id = $this->lead_model->create($payload);
+            $is_new = true;
+            if($lead_id) {
+                if(is_array($tag_ids)) $this->lead_model->set_tags($lead_id,$tag_ids);
+                if(is_array($ptype_ids)) $this->lead_model->set_property_types($lead_id,$ptype_ids);
             }
-            $this->session->set_flashdata($newId? 'success':'error',$newId? 'Lead créé':'Création impossible');
+            $this->session->set_flashdata($lead_id? 'success':'error',$lead_id? 'Lead créé':'Création impossible');
         }
+
+        // Upload fichier si présent
+        if($lead_id && isset($_FILES['piece_identite_scan']) && is_uploaded_file($_FILES['piece_identite_scan']['tmp_name'])) {
+            $upload_dir = FCPATH.'uploads/leads/';
+            if(!is_dir($upload_dir)) @mkdir($upload_dir,0775,true);
+            $ext = pathinfo($_FILES['piece_identite_scan']['name'], PATHINFO_EXTENSION);
+            $filename = 'lead_'.$lead_id.'_id_'.date('YmdHis').'.'.strtolower($ext);
+            $dest = $upload_dir.$filename;
+            if(move_uploaded_file($_FILES['piece_identite_scan']['tmp_name'],$dest)) {
+                // Enregistrement en base
+                $this->lead_model->db->insert('crm_lead_files', [
+                    'lead_id'=>$lead_id,
+                    'filename'=>$filename,
+                    'original_name'=>$_FILES['piece_identite_scan']['name'],
+                    'mime_type'=>$_FILES['piece_identite_scan']['type'],
+                    'taille'=>$_FILES['piece_identite_scan']['size'],
+                    'categorie'=>'id',
+                    'uploaded_by'=>($this->session->userdata('userId') ?? null),
+                    'uploaded_at'=>date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+
         redirect('leads');
     }
 
