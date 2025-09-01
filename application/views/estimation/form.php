@@ -344,13 +344,13 @@
     mapReady = true;
   }
   function showError(msg) {
-    mapDiv.innerHTML = '<span class="text-danger">' + msg + '</span>';
+    // Message désactivé : ne rien faire pour une UX plus neutre
   }
   // Essayer la géoloc, timeout 3s
   var geoTimeout = setTimeout(function(){
     if(!mapReady) {
   showMap(defaultLat, defaultLng, 2);
-  showError("Géolocalisation indisponible ou refusée. Carte centrée sur le monde.");
+  // showError désactivé
     }
   }, 3000);
   if(navigator.geolocation) {
@@ -359,19 +359,15 @@
       showMap(pos.coords.latitude, pos.coords.longitude, 14);
     }, function(err){
       clearTimeout(geoTimeout);
-      showMap(defaultLat, defaultLng, 2);
-      if(window.isSecureContext === false || location.protocol !== 'https:') {
-        showError("Géolocalisation refusée ou impossible (HTTPS requis sur mobile). Carte centrée sur le monde.");
-      } else {
-        showError("Géolocalisation refusée ou impossible. Carte centrée sur le monde.");
-      }
+  showMap(defaultLat, defaultLng, 2);
+  // showError désactivé
     }, { enableHighAccuracy:true, timeout:2500 });
   } else {
     // Pas de support geoloc
     setTimeout(function(){
       if(!mapReady) {
   showMap(defaultLat, defaultLng, 2);
-  showError("Géolocalisation non supportée par ce navigateur. Carte centrée sur le monde.");
+  // showError désactivé
       }
     }, 1000);
   }
