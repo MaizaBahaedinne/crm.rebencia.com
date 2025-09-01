@@ -314,7 +314,7 @@
 (function(){
   var mapDiv = document.getElementById('map');
   if(!mapDiv) return;
-  var defaultLat = 34.0, defaultLng = 9.0; // centre Tunisie
+  var defaultLat = 20.0, defaultLng = 0.0; // centre monde (Afrique/Europe/Atlantique)
   var latInput = document.getElementById('latitude');
   var lngInput = document.getElementById('longitude');
   var map, marker;
@@ -349,8 +349,8 @@
   // Essayer la géoloc, timeout 3s
   var geoTimeout = setTimeout(function(){
     if(!mapReady) {
-      showMap(defaultLat, defaultLng, 6);
-      showError("Géolocalisation indisponible ou refusée. Carte centrée sur la Tunisie.");
+  showMap(defaultLat, defaultLng, 2);
+  showError("Géolocalisation indisponible ou refusée. Carte centrée sur le monde.");
     }
   }, 3000);
   if(navigator.geolocation) {
@@ -359,19 +359,19 @@
       showMap(pos.coords.latitude, pos.coords.longitude, 14);
     }, function(err){
       clearTimeout(geoTimeout);
-      showMap(defaultLat, defaultLng, 6);
+      showMap(defaultLat, defaultLng, 2);
       if(window.isSecureContext === false || location.protocol !== 'https:') {
-        showError("Géolocalisation refusée ou impossible (HTTPS requis sur mobile). Carte centrée sur la Tunisie.");
+        showError("Géolocalisation refusée ou impossible (HTTPS requis sur mobile). Carte centrée sur le monde.");
       } else {
-        showError("Géolocalisation refusée ou impossible. Carte centrée sur la Tunisie.");
+        showError("Géolocalisation refusée ou impossible. Carte centrée sur le monde.");
       }
     }, { enableHighAccuracy:true, timeout:2500 });
   } else {
     // Pas de support geoloc
     setTimeout(function(){
       if(!mapReady) {
-        showMap(defaultLat, defaultLng, 6);
-        showError("Géolocalisation non supportée par ce navigateur.");
+  showMap(defaultLat, defaultLng, 2);
+  showError("Géolocalisation non supportée par ce navigateur. Carte centrée sur le monde.");
       }
     }, 1000);
   }
