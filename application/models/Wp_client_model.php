@@ -12,12 +12,24 @@ class Wp_client_model extends CI_Model {
 
     public function all($limit=200,$offset=0,$filters=[]) {
         if(!$this->wp_db) return [];
+        // Exclure les user_id déjà utilisés dans crm_leads
+        $crm_db = $this->load->database('default', TRUE);
+        $used_ids = [];
+        if($crm_db->table_exists('crm_leads')) {
+            $crm_rows = $crm_db->select('wp_user_id')->get('crm_leads')->result_array();
+            foreach($crm_rows as $r) $used_ids[] = (int)$r['wp_user_id'];
+        }
         $sql = "SELECT user_id, user_login, user_email, user_registered, statut_compte, prenom, nom, telephone, role_houzez
                 FROM {$this->table} WHERE 1=1";
         $params=[];
         if(!empty($filters['q'])) { $sql .= " AND (nom LIKE ? OR prenom LIKE ? OR user_email LIKE ? OR telephone LIKE ?)"; $like='%'.$filters['q'].'%'; $params[]=$like; $params[]=$like; $params[]=$like; $params[]=$like; }
         if(!empty($filters['role'])) { $sql .= " AND role_houzez = ?"; $params[]=$filters['role']; }
         if(!empty($filters['statut'])) { $sql .= " AND statut_compte = ?"; $params[]=$filters['statut']; }
+        if(!empty($used_ids)) {
+            $in = implode(',', array_fill(0, count($used_ids), '?'));
+            $sql .= " AND user_id NOT IN ($in)";
+            $params = array_merge($params, $used_ids);
+        }
         $sql .= " ORDER BY user_registered DESC LIMIT ? OFFSET ?";
         $params[]=(int)$limit; $params[]=(int)$offset;
         $rows = $this->wp_db->query($sql,$params)->result_array();

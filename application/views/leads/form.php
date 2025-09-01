@@ -56,6 +56,52 @@
               <label class="form-label">Nom</label>
               <input name="nom" class="form-control" value="<?= htmlspecialchars($lead['nom'] ?? ''); ?>">
             </div>
+            <!-- Bloc identité client -->
+            <div class="col-12">
+              <div class="card border border-primary mb-3">
+                <div class="card-header bg-primary text-white">
+                  Identité du client
+                </div>
+                <div class="card-body row g-3 align-items-end">
+                  <div class="col-md-3">
+                    <label class="form-label">Type de client *</label>
+                    <select name="client_type" id="client_type" class="form-select" required>
+                      <option value="">-- Sélectionner --</option>
+                      <option value="personne" <?= (($lead['client_type'] ?? '')==='personne')?'selected':''; ?>>Personne physique</option>
+                      <option value="societe" <?= (($lead['client_type'] ?? '')==='societe')?'selected':''; ?>>Société</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Type d'identité *</label>
+                    <select name="client_identite_type" id="client_identite_type" class="form-select" required>
+                      <option value="">-- Sélectionner --</option>
+                      <option value="cin" <?= (($lead['client_identite_type'] ?? '')==='cin')?'selected':''; ?>>CIN</option>
+                      <option value="passeport" <?= (($lead['client_identite_type'] ?? '')==='passeport')?'selected':''; ?>>Passeport</option>
+                      <option value="titre_sejour" <?= (($lead['client_identite_type'] ?? '')==='titre_sejour')?'selected':''; ?>>Titre de séjour</option>
+                      <option value="rc" <?= (($lead['client_identite_type'] ?? '')==='rc')?'selected':''; ?>>RC</option>
+                      <option value="mf" <?= (($lead['client_identite_type'] ?? '')==='mf')?'selected':''; ?>>Matricule fiscal</option>
+                      <option value="autre" <?= (($lead['client_identite_type'] ?? '')==='autre')?'selected':''; ?>>Autre</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Numéro d'identité *</label>
+                    <input name="client_identite_numero" class="form-control" value="<?= htmlspecialchars($lead['client_identite_numero'] ?? ''); ?>" required>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Date de délivrance</label>
+                    <input type="date" name="client_identite_date" class="form-control" value="<?= htmlspecialchars($lead['client_identite_date'] ?? ''); ?>">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Lieu de délivrance</label>
+                    <input name="client_identite_lieu" class="form-control" value="<?= htmlspecialchars($lead['client_identite_lieu'] ?? ''); ?>">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Date d'expiration</label>
+                    <input type="date" name="client_identite_date_expiration" class="form-control" value="<?= htmlspecialchars($lead['client_identite_date_expiration'] ?? ''); ?>">
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="col-md-4">
               <label class="form-label">Email</label>
               <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($lead['email'] ?? ''); ?>">

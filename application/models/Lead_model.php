@@ -43,6 +43,13 @@ class Lead_model extends CI_Model {
         if(!$this->db->table_exists($this->table)) return null;
         $row = $this->db->where('id',(int)$id)->get($this->table)->row_array();
         if(!$row) return null;
+        // Champs identité client (sécurité)
+        $row['client_type'] = $row['client_type'] ?? null;
+        $row['client_identite_type'] = $row['client_identite_type'] ?? null;
+        $row['client_identite_numero'] = $row['client_identite_numero'] ?? null;
+        $row['client_identite_date'] = $row['client_identite_date'] ?? null;
+        $row['client_identite_lieu'] = $row['client_identite_lieu'] ?? null;
+        $row['client_identite_date_expiration'] = $row['client_identite_date_expiration'] ?? null;
         // Tags
         if($this->db->table_exists($this->tag_pivot)) {
             $tags = $this->db->select('t.id,t.slug,t.libelle')
@@ -65,7 +72,7 @@ class Lead_model extends CI_Model {
     public function list_for_select($type=null, $limit=200) {
         if(!$this->db->table_exists($this->table)) return [];
         if($type) $this->db->where('type',$type);
-        return $this->db->select('id, prenom, nom, email, telephone, type, status')->order_by('created_at','DESC')->limit($limit)->get($this->table)->result_array();
+        return $this->db->select('id, prenom, nom, email, telephone, type, status, client_type, client_identite_type, client_identite_numero')->order_by('created_at','DESC')->limit($limit)->get($this->table)->result_array();
     }
 
     private function wp_user_exists($wp_user_id) {
@@ -79,6 +86,9 @@ class Lead_model extends CI_Model {
         if(empty($data['wp_user_id']) || !$this->wp_user_exists($data['wp_user_id'])) return 0; // invalide
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['updated_at'] = date('Y-m-d H:i:s');
+        // Champs identité client
+        $fields = ['client_type','client_identite_type','client_identite_numero','client_identite_date','client_identite_lieu','client_identite_date_expiration'];
+        foreach($fields as $f) if(!isset($data[$f])) $data[$f] = null;
         try {
             $this->db->insert($this->table,$data);
             return (int)$this->db->insert_id();
@@ -91,6 +101,9 @@ class Lead_model extends CI_Model {
         if(!$this->db->table_exists($this->table)) return false;
         if(isset($data['wp_user_id']) && !$this->wp_user_exists($data['wp_user_id'])) return false;
         $data['updated_at'] = date('Y-m-d H:i:s');
+        // Champs identité client
+        $fields = ['client_type','client_identite_type','client_identite_numero','client_identite_date','client_identite_lieu','client_identite_date_expiration'];
+        foreach($fields as $f) if(!isset($data[$f])) $data[$f] = null;
         try {
             $ok = $this->db->where('id',(int)$id)->update($this->table,$data);
             return $ok;

@@ -53,6 +53,12 @@ class Lead extends BaseController {
         $this->form_validation->set_rules('type','Type','required|in_list[acheteur,locataire]');
         $this->form_validation->set_rules('status','Statut','required|in_list[nouveau,qualifie,en_cours,converti,perdu]');
         $this->form_validation->set_rules('email','Email','valid_email');
+        $this->form_validation->set_rules('client_type','Type de client','required|in_list[personne,societe]');
+        $this->form_validation->set_rules('client_identite_type','Type d\'identité','required|in_list[cin,passeport,titre_sejour,rc,mf,autre]');
+        $this->form_validation->set_rules('client_identite_numero','Numéro identité','required');
+        $this->form_validation->set_rules('client_identite_date','Date de délivrance','permit_empty');
+        $this->form_validation->set_rules('client_identite_lieu','Lieu de délivrance','permit_empty');
+        $this->form_validation->set_rules('client_identite_date_expiration','Date d\'expiration','permit_empty');
     }
 
     public function save($id=null) {
@@ -77,6 +83,13 @@ class Lead extends BaseController {
             'code_postal' => $this->input->post('code_postal',TRUE),
             'notes_interne' => $this->input->post('notes_interne',TRUE),
             'lead_score' => (int)$this->input->post('lead_score',TRUE),
+            // Champs identité client
+            'client_type' => $this->input->post('client_type',TRUE),
+            'client_identite_type' => $this->input->post('client_identite_type',TRUE),
+            'client_identite_numero' => $this->input->post('client_identite_numero',TRUE),
+            'client_identite_date' => $this->input->post('client_identite_date',TRUE),
+            'client_identite_lieu' => $this->input->post('client_identite_lieu',TRUE),
+            'client_identite_date_expiration' => $this->input->post('client_identite_date_expiration',TRUE),
         ];
         $tag_ids = $this->input->post('tag_ids');
         $ptype_ids = $this->input->post('property_type_ids');
