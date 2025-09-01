@@ -38,79 +38,81 @@
         </div>
       </div>
 
-      <div class="card mt-4">
-        <div class="card-header">Détails du bien</div>
-        <div class="card-body table-responsive">
-          <table class="table table-sm mb-0">
-            <tbody>
-              <tr><th style="width:30%">Zone</th><td><?= $property['zone_nom']; ?> (ID <?= $property['zone_id']; ?>)</td></tr>
-              <tr><th>Surface habitable</th><td><?= $property['surface_habitable']; ?> m²</td></tr>
-              <tr><th>Valeur min estimée</th><td><?= number_format($property['valeur_min_estimee'],0,'',' '); ?> TND</td></tr>
-              <tr><th>Valeur max estimée</th><td><?= number_format($property['valeur_max_estimee'],0,'',' '); ?> TND</td></tr>
-              <tr><th>Surface terrain</th><td><?= $property['surface_terrain']; ?> m²</td></tr>
-              <tr><th>Pièces / Chambres</th><td><?= $property['nb_pieces']; ?></td></tr>
-              <tr><th>Étage</th><td><?= $property['etage']; ?></td></tr>
-              <tr><th>Ascenseur</th><td><?= $property['ascenseur']; ?></td></tr>
-              <tr><th>Orientation</th><td><?= $property['orientation']; ?></td></tr>
-              <tr><th>État</th><td><?= $property['etat_general']; ?></td></tr>
-              <tr><th>Extérieur</th><td><?= $property['type_exterieur']; ?></td></tr>
-              <tr><th>Parking</th><td><?= $property['parking']; ?></td></tr>
-              <tr><th>Année construction</th><td><?= $property['annee_construction']; ?></td></tr>
-              <tr><th>Type propriété</th><td><?= $property['type_propriete']; ?></td></tr>
-              <tr><th>Type de bien</th><td><?= $property['type_bien']; ?></td></tr>
-              <tr><th>Classe énergie</th><td><?= $property['energie_classe']; ?></td></tr>
-              <tr><th>Titre foncier</th><td><?= $property['titre_foncier']; ?></td></tr>
-              <tr><th>Charges</th><td><?= number_format($property['charges'],0,'',' '); ?> TND</td></tr>
-              <tr><th>Taxes</th><td><?= number_format($property['taxes'],0,'',' '); ?> TND</td></tr>
-              <tr><th>Prix demandé</th><td><?= number_format($property['prix_demande'],0,'',' '); ?> TND</td></tr>
-              <tr><th>Piscine</th><td><?= $property['piscine']; ?></td></tr>
-              <tr><th>Sécurité</th><td><?= $property['securite']; ?></td></tr>
-              <tr><th>Syndic</th><td><?= $property['syndic']; ?></td></tr>
-              <tr><th>Jardin</th><td><?= $property['jardin']; ?></td></tr>
-              <tr><th>Latitude</th><td><?= $property['latitude']; ?></td></tr>
-              <tr><th>Longitude</th><td><?= $property['longitude']; ?></td></tr>
-              <tr><th>Adresse</th><td>
-                <?= ($property['adresse_numero'] ? $property['adresse_numero'].' ' : '') ?>
-                <?= $property['adresse_rue']; ?><br>
-                <?= $property['adresse_cp']; ?> <?= $property['adresse_ville']; ?><br>
-                <?= $property['adresse_pays']; ?>
-              </td></tr>
-              <tr><th>Équipements</th><td><?= $property['equipements']; ?></td></tr>
-              <tr><th>Cave</th><td><?= $property['cave'] ?? ''; ?></td></tr>
-              <tr><th>Cheminée</th><td><?= $property['cheminee'] ?? ''; ?></td></tr>
-              <tr><th>Meublé</th><td><?= $property['meuble'] ?? ''; ?></td></tr>
-              <tr><th>SDB type</th><td><?= $property['sdb_type'] ?? ''; ?></td></tr>
-              <tr><th>Sol</th><td><?= $property['sol_type'] ?? ''; ?></td></tr>
-              <tr><th>Portail auto</th><td><?= $property['portail_auto'] ?? ''; ?></td></tr>
-              <tr><th>Gardien</th><td><?= $property['gardien'] ?? ''; ?></td></tr>
-              <tr><th>Vidéo-surveillance</th><td><?= $property['videosurveillance'] ?? ''; ?></td></tr>
-              <tr><th>Interphone</th><td><?= $property['interphone'] ?? ''; ?></td></tr>
-              <tr><th>Alarme</th><td><?= $property['alarme'] ?? ''; ?></td></tr>
-              <tr><th>Fibre</th><td><?= $property['fibre'] ?? ''; ?></td></tr>
-              <tr><th>Lave-linge</th><td><?= $property['lave_linge'] ?? ''; ?></td></tr>
-              <tr><th>Sèche-linge</th><td><?= $property['seche_linge'] ?? ''; ?></td></tr>
-              <tr><th>Chauffe-eau</th><td><?= $property['chauffe_eau'] ?? ''; ?></td></tr>
-              <tr><th>Gaz</th><td><?= $property['gaz_type'] ?? ''; ?></td></tr>
-              <tr><th>Score transports (form)</th><td><?= $property['proximite_transports_score'] ?? ''; ?></td></tr>
-              <tr><th>Score commodités (form)</th><td><?= $property['proximite_commodites_score'] ?? ''; ?></td></tr>
-              <tr><th>Score écoles</th><td><?= $property['proximite_ecoles_score'] ?? ''; ?></td></tr>
-              <tr><th>Score santé</th><td><?= $property['proximite_sante_score'] ?? ''; ?></td></tr>
-              <tr><th>Score commerces</th><td><?= $property['proximite_commerces_score'] ?? ''; ?></td></tr>
-              <tr><th>Score espaces verts</th><td><?= $property['proximite_espaces_verts_score'] ?? ''; ?></td></tr>
-              <tr><th>Score plage</th><td><?= $property['proximite_plage_score'] ?? ''; ?></td></tr>
-              <tr><th>Proposition agence</th><td><?= isset($property['proposition_agence'])?number_format($property['proposition_agence'],0,'',' '):''; ?> TND</td></tr>
-              <tr><th>Commentaire agence</th><td><?= $property['proposition_commentaire'] ?? ''; ?></td></tr>
-              <?php
-                $badge = 'secondary';
-                if($property['statut_dossier']==='valide') $badge='success';
-                elseif($property['statut_dossier']==='rejete') $badge='danger';
-                elseif($property['statut_dossier']==='en_cours') $badge='warning';
-              ?>
-              <tr><th>Statut dossier</th><td><span class="badge bg-<?= $badge; ?>"><?= $property['statut_dossier']; ?></span></td></tr>
-            </tbody>
-          </table>
+
+      <div class="row mt-4 g-3">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="bi bi-geo-alt-fill text-primary"></i>
+              <span class="fw-semibold">Localisation & Adresse</span>
+            </div>
+            <div class="card-body">
+              <div id="map-result" style="height:220px;background:#f5f5f5;" class="rounded border mb-3"></div>
+              <div class="mb-2">
+                <i class="bi bi-geo-alt"></i>
+                <span class="fw-semibold">Adresse :</span><br>
+                <span class="text-muted">
+                  <?= ($property['adresse_numero'] ? $property['adresse_numero'].' ' : '') ?><?= $property['adresse_rue']; ?><br>
+                  <?= $property['adresse_cp']; ?> <?= $property['adresse_ville']; ?><br>
+                  <?= $property['adresse_pays']; ?>
+                </span>
+              </div>
+              <div class="row g-2">
+                <div class="col-6"><i class="bi bi-globe2"></i> <span class="text-muted">Lat:</span> <?= $property['latitude']; ?></div>
+                <div class="col-6"><i class="bi bi-globe2"></i> <span class="text-muted">Lng:</span> <?= $property['longitude']; ?></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="bi bi-info-circle-fill text-info"></i>
+              <span class="fw-semibold">Détails du bien</span>
+            </div>
+            <div class="card-body">
+              <div class="row g-2 mb-2">
+                <div class="col-6"><span class="text-muted">Zone :</span> <?= $property['zone_nom']; ?></div>
+                <div class="col-6"><span class="text-muted">Type :</span> <?= $property['type_bien']; ?></div>
+                <div class="col-6"><span class="text-muted">Surface hab. :</span> <?= $property['surface_habitable']; ?> m²</div>
+                <div class="col-6"><span class="text-muted">Terrain :</span> <?= $property['surface_terrain']; ?> m²</div>
+                <div class="col-6"><span class="text-muted">Pièces :</span> <?= $property['nb_pieces']; ?></div>
+                <div class="col-6"><span class="text-muted">Étage :</span> <?= $property['etage']; ?></div>
+                <div class="col-6"><span class="text-muted">État :</span> <?= $property['etat_general']; ?></div>
+                <div class="col-6"><span class="text-muted">Année :</span> <?= $property['annee_construction']; ?></div>
+                <div class="col-6"><span class="text-muted">Prix demandé :</span> <?= number_format($property['prix_demande'],0,'',' '); ?> TND</div>
+                <div class="col-6"><span class="text-muted">Charges :</span> <?= number_format($property['charges'],0,'',' '); ?> TND</div>
+                <div class="col-6"><span class="text-muted">Taxes :</span> <?= number_format($property['taxes'],0,'',' '); ?> TND</div>
+                <div class="col-6"><span class="text-muted">Classe énergie :</span> <?= $property['energie_classe']; ?></div>
+                <div class="col-6"><span class="text-muted">Titre foncier :</span> <?= $property['titre_foncier']; ?></div>
+              </div>
+              <div class="mb-2"><span class="text-muted">Équipements :</span> <?= $property['equipements']; ?></div>
+              <div class="mb-2"><span class="text-muted">Extérieur :</span> <?= $property['type_exterieur']; ?> <?= $property['jardin']==='oui'?'(Jardin)':''; ?> <?= $property['piscine']==='oui'?'(Piscine)':''; ?></div>
+              <div class="mb-2"><span class="text-muted">Sécurité :</span> <?= $property['securite']; ?> <?= $property['syndic']==='oui'?'(Syndic)':''; ?></div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Carte Leaflet -->
+      <script src="<?= base_url('assets/libs/leaflet/leaflet.js'); ?>"></script>
+      <link rel="stylesheet" href="<?= base_url('assets/libs/leaflet/leaflet.css'); ?>" />
+      <script>
+      (function(){
+        var lat = parseFloat('<?= $property['latitude'] ?>');
+        var lng = parseFloat('<?= $property['longitude'] ?>');
+        if(!isNaN(lat) && !isNaN(lng) && lat && lng) {
+          var map = L.map('map-result').setView([lat, lng], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+          }).addTo(map);
+          L.marker([lat, lng]).addTo(map);
+        } else {
+          document.getElementById('map-result').innerHTML = '<span class="text-danger">Coordonnées non renseignées</span>';
+        }
+      })();
+      </script>
 
 
       <!-- Carte Leaflet -->
@@ -155,26 +157,51 @@
       </div>
 
 
-      <div class="card mt-4">
-        <div class="card-header">Proposition agence & Statut</div>
-        <div class="card-body">
-          <form method="post" action="<?= base_url('estimation/proposition/'.$property['id']); ?>" class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label">Montant proposé (TND)</label>
-              <input type="number" step="0.01" name="proposition_agence" class="form-control" value="<?= htmlspecialchars($property['proposition_agence'] ?? '', ENT_QUOTES); ?>">
+
+      <div class="row mt-4 g-3">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="bi bi-currency-dollar text-success"></i>
+              <span class="fw-semibold">Proposition agence</span>
             </div>
-            <div class="col-md-9">
-              <label class="form-label">Commentaire</label>
-              <textarea name="proposition_commentaire" class="form-control" rows="2"><?= htmlspecialchars($property['proposition_commentaire'] ?? ''); ?></textarea>
+            <div class="card-body">
+              <form method="post" action="<?= base_url('estimation/proposition/'.$property['id']); ?>" class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Montant proposé (TND)</label>
+                  <input type="number" step="0.01" name="proposition_agence" class="form-control" value="<?= htmlspecialchars($property['proposition_agence'] ?? '', ENT_QUOTES); ?>">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Commentaire</label>
+                  <textarea name="proposition_commentaire" class="form-control" rows="2"><?= htmlspecialchars($property['proposition_commentaire'] ?? ''); ?></textarea>
+                </div>
+                <div class="col-12 text-end">
+                  <button class="btn btn-primary" type="submit">Enregistrer la proposition</button>
+                </div>
+              </form>
             </div>
-            <div class="col-12 d-flex justify-content-between align-items-center">
-              <div>
-                <a href="<?= base_url('estimation/statut/'.$property['id'].'/valide'); ?>" class="btn btn-success me-2" onclick="return confirm('Valider cette estimation ?');">Accepter</a>
-                <a href="<?= base_url('estimation/statut/'.$property['id'].'/rejete'); ?>" class="btn btn-danger" onclick="return confirm('Rejeter cette estimation ?');">Rejeter</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-success"></i>
+              <span class="fw-semibold">Statut du dossier</span>
+            </div>
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+              <?php
+                $badge = 'secondary';
+                if($property['statut_dossier']==='valide') $badge='success';
+                elseif($property['statut_dossier']==='rejete') $badge='danger';
+                elseif($property['statut_dossier']==='en_cours') $badge='warning';
+              ?>
+              <span class="badge bg-<?= $badge; ?> fs-5 mb-3 text-capitalize"><?= $property['statut_dossier']; ?></span>
+              <div class="d-flex gap-2">
+                <a href="<?= base_url('estimation/statut/'.$property['id'].'/valide'); ?>" class="btn btn-success" onclick="return confirm('Valider cette estimation ?');"><i class="bi bi-check-lg"></i> Accepter</a>
+                <a href="<?= base_url('estimation/statut/'.$property['id'].'/rejete'); ?>" class="btn btn-danger" onclick="return confirm('Rejeter cette estimation ?');"><i class="bi bi-x-lg"></i> Rejeter</a>
               </div>
-              <button class="btn btn-primary" type="submit">Enregistrer la proposition</button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
 
