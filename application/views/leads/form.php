@@ -21,13 +21,51 @@
           <div class="card-body row g-3">
             <div class="col-md-4">
               <label class="form-label">Utilisateur WordPress (Client)</label>
-              <select name="wp_user_id" class="form-select" required data-choices data-choices-search="true">
-                <option value="">-- Sélectionner --</option>
-                <?php if(!empty($wp_clients)): foreach($wp_clients as $c): $cid=(int)$c['user_id']; ?>
-                  <option value="<?= $cid; ?>" <?= (!empty($lead['wp_user_id']) && (int)$lead['wp_user_id']===$cid)?'selected':''; ?>>#<?= $cid; ?> - <?= htmlspecialchars($c['full_name']); ?> (<?= htmlspecialchars($c['user_email']); ?>)</option>
-                <?php endforeach; endif; ?>
-              </select>
+              <input type="text" id="wp_user_autocomplete" class="form-control" placeholder="Nom, email ou téléphone..." autocomplete="off" value="<?php
+                if(!empty($lead['wp_user_id']) && !empty($wp_clients)) {
+                  foreach($wp_clients as $c) {
+                    if((int)$c['user_id'] === (int)$lead['wp_user_id']) {
+                      echo htmlspecialchars('#'.$c['user_id'].' - '.$c['full_name'].' ('.$c['user_email'].')');
+                      break;
+                    }
+                  }
+                }
+              ?>">
+              <input type="hidden" name="wp_user_id" id="wp_user_id" value="<?= htmlspecialchars($lead['wp_user_id'] ?? ''); ?>">
+              <div id="wp_user_suggestions" class="list-group position-absolute w-100" style="z-index:1000;display:none;"></div>
             </div>
+<script>
+const wpClients = <?php echo json_encode($wp_clients); ?>;
+const input = document.getElementById('wp_user_autocomplete');
+const hidden = document.getElementById('wp_user_id');
+const sugg = document.getElementById('wp_user_suggestions');
+input.addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  sugg.innerHTML = '';
+  if(q.length < 2) { sugg.style.display = 'none'; return; }
+  const results = wpClients.filter(c =>
+    (c.full_name && c.full_name.toLowerCase().includes(q)) ||
+    (c.user_email && c.user_email.toLowerCase().includes(q)) ||
+    (c.telephone && c.telephone.toLowerCase().includes(q))
+  ).slice(0,10);
+  if(results.length === 0) { sugg.style.display = 'none'; return; }
+  results.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'list-group-item list-group-item-action';
+    div.textContent = `#${c.user_id} - ${c.full_name} (${c.user_email})`;
+    div.onclick = function() {
+      input.value = this.textContent;
+      hidden.value = c.user_id;
+      sugg.style.display = 'none';
+    };
+    sugg.appendChild(div);
+  });
+  sugg.style.display = 'block';
+});
+document.addEventListener('click', function(e) {
+  if(!input.contains(e.target) && !sugg.contains(e.target)) sugg.style.display = 'none';
+});
+</script>
             <div class="col-md-2">
               <label class="form-label">Type *</label>
               <select name="type" class="form-select" required>
