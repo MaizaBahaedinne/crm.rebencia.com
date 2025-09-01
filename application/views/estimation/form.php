@@ -355,8 +355,14 @@
     }
   }
   function showMap(lat, lng, zoom) {
+    // Correction Leaflet: détruire la carte existante si déjà initialisée
+    if (window._leaflet_map_instance) {
+      window._leaflet_map_instance.remove();
+      window._leaflet_map_instance = null;
+    }
     mapDiv.innerHTML = '';
     map = L.map('map').setView([lat, lng], zoom);
+    window._leaflet_map_instance = map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap'
