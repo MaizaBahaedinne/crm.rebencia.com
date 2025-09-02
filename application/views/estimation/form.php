@@ -70,7 +70,7 @@
           <div class="card-body row g-3">
             <div class="col-md-3">
               <label class="form-label">Surface habitable (m²)</label>
-              <input type="number" step="0.01" name="surface_habitable" class="form-control" required>
+              <input type="number" step="0.01" name="surface_habitable" class="form-control">
               <div class="invalid-feedback">Surface requise.</div>
             </div>
             <div class="col-md-3">
@@ -106,7 +106,7 @@
             </div>
             <div class="col-md-3">
               <label class="form-label">État général</label>
-              <select name="etat_general" class="form-select" required>
+              <select name="etat_general" class="form-select">
                 <option value="">--</option>
                 <option value="neuf">Neuf</option>
                 <option value="renove">Rénové</option>
