@@ -62,9 +62,9 @@ class Lead extends BaseController {
         $this->form_validation->set_rules('client_type','Type de client','required|in_list[personne,societe]');
         $this->form_validation->set_rules('client_identite_type','Type d\'identité','required|in_list[cin,passeport,titre_sejour,rc,mf,autre]');
         $this->form_validation->set_rules('client_identite_numero','Numéro identité','required');
-        $this->form_validation->set_rules('client_identite_date','Date de délivrance','permit_empty');
-        $this->form_validation->set_rules('client_identite_lieu','Lieu de délivrance','permit_empty');
-        $this->form_validation->set_rules('client_identite_date_expiration','Date d\'expiration','permit_empty');
+    $this->form_validation->set_rules('client_identite_date','Date de délivrance','trim');
+    $this->form_validation->set_rules('client_identite_lieu','Lieu de délivrance','trim');
+    $this->form_validation->set_rules('client_identite_date_expiration','Date d\'expiration','trim');
     }
 
     public function save($id=null) {
