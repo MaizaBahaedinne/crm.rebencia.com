@@ -25,7 +25,7 @@
             <h5 class="mb-3">Client WordPress</h5>
             <div class="mb-3">
               <label class="form-label">Client WordPress *</label>
-              <input type="text" id="wp_user_autocomplete" class="form-control wizard-check" placeholder="Nom, email ou téléphone..." autocomplete="off" value="<?php
+              <input type="text" id="wp_user_autocomplete" class="form-control wizard-check" placeholder="Nom, email ou téléphone..." autocomplete="off" required value="<?php
                 if(!empty($lead['wp_user_id']) && !empty($wp_clients)) {
                   foreach($wp_clients as $c) {
                     if((int)$c['user_id'] === (int)$lead['wp_user_id']) {
@@ -102,15 +102,25 @@
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($lead['email'] ?? ''); ?>">
+                <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($lead['email'] ?? ''); ?>" required>
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">Téléphone</label>
-                <input name="telephone" class="form-control" value="<?= htmlspecialchars($lead['telephone'] ?? ''); ?>">
+                <input name="telephone" class="form-control" value="<?= htmlspecialchars($lead['telephone'] ?? ''); ?>" required>
               </div>
             </div>
             <button type="button" class="btn btn-light" id="prevStep3">Précédent</button>
             <button type="submit" class="btn btn-success float-end">Enregistrer</button>
+<script>
+// Validation HTML5 + JS sur la soumission finale
+document.getElementById('leadWizardForm').addEventListener('submit', function(e) {
+  if(!this.checkValidity()) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.add('was-validated');
+  }
+});
+</script>
           </div>
         </div>
         <div class="progress mt-4" style="height:6px;">
