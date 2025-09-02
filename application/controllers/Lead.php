@@ -56,8 +56,8 @@ class Lead extends BaseController {
 
     private function _rules() {
         $this->form_validation->set_rules('wp_user_id','Utilisateur WordPress','required|integer');
-        $this->form_validation->set_rules('type','Type','required|in_list[acheteur,locataire]');
-        $this->form_validation->set_rules('status','Statut','required|in_list[nouveau,qualifie,en_cours,converti,perdu]');
+    $this->form_validation->set_rules('type','Type','trim|in_list[acheteur,locataire]');
+    $this->form_validation->set_rules('status','Statut','trim|in_list[nouveau,qualifie,en_cours,converti,perdu]');
         $this->form_validation->set_rules('email','Email','valid_email');
         $this->form_validation->set_rules('client_type','Type de client','required|in_list[personne,societe]');
         $this->form_validation->set_rules('client_identite_type','Type d\'identité','required|in_list[cin,passeport,titre_sejour,rc,mf,autre]');
