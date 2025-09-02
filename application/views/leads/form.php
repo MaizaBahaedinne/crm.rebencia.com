@@ -46,6 +46,27 @@
             <h5 class="mb-3">Identité du client</h5>
             <div class="row g-3">
               <div class="col-md-4 mb-3">
+                <label class="form-label">Type de demande *</label>
+                <select name="type" id="type" class="form-select wizard-check" required>
+                  <option value="">-- Sélectionner --</option>
+                  <option value="acheteur" <?= (($lead['type'] ?? '')==='acheteur')?'selected':''; ?>>Acheteur</option>
+                  <option value="locataire" <?= (($lead['type'] ?? '')==='locataire')?'selected':''; ?>>Locataire</option>
+                </select>
+                <div class="invalid-feedback">Ce champ est obligatoire.</div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Statut *</label>
+                <select name="status" id="status" class="form-select wizard-check" required>
+                  <option value="">-- Sélectionner --</option>
+                  <option value="nouveau" <?= (($lead['status'] ?? '')==='nouveau')?'selected':''; ?>>Nouveau</option>
+                  <option value="qualifie" <?= (($lead['status'] ?? '')==='qualifie')?'selected':''; ?>>Qualifié</option>
+                  <option value="en_cours" <?= (($lead['status'] ?? '')==='en_cours')?'selected':''; ?>>En cours</option>
+                  <option value="converti" <?= (($lead['status'] ?? '')==='converti')?'selected':''; ?>>Converti</option>
+                  <option value="perdu" <?= (($lead['status'] ?? '')==='perdu')?'selected':''; ?>>Perdu</option>
+                </select>
+                <div class="invalid-feedback">Ce champ est obligatoire.</div>
+              </div>
+              <div class="col-md-4 mb-3">
                 <label class="form-label">Type de client *</label>
                 <select name="client_type" id="client_type" class="form-select wizard-check" required>
                   <option value="">-- Sélectionner --</option>
