@@ -69,6 +69,27 @@
           <div class="card-header">Caractéristiques principales</div>
           <div class="card-body row g-3">
             <div class="col-md-3">
+              <label class="form-label">Type de demande</label>
+              <select name="type" class="form-select" required>
+                <option value="">-- Sélectionner --</option>
+                <option value="acheteur">Acheteur</option>
+                <option value="locataire">Locataire</option>
+              </select>
+              <div class="invalid-feedback">Sélectionner le type.</div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Statut</label>
+              <select name="status" class="form-select" required>
+                <option value="">-- Sélectionner --</option>
+                <option value="nouveau">Nouveau</option>
+                <option value="qualifie">Qualifié</option>
+                <option value="en_cours">En cours</option>
+                <option value="converti">Converti</option>
+                <option value="perdu">Perdu</option>
+              </select>
+              <div class="invalid-feedback">Sélectionner le statut.</div>
+            </div>
+            <div class="col-md-3">
               <label class="form-label">Surface habitable (m²)</label>
               <input type="number" step="0.01" name="surface_habitable" class="form-control">
               <div class="invalid-feedback">Surface requise.</div>
