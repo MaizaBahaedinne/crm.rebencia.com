@@ -130,7 +130,7 @@ document.getElementById('leadWizardForm').addEventListener('submit', function(e)
     </div>
   </form>
 <script>
-// Wizard JS
+// Wizard JS + Autocomplete + Remplissage automatique
 let currentStep = 1;
 function showStep(step) {
   document.querySelectorAll('.wizard-step').forEach(function(div) {
@@ -169,6 +169,43 @@ document.getElementById('nextStep2').onclick = function() {
 };
 document.getElementById('prevStep2').onclick = function() { showStep(1); currentStep = 1; };
 document.getElementById('prevStep3').onclick = function() { showStep(2); currentStep = 2; };
+
+// Autocomplete + auto-remplissage
+const wpClients = <?php echo json_encode($wp_clients); ?>;
+const input = document.getElementById('wp_user_autocomplete');
+const hidden = document.getElementById('wp_user_id');
+const sugg = document.getElementById('wp_user_suggestions');
+input.addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  sugg.innerHTML = '';
+  if(q.length < 2) { sugg.style.display = 'none'; return; }
+  const results = wpClients.filter(c =>
+    (c.full_name && c.full_name.toLowerCase().includes(q)) ||
+    (c.user_email && c.user_email.toLowerCase().includes(q)) ||
+    (c.telephone && c.telephone.toLowerCase().includes(q))
+  ).slice(0,10);
+  if(results.length === 0) { sugg.style.display = 'none'; return; }
+  results.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'list-group-item list-group-item-action';
+    div.textContent = `#${c.user_id} - ${c.full_name} (${c.user_email})`;
+    div.onclick = function() {
+      input.value = this.textContent;
+      hidden.value = c.user_id;
+      sugg.style.display = 'none';
+      // Remplissage automatique des champs
+      if(c.prenom) document.querySelector('input[name="prenom"]').value = c.prenom;
+      if(c.nom) document.querySelector('input[name="nom"]').value = c.nom;
+      if(c.user_email) document.querySelector('input[name="email"]').value = c.user_email;
+      if(c.telephone) document.querySelector('input[name="telephone"]').value = c.telephone;
+    };
+    sugg.appendChild(div);
+  });
+  sugg.style.display = 'block';
+});
+document.addEventListener('click', function(e) {
+  if(!input.contains(e.target) && !sugg.contains(e.target)) sugg.style.display = 'none';
+});
 </script>
         
     </div>
