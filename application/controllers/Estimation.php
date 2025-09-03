@@ -9,11 +9,16 @@ require APPPATH . '/libraries/BaseController.php';
  * @property CI_Upload $upload
  */
 class Estimation extends BaseController {
+    /**
+     * @var CI_Session
+     */
+    public $session;
 
     public function __construct() {
-        parent::__construct();
-        $this->load->model('Estimation_model','estim'); // $this->estim
-    // Input library est chargée par défaut dans CI; model alias estim disponible
+    parent::__construct();
+    $this->load->model('Estimation_model','estim'); // $this->estim
+            // Ensure session library is loaded
+        $this->load->library('session');
     $this->isLoggedIn();
     }
 
@@ -66,6 +71,8 @@ class Estimation extends BaseController {
         $estim = $this->estim->compute_estimation($post, $zone);
 
         $save = $post;
+    // Ajout de l'ID agent
+    $save['agent_id'] = $this->vendorId;
         $save['valeur_min_estimee'] = $estim['valeur_min_estimee'];
         $save['valeur_estimee'] = $estim['valeur_estimee'];
         $save['valeur_max_estimee'] = $estim['valeur_max_estimee'];
@@ -106,6 +113,16 @@ class Estimation extends BaseController {
     public function statut($id, $new) {
         $this->isLoggedIn();
         if(!$id || !$new) redirect('estimations');
+    $userId = $this->vendorId;
+    $userRole = $this->role;
+        // Seuls manager ou admin peuvent valider/rejeter
+        if(in_array($new, ['valide','rejete'])) {
+            if(!in_array($userRole, ['admin','manager'])) {
+                $this->session->set_flashdata('error', "Seul un manager ou un administrateur peut valider ou rejeter une estimation.");
+                redirect('estimations');
+                return;
+            }
+        }
         $ok = $this->estim->update_status($id, $new);
         redirect('estimations');
     }

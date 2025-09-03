@@ -48,6 +48,7 @@
             <th>Valeur max</th>
             <th>Loyer (TND/mois)</th>
             <th>Rentabilité (%)</th>
+            <th>Agent</th>
             <th>Statut</th>
             <th></th>
           </tr>
@@ -66,6 +67,14 @@
               <td><?= isset($e['valeur_max_estimee'])?number_format($e['valeur_max_estimee'],0,'',' '):'-'; ?></td>
               <td><?= number_format($e['loyer_potentiel'],0,'',' '); ?></td>
               <td><?= number_format($e['rentabilite'],2,',',' '); ?></td>
+              <td>
+                <?php if(!empty($e['agent_id'])): ?>
+                  <?php $agent = isset($agents[$e['agent_id']]) ? $agents[$e['agent_id']] : null; ?>
+                  <?= $agent ? htmlspecialchars($agent['display_name'] ?? $agent['user_login'] ?? $e['agent_id']) : 'Agent #'.$e['agent_id']; ?>
+                <?php else: ?>
+                  <span class="text-muted">-</span>
+                <?php endif; ?>
+              </td>
               <?php 
                 $b='secondary';
                 if($e['statut_dossier']==='valide') $b='success';
