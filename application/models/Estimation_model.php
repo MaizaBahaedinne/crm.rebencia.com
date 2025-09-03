@@ -78,6 +78,14 @@ class Estimation_model extends CI_Model {
         foreach(['adresse_numero','adresse_rue','adresse_ville','adresse_cp','adresse_pays'] as $f) {
             if(!isset($data[$f])) $data[$f] = null;
         }
+        // Objectif : location ou vente
+        if(isset($data['objectif'])) {
+            $data['objectif'] = ($data['objectif'] === 'location') ? 'location' : 'vente';
+        } else {
+            $data['objectif'] = 'vente'; // défaut
+        }
+        // Suppression des champs statut et type de demande
+        unset($data['statut_dossier'], $data['type_demande']);
         $this->db->insert($this->propertiesTable, $data);
         $id = $this->db->insert_id();
         if(!empty($photos)) {
@@ -111,10 +119,10 @@ class Estimation_model extends CI_Model {
      * Liste paginée des estimations
      */
     public function list_estimations($limit = 100, $offset = 0, $filters = []) {
-    $this->db->select("p.id, p.zone_id, z.nom as zone_nom, p.surface_habitable, p.valeur_min_estimee, p.valeur_estimee, p.valeur_max_estimee, p.loyer_potentiel, p.rentabilite, p.statut_dossier, p.created_at");
+    $this->db->select("p.id, p.zone_id, z.nom as zone_nom, p.surface_habitable, p.valeur_min_estimee, p.valeur_estimee, p.valeur_max_estimee, p.loyer_potentiel, p.rentabilite, p.objectif, p.created_at");
         $this->db->from($this->propertiesTable.' p');
         $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
-        if(!empty($filters['statut'])) { $this->db->where('p.statut_dossier', $filters['statut']); }
+    // Suppression du filtre statut
         if(!empty($filters['zone_id'])) { $this->db->where('p.zone_id', $filters['zone_id']); }
         $this->db->order_by('p.id','DESC');
         $this->db->limit($limit,$offset);
@@ -122,21 +130,17 @@ class Estimation_model extends CI_Model {
     }
 
     public function count_estimations($filters = []) {
-        if(!empty($filters['statut'])) { $this->db->where('statut_dossier', $filters['statut']); }
+    // Suppression du filtre statut
         if(!empty($filters['zone_id'])) { $this->db->where('zone_id', $filters['zone_id']); }
         return (int)$this->db->count_all_results($this->propertiesTable);
     }
 
     public function update_status($id, $status) {
-        if(!in_array($status, $this->allowedStatus)) return false;
-        $this->db->where('id',$id)->update($this->propertiesTable,[
-            'statut_dossier' => $status,
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-        return $this->db->affected_rows() > 0;
+    // Suppression de la gestion du statut
+    return false;
     }
 
-    public function get_allowed_status() { return $this->allowedStatus; }
+    // Suppression de la gestion des statuts
 
     /**
      * Calcule estimation valeur vente, loyer et rentabilité
