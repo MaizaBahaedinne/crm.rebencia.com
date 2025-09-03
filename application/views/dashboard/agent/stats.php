@@ -17,7 +17,7 @@
             <?php 
                 $stats = isset($stats)?$stats:[]; 
                 $kpis = [
-                    ['label'=>'Leads','icon'=>'ri-user-search-line','value'=>$stats['leads'] ?? 0,'class'=>'primary'],
+                    // ['label'=>'Leads','icon'=>'ri-user-search-line','value'=>$stats['leads'] ?? 0,'class'=>'primary'],
                     ['label'=>'Propriétés','icon'=>'ri-home-4-line','value'=>$stats['properties'] ?? 0,'class'=>'info'],
                     ['label'=>'Transactions','icon'=>'ri-exchange-dollar-line','value'=>$stats['sales'] ?? $stats['transactions'] ?? 0,'class'=>'success'],
                     ['label'=>'Tâches','icon'=>'ri-task-line','value'=>$stats['tasks'] ?? 0,'class'=>'warning'],
@@ -57,7 +57,7 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-unstyled mb-0 small">
-                                <li><span class="text-muted">Leads actifs :</span> <strong><?= (int)($stats['leads_actifs'] ?? 0); ?></strong></li>
+                                <!-- Leads actifs supprimés -->
                                 <li><span class="text-muted">Propriétés en cours :</span> <strong><?= (int)($stats['properties_open'] ?? 0); ?></strong></li>
                                 <li><span class="text-muted">Transactions ouvertes :</span> <strong><?= (int)($stats['transactions_open'] ?? 0); ?></strong></li>
                                 <li><span class="text-muted">Transactions clôturées (30j) :</span> <strong><?= (int)($stats['closed_30d'] ?? 0); ?></strong></li>

@@ -55,15 +55,7 @@
                 <?php endforeach; endif; ?>
               </select>
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Lead</label>
-              <select name="lead_id" class="form-select" data-choices data-choices-search="true">
-                <option value="">-- Sélectionner --</option>
-                <?php if(!empty($leads)): foreach($leads as $ld): $lid=(int)($ld['id'] ?? 0); ?>
-                  <option value="<?= $lid; ?>" <?= (!empty($transaction['lead_id']) && (int)$transaction['lead_id']===$lid)?'selected':''; ?>><?= htmlspecialchars($ld['nom'] ?? ('Lead #'.$lid)); ?></option>
-                <?php endforeach; endif; ?>
-              </select>
-            </div>
+            <!-- Lead supprimé -->
             <div class="col-md-3">
               <label class="form-label">Montant (€)</label>
               <input type="number" step="0.01" name="montant" class="form-control" value="<?= htmlspecialchars($transaction['montant'] ?? '') ?>">

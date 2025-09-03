@@ -37,17 +37,6 @@ $route['profile'] = "User/profile";
 $route['profile/(:any)'] = "User/profile/$1";
 $route['profileUpdate'] = "User/profileUpdate";
 $route['profileUpdate/(:any)'] = "User/profileUpdate/$1";
-$route['loadChangePass'] = "User/loadChangePass";
-$route['changePassword'] = "User/changePassword";
-$route['changePassword/(:any)'] = "User/changePassword/$1";
-$route['checkEmailExists'] = "User/checkEmailExists";
-$route['login-history'] = "User/loginHistory";
-$route['login-history/(:num)'] = "User/loginHistory/$1";
-$route['login-history/(:num)/(:num)'] = "User/loginHistory/$1/$2";
-
-/*********** ROLES *******************/
-$route['roleListing'] = "Roles/roleListing";
-$route['roleListing/(:num)'] = "Roles/roleListing/$1";
 $route['roleListing/(:num)/(:num)'] = "Roles/roleListing/$1/$2";
 
 /*********** AGENCIES *******************/

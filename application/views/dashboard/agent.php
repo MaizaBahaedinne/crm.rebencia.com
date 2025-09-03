@@ -10,7 +10,7 @@
     <h2>Agent : <?= $agent->display_name; ?> (ID: <?= $agent->ID; ?>)</h2>
     <h2>Stats personnelles</h2>
     <ul>
-        <li>Leads : <?= $stats['leads']; ?></li>
+    <!-- Leads supprimés -->
         <li>Propriétés : <?= $stats['properties']; ?></li>
         <li>Ventes : <?= $stats['sales']; ?></li>
     </ul>
@@ -20,11 +20,11 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Leads', 'Propriétés', 'Ventes'],
+                labels: ['Propriétés', 'Ventes'],
                 datasets: [{
                     label: 'Stats agent',
-                    data: [<?= $stats['leads']; ?>, <?= $stats['properties']; ?>, <?= $stats['sales']; ?>],
-                    backgroundColor: ['#36a2eb', '#4bc0c0', '#ff6384']
+                    data: [<?= $stats['properties']; ?>, <?= $stats['sales']; ?>],
+                    backgroundColor: ['#4bc0c0', '#ff6384']
                 }]
             }
         });
