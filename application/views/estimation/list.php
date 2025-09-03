@@ -75,13 +75,7 @@
                   <span class="text-muted">-</span>
                 <?php endif; ?>
               </td>
-              <?php 
-                $b='secondary';
-                if($e['statut_dossier']==='valide') $b='success';
-                elseif($e['statut_dossier']==='rejete') $b='danger';
-                elseif($e['statut_dossier']==='en_cours') $b='warning';
-              ?>
-              <td><span class="badge bg-<?= $b; ?>"><?= $e['statut_dossier']; ?></span></td>
+                <!-- Statut supprimé -->
               <td class="text-end">
                 <div class="btn-group btn-group-sm">
                   <a class="btn btn-outline-success" href="<?= base_url('estimation/statut/'.$e['id'].'/valide'); ?>" title="Valider">✔</a>
