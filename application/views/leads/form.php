@@ -56,13 +56,12 @@
               </div>
               <div class="col-md-4 mb-3">
                 <label class="form-label">Statut *</label>
-                <select name="status" id="status" class="form-select wizard-check" required>
-                  <option value="">-- Sélectionner --</option>
-                  <option value="nouveau" <?= (($lead['status'] ?? '')==='nouveau')?'selected':''; ?>>Nouveau</option>
-                  <option value="qualifie" <?= (($lead['status'] ?? '')==='qualifie')?'selected':''; ?>>Qualifié</option>
-                  <option value="en_cours" <?= (($lead['status'] ?? '')==='en_cours')?'selected':''; ?>>En cours</option>
-                  <option value="converti" <?= (($lead['status'] ?? '')==='converti')?'selected':''; ?>>Converti</option>
-                  <option value="perdu" <?= (($lead['status'] ?? '')==='perdu')?'selected':''; ?>>Perdu</option>
+                <select name="status" id="status" class="form-select wizard-check border-primary fw-bold" required>
+                  <option value="nouveau" <?= (($lead['status'] ?? '')==='nouveau')?'selected':''; ?>>🟢 Nouveau</option>
+                  <option value="qualifie" <?= (($lead['status'] ?? '')==='qualifie')?'selected':''; ?>>🔵 Qualifié</option>
+                  <option value="en_cours" <?= (($lead['status'] ?? '')==='en_cours')?'selected':''; ?>>🟡 En cours</option>
+                  <option value="converti" <?= (($lead['status'] ?? '')==='converti')?'selected':''; ?>>🟣 Converti</option>
+                  <option value="perdu" <?= (($lead['status'] ?? '')==='perdu')?'selected':''; ?>>🔴 Perdu</option>
                 </select>
                 <div class="invalid-feedback">Ce champ est obligatoire.</div>
               </div>
