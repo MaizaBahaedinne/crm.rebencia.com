@@ -49,8 +49,15 @@ class Property_model extends CI_Model {
             // Application des filtres dynamiques
             $ok = true;
             if (!empty($filters['nom']) && stripos($property->nom, $filters['nom']) === false) $ok = false;
-            if (!empty($filters['type_bien']) && stripos($property->type_bien, $filters['type_bien']) === false) $ok = false;
-            if (!empty($filters['zone_nom']) && stripos($property->zone_nom, $filters['zone_nom']) === false) $ok = false;
+            // Type bien : doit matcher exactement S+1, S+2, etc.
+            if (!empty($filters['type_bien'])) {
+                $type_val = 'S+' . intval($property->fave_property_bedrooms);
+                if ($filters['type_bien'] !== $type_val) $ok = false;
+            }
+            // Zone : doit matcher exactement la zone sélectionnée
+            if (!empty($filters['zone_nom']) && isset($property->fave_property_address)) {
+                if (stripos($property->fave_property_address, $filters['zone_nom']) === false) $ok = false;
+            }
             // Surface (select)
             if (!empty($filters['surface_habitable']) && is_numeric($property->surface_habitable)) {
                 $surf = (float)$property->surface_habitable;
