@@ -19,19 +19,8 @@ class Property_model extends CI_Model {
             $this->wp_db->where('post_date_gmt', $filters['post_date_gmt']);
         }
 
-        if (!empty($filters)) {
-            $i = 0;
-            foreach ($filters as $key => $value) {
-                $alias = 'pm_' . $i;
-                $this->wp_db->join("wp_Hrg8P_postmeta as $alias", "wp_Hrg8P_posts.ID = $alias.post_id", 'left');
-                $this->wp_db->where("$alias.meta_key", $key);
-                $this->wp_db->where("$alias.meta_value", $value);
-                $i++;
-            }
-        }
-
-        $results = $this->wp_db->get()->result();
-        $filtered = [];
+    $results = $this->wp_db->get()->result();
+    $filtered = [];
         foreach ($results as &$property) {
             $metas = $this->wp_db->where('post_id', $property->ID)->get('wp_Hrg8P_postmeta')->result();
             $meta_map = [];
@@ -50,10 +39,7 @@ class Property_model extends CI_Model {
             $property->zone_nom = isset($meta_map['fave_property_address']) ? $meta_map['fave_property_address'] : '-';
             $property->surface_habitable = isset($meta_map['fave_property_size']) ? $meta_map['fave_property_size'] : '-';
             $property->prix_demande = isset($meta_map['fave_property_price']) ? $meta_map['fave_property_price'] : '-';
-            $property->created_at = isset($property->post_date) ? $property->post_date : '-';
-
-            // Application des filtres dynamiques
-            $ok = true;
+                if (!empty($filters['type_bien']) && $filters['type_bien'] !== $property->type_bien) $ok = false;
             if (!empty($filters['nom']) && stripos($property->nom, $filters['nom']) === false) $ok = false;
             // Type bien : doit matcher exactement S+1, S+2, etc.
             if (!empty($filters['type_bien'])) {
