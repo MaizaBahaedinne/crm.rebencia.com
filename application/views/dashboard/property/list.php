@@ -31,30 +31,69 @@
                             <!-- Filtres dynamiques -->
                             <form method="get" class="row g-3 mb-4">
                                 <div class="col-md-3">
-                                    <input type="text" name="nom" class="form-control" placeholder="Nom du bien" value="<?= isset($_GET['nom']) ? htmlspecialchars($_GET['nom']) : '' ?>">
+                                    <input type="text" name="nom" class="form-control" placeholder="Nom du bien" value="<?= isset($_GET['nom']) ? htmlspecialchars($_GET['nom']) : '' ?>" autocomplete="off" id="autocomplete-nom">
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="text" name="type_bien" class="form-control" placeholder="Type (ex: S+1)" value="<?= isset($_GET['type_bien']) ? htmlspecialchars($_GET['type_bien']) : '' ?>">
+                                    <select name="type_bien" class="form-select">
+                                        <option value="">Type</option>
+                                        <option value="S+1" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+1')?'selected':''; ?>>S+1</option>
+                                        <option value="S+2" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+2')?'selected':''; ?>>S+2</option>
+                                        <option value="S+3" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+3')?'selected':''; ?>>S+3</option>
+                                        <option value="S+4" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+4')?'selected':''; ?>>S+4</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="text" name="zone_nom" class="form-control" placeholder="Zone" value="<?= isset($_GET['zone_nom']) ? htmlspecialchars($_GET['zone_nom']) : '' ?>">
+                                    <select name="zone_nom" class="form-select">
+                                        <option value="">Zone</option>
+                                        <option value="L'Aouina" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="L'Aouina")?'selected':''; ?>>L'Aouina</option>
+                                        <option value="La Marsa" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="La Marsa")?'selected':''; ?>>La Marsa</option>
+                                        <option value="Carthage" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="Carthage")?'selected':''; ?>>Carthage</option>
+                                        <option value="Gammarth" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="Gammarth")?'selected':''; ?>>Gammarth</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="number" name="surface_min" class="form-control" placeholder="Surface min" value="<?= isset($_GET['surface_min']) ? htmlspecialchars($_GET['surface_min']) : '' ?>">
+                                    <select name="surface_habitable" class="form-select">
+                                        <option value="">Surface</option>
+                                        <option value="<50" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='<50')?'selected':''; ?>>Moins de 50 m²</option>
+                                        <option value="50-100" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='50-100')?'selected':''; ?>>50-100 m²</option>
+                                        <option value="100-150" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='100-150')?'selected':''; ?>>100-150 m²</option>
+                                        <option value=">150" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='>150')?'selected':''; ?>>Plus de 150 m²</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="number" name="surface_max" class="form-control" placeholder="Surface max" value="<?= isset($_GET['surface_max']) ? htmlspecialchars($_GET['surface_max']) : '' ?>">
+                                    <select name="prix_demande" class="form-select">
+                                        <option value="">Prix</option>
+                                        <option value="<500" <?= (isset($_GET['prix_demande']) && $_GET['prix_demande']==='<500')?'selected':''; ?>>Moins de 500 TND</option>
+                                        <option value="500-1000" <?= (isset($_GET['prix_demande']) && $_GET['prix_demande']==='500-1000')?'selected':''; ?>>500-1000 TND</option>
+                                        <option value="1000-2000" <?= (isset($_GET['prix_demande']) && $_GET['prix_demande']==='1000-2000')?'selected':''; ?>>1000-2000 TND</option>
+                                        <option value=">2000" <?= (isset($_GET['prix_demande']) && $_GET['prix_demande']==='>2000')?'selected':''; ?>>Plus de 2000 TND</option>
+                                    </select>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" name="prix_min" class="form-control" placeholder="Prix min" value="<?= isset($_GET['prix_min']) ? htmlspecialchars($_GET['prix_min']) : '' ?>">
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" name="prix_max" class="form-control" placeholder="Prix max" value="<?= isset($_GET['prix_max']) ? htmlspecialchars($_GET['prix_max']) : '' ?>">
-                                </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <button type="submit" class="btn btn-primary w-100">Filtrer</button>
                                 </div>
                             </form>
+                            <script>
+                            // Autocomplete JS (exemple simple, à remplacer par AJAX si besoin)
+                            const noms = [
+                                <?php if(!empty($properties)) foreach($properties as $p) echo '"'.addslashes($p->nom).'",'; ?>
+                            ];
+                            const inputNom = document.getElementById('autocomplete-nom');
+                            if(inputNom) {
+                                inputNom.addEventListener('input', function() {
+                                    let val = this.value;
+                                    this.setAttribute('list', 'noms-list');
+                                });
+                                let datalist = document.createElement('datalist');
+                                datalist.id = 'noms-list';
+                                noms.forEach(n => {
+                                    let opt = document.createElement('option');
+                                    opt.value = n;
+                                    datalist.appendChild(opt);
+                                });
+                                document.body.appendChild(datalist);
+                            }
+                            </script>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover align-middle">
                                     <thead class="table-light">
