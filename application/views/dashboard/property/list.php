@@ -47,12 +47,12 @@
                                         <?php if(!empty($properties)): ?>
                                             <?php foreach($properties as $property): ?>
                                                 <tr>
-                                                    <td><?= $property->ID; ?></td>
-                                                    <td><?= htmlspecialchars(isset($property->nom) ? $property->nom : $property->type_bien); ?></td>
-                                                    <td><?= htmlspecialchars($property->type_bien); ?></td>
+                                                    <td><?= isset($property->ID) ? $property->ID : '-'; ?></td>
+                                                    <td><?= htmlspecialchars(isset($property->nom) ? $property->nom : (isset($property->type_bien) ? $property->type_bien : '-')); ?></td>
+                                                    <td><?= htmlspecialchars(isset($property->type_bien) ? $property->type_bien : '-'); ?></td>
                                                     <td><?= htmlspecialchars(isset($property->zone_nom) ? $property->zone_nom : '-'); ?></td>
-                                                    <td><?= htmlspecialchars($property->surface_habitable); ?></td>
-                                                    <td><?= number_format($property->prix_demande, 0, ',', ' '); ?></td>
+                                                    <td><?= isset($property->surface_habitable) ? htmlspecialchars($property->surface_habitable) : '-'; ?></td>
+                                                    <td><?= isset($property->prix_demande) ? number_format($property->prix_demande, 0, ',', ' ') : '-'; ?></td>
                                                     <td><?= htmlspecialchars(isset($property->objectif) ? $property->objectif : '-'); ?></td>
                                                     <td><?= isset($property->created_at) ? date('d/m/Y', strtotime($property->created_at)) : '-'; ?></td>
                                                     <td>
