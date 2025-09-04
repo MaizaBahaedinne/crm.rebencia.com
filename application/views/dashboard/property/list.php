@@ -47,7 +47,7 @@
                                         <?php if(!empty($properties)): ?>
                                             <?php foreach($properties as $property): ?>
                                                 <tr>
-                                                    <td><?= $property->id; ?></td>
+                                                    <td><?= $property->ID; ?></td>
                                                     <td><?= htmlspecialchars(isset($property->nom) ? $property->nom : $property->type_bien); ?></td>
                                                     <td><?= htmlspecialchars($property->type_bien); ?></td>
                                                     <td><?= htmlspecialchars(isset($property->zone_nom) ? $property->zone_nom : '-'); ?></td>
@@ -56,8 +56,8 @@
                                                     <td><?= htmlspecialchars(isset($property->objectif) ? $property->objectif : '-'); ?></td>
                                                     <td><?= isset($property->created_at) ? date('d/m/Y', strtotime($property->created_at)) : '-'; ?></td>
                                                     <td>
-                                                        <a href="<?= base_url('property/view/'.$property->id); ?>" class="btn btn-sm btn-info">Voir</a>
-                                                        <a href="<?= base_url('property/edit/'.$property->id); ?>" class="btn btn-sm btn-warning">Modifier</a>
+                                                        <a href="<?= base_url('property/view/'.$property->ID); ?>" class="btn btn-sm btn-info">Voir</a>
+                                                        <a href="<?= base_url('property/edit/'.$property->ID); ?>" class="btn btn-sm btn-warning">Modifier</a>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
