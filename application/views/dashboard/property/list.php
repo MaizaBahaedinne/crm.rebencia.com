@@ -49,12 +49,20 @@
                                                 <tr>
                                                     <td><?= isset($property->ID) ? $property->ID : '-'; ?></td>
                                                     <td><?= htmlspecialchars(isset($property->nom) ? $property->nom : (isset($property->type_bien) ? $property->type_bien : '-')); ?></td>
-                                                    <td><?= htmlspecialchars(isset($property->type_bien) ? $property->type_bien : '-'); ?></td>
-                                                    <td><?= htmlspecialchars(isset($property->zone_nom) ? $property->zone_nom : '-'); ?></td>
-                                                    <td><?= isset($property->surface_habitable) ? htmlspecialchars($property->surface_habitable) : '-'; ?></td>
-                                                    <td><?= isset($property->prix_demande) ? number_format($property->prix_demande, 0, ',', ' ') : '-'; ?></td>
-                                                    <td><?= htmlspecialchars(isset($property->objectif) ? $property->objectif : '-'); ?></td>
-                                                    <td><?= isset($property->created_at) ? date('d/m/Y', strtotime($property->created_at)) : '-'; ?></td>
+                                                    <td><?= htmlspecialchars(isset($property->type_bien) ? $property->type_bien : (isset($property->property_type) ? $property->property_type : '-')); ?></td>
+                                                    <td><?= htmlspecialchars(isset($property->zone_nom) ? $property->zone_nom : (isset($property->property_zone) ? $property->property_zone : '-')); ?></td>
+                                                    <td><?= isset($property->surface_habitable) && is_numeric($property->surface_habitable) ? htmlspecialchars($property->surface_habitable) : (isset($property->property_surface) && is_numeric($property->property_surface) ? htmlspecialchars($property->property_surface) : '-'); ?></td>
+                                                    <td><?php
+                                                        $prix = null;
+                                                        if (isset($property->prix_demande) && is_numeric($property->prix_demande)) {
+                                                            $prix = $property->prix_demande;
+                                                        } elseif (isset($property->property_price) && is_numeric($property->property_price)) {
+                                                            $prix = $property->property_price;
+                                                        }
+                                                        echo $prix !== null ? number_format((float)$prix, 0, ',', ' ') : '-';
+                                                    ?></td>
+                                                    <td><?= htmlspecialchars(isset($property->objectif) ? $property->objectif : (isset($property->property_objectif) ? $property->property_objectif : '-')); ?></td>
+                                                    <td><?= isset($property->created_at) && strtotime($property->created_at) ? date('d/m/Y', strtotime($property->created_at)) : (isset($property->post_date) && strtotime($property->post_date) ? date('d/m/Y', strtotime($property->post_date)) : '-'); ?></td>
                                                     <td>
                                                         <a href="<?= base_url('property/view/'.$property->ID); ?>" class="btn btn-sm btn-info">Voir</a>
                                                         <a href="<?= base_url('property/edit/'.$property->ID); ?>" class="btn btn-sm btn-warning">Modifier</a>
