@@ -12,6 +12,12 @@ class Property_model extends CI_Model {
         $this->wp_db->from('wp_Hrg8P_posts');
         $this->wp_db->where('post_type', 'property');
         $this->wp_db->where('post_status', 'publish');
+        if (!empty($filters['post_author'])) {
+            $this->wp_db->where('post_author', $filters['post_author']);
+        }
+        if (!empty($filters['post_date_gmt'])) {
+            $this->wp_db->where('post_date_gmt', $filters['post_date_gmt']);
+        }
 
         if (!empty($filters)) {
             $i = 0;
