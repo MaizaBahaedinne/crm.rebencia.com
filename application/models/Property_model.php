@@ -24,7 +24,15 @@ class Property_model extends CI_Model {
             }
         }
 
-        return $this->wp_db->get()->result();
+        $results = $this->wp_db->get()->result();
+        // Enrichir chaque propriété avec ses métadonnées
+        foreach ($results as &$property) {
+            $metas = $this->wp_db->where('post_id', $property->ID)->get('wp_Hrg8P_postmeta')->result();
+            foreach ($metas as $meta) {
+                $property->{$meta->meta_key} = $meta->meta_value;
+            }
+        }
+        return $results;
     }
     // Une propriété
     public function get_property($property_id) {
