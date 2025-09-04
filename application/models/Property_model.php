@@ -39,6 +39,7 @@ class Property_model extends CI_Model {
             $property->zone_nom = isset($meta_map['fave_property_address']) ? $meta_map['fave_property_address'] : '-';
             $property->surface_habitable = isset($meta_map['fave_property_size']) ? $meta_map['fave_property_size'] : '-';
             $property->prix_demande = isset($meta_map['fave_property_price']) ? $meta_map['fave_property_price'] : '-';
+                $ok = true; // Initialize $ok to true before filtering
                 if (!empty($filters['type_bien']) && $filters['type_bien'] !== $property->type_bien) $ok = false;
             if (!empty($filters['nom']) && stripos($property->nom, $filters['nom']) === false) $ok = false;
             // Type bien : doit matcher exactement S+1, S+2, etc.
