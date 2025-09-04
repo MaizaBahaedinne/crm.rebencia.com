@@ -28,6 +28,33 @@
                             <a href="<?= base_url('property/add'); ?>" class="btn btn-success"><i class="ri-add-line align-bottom me-1"></i> Ajouter un bien</a>
                         </div>
                         <div class="card-body">
+                            <!-- Filtres dynamiques -->
+                            <form method="get" class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <input type="text" name="nom" class="form-control" placeholder="Nom du bien" value="<?= isset($_GET['nom']) ? htmlspecialchars($_GET['nom']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" name="type_bien" class="form-control" placeholder="Type (ex: S+1)" value="<?= isset($_GET['type_bien']) ? htmlspecialchars($_GET['type_bien']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" name="zone_nom" class="form-control" placeholder="Zone" value="<?= isset($_GET['zone_nom']) ? htmlspecialchars($_GET['zone_nom']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="surface_min" class="form-control" placeholder="Surface min" value="<?= isset($_GET['surface_min']) ? htmlspecialchars($_GET['surface_min']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="surface_max" class="form-control" placeholder="Surface max" value="<?= isset($_GET['surface_max']) ? htmlspecialchars($_GET['surface_max']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="prix_min" class="form-control" placeholder="Prix min" value="<?= isset($_GET['prix_min']) ? htmlspecialchars($_GET['prix_min']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="prix_max" class="form-control" placeholder="Prix max" value="<?= isset($_GET['prix_max']) ? htmlspecialchars($_GET['prix_max']) : '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover align-middle">
                                     <thead class="table-light">
@@ -62,7 +89,7 @@
                                                         }
                                                         echo $prix !== null ? number_format((float)$prix, 0, ',', ' ') : '-';
                                                     ?></td>
-                                                    <td><?= htmlspecialchars(isset($property->objectif) ? $property->objectif : (isset($property->property_objectif) ? $property->property_objectif : '-')); ?></td>
+                                                    <td>Pour location ou vente</td>
                                                     <td><?= isset($property->created_at) && strtotime($property->created_at) ? date('d/m/Y', strtotime($property->created_at)) : (isset($property->post_date) && strtotime($property->post_date) ? date('d/m/Y', strtotime($property->post_date)) : '-'); ?></td>
                                                     <td>
                                                         <?php

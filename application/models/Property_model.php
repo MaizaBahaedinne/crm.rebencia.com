@@ -25,7 +25,7 @@ class Property_model extends CI_Model {
         }
 
         $results = $this->wp_db->get()->result();
-        // Enrichir chaque propriété avec ses métadonnées
+        $filtered = [];
         foreach ($results as &$property) {
             $metas = $this->wp_db->where('post_id', $property->ID)->get('wp_Hrg8P_postmeta')->result();
             $meta_map = [];
@@ -33,9 +33,7 @@ class Property_model extends CI_Model {
                 $meta_map[$meta->meta_key] = $meta->meta_value;
                 $property->{$meta->meta_key} = $meta->meta_value;
             }
-            // Mapping explicite pour l'affichage
             $property->nom = isset($property->post_title) ? $property->post_title : '-';
-            // Type = S+1, S+2, etc. (on concatène chambres + salon)
             if (isset($meta_map['fave_property_bedrooms']) && isset($meta_map['fave_property_bathrooms'])) {
                 $property->type_bien = 'S+' . $meta_map['fave_property_bedrooms'] . ' – ' . $meta_map['fave_property_bathrooms'] . ' salle(s) de bain';
             } elseif (isset($meta_map['fave_property_bedrooms'])) {
@@ -43,18 +41,23 @@ class Property_model extends CI_Model {
             } else {
                 $property->type_bien = '-';
             }
-            // Zone = adresse
             $property->zone_nom = isset($meta_map['fave_property_address']) ? $meta_map['fave_property_address'] : '-';
-            // Surface
             $property->surface_habitable = isset($meta_map['fave_property_size']) ? $meta_map['fave_property_size'] : '-';
-            // Prix
             $property->prix_demande = isset($meta_map['fave_property_price']) ? $meta_map['fave_property_price'] : '-';
-            // Objectif (vente/location) : à adapter si tu as un champ spécifique, sinon on laisse '-'
-            $property->objectif = isset($meta_map['property_objectif']) ? $meta_map['property_objectif'] : '-';
-            // Date création
             $property->created_at = isset($property->post_date) ? $property->post_date : '-';
+
+            // Application des filtres dynamiques
+            $ok = true;
+            if (!empty($filters['nom']) && stripos($property->nom, $filters['nom']) === false) $ok = false;
+            if (!empty($filters['type_bien']) && stripos($property->type_bien, $filters['type_bien']) === false) $ok = false;
+            if (!empty($filters['zone_nom']) && stripos($property->zone_nom, $filters['zone_nom']) === false) $ok = false;
+            if (!empty($filters['surface_min']) && is_numeric($property->surface_habitable) && $property->surface_habitable < $filters['surface_min']) $ok = false;
+            if (!empty($filters['surface_max']) && is_numeric($property->surface_habitable) && $property->surface_habitable > $filters['surface_max']) $ok = false;
+            if (!empty($filters['prix_min']) && is_numeric($property->prix_demande) && $property->prix_demande < $filters['prix_min']) $ok = false;
+            if (!empty($filters['prix_max']) && is_numeric($property->prix_demande) && $property->prix_demande > $filters['prix_max']) $ok = false;
+            if ($ok) $filtered[] = $property;
         }
-        return $results;
+        return $filtered;
     }
     // Une propriété
     public function get_property($property_id) {
