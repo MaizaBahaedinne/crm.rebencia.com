@@ -51,10 +51,22 @@ class Property_model extends CI_Model {
             if (!empty($filters['nom']) && stripos($property->nom, $filters['nom']) === false) $ok = false;
             if (!empty($filters['type_bien']) && stripos($property->type_bien, $filters['type_bien']) === false) $ok = false;
             if (!empty($filters['zone_nom']) && stripos($property->zone_nom, $filters['zone_nom']) === false) $ok = false;
-            if (!empty($filters['surface_min']) && is_numeric($property->surface_habitable) && $property->surface_habitable < $filters['surface_min']) $ok = false;
-            if (!empty($filters['surface_max']) && is_numeric($property->surface_habitable) && $property->surface_habitable > $filters['surface_max']) $ok = false;
-            if (!empty($filters['prix_min']) && is_numeric($property->prix_demande) && $property->prix_demande < $filters['prix_min']) $ok = false;
-            if (!empty($filters['prix_max']) && is_numeric($property->prix_demande) && $property->prix_demande > $filters['prix_max']) $ok = false;
+            // Surface (select)
+            if (!empty($filters['surface_habitable']) && is_numeric($property->surface_habitable)) {
+                $surf = (float)$property->surface_habitable;
+                if ($filters['surface_habitable'] == '<50' && $surf >= 50) $ok = false;
+                if ($filters['surface_habitable'] == '50-100' && ($surf < 50 || $surf > 100)) $ok = false;
+                if ($filters['surface_habitable'] == '100-150' && ($surf < 100 || $surf > 150)) $ok = false;
+                if ($filters['surface_habitable'] == '>150' && $surf <= 150) $ok = false;
+            }
+            // Prix (select)
+            if (!empty($filters['prix_demande']) && is_numeric($property->prix_demande)) {
+                $prix = (float)$property->prix_demande;
+                if ($filters['prix_demande'] == '<500' && $prix >= 500) $ok = false;
+                if ($filters['prix_demande'] == '500-1000' && ($prix < 500 || $prix > 1000)) $ok = false;
+                if ($filters['prix_demande'] == '1000-2000' && ($prix < 1000 || $prix > 2000)) $ok = false;
+                if ($filters['prix_demande'] == '>2000' && $prix <= 2000) $ok = false;
+            }
             if ($ok) $filtered[] = $property;
         }
         return $filtered;
