@@ -9,6 +9,7 @@ class Property_model extends CI_Model {
     }
     // Toutes les propriétés (avec filtres)
     public function get_all_properties($filters = []) {
+    // Filtres sur les métadonnées WordPress (après enrichissement)
         $this->wp_db->from('wp_Hrg8P_posts');
         $this->wp_db->where('post_type', 'property');
         $this->wp_db->where('post_status', 'publish');
@@ -22,6 +23,14 @@ class Property_model extends CI_Model {
     $results = $this->wp_db->get()->result();
     $filtered = [];
         foreach ($results as &$property) {
+            // Filtres sur les meta (valeurs exactes)
+            if (!empty($filters['fave_property_bathrooms']) && isset($meta_map['fave_property_bathrooms']) && $meta_map['fave_property_bathrooms'] != $filters['fave_property_bathrooms']) $ok = false;
+            if (!empty($filters['fave_property_bedrooms']) && isset($meta_map['fave_property_bedrooms']) && $meta_map['fave_property_bedrooms'] != $filters['fave_property_bedrooms']) $ok = false;
+            if (!empty($filters['fave_property_size']) && isset($meta_map['fave_property_size']) && $meta_map['fave_property_size'] != $filters['fave_property_size']) $ok = false;
+            if (!empty($filters['fave_property_size_prefix']) && isset($meta_map['fave_property_size_prefix']) && $meta_map['fave_property_size_prefix'] != $filters['fave_property_size_prefix']) $ok = false;
+            if (!empty($filters['fave_property_garage']) && isset($meta_map['fave_property_garage']) && $meta_map['fave_property_garage'] != $filters['fave_property_garage']) $ok = false;
+            if (!empty($filters['fave_property_year']) && isset($meta_map['fave_property_year']) && $meta_map['fave_property_year'] != $filters['fave_property_year']) $ok = false;
+            if (!empty($filters['fave_property_price']) && isset($meta_map['fave_property_price']) && $meta_map['fave_property_price'] != $filters['fave_property_price']) $ok = false;
             $metas = $this->wp_db->where('post_id', $property->ID)->get('wp_Hrg8P_postmeta')->result();
             $meta_map = [];
             foreach ($metas as $meta) {
