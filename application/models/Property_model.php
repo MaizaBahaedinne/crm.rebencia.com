@@ -34,12 +34,24 @@ class Property_model extends CI_Model {
                 $property->{$meta->meta_key} = $meta->meta_value;
             }
             // Mapping explicite pour l'affichage
-            $property->nom = isset($meta_map['property_title']) ? $meta_map['property_title'] : (isset($property->post_title) ? $property->post_title : '-');
-            $property->type_bien = isset($meta_map['property_type']) ? $meta_map['property_type'] : '-';
-            $property->zone_nom = isset($meta_map['property_zone']) ? $meta_map['property_zone'] : '-';
-            $property->surface_habitable = isset($meta_map['property_surface']) ? $meta_map['property_surface'] : '-';
-            $property->prix_demande = isset($meta_map['property_price']) ? $meta_map['property_price'] : '-';
+            $property->nom = isset($property->post_title) ? $property->post_title : '-';
+            // Type = S+1, S+2, etc. (on concatène chambres + salon)
+            if (isset($meta_map['fave_property_bedrooms']) && isset($meta_map['fave_property_bathrooms'])) {
+                $property->type_bien = 'S+' . $meta_map['fave_property_bedrooms'] . ' – ' . $meta_map['fave_property_bathrooms'] . ' salle(s) de bain';
+            } elseif (isset($meta_map['fave_property_bedrooms'])) {
+                $property->type_bien = 'S+' . $meta_map['fave_property_bedrooms'];
+            } else {
+                $property->type_bien = '-';
+            }
+            // Zone = adresse
+            $property->zone_nom = isset($meta_map['fave_property_address']) ? $meta_map['fave_property_address'] : '-';
+            // Surface
+            $property->surface_habitable = isset($meta_map['fave_property_size']) ? $meta_map['fave_property_size'] : '-';
+            // Prix
+            $property->prix_demande = isset($meta_map['fave_property_price']) ? $meta_map['fave_property_price'] : '-';
+            // Objectif (vente/location) : à adapter si tu as un champ spécifique, sinon on laisse '-'
             $property->objectif = isset($meta_map['property_objectif']) ? $meta_map['property_objectif'] : '-';
+            // Date création
             $property->created_at = isset($property->post_date) ? $property->post_date : '-';
         }
         return $results;
