@@ -28,9 +28,19 @@ class Property_model extends CI_Model {
         // Enrichir chaque propriété avec ses métadonnées
         foreach ($results as &$property) {
             $metas = $this->wp_db->where('post_id', $property->ID)->get('wp_Hrg8P_postmeta')->result();
+            $meta_map = [];
             foreach ($metas as $meta) {
+                $meta_map[$meta->meta_key] = $meta->meta_value;
                 $property->{$meta->meta_key} = $meta->meta_value;
             }
+            // Mapping explicite pour l'affichage
+            $property->nom = isset($meta_map['property_title']) ? $meta_map['property_title'] : (isset($property->post_title) ? $property->post_title : '-');
+            $property->type_bien = isset($meta_map['property_type']) ? $meta_map['property_type'] : '-';
+            $property->zone_nom = isset($meta_map['property_zone']) ? $meta_map['property_zone'] : '-';
+            $property->surface_habitable = isset($meta_map['property_surface']) ? $meta_map['property_surface'] : '-';
+            $property->prix_demande = isset($meta_map['property_price']) ? $meta_map['property_price'] : '-';
+            $property->objectif = isset($meta_map['property_objectif']) ? $meta_map['property_objectif'] : '-';
+            $property->created_at = isset($property->post_date) ? $property->post_date : '-';
         }
         return $results;
     }
