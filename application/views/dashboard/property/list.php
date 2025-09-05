@@ -23,26 +23,37 @@
                 </div>
             </div>
 
+
             <div id="properties-grid">
                 <div class="row">
                     <?php if(!empty($properties)): ?>
                         <?php foreach($properties as $property): ?>
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100">
-                                    <img src="<?= !empty($property->photo_principale) ? htmlspecialchars($property->photo_principale) : base_url('assets/images/default.jpg') ?>" class="card-img-top" alt="Photo">
+                            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100 product-card">
+                                    <div class="card-img-top position-relative">
+                                        <img src="<?= !empty($property->photo_principale) ? htmlspecialchars($property->photo_principale) : base_url('assets/images/default.jpg') ?>" class="img-fluid rounded-top" alt="Photo bien">
+                                        <?php if(!empty($property->statut_houzez)): ?>
+                                            <span class="badge bg-info position-absolute top-0 end-0 m-2"><?= htmlspecialchars($property->statut_houzez) ?></span>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="card-body">
-                                        <h5 class="card-title"><?= htmlspecialchars(!empty($property->nom) ? $property->nom : (!empty($property->titre) ? $property->titre : '-')) ?></h5>
-                                        <p class="card-text">
-                                            <span class="badge bg-info"><?= htmlspecialchars(!empty($property->statut_houzez) ? $property->statut_houzez : (!empty($property->statut) ? $property->statut : '-')) ?></span>
-                                            <span class="badge bg-primary"><?= htmlspecialchars(!empty($property->type_bien) ? $property->type_bien : (!empty($property->property_type) ? $property->property_type : (!empty($property->type) ? $property->type : '-'))) ?></span>
-                                        </p>
-                                        <p>
-                                            <strong>Prix :</strong> <?= !empty($property->prix_demande) ? number_format($property->prix_demande, 0, ',', ' ') : (!empty($property->property_price) ? number_format($property->property_price, 0, ',', ' ') : '-') ?> TND<br>
-                                            <strong>Surface :</strong> <?= !empty($property->surface_habitable) ? $property->surface_habitable : (!empty($property->property_surface) ? $property->property_surface : '-') ?> m²<br>
-                                            <strong>Chambres :</strong> <?= !empty($property->fave_property_bedrooms) ? $property->fave_property_bedrooms : (!empty($property->chambres) ? $property->chambres : '-') ?> | <strong>Sdb :</strong> <?= !empty($property->fave_property_bathrooms) ? $property->fave_property_bathrooms : (!empty($property->salles_de_bain) ? $property->salles_de_bain : '-') ?><br>
-                                            <strong>Adresse :</strong> <?= htmlspecialchars(!empty($property->zone_nom) ? $property->zone_nom : (!empty($property->adresse_courte) ? $property->adresse_courte : (!empty($property->city) ? $property->city : '-'))) ?>
-                                        </p>
-                                        <a href="<?= base_url('property/view/'.$property->ID); ?>" class="btn btn-sm btn-info">Voir</a>
+                                        <h5 class="card-title mb-2 text-truncate"><?= htmlspecialchars($property->nom) ?></h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-primary me-1"><?= htmlspecialchars($property->type_bien) ?></span>
+                                            <span class="badge bg-light text-dark"><?= htmlspecialchars($property->zone_nom) ?></span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong><?= number_format($property->prix_demande, 0, ',', ' ') ?> TND</strong>
+                                        </div>
+                                        <div class="mb-2 small">
+                                            <span><i class="ri-home-2-line"></i> <?= $property->surface_habitable ?> m²</span>
+                                            <span class="ms-2"><i class="ri-hotel-bed-line"></i> <?= $property->fave_property_bedrooms ?> ch.</span>
+                                            <span class="ms-2"><i class="ri-shower-line"></i> <?= $property->fave_property_bathrooms ?> sdb</span>
+                                        </div>
+                                        <div class="mb-2 text-muted small">
+                                            <i class="ri-map-pin-line"></i> <?= htmlspecialchars($property->adresse_courte ?? $property->zone_nom) ?>
+                                        </div>
+                                        <a href="<?= base_url('property/view/'.$property->ID); ?>" class="btn btn-sm btn-outline-primary w-100">Voir le bien</a>
                                     </div>
                                 </div>
                             </div>
