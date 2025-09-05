@@ -34,21 +34,31 @@
                                     <input type="text" name="nom" class="form-control" placeholder="Nom du bien" value="<?= isset($_GET['nom']) ? htmlspecialchars($_GET['nom']) : '' ?>" autocomplete="off" id="autocomplete-nom">
                                 </div>
                                 <div class="col-md-2">
+                                    <select name="statut_houzez" class="form-select">
+                                        <option value="">Statut</option>
+                                        <option value="Location" <?= (isset($_GET['statut_houzez']) && $_GET['statut_houzez']==='Location')?'selected':''; ?>>Location</option>
+                                        <option value="Vente" <?= (isset($_GET['statut_houzez']) && $_GET['statut_houzez']==='Vente')?'selected':''; ?>>Vente</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
                                     <select name="type_bien" class="form-select">
-                                        <option value="">Type</option>
-                                        <option value="S+1" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+1')?'selected':''; ?>>S+1</option>
-                                        <option value="S+2" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+2')?'selected':''; ?>>S+2</option>
-                                        <option value="S+3" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+3')?'selected':''; ?>>S+3</option>
-                                        <option value="S+4" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='S+4')?'selected':''; ?>>S+4</option>
+                                        <option value="">Type de bien</option>
+                                        <option value="Appartement" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Appartement')?'selected':''; ?>>Appartement</option>
+                                        <option value="Villa" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Villa')?'selected':''; ?>>Villa</option>
+                                        <option value="Studio" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Studio')?'selected':''; ?>>Studio</option>
+                                        <option value="Duplex" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Duplex')?'selected':''; ?>>Duplex</option>
+                                        <option value="Terrain" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Terrain')?'selected':''; ?>>Terrain</option>
+                                        <!-- Ajoute ici les autres types de ta base -->
                                     </select>
                                 </div>
                                 <div class="col-md-2">
                                     <select name="zone_nom" class="form-select">
-                                        <option value="">Zone</option>
-                                        <option value="L'Aouina" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="L'Aouina")?'selected':''; ?>>L'Aouina</option>
-                                        <option value="La Marsa" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="La Marsa")?'selected':''; ?>>La Marsa</option>
-                                        <option value="Carthage" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="Carthage")?'selected':''; ?>>Carthage</option>
-                                        <option value="Gammarth" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==="Gammarth")?'selected':''; ?>>Gammarth</option>
+                                        <option value="">Ville</option>
+                                        <option value="Tunis" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='Tunis')?'selected':''; ?>>Tunis</option>
+                                        <option value="La Marsa" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='La Marsa')?'selected':''; ?>>La Marsa</option>
+                                        <option value="Carthage" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='Carthage')?'selected':''; ?>>Carthage</option>
+                                        <option value="Gammarth" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='Gammarth')?'selected':''; ?>>Gammarth</option>
+                                        <!-- Ajoute ici les autres villes de ta base -->
                                     </select>
                                 </div>
                                 <div class="col-md-2">
