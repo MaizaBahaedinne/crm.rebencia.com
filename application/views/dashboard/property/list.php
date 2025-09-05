@@ -25,7 +25,7 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Liste des biens</h5>
-                            <a href="<?= base_url('property/add'); ?>" class="btn btn-success"><i class="ri-add-line align-bottom me-1"></i> Ajouter un bien</a>
+                            <!-- Bouton Ajouter supprimé (CRM = consultation uniquement) -->
                         </div>
                         <div class="card-body">
                             <!-- Filtres dynamiques -->
@@ -181,7 +181,7 @@
                                                     <td><?= isset($property->created_at) && strtotime($property->created_at) ? date('d/m/Y', strtotime($property->created_at)) : (isset($property->post_date) && strtotime($property->post_date) ? date('d/m/Y', strtotime($property->post_date)) : '-'); ?></td>
                                                     <td>
                                                         <a href="<?= base_url('property/view/'.$property->ID); ?>" class="btn btn-sm btn-info">Voir</a>
-                                                        <a href="<?= base_url('property/edit/'.$property->ID); ?>" class="btn btn-sm btn-warning">Modifier</a>
+                                                        <!-- Bouton Modifier supprimé (CRM = consultation uniquement) -->
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
