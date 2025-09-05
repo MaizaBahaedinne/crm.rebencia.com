@@ -43,6 +43,7 @@ class Property_model extends CI_Model {
                 ->get();
             $statut = $statut_query->row();
             $property->statut_houzez = $statut ? $statut->name : '-';
+            $ok = true;
             // Filtres sur les meta (valeurs exactes)
             if (!empty($filters['fave_property_bathrooms']) && isset($meta_map['fave_property_bathrooms']) && $meta_map['fave_property_bathrooms'] != $filters['fave_property_bathrooms']) $ok = false;
             if (!empty($filters['fave_property_bedrooms']) && isset($meta_map['fave_property_bedrooms']) && $meta_map['fave_property_bedrooms'] != $filters['fave_property_bedrooms']) $ok = false;
@@ -51,6 +52,10 @@ class Property_model extends CI_Model {
             if (!empty($filters['fave_property_garage']) && isset($meta_map['fave_property_garage']) && $meta_map['fave_property_garage'] != $filters['fave_property_garage']) $ok = false;
             if (!empty($filters['fave_property_year']) && isset($meta_map['fave_property_year']) && $meta_map['fave_property_year'] != $filters['fave_property_year']) $ok = false;
             if (!empty($filters['fave_property_price']) && isset($meta_map['fave_property_price']) && $meta_map['fave_property_price'] != $filters['fave_property_price']) $ok = false;
+            // Filtre sur le statut (location/vente)
+            if (!empty($filters['statut_houzez']) && isset($property->statut_houzez) && $property->statut_houzez != $filters['statut_houzez']) $ok = false;
+            // Filtre sur la ville
+            if (!empty($filters['zone_nom']) && isset($property->zone_nom) && $property->zone_nom != $filters['zone_nom']) $ok = false;
             $metas = $this->wp_db->where('post_id', $property->ID)->get('wp_Hrg8P_postmeta')->result();
             $meta_map = [];
             foreach ($metas as $meta) {

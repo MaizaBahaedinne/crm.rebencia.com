@@ -10,7 +10,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                        <h4 class="mb-sm-0">Biens immobiliers</h4>
+                                    <input type="text" name="nom" class="form-control" placeholder="Nom du bien" value="<?= isset($_GET['nom']) ? htmlspecialchars($_GET['nom']) : '' ?>" autocomplete="off" id="autocomplete-nom">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="<?= base_url('dashboard'); ?>">Tableau de bord</a></li>
@@ -19,6 +19,19 @@
                         </div>
                     </div>
                 </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-4">
+                                        <div class="card-header"><strong>Filtres</strong></div>
+                                        <div class="card-body">
+                                            <form method="get" class="row g-3">
+                                                <div class="col-12 d-flex gap-2">
+                                                    <button type="submit" class="btn btn-primary flex-fill">Filtrer</button>
+                                                    <a href="<?= base_url('property'); ?>" class="btn btn-outline-secondary flex-fill">Réinitialiser</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
             </div>
             <div class="row">
                 <div class="col-12">
@@ -145,13 +158,14 @@
                             }
                             </script>
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover align-middle">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-hover align-middle">
                                     <thead class="table-light">
                                         <tr>
                                             <th>ID</th>
                                             <th>Nom</th>
                                             <th>Type</th>
-                                            <th>Zone</th>
+                                            <th>Ville</th>
                                             <th>Surface (m²)</th>
                                             <th>Prix (TND)</th>
                                             <th>Statut</th>
@@ -166,7 +180,7 @@
                                                     <td><?= isset($property->ID) ? $property->ID : '-'; ?></td>
                                                     <td><?= htmlspecialchars(isset($property->nom) ? $property->nom : (isset($property->type_bien) ? $property->type_bien : '-')); ?></td>
                                                     <td><?= htmlspecialchars(isset($property->type_bien) ? $property->type_bien : (isset($property->property_type) ? $property->property_type : '-')); ?></td>
-                                                    <td><?= htmlspecialchars(isset($property->zone_nom) ? $property->zone_nom : (isset($property->property_zone) ? $property->property_zone : '-')); ?></td>
+                                                    <td><?= htmlspecialchars(isset($property->zone_nom) ? $property->zone_nom : '-'); ?></td>
                                                     <td><?= isset($property->surface_habitable) && is_numeric($property->surface_habitable) ? htmlspecialchars($property->surface_habitable) : (isset($property->property_surface) && is_numeric($property->property_surface) ? htmlspecialchars($property->property_surface) : '-'); ?></td>
                                                     <td><?php
                                                         $prix = null;
@@ -190,10 +204,11 @@
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
