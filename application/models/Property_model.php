@@ -23,6 +23,16 @@ class Property_model extends CI_Model {
     $results = $this->wp_db->get()->result();
     $filtered = [];
         foreach ($results as &$property) {
+            // Récupérer le statut (location/vente) via la taxonomie property_status
+            $statut_query = $this->wp_db->select('t.name')
+                ->from('wp_Hrg8P_term_relationships tr')
+                ->join('wp_Hrg8P_term_taxonomy tt', 'tr.term_taxonomy_id = tt.term_taxonomy_id', 'left')
+                ->join('wp_Hrg8P_terms t', 'tt.term_id = t.term_id', 'left')
+                ->where('tr.object_id', $property->ID)
+                ->where('tt.taxonomy', 'property_status')
+                ->get();
+            $statut = $statut_query->row();
+            $property->statut_houzez = $statut ? $statut->name : '-';
             // Filtres sur les meta (valeurs exactes)
             if (!empty($filters['fave_property_bathrooms']) && isset($meta_map['fave_property_bathrooms']) && $meta_map['fave_property_bathrooms'] != $filters['fave_property_bathrooms']) $ok = false;
             if (!empty($filters['fave_property_bedrooms']) && isset($meta_map['fave_property_bedrooms']) && $meta_map['fave_property_bedrooms'] != $filters['fave_property_bedrooms']) $ok = false;
