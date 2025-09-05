@@ -22,52 +22,36 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="card h-100">
-                        <div class="card-header"><strong>Filtres</strong></div>
-                        <div class="card-body">
-                            <form method="get" class="row gy-3">
-                                <div class="mb-3">
-                                    <input type="text" name="nom" id="nom" class="form-control" placeholder="Nom du bien" value="<?= isset($_GET['nom']) ? htmlspecialchars($_GET['nom']) : '' ?>" autocomplete="off" onkeyup="rechercheTempsReel()">
+
+            <div id="properties-grid">
+                <div class="row">
+                    <?php if(!empty($properties)): ?>
+                        <?php foreach($properties as $property): ?>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <img src="<?= !empty($property->photo_principale) ? htmlspecialchars($property->photo_principale) : base_url('assets/images/default.jpg') ?>" class="card-img-top" alt="Photo">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?= htmlspecialchars(!empty($property->nom) ? $property->nom : (!empty($property->titre) ? $property->titre : '-')) ?></h5>
+                                        <p class="card-text">
+                                            <span class="badge bg-info"><?= htmlspecialchars(!empty($property->statut_houzez) ? $property->statut_houzez : (!empty($property->statut) ? $property->statut : '-')) ?></span>
+                                            <span class="badge bg-primary"><?= htmlspecialchars(!empty($property->type_bien) ? $property->type_bien : (!empty($property->property_type) ? $property->property_type : (!empty($property->type) ? $property->type : '-'))) ?></span>
+                                        </p>
+                                        <p>
+                                            <strong>Prix :</strong> <?= !empty($property->prix_demande) ? number_format($property->prix_demande, 0, ',', ' ') : (!empty($property->property_price) ? number_format($property->property_price, 0, ',', ' ') : '-') ?> TND<br>
+                                            <strong>Surface :</strong> <?= !empty($property->surface_habitable) ? $property->surface_habitable : (!empty($property->property_surface) ? $property->property_surface : '-') ?> m²<br>
+                                            <strong>Chambres :</strong> <?= !empty($property->fave_property_bedrooms) ? $property->fave_property_bedrooms : (!empty($property->chambres) ? $property->chambres : '-') ?> | <strong>Sdb :</strong> <?= !empty($property->fave_property_bathrooms) ? $property->fave_property_bathrooms : (!empty($property->salles_de_bain) ? $property->salles_de_bain : '-') ?><br>
+                                            <strong>Adresse :</strong> <?= htmlspecialchars(!empty($property->zone_nom) ? $property->zone_nom : (!empty($property->adresse_courte) ? $property->adresse_courte : (!empty($property->city) ? $property->city : '-'))) ?>
+                                        </p>
+                                        <a href="<?= base_url('property/view/'.$property->ID); ?>" class="btn btn-sm btn-info">Voir</a>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <select name="statut_houzez" id="statut_houzez" class="form-select">
-                                        <option value="">Statut</option>
-                                        <option value="Location" <?= (isset($_GET['statut_houzez']) && $_GET['statut_houzez']==='Location')?'selected':''; ?>>Location</option>
-                                        <option value="Vente" <?= (isset($_GET['statut_houzez']) && $_GET['statut_houzez']==='Vente')?'selected':''; ?>>Vente</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <select name="type_bien" id="type_bien" class="form-select">
-                                        <option value="">Type de bien</option>
-                                        <option value="Appartement" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Appartement')?'selected':''; ?>>Appartement</option>
-                                        <option value="Villa" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Villa')?'selected':''; ?>>Villa</option>
-                                        <option value="Studio" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Studio')?'selected':''; ?>>Studio</option>
-                                        <option value="Duplex" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Duplex')?'selected':''; ?>>Duplex</option>
-                                        <option value="Terrain" <?= (isset($_GET['type_bien']) && $_GET['type_bien']==='Terrain')?'selected':''; ?>>Terrain</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <select name="zone_nom" id="zone_nom" class="form-select">
-                                        <option value="">Ville</option>
-                                        <option value="Tunis" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='Tunis')?'selected':''; ?>>Tunis</option>
-                                        <option value="La Marsa" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='La Marsa')?'selected':''; ?>>La Marsa</option>
-                                        <option value="Carthage" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='Carthage')?'selected':''; ?>>Carthage</option>
-                                        <option value="Gammarth" <?= (isset($_GET['zone_nom']) && $_GET['zone_nom']==='Gammarth')?'selected':''; ?>>Gammarth</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <select name="surface_habitable" id="surface_habitable" class="form-select">
-                                        <option value="">Surface</option>
-                                        <option value="<50" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='<50')?'selected':''; ?>>Moins de 50 m²</option>
-                                        <option value="50-100" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='50-100')?'selected':''; ?>>50-100 m²</option>
-                                        <option value="100-150" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='100-150')?'selected':''; ?>>100-150 m²</option>
-                                        <option value=">150" <?= (isset($_GET['surface_habitable']) && $_GET['surface_habitable']==='>150')?'selected':''; ?>>Plus de 150 m²</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <select name="prix_demande" id="prix_demande" class="form-select">
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center">Aucun bien trouvé.</div>
+                    <?php endif; ?>
+                </div>
+            </div>
                                         <option value="">Prix</option>
                                         <option value="<500" <?= (isset($_GET['prix_demande']) && $_GET['prix_demande']==='<500')?'selected':''; ?>>Moins de 500 TND</option>
                                         <option value="500-1000" <?= (isset($_GET['prix_demande']) && $_GET['prix_demande']==='500-1000')?'selected':''; ?>>500-1000 TND</option>
