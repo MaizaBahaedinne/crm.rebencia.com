@@ -2,7 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . '/libraries/BaseController.php';
 
-s
 class Properties extends BaseController {
     
     public function __construct() {
