@@ -84,15 +84,18 @@ $route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
 
 // Routes alternatives utilisant crm_agents directement
 $route['client/search_agencies_from_crm'] = 'Client/search_agencies_from_crm';
+$route['client/search_agencies_no_auth'] = 'Client/search_agencies_no_auth';
 $route['client/search_agents_from_crm'] = 'Client/search_agents_from_crm';
 
 // Routes de debug
+$route['client/ping'] = 'Client/ping';
+$route['client/test_json_simple'] = 'Client/test_json_simple';
+$route['client/debug_agencies'] = 'Client/debug_agencies';
 $route['client/test_agency_agent_mapping'] = 'Client/test_agency_agent_mapping';
 $route['client/debug_crm_agents_table'] = 'Client/debug_crm_agents_table';
 $route['client/debug_agents_detailed'] = 'Client/debug_agents_detailed';
 $route['client/test_houzez_data'] = 'Client/test_houzez_data';
 $route['client/debug_wordpress_structure'] = 'Client/debug_wordpress_structure';
-$route['client/debug_agencies'] = 'Client/debug_agencies';
 $route['client/debug_agents_by_agency'] = 'Client/debug_agents_by_agency';
 
 /*********** TRANSACTIONS *******************/

@@ -4,13 +4,16 @@ require APPPATH.'libraries/BaseController.php';
 class Client extends BaseController {
     public function __construct(){
         parent::__construct();
+        $this->load->library('session');
+        $this->load->library('form_validation');
+        $this->load->helper(['url','form']);
+        
         $this->isLoggedIn();
+        
         $this->load->model('wp_client_model');
         $this->load->model('client_model');
         $this->load->model('agency_model');
         $this->load->model('agent_model');
-        $this->load->library(['form_validation','session']);
-        $this->load->helper(['url','form']);
     }
 
     public function index() {
@@ -69,39 +72,154 @@ class Client extends BaseController {
     }
 
     /**
-     * Solution alternative : utiliser crm_agents pour agences ET agents
+     * Version de test sans vérification de session
      */
-    public function search_agencies_from_crm() {
-        $this->isLoggedIn();
+    public function search_agencies_no_auth() {
+        // Définir le header JSON en premier
+        header('Content-Type: application/json');
+        
+        // Éviter toute sortie HTML non désirée
+        ob_clean();
         
         $query = $this->input->post('query');
         
         if (!$query || strlen($query) < 2) {
             echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
-            return;
+            exit;
         }
         
         try {
+            // Vérification de la connexion à la DB WordPress
             $wp_db = $this->load->database('wordpress', TRUE);
+            
+            if (!$wp_db) {
+                throw new Exception('Impossible de se connecter à la base WordPress');
+            }
+            
+            // Test de la table crm_agents
+            $table_name = $wp_db->dbprefix . 'crm_agents';
+            
+            // Vérifier que la table existe
+            if (!$wp_db->table_exists('crm_agents')) {
+                throw new Exception('Table crm_agents introuvable');
+            }
             
             // Récupérer les agences distinctes de la table crm_agents
             $agencies = $wp_db->select('DISTINCT agency_id, agency_name')
-                ->from($wp_db->dbprefix . 'crm_agents')
+                ->from($table_name)
                 ->like('agency_name', $query)
+                ->limit(10)
                 ->get()->result();
             
             $filtered_agencies = [];
             foreach ($agencies as $agency) {
-                $filtered_agencies[] = [
-                    'id' => $agency->agency_id,
-                    'name' => $agency->agency_name
-                ];
+                if (!empty($agency->agency_name) && !empty($agency->agency_id)) {
+                    $filtered_agencies[] = [
+                        'id' => $agency->agency_id,
+                        'name' => $agency->agency_name
+                    ];
+                }
             }
             
-            echo json_encode(['success' => true, 'agencies' => $filtered_agencies]);
+            echo json_encode([
+                'success' => true, 
+                'agencies' => $filtered_agencies,
+                'count' => count($filtered_agencies)
+            ]);
+            
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche: ' . $e->getMessage()]);
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Erreur lors de la recherche: ' . $e->getMessage(),
+                'debug' => [
+                    'query' => $query,
+                    'table' => isset($table_name) ? $table_name : 'N/A'
+                ]
+            ]);
         }
+        
+        exit; // Importante pour éviter toute sortie supplémentaire
+    }
+
+    /**
+     * Solution alternative : utiliser crm_agents pour agences ET agents
+     * Version qui évite les redirections pour les appels AJAX
+     */
+    public function search_agencies_from_crm() {
+        // Définir le header JSON en premier
+        header('Content-Type: application/json');
+        
+        // Éviter toute sortie HTML non désirée
+        ob_clean();
+        
+        // Vérification simple de la session sans redirection
+        $CI =& get_instance();
+        $CI->load->library('session');
+        $isLoggedIn = $CI->session->userdata('isLoggedIn');
+        
+        if (!isset($isLoggedIn) || $isLoggedIn != TRUE) {
+            echo json_encode(['success' => false, 'message' => 'Session expirée']);
+            exit;
+        }
+        
+        $query = $this->input->post('query');
+        
+        if (!$query || strlen($query) < 2) {
+            echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
+            exit;
+        }
+        
+        try {
+            // Vérification de la connexion à la DB WordPress
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            if (!$wp_db) {
+                throw new Exception('Impossible de se connecter à la base WordPress');
+            }
+            
+            // Test de la table crm_agents
+            $table_name = $wp_db->dbprefix . 'crm_agents';
+            
+            // Vérifier que la table existe
+            if (!$wp_db->table_exists('crm_agents')) {
+                throw new Exception('Table crm_agents introuvable');
+            }
+            
+            // Récupérer les agences distinctes de la table crm_agents
+            $agencies = $wp_db->select('DISTINCT agency_id, agency_name')
+                ->from($table_name)
+                ->like('agency_name', $query)
+                ->limit(10)
+                ->get()->result();
+            
+            $filtered_agencies = [];
+            foreach ($agencies as $agency) {
+                if (!empty($agency->agency_name) && !empty($agency->agency_id)) {
+                    $filtered_agencies[] = [
+                        'id' => $agency->agency_id,
+                        'name' => $agency->agency_name
+                    ];
+                }
+            }
+            
+            echo json_encode([
+                'success' => true, 
+                'agencies' => $filtered_agencies,
+                'count' => count($filtered_agencies)
+            ]);
+            
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Erreur lors de la recherche: ' . $e->getMessage(),
+                'debug' => [
+                    'query' => $query,
+                    'table' => isset($table_name) ? $table_name : 'N/A'
+                ]
+            ]);
+        }
+        
+        exit; // Importante pour éviter toute sortie supplémentaire
     }
 
     /**
@@ -143,6 +261,79 @@ class Client extends BaseController {
             echo json_encode(['success' => true, 'agents' => $filtered_agents]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche des agents: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Test ultra-simple sans aucune dépendance
+     */
+    public function ping() {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => 'pong', 'timestamp' => time()]);
+    }
+
+    /**
+     * Version simplifiée pour tester sans DB
+     */
+    public function test_json_simple() {
+        header('Content-Type: application/json');
+        
+        try {
+            $query = $this->input->post('query');
+            
+            // Test avec données statiques pour éviter les erreurs DB
+            $mock_agencies = [
+                ['id' => 18907, 'name' => 'Agence Ben arous'],
+                ['id' => 12345, 'name' => 'Agence Test']
+            ];
+            
+            // Filtrer par query si fournie
+            $filtered = [];
+            if (!empty($query)) {
+                foreach ($mock_agencies as $agency) {
+                    if (stripos($agency['name'], $query) !== false) {
+                        $filtered[] = $agency;
+                    }
+                }
+            } else {
+                $filtered = $mock_agencies;
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'agencies' => $filtered,
+                'count' => count($filtered),
+                'query' => $query,
+                'debug' => 'Version simplifiée sans DB'
+            ]);
+            
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Test simple pour débugger l'erreur 500
+     */
+    public function debug_agencies() {
+        header('Content-Type: application/json');
+        
+        try {
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Test de base réussi',
+                'php_version' => phpversion(),
+                'post_data' => $this->input->post(),
+                'session' => 'connecté (isLoggedIn() passé)'
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
