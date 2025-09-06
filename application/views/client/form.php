@@ -36,8 +36,12 @@
                                         <select name="agency_id" class="form-select" required>
                                             <option value="">Sélectionner une agence</option>
                                             <?php if(isset($agencies) && !empty($agencies)): foreach($agencies as $agency): ?>
-                                                <option value="<?= $agency->id ?>" <?= (isset($client) && $client->agency_id==$agency->id)?'selected':''; ?>>
-                                                    <?= htmlspecialchars($agency->nom ?? $agency->name ?? $agency->libelle) ?>
+                                                <?php 
+                                                $agency_id = isset($agency['id']) ? $agency['id'] : (isset($agency->id) ? $agency->id : '');
+                                                $agency_name = isset($agency['nom']) ? $agency['nom'] : (isset($agency['name']) ? $agency['name'] : (isset($agency['libelle']) ? $agency['libelle'] : (isset($agency->nom) ? $agency->nom : (isset($agency->name) ? $agency->name : (isset($agency->libelle) ? $agency->libelle : 'Agence')))));
+                                                ?>
+                                                <option value="<?= $agency_id ?>" <?= (isset($client) && isset($client->agency_id) && $client->agency_id==$agency_id)?'selected':''; ?>>
+                                                    <?= htmlspecialchars($agency_name) ?>
                                                 </option>
                                             <?php endforeach; endif; ?>
                                         </select>
@@ -48,8 +52,12 @@
                                         <select name="agent_id" class="form-select" required>
                                             <option value="">Sélectionner un agent</option>
                                             <?php if(isset($agents) && !empty($agents)): foreach($agents as $agent): ?>
-                                                <option value="<?= $agent->id ?>" <?= (isset($client) && $client->agent_id==$agent->id)?'selected':''; ?>>
-                                                    <?= htmlspecialchars($agent->nom ?? $agent->name ?? $agent->prenom) ?>
+                                                <?php 
+                                                $agent_id = isset($agent['id']) ? $agent['id'] : (isset($agent->id) ? $agent->id : '');
+                                                $agent_name = isset($agent['nom']) ? $agent['nom'] : (isset($agent['name']) ? $agent['name'] : (isset($agent['prenom']) ? $agent['prenom'] : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')))));
+                                                ?>
+                                                <option value="<?= $agent_id ?>" <?= (isset($client) && isset($client->agent_id) && $client->agent_id==$agent_id)?'selected':''; ?>>
+                                                    <?= htmlspecialchars($agent_name) ?>
                                                 </option>
                                             <?php endforeach; endif; ?>
                                         </select>
