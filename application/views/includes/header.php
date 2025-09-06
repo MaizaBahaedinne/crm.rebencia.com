@@ -655,15 +655,10 @@
                                     <i class="ri-dashboard-2-line"></i> <span>Tableau de bord global</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Agences</span></li>
+                            <li class="menu-title"><span>Agences HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('agencies'); ?>">
                                     <i class="ri-building-line"></i> <span>Liste des agences</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('agencies/create'); ?>">
-                                    <i class="ri-add-line"></i> <span>Créer une agence</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -671,15 +666,10 @@
                                     <i class="ri-bar-chart-line"></i> <span>Statistiques agences</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Agents</span></li>
+                            <li class="menu-title"><span>Agents HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('agents'); ?>">
                                     <i class="ri-user-3-line"></i> <span>Liste des agents</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('agents/create'); ?>">
-                                    <i class="ri-user-add-line"></i> <span>Créer un agent</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -687,20 +677,15 @@
                                     <i class="ri-trophy-line"></i> <span>Performance agents</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Propriétés</span></li>
+                            <li class="menu-title"><span>Propriétés HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
                                     <i class="ri-home-4-line"></i> <span>Liste des propriétés</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
-                                    <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('properties/status'); ?>">
-                                    <i class="ri-information-line"></i> <span>Statut (disponible, vendu, loué)</span>
+                                    <i class="ri-information-line"></i> <span>Statut des biens</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Estimations des biens</span></li>
@@ -790,10 +775,10 @@
                                     <i class="ri-user-3-line"></i> <span>Agents de l’agence</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Agents</span></li>
+                            <li class="menu-title"><span>Agents HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('agents'); ?>">
-                                    <i class="ri-user-3-line"></i> <span>Liste agents</span>
+                                    <i class="ri-user-3-line"></i> <span>Agents de l'agence</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -801,15 +786,10 @@
                                     <i class="ri-trophy-line"></i> <span>Performance agents</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Propriétés</span></li>
+                            <li class="menu-title"><span>Propriétés HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
-                                    <i class="ri-home-4-line"></i> <span>Mes propriétés</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
-                                    <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
+                                    <i class="ri-home-4-line"></i> <span>Propriétés agence</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Estimations</span></li>
@@ -862,15 +842,10 @@
                                     <i class="ri-dashboard-2-line"></i> <span>Mon tableau de bord</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Mes propriétés</span></li>
+                            <li class="menu-title"><span>Propriétés HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
-                                    <i class="ri-home-4-line"></i> <span>Propriétés listées</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('properties/create'); ?>">
-                                    <i class="ri-add-circle-line"></i> <span>Ajouter une propriété</span>
+                                    <i class="ri-home-4-line"></i> <span>Mes propriétés</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Estimations</span></li>

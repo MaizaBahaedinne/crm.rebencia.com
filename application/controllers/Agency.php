@@ -6,17 +6,38 @@ require APPPATH . '/libraries/BaseController.php';
 class Agency extends BaseController {
     public function __construct() {
         parent::__construct();
-    $this->load->model('agency_model');
-    $this->load->model('agent_model');
-    $this->load->model('property_model');
+        $this->load->model('agency_model');
+        $this->load->model('agent_model');
+        $this->load->model('property_model');
         $this->load->library('form_validation');
+        $this->load->helper(['url', 'form']);
     }
 
-    // Liste des agences
+    // Liste des agences avec statistiques et filtres
     public function index() {
         $this->isLoggedIn();
-    $data['agencies'] = $this->agency_model->get_all_agencies();
-        $this->loadViews('dashboard/agency/list', $this->global, $data, NULL);
+        
+        // Récupération des filtres
+        $filters = [
+            'search' => $this->input->get('search'),
+            'ville' => $this->input->get('ville'),
+            'status' => $this->input->get('status')
+        ];
+        
+        // Récupération des données depuis HOUZEZ WordPress
+        $data = $this->global;
+        $data['agencies'] = $this->agency_model->get_agencies_with_stats($filters);
+        $data['filters'] = $filters;
+        
+        // Statistiques globales
+        $data['total_stats'] = [
+            'total_agencies' => count($data['agencies']),
+            'total_agents' => array_sum(array_column($data['agencies'], 'agents_count')),
+            'total_properties' => array_sum(array_column($data['agencies'], 'properties_count')),
+            'total_sales' => array_sum(array_column($data['agencies'], 'sales_count'))
+        ];
+        
+        $this->loadViews('dashboard/agency/list_cards', $data, NULL, NULL);
     }
 
     // Formulaire ajout/modif agence
@@ -38,6 +59,24 @@ class Agency extends BaseController {
     }
     public function delete($id) {
         // ... logique suppression agence ...
+    }
+
+    // Voir les détails d'une agence
+    public function view($agency_id) {
+        $this->isLoggedIn();
+        
+        $data = $this->global;
+        $data['agency'] = $this->agency_model->get_agency_details($agency_id);
+        $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
+        $data['properties'] = $this->property_model->get_properties_by_agency($agency_id, 5); // Limite 5 pour aperçu
+        $data['stats'] = $this->agency_model->get_agency_stats($agency_id);
+        
+        if (empty($data['agency'])) {
+            show_404();
+            return;
+        }
+        
+        $this->loadViews('dashboard/agency/view', $data, NULL, NULL);
     }
 
     // Voir les agents d'une agence

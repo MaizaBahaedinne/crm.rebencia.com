@@ -39,25 +39,25 @@ $route['profileUpdate'] = "User/profileUpdate";
 $route['profileUpdate/(:any)'] = "User/profileUpdate/$1";
 $route['roleListing/(:num)/(:num)'] = "Roles/roleListing/$1/$2";
 
-/*********** AGENCIES *******************/
+/*********** AGENCIES (HOUZEZ - Consultation) *******************/
 $route['agencies'] = 'Agency/index';
-$route['agencies/create'] = 'Agency/create';
 $route['agencies/stats'] = 'Agency/stats';
 $route['agency/info'] = 'Agency/info';
 $route['agency/agents'] = 'Agency/agents';
+$route['agency/view/(:num)'] = 'Agency/view/$1';
 
-/*********** AGENTS *******************/
+/*********** AGENTS (HOUZEZ - Consultation) *******************/
 $route['agents'] = 'Agent/index';
-$route['agents/create'] = 'Agent/create';
 $route['agents/performance'] = 'Agent/performance';
-$route['agents/(:num)'] = 'Agent/stats/$1';
+$route['agents/(:num)'] = 'Agent/view/$1';
 $route['agents/(:num)/stats'] = 'Agent/stats/$1';
-$route['agents/(:num)/proprietes'] = 'Agent/properties/$1';
+$route['agents/(:num)/properties'] = 'Agent/properties/$1';
 
-/*********** PROPERTIES *******************/
+/*********** PROPERTIES (HOUZEZ - Consultation) *******************/
 $route['properties'] = 'Property/index';
-$route['properties/create'] = 'Property/create';
 $route['properties/status'] = 'Property/status';
+$route['property/view/(:num)'] = 'Property/view/$1';
+$route['property/details/(:num)'] = 'Property/details/$1';
 
 /*********** CLIENTS *******************/
 $route['clients'] = 'Client/index';
