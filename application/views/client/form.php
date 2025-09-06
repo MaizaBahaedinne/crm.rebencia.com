@@ -198,7 +198,51 @@
                                 <div class="row g-3">
                                     <div class="col-md-12">
                                         <label class="form-label">Source d'information</label>
-                                        <input type="text" name="source" class="form-control" placeholder="Comment le client nous a-t-il connu ?" value="<?= isset($client) ? htmlspecialchars($client->source) : '' ?>">
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Site web" id="source_web" <?= (isset($client) && $client->source=='Site web')?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_web">Site web</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Réseaux sociaux" id="source_social" <?= (isset($client) && $client->source=='Réseaux sociaux')?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_social">Réseaux sociaux</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Bouche à oreille" id="source_bouche" <?= (isset($client) && $client->source=='Bouche à oreille')?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_bouche">Bouche à oreille</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Publicité" id="source_pub" <?= (isset($client) && $client->source=='Publicité')?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_pub">Publicité</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Partenaire" id="source_partenaire" <?= (isset($client) && $client->source=='Partenaire')?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_partenaire">Partenaire</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Prospection directe" id="source_prospection" <?= (isset($client) && $client->source=='Prospection directe')?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_prospection">Prospection directe</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="source" value="Autre" id="source_autre" <?= (isset($client) && !in_array($client->source, ['Site web', 'Réseaux sociaux', 'Bouche à oreille', 'Publicité', 'Partenaire', 'Prospection directe', '']))?'checked':''; ?>>
+                                                    <label class="form-check-label" for="source_autre">Autre :</label>
+                                                    <input type="text" name="source_autre_detail" class="form-control mt-2" placeholder="Précisez..." value="<?= (isset($client) && !in_array($client->source, ['Site web', 'Réseaux sociaux', 'Bouche à oreille', 'Publicité', 'Partenaire', 'Prospection directe', ''])) ? htmlspecialchars($client->source) : '' ?>" style="display: <?= (isset($client) && !in_array($client->source, ['Site web', 'Réseaux sociaux', 'Bouche à oreille', 'Publicité', 'Partenaire', 'Prospection directe', ''])) ? 'block' : 'none' ?>;">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-12">
                                         <label class="form-label">Notes</label>
@@ -238,3 +282,28 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sourceRadios = document.querySelectorAll('input[name="source"]');
+    const sourceAutreDetail = document.querySelector('input[name="source_autre_detail"]');
+    
+    sourceRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'Autre') {
+                sourceAutreDetail.style.display = 'block';
+                sourceAutreDetail.focus();
+            } else {
+                sourceAutreDetail.style.display = 'none';
+                sourceAutreDetail.value = '';
+            }
+        });
+    });
+    
+    // Si "Autre" est pré-sélectionné, afficher le champ
+    const sourceAutre = document.getElementById('source_autre');
+    if (sourceAutre && sourceAutre.checked) {
+        sourceAutreDetail.style.display = 'block';
+    }
+});
+</script>

@@ -52,6 +52,12 @@ class Client extends BaseController {
         public function add() {
             $this->isLoggedIn();
         if ($this->input->post()) {
+            // Gestion de la source d'information
+            $source = $this->input->post('source');
+            if ($source === 'Autre') {
+                $source = $this->input->post('source_autre_detail');
+            }
+            
             $data = [
                 'nom' => $this->input->post('nom'),
                 'prenom' => $this->input->post('prenom'),
@@ -66,7 +72,7 @@ class Client extends BaseController {
                 'ville' => $this->input->post('ville'),
                 'code_postal' => $this->input->post('code_postal'),
                 'pays' => $this->input->post('pays'),
-                'source' => $this->input->post('source'),
+                'source' => $source,
                 'notes' => $this->input->post('notes'),
                 'agency_id' => $this->input->post('agency_id'),
                 'agent_id' => $this->input->post('agent_id'),
@@ -140,6 +146,12 @@ class Client extends BaseController {
     public function update($id) {
         $this->isLoggedIn();
         if ($this->input->post()) {
+            // Gestion de la source d'information
+            $source = $this->input->post('source');
+            if ($source === 'Autre') {
+                $source = $this->input->post('source_autre_detail');
+            }
+            
             $data = [
                 'nom' => $this->input->post('nom'),
                 'prenom' => $this->input->post('prenom'),
@@ -154,7 +166,7 @@ class Client extends BaseController {
                 'ville' => $this->input->post('ville'),
                 'code_postal' => $this->input->post('code_postal'),
                 'pays' => $this->input->post('pays'),
-                'source' => $this->input->post('source'),
+                'source' => $source,
                 'notes' => $this->input->post('notes'),
                 'agency_id' => $this->input->post('agency_id'),
                 'agent_id' => $this->input->post('agent_id'),
