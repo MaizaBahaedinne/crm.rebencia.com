@@ -13,11 +13,140 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    // Récupérer les informations de session utilisateur
+    session_start();
+    $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
+    $user_id = isset($_SESSION['wp_id']) ? $_SESSION['wp_id'] : null;
+    $is_admin = isset($_SESSION['isAdmin']) ? $_SESSION['isAdmin'] : false;
+    
     $action = isset($_GET['action']) ? $_GET['action'] : 'test';
     $query = isset($_POST['query']) ? $_POST['query'] : (isset($_GET['query']) ? $_GET['query'] : '');
     
-    if ($action === 'agencies') {
-        // Autocomplétion des agences depuis la vraie requête
+    if ($action === 'user_context') {
+        // Endpoint pour récupérer le contexte utilisateur
+        if (!$user_id) {
+            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
+            exit;
+        }
+        
+        // Récupérer les informations complètes de l'utilisateur
+        $stmt = $pdo->prepare("
+            SELECT 
+                u.ID as user_id,
+                u.user_login,
+                u.user_email,
+                u.display_name,
+                p.ID as agent_post_id,
+                p.post_title as agent_name,
+                a.ID as agency_id,
+                a.post_title as agency_name,
+                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position
+            FROM {$prefix}users u
+            LEFT JOIN {$prefix}postmeta pm_email ON pm_email.meta_value = u.user_email
+            LEFT JOIN {$prefix}posts p ON (p.ID = pm_email.post_id AND p.post_type = 'houzez_agent')
+            LEFT JOIN {$prefix}postmeta pm_agency ON (pm_agency.post_id = p.ID AND pm_agency.meta_key = 'fave_agent_agencies')
+            LEFT JOIN {$prefix}posts a ON (a.ID = pm_agency.meta_value AND a.post_type = 'houzez_agency')
+            LEFT JOIN {$prefix}postmeta pm_contact ON pm_contact.post_id = p.ID
+            WHERE u.ID = :user_id
+            GROUP BY u.ID, p.ID, a.ID
+        ");
+        $stmt->execute(['user_id' => $user_id]);
+        $user_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $context = [
+            'user_id' => $user_id,
+            'role' => $user_role,
+            'is_admin' => $is_admin,
+            'agent_info' => $user_info
+        ];
+        
+        // Déterminer les permissions selon le rôle
+        if ($is_admin) {
+            $context['permissions'] = [
+                'can_choose_agency' => true,
+                'can_choose_agent' => true,
+                'auto_fill_agency' => false,
+                'auto_fill_agent' => false,
+                'description' => 'Admin - Accès complet à toutes les agences et agents'
+            ];
+        } elseif ($user_role === 'manager' && $user_info && $user_info['agency_id']) {
+            $context['permissions'] = [
+                'can_choose_agency' => false,
+                'can_choose_agent' => true,
+                'auto_fill_agency' => true,
+                'auto_fill_agent' => false,
+                'agency_id' => $user_info['agency_id'],
+                'agency_name' => $user_info['agency_name'],
+                'description' => 'Manager - Limité à son agence'
+            ];
+        } elseif ($user_role === 'agent' && $user_info) {
+            $context['permissions'] = [
+                'can_choose_agency' => false,
+                'can_choose_agent' => false,
+                'auto_fill_agency' => true,
+                'auto_fill_agent' => true,
+                'agency_id' => $user_info['agency_id'],
+                'agency_name' => $user_info['agency_name'],
+                'agent_id' => $user_info['user_id'],
+                'agent_name' => $user_info['agent_name'],
+                'description' => 'Agent - Remplissage automatique'
+            ];
+        } else {
+            $context['permissions'] = [
+                'can_choose_agency' => true,
+                'can_choose_agent' => true,
+                'auto_fill_agency' => false,
+                'auto_fill_agent' => false,
+                'description' => 'Utilisateur standard'
+            ];
+        }
+        
+        echo json_encode(['success' => true, 'context' => $context]);
+        
+    } elseif ($action === 'agencies') {
+        // Autocomplétion des agences avec contrôle d'accès
+        
+        // Vérifier les permissions
+        session_start();
+        $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
+        $user_id = isset($_SESSION['wp_id']) ? $_SESSION['wp_id'] : null;
+        $is_admin = isset($_SESSION['isAdmin']) ? $_SESSION['isAdmin'] : false;
+        
+        // Si manager ou agent, limiter aux agences autorisées
+        if (!$is_admin && ($user_role === 'manager' || $user_role === 'agent')) {
+            // Récupérer l'agence de l'utilisateur
+            $stmt = $pdo->prepare("
+                SELECT a.ID as agency_id, a.post_title as agency_name
+                FROM {$prefix}users u
+                LEFT JOIN {$prefix}postmeta pm_email ON pm_email.meta_value = u.user_email
+                LEFT JOIN {$prefix}posts p ON (p.ID = pm_email.post_id AND p.post_type = 'houzez_agent')
+                LEFT JOIN {$prefix}postmeta pm_agency ON (pm_agency.post_id = p.ID AND pm_agency.meta_key = 'fave_agent_agencies')
+                LEFT JOIN {$prefix}posts a ON (a.ID = pm_agency.meta_value AND a.post_type = 'houzez_agency')
+                WHERE u.ID = :user_id AND a.ID IS NOT NULL
+            ");
+            $stmt->execute(['user_id' => $user_id]);
+            $user_agency = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user_agency) {
+                echo json_encode([
+                    'success' => true,
+                    'agencies' => [[
+                        'id' => $user_agency['agency_id'],
+                        'name' => $user_agency['agency_name'],
+                        'agent_count' => 1,
+                        'display' => $user_agency['agency_name'] . ' (Votre agence)'
+                    ]],
+                    'count' => 1,
+                    'restricted' => true,
+                    'role' => $user_role
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Agence utilisateur non trouvée']);
+            }
+            exit;
+        }
+        
+        // Admin - accès complet
         if (!$query || strlen($query) < 2) {
             echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
             exit;
@@ -66,67 +195,76 @@ try {
         ]);
         
     } elseif ($action === 'agents') {
-        // Agents par agence avec la requête SQL complète
+        // Agents par agence avec contrôle d'accès par rôle
         $agency_id = isset($_POST['agency_id']) ? $_POST['agency_id'] : (isset($_GET['agency_id']) ? $_GET['agency_id'] : '');
+        
+        session_start();
+        $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
+        $user_id = isset($_SESSION['wp_id']) ? $_SESSION['wp_id'] : null;
+        $is_admin = isset($_SESSION['isAdmin']) ? $_SESSION['isAdmin'] : false;
         
         if (!$agency_id) {
             echo json_encode(['success' => false, 'message' => 'ID agence requis']);
             exit;
         }
         
-        // Votre requête SQL complète adaptée pour filtrer par agence
+        // Construire la requête selon le rôle
         $sql = "
             SELECT 
                 u.ID AS user_id,
                 u.user_login AS user_login,
                 u.user_email AS user_email,
-                u.user_status AS user_status,
-                u.user_registered AS registration_date,
                 p.ID AS agent_post_id,
                 p.post_title AS agent_name,
-                p.post_status AS post_status,
                 pm_email.meta_value AS agent_email,
                 a.ID AS agency_id,
                 a.post_title AS agency_name,
                 MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) AS phone,
                 MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) AS mobile,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) AS whatsapp,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) AS skype,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) AS website,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) AS agent_avatar,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_facebook' THEN pm_contact.meta_value END) AS facebook,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_twitter' THEN pm_contact.meta_value END) AS twitter,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_linkedin' THEN pm_contact.meta_value END) AS linkedin,
-                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_zip' THEN pm_contact.meta_value END) AS postal_code
+                MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position
             FROM {$prefix}users u
             LEFT JOIN {$prefix}postmeta pm_email ON pm_email.meta_value = u.user_email
             LEFT JOIN {$prefix}posts p ON (p.ID = pm_email.post_id AND p.post_type = 'houzez_agent')
             LEFT JOIN {$prefix}postmeta pm_agency ON (pm_agency.post_id = p.ID AND pm_agency.meta_key = 'fave_agent_agencies')
             LEFT JOIN {$prefix}posts a ON (a.ID = pm_agency.meta_value AND a.post_type = 'houzez_agency')
             LEFT JOIN {$prefix}postmeta pm_contact ON pm_contact.post_id = p.ID
-            LEFT JOIN {$prefix}posts media ON (media.ID = pm_contact.meta_value AND pm_contact.meta_key = 'fave_agent_picture' AND media.post_type = 'attachment')
             WHERE p.post_type = 'houzez_agent'
             AND a.ID = :agency_id
             AND p.post_status = 'publish'
         ";
         
+        $params = ['agency_id' => $agency_id];
+        
+        // Si manager, inclure lui-même + ses agents
+        if ($user_role === 'manager' && !$is_admin) {
+            // Ajouter le manager lui-même dans les résultats si il fait partie de cette agence
+            $sql .= " AND (u.ID = :user_id OR u.ID != :user_id)";
+            $params['user_id'] = $user_id;
+        }
+        
+        // Si agent, seul lui-même
+        if ($user_role === 'agent' && !$is_admin) {
+            $sql .= " AND u.ID = :user_id";
+            $params['user_id'] = $user_id;
+        }
+        
         // Ajouter filtre par nom si query fournie
         if ($query && strlen($query) >= 2) {
             $sql .= " AND p.post_title LIKE :query";
+            $params['query'] = '%' . $query . '%';
         }
         
         $sql .= "
-            GROUP BY u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_status, pm_email.meta_value, a.ID, a.post_title
-            ORDER BY p.post_title ASC
+            GROUP BY u.ID, u.user_login, u.user_email, p.ID, p.post_title, pm_email.meta_value, a.ID, a.post_title
+            ORDER BY 
+                CASE WHEN u.ID = :current_user_id THEN 0 ELSE 1 END,
+                p.post_title ASC
             LIMIT 10
         ";
         
+        $params['current_user_id'] = $user_id;
+        
         $stmt = $pdo->prepare($sql);
-        $params = ['agency_id' => $agency_id];
-        if ($query && strlen($query) >= 2) {
-            $params['query'] = '%' . $query . '%';
-        }
         $stmt->execute($params);
         $agents = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -137,6 +275,12 @@ try {
             if (!empty($agent['mobile'])) $contact_info[] = $agent['mobile'];
             
             $display_name = $agent['agent_name'];
+            
+            // Marquer l'utilisateur connecté
+            if ($agent['user_id'] == $user_id) {
+                $display_name .= " (Vous)";
+            }
+            
             if (!empty($agent['position'])) {
                 $display_name .= " - " . $agent['position'];
             }
@@ -153,16 +297,17 @@ try {
                 'mobile' => $agent['mobile'],
                 'position' => $agent['position'],
                 'agency_name' => $agent['agency_name'],
-                'whatsapp' => $agent['whatsapp'],
-                'website' => $agent['website'],
-                'avatar' => $agent['agent_avatar']
+                'is_current_user' => ($agent['user_id'] == $user_id)
             ];
         }
         
         echo json_encode([
             'success' => true, 
             'agents' => $filtered_agents,
-            'source' => 'Requête SQL HOUZEZ complète'
+            'role' => $user_role,
+            'is_admin' => $is_admin,
+            'restricted' => !$is_admin,
+            'source' => 'Requête SQL HOUZEZ avec contrôle rôle'
         ]);
         
     } else {
