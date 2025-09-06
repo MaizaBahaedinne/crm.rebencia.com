@@ -86,6 +86,7 @@ $route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
 $route['client/search_agencies_from_crm'] = 'Client/search_agencies_from_crm';
 $route['client/search_agencies_no_auth'] = 'Client/search_agencies_no_auth';
 $route['client/search_agents_from_crm'] = 'Client/search_agents_from_crm';
+$route['client/search_agents_no_auth'] = 'Client/search_agents_no_auth';
 
 // Routes de debug
 $route['client/ping'] = 'Client/ping';

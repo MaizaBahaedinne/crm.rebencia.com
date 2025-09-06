@@ -223,6 +223,56 @@ class Client extends BaseController {
     }
 
     /**
+     * Version agents sans authentification pour tests
+     */
+    public function search_agents_no_auth() {
+        header('Content-Type: application/json');
+        ob_clean();
+        
+        $agency_id = $this->input->post('agency_id');
+        $query = $this->input->post('query');
+        
+        if (!$agency_id) {
+            echo json_encode(['success' => false, 'message' => 'ID agence requis']);
+            exit;
+        }
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            if (!$wp_db) {
+                throw new Exception('Impossible de se connecter à la base WordPress');
+            }
+            
+            $wp_db->select('user_id, agent_name, agent_email, agency_name')
+                ->from($wp_db->dbprefix . 'crm_agents')
+                ->where('agency_id', $agency_id);
+            
+            // Si une query est fournie, filtrer par nom
+            if ($query && strlen($query) >= 2) {
+                $wp_db->like('agent_name', $query);
+            }
+            
+            $agents = $wp_db->limit(10)->get()->result();
+            
+            $filtered_agents = [];
+            foreach ($agents as $agent) {
+                $filtered_agents[] = [
+                    'id' => $agent->user_id,
+                    'name' => $agent->agent_name
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'agents' => $filtered_agents]);
+            
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche des agents: ' . $e->getMessage()]);
+        }
+        
+        exit;
+    }
+
+    /**
      * Solution alternative : récupérer agents directement de crm_agents
      */
     public function search_agents_from_crm() {
