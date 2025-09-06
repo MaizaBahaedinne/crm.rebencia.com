@@ -149,7 +149,7 @@
                                 <?php if (!empty($property->prix_demande) && is_numeric($property->prix_demande)) : ?>
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <span class="badge bg-primary fs-6">
-                                        <?php echo number_format($property->prix_demande, 0, ',', ' '); ?> €
+                                        <?php echo number_format($property->prix_demande, 0, ',', ' '); ?> TND
                                     </span>
                                 </div>
                                 <?php endif; ?>

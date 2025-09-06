@@ -56,7 +56,7 @@
                                         </span>
                                         <?php if (!empty($property->fave_property_price) && is_numeric($property->fave_property_price)) : ?>
                                         <span class="badge bg-success-subtle text-success fs-6">
-                                            <i class="ri-price-tag-3-line me-1"></i><?php echo number_format($property->fave_property_price, 0, ',', ' '); ?> €
+                                            <i class="ri-price-tag-3-line me-1"></i><?php echo number_format($property->fave_property_price, 0, ',', ' '); ?> TND
                                         </span>
                                         <?php endif; ?>
                                         <span class="badge bg-info-subtle text-info">
@@ -273,7 +273,7 @@
                                             </small>
                                             <?php if (!empty($similar->fave_property_price)) : ?>
                                             <strong class="text-primary">
-                                                <?php echo number_format($similar->fave_property_price, 0, ',', ' '); ?> €
+                                                <?php echo number_format($similar->fave_property_price, 0, ',', ' '); ?> TND
                                             </strong>
                                             <?php endif; ?>
                                         </div>
@@ -298,7 +298,7 @@
                         <div class="card-body">
                             <?php if (!empty($property->fave_property_price) && is_numeric($property->fave_property_price)) : ?>
                             <div class="text-center mb-3">
-                                <h3 class="text-primary mb-0"><?php echo number_format($property->fave_property_price, 0, ',', ' '); ?> €</h3>
+                                <h3 class="text-primary mb-0"><?php echo number_format($property->fave_property_price, 0, ',', ' '); ?> TND</h3>
                                 <small class="text-muted">Prix affiché</small>
                             </div>
                             <?php endif; ?>
