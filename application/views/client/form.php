@@ -65,27 +65,27 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label">Nom <span class="text-danger">*</span></label>
-                                        <input type="text" name="nom" class="form-control" placeholder="Nom complet / Raison sociale" value="<?= isset($client) ? htmlspecialchars($client->nom) : '' ?>" required>
+                                        <input type="text" name="nom" class="form-control" placeholder="Nom complet / Raison sociale" value="<?= isset($client) && isset($client->nom) ? htmlspecialchars($client->nom) : '' ?>" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Prénom</label>
-                                        <input type="text" name="prenom" class="form-control" placeholder="Prénom" value="<?= isset($client) ? htmlspecialchars($client->prenom) : '' ?>">
+                                        <input type="text" name="prenom" class="form-control" placeholder="Prénom" value="<?= isset($client) && isset($client->prenom) ? htmlspecialchars($client->prenom) : '' ?>">
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <label class="form-label">Type de client <span class="text-danger">*</span></label>
                                         <select name="type_client" class="form-select" required>
                                             <option value="">Sélectionner le type</option>
-                                            <option value="Acheteur" <?= (isset($client) && $client->type_client=='Acheteur')?'selected':''; ?>>Acheteur</option>
-                                            <option value="Vendeur" <?= (isset($client) && $client->type_client=='Vendeur')?'selected':''; ?>>Vendeur</option>
-                                            <option value="Investisseur" <?= (isset($client) && $client->type_client=='Investisseur')?'selected':''; ?>>Investisseur</option>
-                                            <option value="Locataire" <?= (isset($client) && $client->type_client=='Locataire')?'selected':''; ?>>Locataire</option>
+                                            <option value="Acheteur" <?= (isset($client) && isset($client->type_client) && $client->type_client=='Acheteur')?'selected':''; ?>>Acheteur</option>
+                                            <option value="Vendeur" <?= (isset($client) && isset($client->type_client) && $client->type_client=='Vendeur')?'selected':''; ?>>Vendeur</option>
+                                            <option value="Investisseur" <?= (isset($client) && isset($client->type_client) && $client->type_client=='Investisseur')?'selected':''; ?>>Investisseur</option>
+                                            <option value="Locataire" <?= (isset($client) && isset($client->type_client) && $client->type_client=='Locataire')?'selected':''; ?>>Locataire</option>
                                         </select>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <label class="form-label">Email <span class="text-danger">*</span></label>
-                                        <input type="email" name="email" class="form-control" placeholder="Email" value="<?= isset($client) ? htmlspecialchars($client->email) : '' ?>" required>
+                                        <input type="email" name="email" class="form-control" placeholder="Email" value="<?= isset($client) && isset($client->email) ? htmlspecialchars($client->email) : '' ?>" required>
                                     </div>
                                 </div>
                             </div>
