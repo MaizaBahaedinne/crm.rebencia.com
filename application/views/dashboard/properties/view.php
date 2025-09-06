@@ -141,7 +141,19 @@
                         <div class="card-body">
                             <?php if (!empty($property->post_content)) : ?>
                                 <div class="property-description">
-                                    <?php echo nl2br(htmlspecialchars($property->post_content)); ?>
+                                    <?php 
+                                    // Nettoyer la description : supprimer les attributs data-start et data-end
+                                    $description = $property->post_content;
+                                    $description = preg_replace('/\s*data-start="[^"]*"/', '', $description);
+                                    $description = preg_replace('/\s*data-end="[^"]*"/', '', $description);
+                                    
+                                    // Si c'est du HTML, l'afficher directement, sinon l'échapper
+                                    if (strip_tags($description) !== $description) {
+                                        echo $description;
+                                    } else {
+                                        echo nl2br(htmlspecialchars($description));
+                                    }
+                                    ?>
                                 </div>
                             <?php else : ?>
                                 <p class="text-muted mb-0">Aucune description disponible pour cette propriété.</p>
@@ -444,6 +456,28 @@
 .property-description {
     line-height: 1.6;
     font-size: 15px;
+}
+
+.property-description p {
+    margin-bottom: 1rem;
+}
+
+.property-description strong {
+    color: #495057;
+    font-weight: 600;
+}
+
+.property-description br {
+    line-height: 1.8;
+}
+
+.property-description ul, .property-description ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.property-description li {
+    margin-bottom: 0.5rem;
 }
 
 .carousel-item img {
