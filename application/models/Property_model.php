@@ -236,7 +236,7 @@ class Property_model extends CI_Model {
             // Nettoyer les données
             $property->title = $property->post_title;
             $property->address = $property->fave_property_address ?: 'Adresse non fournie';
-            $property->price = $property->fave_property_price ? number_format($property->fave_property_price, 0, ',', ' ') . ' €' : 'Prix sur demande';
+            $property->price = $property->fave_property_price ? number_format($property->fave_property_price, 0, ',', ' ') . ' TND' : 'Prix sur demande';
         }
         
         return $properties;
