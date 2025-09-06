@@ -28,42 +28,42 @@ class Agent_model extends CI_Model {
      * @return object[]
      */
     public function get_all_agents($filters = []) {
-        // Requête complète pour récupérer tous les agents HOUZEZ avec leurs informations
+        // Requête pour récupérer tous les agents HOUZEZ depuis la table posts
         $this->wp_db->select("
-            u.ID as user_id,
-            u.user_login as user_login,
-            u.user_email as user_email,
-            u.user_status as user_status,
-            u.user_registered as registration_date,
-            p.ID as agent_post_id,
+            p.ID as agent_id,
             p.post_title as agent_name,
+            p.post_content as agent_description,
             p.post_status as post_status,
-            pm_email.meta_value as agent_email,
+            p.post_date as created_date,
             a.ID as agency_id,
             a.post_title as agency_name,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) as phone,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) as mobile,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) as whatsapp,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_instagram' THEN pm.meta_value END) as instagram
         ", FALSE);
         
-        $this->wp_db->from($this->users_table . ' u')
-            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email', 'left')
-            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'left')
+        $this->wp_db->from($this->posts_table . ' p')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
-            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
-            ->where('p.post_type', 'houzez_agent');
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->where('p.post_type', 'houzez_agent')
+            ->where('p.post_status', 'publish');
 
         // Appliquer les filtres
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $this->wp_db->group_start()
                 ->like('p.post_title', $search)
-                ->or_like('u.user_email', $search)
-                ->or_like('u.user_login', $search)
+                ->or_like('p.post_content', $search)
                 ->group_end();
         }
 
@@ -71,7 +71,7 @@ class Agent_model extends CI_Model {
             $this->wp_db->where('a.ID', $filters['agency_id']);
         }
 
-        $this->wp_db->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_status, pm_email.meta_value, a.ID, a.post_title');
+        $this->wp_db->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, a.ID, a.post_title');
 
         return $this->wp_db->get()->result();
     }
@@ -95,40 +95,35 @@ class Agent_model extends CI_Model {
      */
     public function get_agent($agent_id) {
         $this->wp_db->select("
-            u.ID as user_id,
-            u.user_login as user_login,
-            u.user_email as user_email,
-            u.user_status as user_status,
-            u.user_registered as registration_date,
-            p.ID as agent_post_id,
+            p.ID as agent_id,
             p.post_title as agent_name,
-            p.post_status as post_status,
             p.post_content as agent_description,
+            p.post_status as post_status,
+            p.post_date as created_date,
             a.ID as agency_id,
             a.post_title as agency_name,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) as phone,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) as mobile,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) as whatsapp,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) as skype,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_facebook' THEN pm_contact.meta_value END) as facebook,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_twitter' THEN pm_contact.meta_value END) as twitter,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_linkedin' THEN pm_contact.meta_value END) as linkedin,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_instagram' THEN pm_contact.meta_value END) as instagram
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_instagram' THEN pm.meta_value END) as instagram
         ", FALSE);
         
-        $this->wp_db->from($this->users_table . ' u')
-            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email', 'left')
-            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'left')
+        $this->wp_db->from($this->posts_table . ' p')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
-            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
-            ->where('u.ID', $agent_id)
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->where('p.ID', $agent_id)
             ->where('p.post_type', 'houzez_agent')
-            ->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_status, p.post_content, a.ID, a.post_title');
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, a.ID, a.post_title');
 
         return $this->wp_db->get()->row();
     }
@@ -203,8 +198,8 @@ class Agent_model extends CI_Model {
         
         // Ajouter les statistiques pour chaque agent
         foreach ($agents as $agent) {
-            if ($agent->agent_post_id) {
-                $stats = $this->get_agent_stats($agent->agent_post_id);
+            if ($agent->agent_id) {
+                $stats = $this->get_agent_stats($agent->agent_id);
                 $agent->total_properties = $stats['total_properties'];
                 $agent->active_properties = $stats['active_properties'];
                 $agent->sold_properties = $stats['sold_properties'];
@@ -230,8 +225,8 @@ class Agent_model extends CI_Model {
         if (!$agent) return null;
 
         // Ajouter les statistiques
-        if ($agent->agent_post_id) {
-            $stats = $this->get_agent_stats($agent->agent_post_id);
+        if ($agent->agent_id) {
+            $stats = $this->get_agent_stats($agent->agent_id);
             $agent->total_properties = $stats['total_properties'];
             $agent->active_properties = $stats['active_properties'];
             $agent->sold_properties = $stats['sold_properties'];

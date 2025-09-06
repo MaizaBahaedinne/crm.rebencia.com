@@ -37,52 +37,65 @@ class Agency_model extends CI_Model {
     }
 
     /**
-     * Retourne toutes les agences (users ayant le rôle houzez_agency)
-     * Optimisé: une seule requête users + une requête metadatas globale
+     * Retourne toutes les agences depuis la table posts (post_type = houzez_agency)
      * @return object[]
      */
     public function get_all_agencies() {
-        $agencies = $this->wp_db->select('u.ID,u.user_login,u.user_email,u.display_name,u.user_registered')
-            ->from($this->users_table.' u')
-            ->join($this->usermeta_table.' m', 'u.ID = m.user_id AND m.meta_key = '.$this->wp_db->escape($this->capabilities_key), 'inner', false)
-            ->like('m.meta_value', 'houzez_agency')
+        $this->wp_db->select("
+            p.ID as agency_id,
+            p.post_title as agency_name,
+            p.post_content as agency_description,
+            p.post_status as post_status,
+            p.post_date as created_date,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_email' THEN pm.meta_value END) as agency_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_address' THEN pm.meta_value END) as agency_address,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_web' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_picture' THEN media.guid END) as agency_logo
+        ", FALSE);
+        
+        $agencies = $this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agency_picture" AND media.post_type = "attachment"', 'left')
+            ->where('p.post_type', 'houzez_agency')
+            ->where('p.post_status', 'publish')
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date')
             ->get()->result();
 
-        if (empty($agencies)) return [];
-        $ids = array_map(function($a){ return (int)$a->ID; }, $agencies);
-
-        // Récupérer en bloc les métadatas requises
-        $meta_rows = $this->wp_db->select('user_id, meta_key, meta_value')
-            ->from($this->usermeta_table)
-            ->where_in('user_id', $ids)
-            ->where_in('meta_key', $this->wanted_meta_keys)
-            ->get()->result();
-
-        $byUser = [];
-        foreach ($meta_rows as $r) {
-            if(!isset($byUser[$r->user_id])) $byUser[$r->user_id] = [];
-            $byUser[$r->user_id][$r->meta_key] = $r->meta_value;
-        }
-
-        foreach ($agencies as $a) {
-            $m = $byUser[$a->ID] ?? [];
-            foreach ($this->wanted_meta_keys as $k) {
-                $prop = $k; // on mappe directement
-                $a->$prop = $m[$k] ?? '';
-            }
-        }
         return $agencies;
     }
 
     /** Une agence avec métadonnées */
     public function get_agency($agency_id) {
-        $agency = $this->wp_db->where('ID', (int)$agency_id)->get($this->users_table)->row();
-        if(!$agency) return null;
-        $meta_rows = $this->wp_db->select('meta_key, meta_value')
-            ->where('user_id', (int)$agency_id)
-            ->where_in('meta_key', $this->wanted_meta_keys)
-            ->get($this->usermeta_table)->result();
-        foreach ($meta_rows as $r) { $agency->{$r->meta_key} = $r->meta_value; }
+        $this->wp_db->select("
+            p.ID as agency_id,
+            p.post_title as agency_name,
+            p.post_content as agency_description,
+            p.post_status as post_status,
+            p.post_date as created_date,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_email' THEN pm.meta_value END) as agency_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_address' THEN pm.meta_value END) as agency_address,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_web' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agency_picture' THEN media.guid END) as agency_logo
+        ", FALSE);
+        
+        $agency = $this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agency_picture" AND media.post_type = "attachment"', 'left')
+            ->where('p.ID', (int)$agency_id)
+            ->where('p.post_type', 'houzez_agency')
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date')
+            ->get()->row();
+            
         return $agency;
     }
 
@@ -114,62 +127,34 @@ class Agency_model extends CI_Model {
      * @return object[]
      */
     public function get_agencies_with_stats($filters = []) {
-        // Requête de base pour les agences
-        $this->wp_db->select('u.ID, u.user_login, u.user_email, u.display_name, u.user_registered')
-            ->from($this->users_table.' u')
-            ->join($this->usermeta_table.' m', 'u.ID = m.user_id AND m.meta_key = '.$this->wp_db->escape($this->capabilities_key), 'inner', false)
-            ->like('m.meta_value', 'houzez_agency');
-
+        // Récupérer toutes les agences depuis la table posts
+        $agencies = $this->get_all_agencies();
+        
         // Appliquer les filtres
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $this->wp_db->group_start()
-                ->like('u.display_name', $search)
-                ->or_like('u.user_email', $search)
-                ->or_like('u.user_login', $search)
-                ->group_end();
+            $search = strtolower($filters['search']);
+            $agencies = array_filter($agencies, function($agency) use ($search) {
+                return strpos(strtolower($agency->agency_name), $search) !== false ||
+                       strpos(strtolower($agency->agency_email ?? ''), $search) !== false ||
+                       strpos(strtolower($agency->agency_address ?? ''), $search) !== false;
+            });
         }
 
-        // Filtrer par ville (via métadonnées)
         if (!empty($filters['ville'])) {
-            $this->wp_db->join($this->usermeta_table.' m_ville', 'u.ID = m_ville.user_id AND m_ville.meta_key = "agency_address"', 'left', false)
-                ->like('m_ville.meta_value', $filters['ville']);
+            $ville = strtolower($filters['ville']);
+            $agencies = array_filter($agencies, function($agency) use ($ville) {
+                return strpos(strtolower($agency->agency_address ?? ''), $ville) !== false;
+            });
         }
 
-        $agencies = $this->wp_db->get()->result();
-
-        if (empty($agencies)) return [];
-
-        $ids = array_map(function($a){ return (int)$a->ID; }, $agencies);
-
-        // Récupérer les métadonnées
-        $meta_rows = $this->wp_db->select('user_id, meta_key, meta_value')
-            ->from($this->usermeta_table)
-            ->where_in('user_id', $ids)
-            ->where_in('meta_key', $this->wanted_meta_keys)
-            ->get()->result();
-
-        $byUser = [];
-        foreach ($meta_rows as $r) {
-            if(!isset($byUser[$r->user_id])) $byUser[$r->user_id] = [];
-            $byUser[$r->user_id][$r->meta_key] = $r->meta_value;
-        }
-
-        // Récupérer les statistiques pour chaque agence
+        // Ajouter les statistiques pour chaque agence
         foreach ($agencies as $agency) {
-            $m = $byUser[$agency->ID] ?? [];
-            foreach ($this->wanted_meta_keys as $k) {
-                $prop = $k;
-                $agency->$prop = $m[$k] ?? '';
-            }
-
-            // Ajouter les statistiques
-            $agency->agents_count = $this->count_agents($agency->ID);
-            $agency->properties_count = $this->count_properties($agency->ID);
-            $agency->sales_count = $this->count_sales($agency->ID);
+            $agency->agents_count = $this->count_agents($agency->agency_id);
+            $agency->properties_count = $this->count_properties($agency->agency_id);
+            $agency->sales_count = $this->count_sales($agency->agency_id);
         }
 
-        return $agencies;
+        return array_values($agencies); // Réindexer le tableau
     }
 
     /**
