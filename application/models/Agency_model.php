@@ -109,7 +109,131 @@ class Agency_model extends CI_Model {
     }
 
     /**
-     * Statistiques simples: nombre d'agents rattachés + propriétés.
+     * Retourne toutes les agences avec statistiques et filtres
+     * @param array $filters Filtres de recherche
+     * @return object[]
+     */
+    public function get_agencies_with_stats($filters = []) {
+        // Requête de base pour les agences
+        $this->wp_db->select('u.ID, u.user_login, u.user_email, u.display_name, u.user_registered')
+            ->from($this->users_table.' u')
+            ->join($this->usermeta_table.' m', 'u.ID = m.user_id AND m.meta_key = '.$this->wp_db->escape($this->capabilities_key), 'inner', false)
+            ->like('m.meta_value', 'houzez_agency');
+
+        // Appliquer les filtres
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $this->wp_db->group_start()
+                ->like('u.display_name', $search)
+                ->or_like('u.user_email', $search)
+                ->or_like('u.user_login', $search)
+                ->group_end();
+        }
+
+        // Filtrer par ville (via métadonnées)
+        if (!empty($filters['ville'])) {
+            $this->wp_db->join($this->usermeta_table.' m_ville', 'u.ID = m_ville.user_id AND m_ville.meta_key = "agency_address"', 'left', false)
+                ->like('m_ville.meta_value', $filters['ville']);
+        }
+
+        $agencies = $this->wp_db->get()->result();
+
+        if (empty($agencies)) return [];
+
+        $ids = array_map(function($a){ return (int)$a->ID; }, $agencies);
+
+        // Récupérer les métadonnées
+        $meta_rows = $this->wp_db->select('user_id, meta_key, meta_value')
+            ->from($this->usermeta_table)
+            ->where_in('user_id', $ids)
+            ->where_in('meta_key', $this->wanted_meta_keys)
+            ->get()->result();
+
+        $byUser = [];
+        foreach ($meta_rows as $r) {
+            if(!isset($byUser[$r->user_id])) $byUser[$r->user_id] = [];
+            $byUser[$r->user_id][$r->meta_key] = $r->meta_value;
+        }
+
+        // Récupérer les statistiques pour chaque agence
+        foreach ($agencies as $agency) {
+            $m = $byUser[$agency->ID] ?? [];
+            foreach ($this->wanted_meta_keys as $k) {
+                $prop = $k;
+                $agency->$prop = $m[$k] ?? '';
+            }
+
+            // Ajouter les statistiques
+            $agency->agents_count = $this->count_agents($agency->ID);
+            $agency->properties_count = $this->count_properties($agency->ID);
+            $agency->sales_count = $this->count_sales($agency->ID);
+        }
+
+        return $agencies;
+    }
+
+    /**
+     * Retourne les détails complets d'une agence
+     * @param int $agency_id
+     * @return object|null
+     */
+    public function get_agency_details($agency_id) {
+        $agency = $this->get_agency($agency_id);
+        if (!$agency) return null;
+
+        // Ajouter les statistiques détaillées
+        $agency->agents_count = $this->count_agents($agency_id);
+        $agency->properties_count = $this->count_properties($agency_id);
+        $agency->sales_count = $this->count_sales($agency_id);
+        $agency->active_properties = $this->count_active_properties($agency_id);
+        $agency->sold_properties = $this->count_sold_properties($agency_id);
+
+        return $agency;
+    }
+
+    /**
+     * Compte les ventes de l'agence (propriétés vendues/louées)
+     * @param int $agency_id
+     * @return int
+     */
+    public function count_sales($agency_id) {
+        return (int)$this->wp_db->from($this->posts_table.' p')
+            ->join($this->postmeta_table.' pm_agency', 'p.ID = pm_agency.post_id AND pm_agency.meta_key = "fave_property_agency"', 'inner', false)
+            ->join($this->postmeta_table.' pm_status', 'p.ID = pm_status.post_id AND pm_status.meta_key = "fave_property_status"', 'inner', false)
+            ->where('pm_agency.meta_value', (int)$agency_id)
+            ->where('p.post_type', 'property')
+            ->where_in('pm_status.meta_value', ['sold', 'rented'])
+            ->where('p.post_status !=', 'trash')
+            ->count_all_results();
+    }
+
+    /**
+     * Compte les propriétés actives (à vendre/à louer)
+     * @param int $agency_id
+     * @return int
+     */
+    public function count_active_properties($agency_id) {
+        return (int)$this->wp_db->from($this->posts_table.' p')
+            ->join($this->postmeta_table.' pm_agency', 'p.ID = pm_agency.post_id AND pm_agency.meta_key = "fave_property_agency"', 'inner', false)
+            ->join($this->postmeta_table.' pm_status', 'p.ID = pm_status.post_id AND pm_status.meta_key = "fave_property_status"', 'inner', false)
+            ->where('pm_agency.meta_value', (int)$agency_id)
+            ->where('p.post_type', 'property')
+            ->where_in('pm_status.meta_value', ['for-sale', 'for-rent'])
+            ->where('p.post_status', 'publish')
+            ->count_all_results();
+    }
+
+    /**
+     * Compte les propriétés vendues/louées
+     * @param int $agency_id
+     * @return int
+     */
+    public function count_sold_properties($agency_id) {
+        return $this->count_sales($agency_id); // Alias
+    }
+
+    /**
+     * Statistiques complètes d'une agence
      * @param int $agency_id
      * @return array
      */
