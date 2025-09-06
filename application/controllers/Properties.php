@@ -1,20 +1,17 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 require APPPATH . '/libraries/BaseController.php';
 
 class Properties extends BaseController {
     
     public function __construct() {
         parent::__construct();
-        $this->load->model('Property_model');
-        $this->load->model('Agency_model');
-        $this->load->model('Agent_model');
-        $this->load->helper('url');
-        
-        // Vérifier l'authentification
-        $this->isLoggedIn();
-       
+        $this->load->model('property_model');
+        $this->load->model('agency_model');
+        $this->load->model('agent_model');
     }
+
     
     // Liste des propriétés
     public function index() {
@@ -25,7 +22,7 @@ class Properties extends BaseController {
         $data['agents'] = $this->Agent_model->get_all_agents();
         $data['filters'] = $filters;
         
-        $this->loadViews('dashboard/properties/index', $data);
+        $this->loadViews('dashboard/properties/index', $this->global, $data, NULL);
     }
     
     // Vue détaillée d'une propriété
@@ -60,7 +57,7 @@ class Properties extends BaseController {
         $data['agency'] = $agency;
         $data['similar_properties'] = $similar_properties;
         
-        $this->loadViews('dashboard/properties/view', $data);
+        $this->loadViews('dashboard/properties/view', $this->global, $data, NULL);
     }
     
     // AJAX - Liste filtrée
