@@ -3,73 +3,82 @@
 ## Date de nettoyage
 6 septembre 2025
 
-## Fichiers supprimés
+## Phase 1: Nettoyage des fichiers de test
 
-### Fichiers de test à la racine
+### Fichiers supprimés
 - `test_autocomplete.html` - Page de test pour l'autocomplétion
 - `test_basecontroller_integration.html` - Page de test pour l'intégration BaseController 
 - `test_direct.php` - Script PHP de test direct avec autocomplétion
 
-### Contrôleurs de test/backup
+### Contrôleurs de test/backup supprimés
 - `application/controllers/Ajax.php` - Contrôleur AJAX de contournement
 - `application/controllers/Client_backup.php` - Sauvegarde du contrôleur Client
 - `application/controllers/Client_corrupted.php` - Version corrompue du contrôleur
 
-## Méthodes supprimées du contrôleur Client.php
+### Méthodes debug supprimées du contrôleur Client.php
+- `test_basic_json()`, `test_no_base()`, `search_agencies_no_auth()`
+- `search_agents_no_auth()`, `ping()`, `test_json_simple()`
+- `debug_agencies()`, `debug_agency_details()`, `test_agency_agent_mapping()`
 
-### Méthodes de debug supprimées
-- `test_basic_json()` - Test JSON ultra-simple
-- `test_no_base()` - Test sans BaseController
-- `search_agencies_no_auth()` - Recherche sans authentification
-- `search_agents_no_auth()` - Recherche agents sans auth
-- `ping()` - Test de ping basique
-- `test_json_simple()` - Version simplifiée sans DB
-- `debug_agencies()` - Debug des agences
-- `debug_agency_details()` - Affichage détaillé des agences
-- `test_agency_agent_mapping()` - Test de mapping agences-agents
+## Phase 2: Nettoyage du menu et des routes
 
-## Méthodes conservées et nettoyées
+### Routes supprimées (contrôleurs inexistants)
+❌ **Toutes les routes Lead/** - Contrôleur `Lead.php` inexistant
+- `leads`, `leads/nouveau`, `leads/edit`, `leads/save`, `leads/delete`
+- `leads/conversion`, `leads/followup`, `leads/status`
 
-### Méthodes principales du module Client
-✅ `index()` - Liste des clients
-✅ `add()` - Ajout de client  
-✅ `edit($id)` - Modification de client
-✅ `view($id)` - Détail client
-✅ `delete($id)` - Suppression
-✅ `search()` - Recherche clients
+❌ **Routes AJAX de test supprimées**
+- `ajax/*`, `client/ping`, `client/test_*`, `client/debug_*`
+- Routes de fonction anonyme `test_direct`
 
-### Méthodes AJAX de production
-✅ `search_agencies_from_crm()` - Recherche agences avec gestion des rôles
-✅ `search_agents_from_crm()` - Recherche agents avec gestion des rôles  
-✅ `get_user_context()` - Context utilisateur pour adaptation UI
+### Menu nettoyé selon rôles
+✅ **Menu Administrator**
+- Supprimé: Section "Leads", routes inexistantes
+- Nettoyé: "Clients" simplifié, focus sur gestion des clients CRM
+- Conservé: Agences, Agents, Propriétés, Estimations, Transactions, Rapports, Paramètres
+
+✅ **Menu Agency Admin** 
+- Supprimé: Toutes références aux leads inexistants
+- Ajusté: Focus sur "Clients" de l'agence
+
+✅ **Menu Agent**
+- Supprimé: Section "Mes leads" 
+- Ajusté: "Clients" pour la gestion client agent
+
+### Routes finales valides
+✅ **Dashboard**: `dashboard`
+✅ **Users**: `userListing`, `addNew`, `editOld`, etc.
+✅ **Agencies**: `agencies`, `agencies/create`, `agencies/stats`
+✅ **Agents**: `agents`, `agents/create`, `agents/performance`
+✅ **Properties**: `properties`, `properties/create`, `properties/status`
+✅ **Clients**: `clients`, `client/add`, `client/edit`, `client/view`, `client/delete`
+✅ **AJAX Clients**: `client/search_agencies_from_crm`, `client/search_agents_from_crm`, `client/get_user_context`
+✅ **Transactions**: `transactions`, `transactions/sales`, `transactions/rentals`
+✅ **Estimations**: `estimation`, `estimations`, `zones`
+✅ **Reports**: `reports/sales`
+✅ **Settings**: `settings/roles`, `settings/wordpress`, `settings/crm`
+✅ **Profile**: `profile`, `profile/avatar`
 
 ## État final du projet
 
-### Structure propre
-- Aucun fichier de test dans le répertoire racine
-- Contrôleurs nettoyés des méthodes de debug
+### ✅ Structure cohérente
+- Menu aligné avec les contrôleurs existants
+- Routes nettoyées, plus d'erreurs 404 sur liens inexistants  
 - Code de production uniquement
 
-### Fonctionnalités préservées
-- Module clients complet avec CRUD
-- Autocomplétion agences/agents fonctionnelle
-- Gestion des rôles utilisateur (admin/manager/agent)
-- Intégration HOUZEZ WordPress
-- Interface adaptative selon les permissions
+### ✅ Contrôleurs existants confirmés
+- `Agency.php`, `Agent.php`, `Client.php`, `Dashboard.php`
+- `Estimation.php`, `Property.php`, `Transaction.php`, `Report.php`
+- `User.php`, `Profile.php`, `Settings.php`, `Roles.php`
 
-### Points techniques
-- BaseController session management intégré
-- Requêtes optimisées sur table `crm_agents`
-- Gestion d'erreurs robuste
-- Headers JSON appropriés pour AJAX
+### ❌ Contrôleurs manquants identifiés
+- `Lead.php` - Références supprimées du menu et routes
 
-## Recommandations post-nettoyage
-
-1. **Tests en production** : Vérifier que l'autocomplétion fonctionne toujours
-2. **Session management** : Surveiller les erreurs de session sur les appels AJAX
-3. **Performance** : Monitor les requêtes SQL sur la table `crm_agents`
-4. **Sécurité** : Valider que seuls les utilisateurs autorisés accèdent aux endpoints
+### 🎯 Navigation finale par rôle
+- **Admin**: Accès complet aux modules existants
+- **Agency Admin**: Limité à son agence, clients et agents
+- **Agent**: Ses propriétés, clients et ventes personnels
 
 ---
 
-**Projet nettoyé et prêt pour la production** ✅
+**Menu et routes nettoyés et cohérents** ✅

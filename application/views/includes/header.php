@@ -719,30 +719,15 @@
                                     <i class="ri-map-pin-line"></i> <span>Gestion des zones</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Leads / Clients</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link <?php echo $isLeads ? 'active' : ''; ?>" href="<?php echo base_url('leads'); ?>">
-                                    <i class="ri-user-search-line"></i> <span>Liste des leads</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads/nouveau'); ?>">
-                                    <i class="ri-user-add-line"></i> <span>Nouveau lead</span>
-                                </a>
-                            </li>
+                            <li class="menu-title"><span>Clients</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link <?= $isClients ? 'active' : ''; ?>" href="<?php echo base_url('clients'); ?>">
-                                    <i class="ri-group-line"></i> <span>Clients (Houzez)</span>
+                                    <i class="ri-group-line"></i> <span>Gestion des clients</span>
                                 </a>
                             </li>
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link <?php echo ($seg1 === 'crm_clients') ? 'active' : ''; ?>" href="<?php echo base_url('crm_clients'); ?>">
-                                        <i class="ri-user-2-line"></i> <span>Clients CRM</span>
-                                    </a>
-                                </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads/conversion'); ?>">
-                                    <i class="ri-exchange-line"></i> <span>Conversion & suivi</span>
+                                <a class="nav-link menu-link" href="<?php echo base_url('client/add'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Nouveau client</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Transactions</span></li>
@@ -766,20 +751,10 @@
                                     <i class="ri-refresh-line"></i> <span>Sync Houzez</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Rapports & Analytics</span></li>
+                            <li class="menu-title"><span>Rapports</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('reports/sales'); ?>">
-                                    <i class="ri-bar-chart-grouped-line"></i> <span>Ventes globales</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('reports/leads'); ?>">
-                                    <i class="ri-user-star-line"></i> <span>Leads globales</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('reports/agency-performance'); ?>">
-                                    <i class="ri-building-2-line"></i> <span>Performance par agence</span>
+                                    <i class="ri-bar-chart-grouped-line"></i> <span>Rapports de ventes</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Paramètres</span></li>
@@ -848,20 +823,15 @@
                                     <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Leads</span></li>
+                            <li class="menu-title"><span>Clients</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link <?php echo $isLeads ? 'active' : ''; ?>" href="<?php echo base_url('leads'); ?>">
-                                    <i class="ri-user-search-line"></i> <span>Leads assignés</span>
+                                <a class="nav-link menu-link <?= $isClients ? 'active' : ''; ?>" href="<?php echo base_url('clients'); ?>">
+                                    <i class="ri-group-line"></i> <span>Mes clients</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads/nouveau'); ?>">
-                                    <i class="ri-user-add-line"></i> <span>Ajouter lead</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads/followup'); ?>">
-                                    <i class="ri-exchange-line"></i> <span>Suivi des prospects</span>
+                                <a class="nav-link menu-link" href="<?php echo base_url('client/add'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Nouveau client</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Transactions</span></li>
@@ -914,20 +884,15 @@
                                     <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Mes leads</span></li>
+                            <li class="menu-title"><span>Clients</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link <?php echo $isLeads ? 'active' : ''; ?>" href="<?php echo base_url('leads'); ?>">
-                                    <i class="ri-user-search-line"></i> <span>Leads assignés</span>
+                                <a class="nav-link menu-link <?= $isClients ? 'active' : ''; ?>" href="<?php echo base_url('clients'); ?>">
+                                    <i class="ri-group-line"></i> <span>Mes clients</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads/nouveau'); ?>">
-                                    <i class="ri-user-add-line"></i> <span>Nouveau lead</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('leads/status'); ?>">
-                                    <i class="ri-exchange-line"></i> <span>Statut suivi</span>
+                                <a class="nav-link menu-link" href="<?php echo base_url('client/add'); ?>">
+                                    <i class="ri-user-add-line"></i> <span>Nouveau client</span>
                                 </a>
                             </li>
                             <li class="menu-title"><span>Mes ventes & locations</span></li>

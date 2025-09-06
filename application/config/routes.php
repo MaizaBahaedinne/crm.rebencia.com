@@ -59,65 +59,17 @@ $route['properties'] = 'Property/index';
 $route['properties/create'] = 'Property/create';
 $route['properties/status'] = 'Property/status';
 
-/*********** LEADS *******************/
-$route['leads'] = 'Lead/index';
-$route['leads/page/(:num)'] = 'Lead/index/$1';
-$route['leads/nouveau'] = 'Lead/form';
-$route['leads/edit/(:num)'] = 'Lead/form/$1';
-$route['leads/save'] = 'Lead/save';
-$route['leads/save/(:num)'] = 'Lead/save/$1';
-$route['leads/delete/(:num)'] = 'Lead/delete/$1';
-$route['leads/conversion'] = 'Lead/conversion';
-$route['leads/followup'] = 'Lead/followup';
-$route['leads/status'] = 'Lead/status';
-
-/*********** CLIENTS (Houzez, lecture seule) *******************/
+/*********** CLIENTS *******************/
 $route['clients'] = 'Client/index';
+$route['client/add'] = 'Client/add';
+$route['client/edit/(:num)'] = 'Client/edit/$1';
+$route['client/view/(:num)'] = 'Client/view/$1';
+$route['client/delete/(:num)'] = 'Client/delete/$1';
 
-/*********** CRM CLIENTS *******************/
-$route['crm_clients'] = 'Client/crm_clients';
-
-// Routes pour l'autocomplétion
-$route['client/search_agencies'] = 'Client/search_agencies';
-$route['client/search_agents_by_agency'] = 'Client/search_agents_by_agency';
-$route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
-
-// Routes alternatives utilisant crm_agents directement
+// Routes AJAX pour autocomplétion
 $route['client/search_agencies_from_crm'] = 'Client/search_agencies_from_crm';
-$route['client/search_agencies_no_auth'] = 'Client/search_agencies_no_auth';
-$route['client/search_agencies_enhanced'] = 'Client/search_agencies_enhanced';
 $route['client/search_agents_from_crm'] = 'Client/search_agents_from_crm';
-$route['client/search_agents_no_auth'] = 'Client/search_agents_no_auth';
-$route['client/search_agents_enhanced'] = 'Client/search_agents_enhanced';
-
-// Routes de test direct (pas via CodeIgniter)
-$route['test_direct'] = function() {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => true, 'message' => 'Route directe fonctionne']);
-    exit;
-};
-
-// Routes AJAX dédiées (sans BaseController)
-$route['ajax/test'] = 'Ajax/test';
-$route['ajax/ping'] = 'Ajax/ping';
-$route['ajax/search_agencies_simple'] = 'Ajax/search_agencies_simple';
-$route['ajax/search_agents_simple'] = 'Ajax/search_agents_simple';
-$route['ajax/search_agencies'] = 'Ajax/search_agencies';
-$route['ajax/search_agents'] = 'Ajax/search_agents';
-
-// Routes de debug
-$route['client/ping'] = 'Client/ping';
-$route['client/test_basic_json'] = 'Client/test_basic_json';
-$route['client/test_no_base'] = 'Client/test_no_base';
-$route['client/test_json_simple'] = 'Client/test_json_simple';
-$route['client/debug_agencies'] = 'Client/debug_agencies';
-$route['client/debug_agency_details'] = 'Client/debug_agency_details';
-$route['client/test_agency_agent_mapping'] = 'Client/test_agency_agent_mapping';
-$route['client/debug_crm_agents_table'] = 'Client/debug_crm_agents_table';
-$route['client/debug_agents_detailed'] = 'Client/debug_agents_detailed';
-$route['client/test_houzez_data'] = 'Client/test_houzez_data';
-$route['client/debug_wordpress_structure'] = 'Client/debug_wordpress_structure';
-$route['client/debug_agents_by_agency'] = 'Client/debug_agents_by_agency';
+$route['client/get_user_context'] = 'Client/get_user_context';
 
 /*********** TRANSACTIONS *******************/
 $route['transactions'] = 'Transaction/index';
@@ -131,9 +83,8 @@ $route['transactions/delete/(:num)'] = 'Transaction/delete/$1';
 $route['transactions/sync/houzez'] = 'Transaction/sync_houzez';
 $route['transactions/properties/by-type'] = 'Transaction/properties_by_type';
 
-/*********** REPORTS & ANALYTICS *******************/
+/*********** REPORTS *******************/
 $route['reports/sales'] = 'Report/sales';
-$route['reports/leads'] = 'Report/leads';
 $route['reports/agency-performance'] = 'Report/agency_performance';
 $route['reports/agency'] = 'Report/agency';
 
