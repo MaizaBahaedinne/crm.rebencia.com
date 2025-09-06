@@ -499,6 +499,104 @@ class Client extends BaseController {
     }
 
     /**
+     * Endpoint pour récupérer le contexte utilisateur connecté
+     */
+    public function get_user_context() {
+        header('Content-Type: application/json');
+        
+        try {
+            // Récupérer les données utilisateur depuis BaseController
+            $context = [
+                'user_id' => $this->vendorId,
+                'name' => $this->name,
+                'role' => $this->role,
+                'role_text' => $this->roleText,
+                'is_admin' => $this->isAdmin,
+                'last_login' => $this->lastLogin,
+                'wp_avatar' => $this->wp_avatar
+            ];
+            
+            // Récupérer les informations agent/agence depuis la DB WordPress
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $stmt = $wp_db->query("
+                SELECT 
+                    u.ID as user_id,
+                    u.user_login,
+                    u.user_email,
+                    u.display_name,
+                    p.ID as agent_post_id,
+                    p.post_title as agent_name,
+                    a.ID as agency_id,
+                    a.post_title as agency_name,
+                    MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position
+                FROM {$wp_db->dbprefix}users u
+                LEFT JOIN {$wp_db->dbprefix}postmeta pm_email ON pm_email.meta_value = u.user_email
+                LEFT JOIN {$wp_db->dbprefix}posts p ON (p.ID = pm_email.post_id AND p.post_type = 'houzez_agent')
+                LEFT JOIN {$wp_db->dbprefix}postmeta pm_agency ON (pm_agency.post_id = p.ID AND pm_agency.meta_key = 'fave_agent_agencies')
+                LEFT JOIN {$wp_db->dbprefix}posts a ON (a.ID = pm_agency.meta_value AND a.post_type = 'houzez_agency')
+                LEFT JOIN {$wp_db->dbprefix}postmeta pm_contact ON pm_contact.post_id = p.ID
+                WHERE u.ID = {$this->vendorId}
+                GROUP BY u.ID, p.ID, a.ID
+            ");
+            
+            $agent_info = $stmt->result();
+            $context['agent_info'] = !empty($agent_info) ? $agent_info[0] : null;
+            
+            // Déterminer les permissions selon le rôle
+            if ($this->isAdmin == 1) {
+                $context['permissions'] = [
+                    'can_choose_agency' => true,
+                    'can_choose_agent' => true,
+                    'auto_fill_agency' => false,
+                    'auto_fill_agent' => false,
+                    'description' => 'Admin - Accès complet à toutes les agences et agents'
+                ];
+            } elseif ($this->role === 'manager' && !empty($agent_info) && $agent_info[0]->agency_id) {
+                $context['permissions'] = [
+                    'can_choose_agency' => false,
+                    'can_choose_agent' => true,
+                    'auto_fill_agency' => true,
+                    'auto_fill_agent' => false,
+                    'agency_id' => $agent_info[0]->agency_id,
+                    'agency_name' => $agent_info[0]->agency_name,
+                    'description' => 'Manager - Limité à son agence'
+                ];
+            } elseif ($this->role === 'agent' && !empty($agent_info)) {
+                $context['permissions'] = [
+                    'can_choose_agency' => false,
+                    'can_choose_agent' => false,
+                    'auto_fill_agency' => true,
+                    'auto_fill_agent' => true,
+                    'agency_id' => $agent_info[0]->agency_id,
+                    'agency_name' => $agent_info[0]->agency_name,
+                    'agent_id' => $agent_info[0]->user_id,
+                    'agent_name' => $agent_info[0]->agent_name,
+                    'description' => 'Agent - Remplissage automatique'
+                ];
+            } else {
+                $context['permissions'] = [
+                    'can_choose_agency' => true,
+                    'can_choose_agent' => true,
+                    'auto_fill_agency' => false,
+                    'auto_fill_agent' => false,
+                    'description' => 'Utilisateur standard'
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'context' => $context]);
+            
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
+        
+        exit;
+    }
+
+    /**
      * Test ultra-simple sans aucune dépendance
      */
     public function ping() {
