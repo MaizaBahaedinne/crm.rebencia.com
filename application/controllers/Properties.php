@@ -1,13 +1,20 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Properties extends BaseController {
+class Properties extends CI_Controller {
     
     public function __construct() {
         parent::__construct();
         $this->load->model('Property_model');
         $this->load->model('Agency_model');
         $this->load->model('Agent_model');
+        $this->load->helper('url');
+        
+        // Vérifier l'authentification
+        $isLoggedIn = $this->session->userdata('isLoggedIn');
+        if (!isset($isLoggedIn) || $isLoggedIn != TRUE) {
+            redirect('login');
+        }
     }
     
     // Liste des propriétés
@@ -18,7 +25,9 @@ class Properties extends BaseController {
         $data['agents'] = $this->Agent_model->get_all_agents();
         $data['filters'] = $filters;
         
-        $this->loadViews('dashboard/properties/index', $data);
+        $this->load->view('includes/header', $data);
+        $this->load->view('dashboard/properties/index', $data);
+        $this->load->view('includes/footer');
     }
     
     // Vue détaillée d'une propriété
@@ -52,7 +61,9 @@ class Properties extends BaseController {
         $data['agency'] = $agency;
         $data['similar_properties'] = $similar_properties;
         
-        $this->loadViews('dashboard/properties/view', $data);
+        $this->load->view('includes/header', $data);
+        $this->load->view('dashboard/properties/view', $data);
+        $this->load->view('includes/footer');
     }
     
     // AJAX - Liste filtrée
@@ -73,11 +84,12 @@ class Properties extends BaseController {
                 'id' => $property->ID,
                 'label' => $property->post_title,
                 'value' => $property->post_title,
-                'address' => $property->fave_property_address ?? '',
-                'price' => $property->fave_property_price ?? ''
+                'address' => isset($property->fave_property_address) ? $property->fave_property_address : '',
+                'price' => isset($property->fave_property_price) ? $property->fave_property_price : ''
             ];
         }
         
+        header('Content-Type: application/json');
         echo json_encode($results);
     }
 }
