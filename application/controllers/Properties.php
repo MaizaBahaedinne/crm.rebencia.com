@@ -19,6 +19,7 @@ class Properties extends CI_Controller {
     
     // Liste des propriétés
     public function index() {
+        $this->isLoggedIn();
         $filters = $this->input->get();
         $data['properties'] = $this->Property_model->get_all_properties($filters);
         $data['agencies'] = $this->Agency_model->get_agencies_with_stats();
@@ -32,6 +33,7 @@ class Properties extends CI_Controller {
     
     // Vue détaillée d'une propriété
     public function view($property_id) {
+        $this->isLoggedIn();
         $property = $this->Property_model->get_property($property_id);
         
         if (!$property) {
