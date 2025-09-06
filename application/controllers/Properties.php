@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
-class Properties extends CI_Controller {
+require APPPATH . '/libraries/BaseController.php';
+class Properties extends BaseController {
     
     public function __construct() {
         parent::__construct();
@@ -26,9 +26,7 @@ class Properties extends CI_Controller {
         $data['agents'] = $this->Agent_model->get_all_agents();
         $data['filters'] = $filters;
         
-        $this->load->view('includes/header', $data);
-        $this->load->view('dashboard/properties/index', $data);
-        $this->load->view('includes/footer');
+        $this->loadViews('dashboard/properties/index', $data);
     }
     
     // Vue détaillée d'une propriété
@@ -63,9 +61,7 @@ class Properties extends CI_Controller {
         $data['agency'] = $agency;
         $data['similar_properties'] = $similar_properties;
         
-        $this->load->view('includes/header', $data);
-        $this->load->view('dashboard/properties/view', $data);
-        $this->load->view('includes/footer');
+        $this->loadViews('dashboard/properties/view', $data);
     }
     
     // AJAX - Liste filtrée
