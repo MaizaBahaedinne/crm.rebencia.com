@@ -42,8 +42,8 @@ class Client extends BaseController {
                 'telephone' => $this->input->post('telephone'),
                 'adresse' => $this->input->post('adresse'),
             ];
-            $this->load->model('Client_model');
-            $this->Client_model->insert_client($data);
+            $this->load->model('client_model');
+            $this->client_model->insert_client($data);
             redirect('client');
         } else {
             $this->load->view('include/header');
@@ -53,8 +53,8 @@ class Client extends BaseController {
     }
 
     public function edit($id) {
-        $this->load->model('Client_model');
-        $client = $this->Client_model->get_client($id);
+    $this->load->model('client_model');
+    $client = $this->client_model->get_client($id);
         $this->load->view('include/header');
         $this->load->view('client/form', ['client' => $client]);
         $this->load->view('include/footer');
@@ -68,22 +68,22 @@ class Client extends BaseController {
                 'telephone' => $this->input->post('telephone'),
                 'adresse' => $this->input->post('adresse'),
             ];
-            $this->load->model('Client_model');
-            $this->Client_model->update_client($id, $data);
+            $this->load->model('client_model');
+            $this->client_model->update_client($id, $data);
             redirect('client');
         }
     }
 
     public function delete($id) {
-        $this->load->model('Client_model');
-        $this->Client_model->delete_client($id);
+    $this->load->model('client_model');
+    $this->client_model->delete_client($id);
         redirect('client');
     }
 
 
     public function crm_clients() {
-        $this->load->model('Client_model');
-        $clients = $this->Client_model->get_all_clients();
+    $this->load->model('client_model');
+    $clients = $this->client_model->get_all_clients();
         $this->load->view('includes/header');
         $this->load->view('client/list_grid', ['clients' => $clients]);
         $this->load->view('includes/footer');
