@@ -24,14 +24,14 @@ class Client extends BaseController {
         ];
     }
     
-    public function index(){
+    public function crm_cleints(){
         $this->isLoggedIn();
         $filters=$this->_filters();
         $data=$this->global;
-        $data['pageTitle']='Clients (Houzez)';
+        $data['pageTitle']='Clients CRM';
         $data['filters']=$filters;
-        $data['clients']=$this->wp_client_model->all(1000,0,$filters);
-        $this->loadViews('clients/list',$data,$data,NULL);
+        $data['clients']=$this->client_model->all(1000,0,$filters);
+        $this->loadViews('client/list_grid',$data,$data,NULL);
     }
 
 
@@ -48,19 +48,20 @@ class Client extends BaseController {
             $this->client_model->insert_client($data);
             redirect('client');
         } else {
-            $this->load->view('include/header');
-            $this->load->view('client/form');
-            $this->load->view('include/footer');
+            $data = $this->global;
+            $data['pageTitle'] = 'Ajouter un client';
+            $this->loadViews('client/form', $data, NULL, NULL);
         }
     }
 
     public function edit($id) {
         $this->isLoggedIn();
-    $this->load->model('client_model');
-    $client = $this->client_model->get_client($id);
-        $this->load->view('include/header');
-        $this->load->view('client/form', ['client' => $client]);
-        $this->load->view('include/footer');
+        $this->load->model('client_model');
+        $client = $this->client_model->get_client($id);
+        $data = $this->global;
+        $data['pageTitle'] = 'Modifier un client';
+        $data['client'] = $client;
+        $this->loadViews('client/form', $data, NULL, NULL);
     }
 
     public function update($id) {
@@ -86,13 +87,14 @@ class Client extends BaseController {
     }
 
 
-    public function crm_clients() {
+    public function index() {
         $this->isLoggedIn();
-    $this->load->model('client_model');
-    $clients = $this->client_model->get_all_clients();
-        $this->load->view('includes/header');
-        $this->load->view('client/list_grid', ['clients' => $clients]);
-        $this->load->view('includes/footer');
+        $this->load->model('client_model');
+        $clients = $this->client_model->get_all_clients();
+        $data = $this->global;
+        $data['pageTitle'] = 'Clients CRM';
+        $data['clients'] = $clients;
+        $this->loadViews('client/list_grid', $data, NULL, NULL);
     }
 
 
