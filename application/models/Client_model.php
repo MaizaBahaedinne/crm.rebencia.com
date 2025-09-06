@@ -1,6 +1,45 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Client_model extends CI_Model {
+    public function insert_client($data) {
+        // Gestion de l'upload du document identité
+        if (!empty($_FILES['identite_doc']['name'])) {
+            $config['upload_path'] = './uploads/clients/';
+            $config['allowed_types'] = 'pdf|jpg|jpeg|png';
+            $config['max_size'] = 2048;
+            $this->load->library('upload', $config);
+            if ($this->upload->do_upload('identite_doc')) {
+                $fileData = $this->upload->data();
+                $data['identite_doc'] = $fileData['file_name'];
+            }
+        }
+        return $this->db->insert('clients', $data);
+    }
+
+    public function get_client($id) {
+        return $this->db->get_where('clients', ['id' => $id])->row();
+    }
+
+    public function update_client($id, $data) {
+        // Gestion de l'upload du document identité
+        if (!empty($_FILES['identite_doc']['name'])) {
+            $config['upload_path'] = './uploads/clients/';
+            $config['allowed_types'] = 'pdf|jpg|jpeg|png';
+            $config['max_size'] = 2048;
+            $this->load->library('upload', $config);
+            if ($this->upload->do_upload('identite_doc')) {
+                $fileData = $this->upload->data();
+                $data['identite_doc'] = $fileData['file_name'];
+            }
+        }
+        $this->db->where('id', $id);
+        return $this->db->update('clients', $data);
+    }
+
+    public function delete_client($id) {
+        $this->db->where('id', $id);
+        return $this->db->delete('clients');
+    }
     protected $table = 'crm_clients';
     
     public function all($limit=100,$offset=0,$filters=[]) {

@@ -735,6 +735,11 @@
                                     <i class="ri-group-line"></i> <span>Clients (Houzez)</span>
                                 </a>
                             </li>
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link <?php echo ($seg1 === 'crm_clients') ? 'active' : ''; ?>" href="<?php echo base_url('crm_clients'); ?>">
+                                        <i class="ri-user-2-line"></i> <span>Clients CRM</span>
+                                    </a>
+                                </li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('leads/conversion'); ?>">
                                     <i class="ri-exchange-line"></i> <span>Conversion & suivi</span>

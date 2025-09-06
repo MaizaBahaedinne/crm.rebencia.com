@@ -1,3 +1,56 @@
+    public function add() {
+        if ($this->input->post()) {
+            $data = [
+                'nom' => $this->input->post('nom'),
+                'email' => $this->input->post('email'),
+                'telephone' => $this->input->post('telephone'),
+                'adresse' => $this->input->post('adresse'),
+            ];
+            $this->load->model('Client_model');
+            $this->Client_model->insert_client($data);
+            redirect('client');
+        } else {
+            $this->load->view('include/header');
+            $this->load->view('client/form');
+            $this->load->view('include/footer');
+        }
+    }
+
+    public function edit($id) {
+        $this->load->model('Client_model');
+        $client = $this->Client_model->get_client($id);
+        $this->load->view('include/header');
+        $this->load->view('client/form', ['client' => $client]);
+        $this->load->view('include/footer');
+    }
+
+    public function update($id) {
+        if ($this->input->post()) {
+            $data = [
+                'nom' => $this->input->post('nom'),
+                'email' => $this->input->post('email'),
+                'telephone' => $this->input->post('telephone'),
+                'adresse' => $this->input->post('adresse'),
+            ];
+            $this->load->model('Client_model');
+            $this->Client_model->update_client($id, $data);
+            redirect('client');
+        }
+    }
+
+    public function delete($id) {
+        $this->load->model('Client_model');
+        $this->Client_model->delete_client($id);
+        redirect('client');
+    }
+
+    public function view($id) {
+        $this->load->model('Client_model');
+        $client = $this->Client_model->get_client($id);
+        $this->load->view('include/header');
+        $this->load->view('client/form', ['client' => $client]);
+        $this->load->view('include/footer');
+    }
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH.'libraries/BaseController.php';
 /**

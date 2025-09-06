@@ -74,6 +74,9 @@ $route['leads/status'] = 'Lead/status';
 /*********** CLIENTS (Houzez, lecture seule) *******************/
 $route['clients'] = 'Client/index';
 
+/*********** CRM CLIENTS *******************/
+$route['crm_clients'] = 'Client/crm_clients';
+
 /*********** TRANSACTIONS *******************/
 $route['transactions'] = 'Transaction/index';
 $route['transactions/sales'] = 'Transaction/sales';

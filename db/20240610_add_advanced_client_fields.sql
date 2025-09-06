@@ -1,0 +1,15 @@
+-- Migration SQL pour ajouter les nouveaux champs avancés à la table clients
+ALTER TABLE clients
+    ADD COLUMN type_client VARCHAR(50) DEFAULT NULL,
+    ADD COLUMN identite_type VARCHAR(50) DEFAULT NULL,
+    ADD COLUMN identite_numero VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN identite_doc VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN contact_principal VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN contact_secondaire VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN email VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN adresse TEXT DEFAULT NULL,
+    ADD COLUMN ville VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN code_postal VARCHAR(20) DEFAULT NULL,
+    ADD COLUMN pays VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN source VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN notes TEXT DEFAULT NULL;
