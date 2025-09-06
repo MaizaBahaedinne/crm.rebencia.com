@@ -32,6 +32,57 @@ class Ajax extends CI_Controller {
     }
     
     /**
+     * Recherche d'agences pour autocomplétion - Version simplifiée
+     */
+    public function search_agencies_simple() {
+        try {
+            header('Content-Type: application/json');
+            
+            $query = isset($_POST['query']) ? $_POST['query'] : null;
+            
+            if (!$query || strlen($query) < 2) {
+                echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
+                exit;
+            }
+            
+            // Données statiques pour test
+            $all_agencies = [
+                ['id' => 18907, 'name' => 'Agence Ben arous', 'agent_count' => 1],
+                ['id' => 12345, 'name' => 'Agence Test', 'agent_count' => 2],
+                ['id' => 67890, 'name' => 'Agence Centre Ville', 'agent_count' => 3]
+            ];
+            
+            // Filtrer par query
+            $filtered_agencies = [];
+            foreach ($all_agencies as $agency) {
+                if (stripos($agency['name'], $query) !== false) {
+                    $agency['display'] = $agency['name'] . " ({$agency['agent_count']} agent" . ($agency['agent_count'] > 1 ? 's' : '') . ")";
+                    $filtered_agencies[] = $agency;
+                }
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'agencies' => $filtered_agencies,
+                'count' => count($filtered_agencies),
+                'query' => $query,
+                'debug' => 'Version statique simplifiée'
+            ]);
+            exit;
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'file' => __FILE__,
+                'line' => __LINE__
+            ]);
+            exit;
+        }
+    }
+
+    /**
      * Recherche d'agences pour autocomplétion
      */
     public function search_agencies() {
@@ -96,6 +147,74 @@ class Ajax extends CI_Controller {
         exit;
     }
     
+    /**
+     * Agents simplifiés avec données statiques
+     */
+    public function search_agents_simple() {
+        try {
+            header('Content-Type: application/json');
+            
+            $agency_id = isset($_POST['agency_id']) ? $_POST['agency_id'] : null;
+            $query = isset($_POST['query']) ? $_POST['query'] : null;
+            
+            if (!$agency_id) {
+                echo json_encode(['success' => false, 'message' => 'ID agence requis']);
+                exit;
+            }
+            
+            // Données statiques par agence
+            $agents_by_agency = [
+                18907 => [
+                    ['id' => 123, 'name' => 'Montasar Barkouti', 'email' => 'montasar@example.com', 'phone' => '+216 12345678', 'position' => 'Agent Commercial'],
+                    ['id' => 124, 'name' => 'Ahmed Ben Ali', 'email' => 'ahmed@example.com', 'phone' => '+216 87654321', 'position' => 'Responsable Ventes']
+                ],
+                12345 => [
+                    ['id' => 125, 'name' => 'Sarah Trabelsi', 'email' => 'sarah@example.com', 'phone' => '+216 11111111', 'position' => 'Agent'],
+                    ['id' => 126, 'name' => 'Karim Souissi', 'email' => 'karim@example.com', 'phone' => '+216 22222222', 'position' => 'Manager']
+                ]
+            ];
+            
+            $agents = isset($agents_by_agency[$agency_id]) ? $agents_by_agency[$agency_id] : [];
+            
+            // Filtrer par query si fournie
+            if ($query && strlen($query) >= 2) {
+                $agents = array_filter($agents, function($agent) use ($query) {
+                    return stripos($agent['name'], $query) !== false;
+                });
+                $agents = array_values($agents); // Réindexer
+            }
+            
+            // Formater pour l'affichage
+            $filtered_agents = [];
+            foreach ($agents as $agent) {
+                $display = $agent['name'];
+                if ($agent['position']) {
+                    $display .= " - " . $agent['position'];
+                }
+                if ($agent['phone']) {
+                    $display .= " (" . $agent['phone'] . ")";
+                }
+                
+                $filtered_agents[] = [
+                    'id' => $agent['id'],
+                    'name' => $agent['name'],
+                    'display' => $display,
+                    'email' => $agent['email'],
+                    'phone' => $agent['phone'],
+                    'position' => $agent['position']
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'agents' => $filtered_agents]);
+            exit;
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            exit;
+        }
+    }
+
     /**
      * Recherche d'agents par agence
      */
@@ -165,6 +284,34 @@ class Ajax extends CI_Controller {
         exit;
     }
     
+    /**
+     * Test ultra-simple sans aucune dépendance
+     */
+    public function test() {
+        try {
+            header('Content-Type: application/json');
+            
+            $response = [
+                'success' => true,
+                'message' => 'Ajax controller test réussi',
+                'timestamp' => time(),
+                'post' => $_POST,
+                'get' => $_GET
+            ];
+            
+            echo json_encode($response);
+            exit;
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+            exit;
+        }
+    }
+
     /**
      * Test simple pour vérifier que le contrôleur fonctionne
      */

@@ -90,8 +90,18 @@ $route['client/search_agents_from_crm'] = 'Client/search_agents_from_crm';
 $route['client/search_agents_no_auth'] = 'Client/search_agents_no_auth';
 $route['client/search_agents_enhanced'] = 'Client/search_agents_enhanced';
 
+// Routes de test direct (pas via CodeIgniter)
+$route['test_direct'] = function() {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Route directe fonctionne']);
+    exit;
+};
+
 // Routes AJAX dédiées (sans BaseController)
+$route['ajax/test'] = 'Ajax/test';
 $route['ajax/ping'] = 'Ajax/ping';
+$route['ajax/search_agencies_simple'] = 'Ajax/search_agencies_simple';
+$route['ajax/search_agents_simple'] = 'Ajax/search_agents_simple';
 $route['ajax/search_agencies'] = 'Ajax/search_agencies';
 $route['ajax/search_agents'] = 'Ajax/search_agents';
 
