@@ -114,6 +114,82 @@ class Property_model extends CI_Model {
         // À adapter selon structure
         return [];
     }
+    
+    // Propriétés d'une agence
+    public function get_properties_by_agency($agency_id, $limit = null) {
+        // Récupérer les agents de l'agence depuis crm_agents
+        $this->db->select('agent_id, user_id');
+        $this->db->from('crm_agents');
+        $this->db->where('agency_id', $agency_id);
+        $agents_query = $this->db->get();
+        $agents = $agents_query->result();
+        
+        if (empty($agents)) {
+            return [];
+        }
+        
+        // Collecter les user_ids des agents
+        $agent_user_ids = [];
+        foreach ($agents as $agent) {
+            if (!empty($agent->user_id)) {
+                $agent_user_ids[] = $agent->user_id;
+            }
+        }
+        
+        if (empty($agent_user_ids)) {
+            return [];
+        }
+        
+        // Récupérer les propriétés HOUZEZ de ces agents
+        $this->wp_db->select('p.*, pm1.meta_value as fave_property_price, pm2.meta_value as fave_property_address, pm3.meta_value as fave_property_size');
+        $this->wp_db->from('wp_Hrg8P_posts p');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm1', 'p.ID = pm1.post_id AND pm1.meta_key = "fave_property_price"', 'left');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm2', 'p.ID = pm2.post_id AND pm2.meta_key = "fave_property_address"', 'left');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm3', 'p.ID = pm3.post_id AND pm3.meta_key = "fave_property_size"', 'left');
+        $this->wp_db->where('p.post_type', 'property');
+        $this->wp_db->where('p.post_status', 'publish');
+        $this->wp_db->where_in('p.post_author', $agent_user_ids);
+        $this->wp_db->order_by('p.post_date', 'DESC');
+        
+        if ($limit) {
+            $this->wp_db->limit($limit);
+        }
+        
+        $properties = $this->wp_db->get()->result();
+        
+        // Enrichir les propriétés avec les métadonnées et statuts
+        foreach ($properties as &$property) {
+            // Récupérer le type via taxonomie property_type
+            $type_query = $this->wp_db->select('t.name')
+                ->from('wp_Hrg8P_term_relationships tr')
+                ->join('wp_Hrg8P_term_taxonomy tt', 'tr.term_taxonomy_id = tt.term_taxonomy_id', 'left')
+                ->join('wp_Hrg8P_terms t', 'tt.term_id = t.term_id', 'left')
+                ->where('tr.object_id', $property->ID)
+                ->where('tt.taxonomy', 'property_type')
+                ->get();
+            $type = $type_query->row();
+            $property->type = $type ? $type->name : 'Non spécifié';
+            
+            // Récupérer le statut via taxonomie property_status
+            $status_query = $this->wp_db->select('t.slug')
+                ->from('wp_Hrg8P_term_relationships tr')
+                ->join('wp_Hrg8P_term_taxonomy tt', 'tr.term_taxonomy_id = tt.term_taxonomy_id', 'left')
+                ->join('wp_Hrg8P_terms t', 'tt.term_id = t.term_id', 'left')
+                ->where('tr.object_id', $property->ID)
+                ->where('tt.taxonomy', 'property_status')
+                ->get();
+            $status = $status_query->row();
+            $property->status = $status ? $status->slug : 'unknown';
+            
+            // Nettoyer les données
+            $property->title = $property->post_title;
+            $property->address = $property->fave_property_address ?: 'Adresse non fournie';
+            $property->price = $property->fave_property_price ? number_format($property->fave_property_price, 0, ',', ' ') . ' €' : 'Prix sur demande';
+        }
+        
+        return $properties;
+    }
+    
     // Statistiques propriétés (exemple)
     public function get_properties_stats() {
         // À adapter selon structure
