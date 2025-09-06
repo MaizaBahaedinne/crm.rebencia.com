@@ -201,6 +201,61 @@ class Client extends BaseController {
     }
 
     /**
+     * Version ultra-simple pour identifier le problème
+     */
+    public function test_basic_json() {
+        // Pas de vérification de session, pas de DB, juste du JSON
+        try {
+            header('Content-Type: application/json');
+            ob_clean(); // Nettoyer le buffer de sortie
+            
+            $query = isset($_POST['query']) ? $_POST['query'] : null;
+            
+            // Test avec données statiques
+            $agencies = [
+                ['id' => 18907, 'name' => 'Agence Ben arous'],
+                ['id' => 12345, 'name' => 'Agence Test']
+            ];
+            
+            $result = [
+                'success' => true,
+                'agencies' => $agencies,
+                'query' => $query,
+                'method' => 'test_basic_json',
+                'timestamp' => time()
+            ];
+            
+            echo json_encode($result);
+            exit();
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'file' => __FILE__,
+                'line' => __LINE__
+            ]);
+            exit();
+        }
+    }
+
+    /**
+     * Test sans extends BaseController pour éviter isLoggedIn
+     */
+    public function test_no_base() {
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Test sans BaseController réussi',
+            'post_data' => $_POST,
+            'get_data' => $_GET
+        ]);
+        exit();
+    }
+
+    /**
      * Version de test sans vérification de session
      */
     public function search_agencies_no_auth() {
