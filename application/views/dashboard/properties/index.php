@@ -122,22 +122,26 @@
                                 <!-- Status Badge -->
                                 <div class="position-absolute top-0 start-0 m-2">
                                     <span class="badge bg-<?php 
-                                        echo match($property->statut_houzez ?? 'unknown') {
-                                            'for-sale' => 'warning',
-                                            'for-rent' => 'info', 
-                                            'sold' => 'success',
-                                            'rented' => 'secondary',
-                                            default => 'light'
-                                        };
+                                        $status_color = 'light';
+                                        switch($property->statut_houzez ?? 'unknown') {
+                                            case 'for-sale': $status_color = 'warning'; break;
+                                            case 'for-rent': $status_color = 'info'; break; 
+                                            case 'sold': $status_color = 'success'; break;
+                                            case 'rented': $status_color = 'secondary'; break;
+                                            default: $status_color = 'light'; break;
+                                        }
+                                        echo $status_color;
                                     ?>">
                                         <?php 
-                                        echo match($property->statut_houzez ?? 'unknown') {
-                                            'for-sale' => 'À vendre',
-                                            'for-rent' => 'À louer',
-                                            'sold' => 'Vendu', 
-                                            'rented' => 'Loué',
-                                            default => 'Statut inconnu'
-                                        };
+                                        $status_label = 'Statut inconnu';
+                                        switch($property->statut_houzez ?? 'unknown') {
+                                            case 'for-sale': $status_label = 'À vendre'; break;
+                                            case 'for-rent': $status_label = 'À louer'; break;
+                                            case 'sold': $status_label = 'Vendu'; break; 
+                                            case 'rented': $status_label = 'Loué'; break;
+                                            default: $status_label = 'Statut inconnu'; break;
+                                        }
+                                        echo $status_label;
                                         ?>
                                     </span>
                                 </div>

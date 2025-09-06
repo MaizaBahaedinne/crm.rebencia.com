@@ -54,10 +54,13 @@ $route['agents/(:num)/stats'] = 'Agent/stats/$1';
 $route['agents/(:num)/properties'] = 'Agent/properties/$1';
 
 /*********** PROPERTIES (HOUZEZ - Consultation) *******************/
-$route['properties'] = 'Property/index';
-$route['properties/status'] = 'Property/status';
-$route['property/view/(:num)'] = 'Property/view/$1';
-$route['property/details/(:num)'] = 'Property/details/$1';
+$route['properties'] = 'Properties/index';
+$route['properties/test'] = 'PropertiesTest/index';
+$route['properties/status'] = 'Properties/status';
+$route['properties/view/(:num)'] = 'Properties/view/$1';
+$route['properties/details/(:num)'] = 'Properties/details/$1';
+$route['properties/ajax_list'] = 'Properties/ajax_list';
+$route['properties/ajax_search'] = 'Properties/ajax_search';
 
 /*********** CLIENTS *******************/
 $route['clients'] = 'Client/index';

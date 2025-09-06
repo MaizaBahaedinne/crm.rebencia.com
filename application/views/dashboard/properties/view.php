@@ -49,7 +49,7 @@
                                             'rented' => ['label' => 'Loué', 'class' => 'secondary']
                                         ];
                                         $status = $property->fave_property_status ?? 'unknown';
-                                        $status_info = $status_labels[$status] ?? ['label' => 'Statut inconnu', 'class' => 'light'];
+                                        $status_info = isset($status_labels[$status]) ? $status_labels[$status] : ['label' => 'Statut inconnu', 'class' => 'light'];
                                         ?>
                                         <span class="badge bg-<?php echo $status_info['class']; ?>-subtle text-<?php echo $status_info['class']; ?>">
                                             <?php echo $status_info['label']; ?>
