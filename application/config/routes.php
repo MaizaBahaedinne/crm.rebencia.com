@@ -77,6 +77,11 @@ $route['clients'] = 'Client/index';
 /*********** CRM CLIENTS *******************/
 $route['crm_clients'] = 'Client/crm_clients';
 
+// Routes pour l'autocomplétion
+$route['client/search_agencies'] = 'Client/search_agencies';
+$route['client/search_agents_by_agency'] = 'Client/search_agents_by_agency';
+$route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
+
 /*********** TRANSACTIONS *******************/
 $route['transactions'] = 'Transaction/index';
 $route['transactions/sales'] = 'Transaction/sales';

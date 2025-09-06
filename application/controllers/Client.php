@@ -183,6 +183,112 @@ class Client extends BaseController {
         redirect('client');
     }
 
+    /**
+     * Méthode AJAX pour la recherche d'agences (autocomplétion)
+     */
+    public function search_agencies() {
+        $this->isLoggedIn();
+        
+        $query = $this->input->post('query');
+        
+        if (!$query || strlen($query) < 2) {
+            echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
+            return;
+        }
+        
+        try {
+            $all_agencies = $this->agency_model->get_all_agencies();
+            $filtered_agencies = [];
+            
+            foreach ($all_agencies as $agency) {
+                $agency_id = isset($agency->ID) ? $agency->ID : (isset($agency->id) ? $agency->id : '');
+                $agency_name = isset($agency->display_name) ? $agency->display_name : (isset($agency->nom) ? $agency->nom : (isset($agency->name) ? $agency->name : (isset($agency->libelle) ? $agency->libelle : 'Agence')));
+                
+                // Recherche insensible à la casse
+                if (stripos($agency_name, $query) !== false) {
+                    $filtered_agencies[] = [
+                        'id' => $agency_id,
+                        'name' => $agency_name
+                    ];
+                }
+            }
+            
+            echo json_encode(['success' => true, 'agencies' => $filtered_agencies]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Méthode AJAX pour la recherche d'agents par agence (autocomplétion)
+     */
+    public function search_agents_by_agency() {
+        $this->isLoggedIn();
+        
+        $agency_id = $this->input->post('agency_id');
+        $query = $this->input->post('query');
+        
+        if (!$agency_id) {
+            echo json_encode(['success' => false, 'message' => 'ID agence requis']);
+            return;
+        }
+        
+        try {
+            $agents = $this->agent_model->get_agents_by_agency($agency_id);
+            $filtered_agents = [];
+            
+            foreach ($agents as $agent) {
+                $agent_id = isset($agent->ID) ? $agent->ID : (isset($agent->id) ? $agent->id : '');
+                $agent_name = isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')));
+                
+                // Si pas de query ou si le nom correspond à la recherche
+                if (!$query || strlen($query) < 2 || stripos($agent_name, $query) !== false) {
+                    $filtered_agents[] = [
+                        'id' => $agent_id,
+                        'name' => $agent_name
+                    ];
+                }
+            }
+            
+            echo json_encode(['success' => true, 'agents' => $filtered_agents]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche des agents: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Méthode AJAX pour récupérer les agents d'une agence
+     */
+    public function get_agents_by_agency() {
+        $this->isLoggedIn();
+        
+        $agency_id = $this->input->post('agency_id');
+        
+        if (!$agency_id) {
+            echo json_encode(['success' => false, 'message' => 'ID agence requis']);
+            return;
+        }
+        
+        try {
+            $agents = $this->agent_model->get_agents_by_agency($agency_id);
+            
+            $agents_data = [];
+            foreach ($agents as $agent) {
+                $agent_id = isset($agent->ID) ? $agent->ID : (isset($agent->id) ? $agent->id : '');
+                $agent_name = isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')));
+                
+                $agents_data[] = [
+                    'id' => $agent_id,
+                    'name' => $agent_name
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'agents' => $agents_data]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors du chargement des agents: ' . $e->getMessage()]);
+        }
+    }
+
 
 
 

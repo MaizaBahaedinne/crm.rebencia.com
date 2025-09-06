@@ -33,34 +33,25 @@
                                     <!-- Agence et Agent -->
                                     <div class="col-md-6">
                                         <label class="form-label">Agence <span class="text-danger">*</span></label>
-                                        <select name="agency_id" class="form-select" required>
-                                            <option value="">Sélectionner une agence</option>
-                                            <?php if(isset($agencies) && !empty($agencies)): foreach($agencies as $agency): ?>
-                                                <?php 
-                                                $agency_id = isset($agency->ID) ? $agency->ID : (isset($agency->id) ? $agency->id : '');
-                                                $agency_name = isset($agency->display_name) ? $agency->display_name : (isset($agency->nom) ? $agency->nom : (isset($agency->name) ? $agency->name : (isset($agency->libelle) ? $agency->libelle : 'Agence')));
-                                                ?>
-                                                <option value="<?= $agency_id ?>" <?= (isset($client) && isset($client->agency_id) && $client->agency_id==$agency_id)?'selected':''; ?>>
-                                                    <?= htmlspecialchars($agency_name) ?>
-                                                </option>
-                                            <?php endforeach; endif; ?>
-                                        </select>
+                                        <div class="position-relative">
+                                            <input type="text" id="agency_search" class="form-control" placeholder="Rechercher une agence..." autocomplete="off" value="<?= isset($client) && isset($client->agency_name) ? htmlspecialchars($client->agency_name) : '' ?>" required>
+                                            <input type="hidden" name="agency_id" id="agency_id" value="<?= isset($client) && isset($client->agency_id) ? $client->agency_id : '' ?>">
+                                            <div id="agency_dropdown" class="dropdown-menu w-100" style="display: none; max-height: 200px; overflow-y: auto;"></div>
+                                        </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <label class="form-label">Agent responsable <span class="text-danger">*</span></label>
-                                        <select name="agent_id" class="form-select" required>
-                                            <option value="">Sélectionner un agent</option>
-                                            <?php if(isset($agents) && !empty($agents)): foreach($agents as $agent): ?>
-                                                <?php 
-                                                $agent_id = isset($agent->ID) ? $agent->ID : (isset($agent->id) ? $agent->id : '');
-                                                $agent_name = isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')));
-                                                ?>
-                                                <option value="<?= $agent_id ?>" <?= (isset($client) && isset($client->agent_id) && $client->agent_id==$agent_id)?'selected':''; ?>>
-                                                    <?= htmlspecialchars($agent_name) ?>
-                                                </option>
-                                            <?php endforeach; endif; ?>
-                                        </select>
+                                        <div class="position-relative">
+                                            <input type="text" id="agent_search" class="form-control" placeholder="Sélectionner d'abord une agence" autocomplete="off" disabled value="<?= isset($client) && isset($client->agent_name) ? htmlspecialchars($client->agent_name) : '' ?>" required>
+                                            <input type="hidden" name="agent_id" id="agent_id" value="<?= isset($client) && isset($client->agent_id) ? $client->agent_id : '' ?>">
+                                            <div id="agent_dropdown" class="dropdown-menu w-100" style="display: none; max-height: 200px; overflow-y: auto;"></div>
+                                        </div>
+                                        <div id="agent_loading" style="display: none;" class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="ri-loader-4-line"></i> Chargement des agents...
+                                            </small>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -283,11 +274,70 @@
     </div>
 </div>
 
+<style>
+/* Styles pour l'autocomplétion */
+.dropdown-menu {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    z-index: 1050;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.dropdown-item-text {
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.position-relative .form-control:focus + .dropdown-menu {
+    border-color: #86b7fe;
+}
+
+/* Animation pour le loader */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ri-loader-4-line {
+    animation: spin 1s linear infinite;
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const sourceRadios = document.querySelectorAll('input[name="source"]');
     const sourceAutreDetail = document.querySelector('input[name="source_autre_detail"]');
     
+    // Variables pour l'autocomplétion des agences
+    const agencySearch = document.getElementById('agency_search');
+    const agencyId = document.getElementById('agency_id');
+    const agencyDropdown = document.getElementById('agency_dropdown');
+    
+    // Variables pour l'autocomplétion des agents
+    const agentSearch = document.getElementById('agent_search');
+    const agentId = document.getElementById('agent_id');
+    const agentDropdown = document.getElementById('agent_dropdown');
+    const agentLoading = document.getElementById('agent_loading');
+    
+    let agencySearchTimeout;
+    let agentSearchTimeout;
+    
+    // Gestion du champ "Autre" pour la source
     sourceRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.value === 'Autre') {
@@ -305,5 +355,183 @@ document.addEventListener('DOMContentLoaded', function() {
     if (sourceAutre && sourceAutre.checked) {
         sourceAutreDetail.style.display = 'block';
     }
+    
+    // ===== AUTOCOMPLETION AGENCES =====
+    agencySearch.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        clearTimeout(agencySearchTimeout);
+        
+        if (query.length < 2) {
+            agencyDropdown.style.display = 'none';
+            agencyId.value = '';
+            resetAgentField();
+            return;
+        }
+        
+        agencySearchTimeout = setTimeout(() => {
+            searchAgencies(query);
+        }, 300);
+    });
+    
+    function searchAgencies(query) {
+        fetch('<?= base_url("client/search_agencies") ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'query=' + encodeURIComponent(query)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.agencies) {
+                showAgencyDropdown(data.agencies);
+            } else {
+                agencyDropdown.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Erreur recherche agences:', error);
+            agencyDropdown.style.display = 'none';
+        });
+    }
+    
+    function showAgencyDropdown(agencies) {
+        agencyDropdown.innerHTML = '';
+        
+        if (agencies.length === 0) {
+            agencyDropdown.innerHTML = '<div class="dropdown-item-text">Aucune agence trouvée</div>';
+        } else {
+            agencies.forEach(agency => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.style.cursor = 'pointer';
+                item.textContent = agency.name;
+                item.addEventListener('click', () => selectAgency(agency));
+                agencyDropdown.appendChild(item);
+            });
+        }
+        
+        agencyDropdown.style.display = 'block';
+    }
+    
+    function selectAgency(agency) {
+        agencySearch.value = agency.name;
+        agencyId.value = agency.id;
+        agencyDropdown.style.display = 'none';
+        
+        // Réinitialiser et activer le champ agent
+        resetAgentField();
+        agentSearch.disabled = false;
+        agentSearch.placeholder = 'Rechercher un agent...';
+        
+        // Charger tous les agents de cette agence
+        loadAgentsByAgency(agency.id);
+    }
+    
+    // ===== AUTOCOMPLETION AGENTS =====
+    agentSearch.addEventListener('input', function() {
+        const query = this.value.trim();
+        const currentAgencyId = agencyId.value;
+        
+        if (!currentAgencyId) {
+            return;
+        }
+        
+        clearTimeout(agentSearchTimeout);
+        
+        if (query.length < 2) {
+            // Charger tous les agents si moins de 2 caractères
+            loadAgentsByAgency(currentAgencyId);
+            return;
+        }
+        
+        agentSearchTimeout = setTimeout(() => {
+            searchAgentsByAgency(currentAgencyId, query);
+        }, 300);
+    });
+    
+    function searchAgentsByAgency(agencyId, query = '') {
+        agentLoading.style.display = 'block';
+        
+        fetch('<?= base_url("client/search_agents_by_agency") ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'agency_id=' + encodeURIComponent(agencyId) + '&query=' + encodeURIComponent(query)
+        })
+        .then(response => response.json())
+        .then(data => {
+            agentLoading.style.display = 'none';
+            
+            if (data.success && data.agents) {
+                showAgentDropdown(data.agents);
+            } else {
+                agentDropdown.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            agentLoading.style.display = 'none';
+            console.error('Erreur recherche agents:', error);
+            agentDropdown.style.display = 'none';
+        });
+    }
+    
+    function loadAgentsByAgency(agencyId) {
+        searchAgentsByAgency(agencyId, '');
+    }
+    
+    function showAgentDropdown(agents) {
+        agentDropdown.innerHTML = '';
+        
+        if (agents.length === 0) {
+            agentDropdown.innerHTML = '<div class="dropdown-item-text">Aucun agent trouvé</div>';
+        } else {
+            agents.forEach(agent => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.style.cursor = 'pointer';
+                item.textContent = agent.name;
+                item.addEventListener('click', () => selectAgent(agent));
+                agentDropdown.appendChild(item);
+            });
+        }
+        
+        agentDropdown.style.display = 'block';
+    }
+    
+    function selectAgent(agent) {
+        agentSearch.value = agent.name;
+        agentId.value = agent.id;
+        agentDropdown.style.display = 'none';
+    }
+    
+    function resetAgentField() {
+        agentSearch.value = '';
+        agentId.value = '';
+        agentSearch.disabled = true;
+        agentSearch.placeholder = 'Sélectionner d\'abord une agence';
+        agentDropdown.style.display = 'none';
+    }
+    
+    // Cacher les dropdowns en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!agencySearch.contains(e.target) && !agencyDropdown.contains(e.target)) {
+            agencyDropdown.style.display = 'none';
+        }
+        if (!agentSearch.contains(e.target) && !agentDropdown.contains(e.target)) {
+            agentDropdown.style.display = 'none';
+        }
+    });
+    
+    // Si on est en mode édition avec des valeurs pré-remplies
+    <?php if(isset($client) && isset($client->agency_id)): ?>
+    if (agencyId.value) {
+        agentSearch.disabled = false;
+        agentSearch.placeholder = 'Rechercher un agent...';
+        loadAgentsByAgency(agencyId.value);
+    }
+    <?php endif; ?>
 });
 </script>
