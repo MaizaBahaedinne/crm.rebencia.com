@@ -6,16 +6,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                        <h4 class="mb-sm-0"><?= $pageTitle ?? (isset($client) ? 'Modifier le client' : 'Ajouter un     function searchAgentsByAgency(agencyId, query = '') {
-        agentLoading.style.display = 'block';
-        
-        fetch('<?= base_url("test_direct.php") ?>?action=agents', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'agency_id=' + encodeURIComponent(agencyId) + '&query=' + encodeURIComponent(query)
-        })></h4>
+                        <h4 class="mb-sm-0"><?= $pageTitle ?? (isset($client) ? 'Modifier le client' : 'Ajouter un client') ?></h4>
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Dashboard</a></li>

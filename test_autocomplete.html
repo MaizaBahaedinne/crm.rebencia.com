@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Autocomplétion</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .dropdown { position: absolute; background: white; border: 1px solid #ccc; border-top: none; max-height: 200px; overflow-y: auto; z-index: 1000; width: 300px; }
+        .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .dropdown-item:hover { background-color: #f5f5f5; }
+        .loading { color: #666; font-style: italic; padding: 10px; }
+        #result { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Test Autocomplétion Agences et Agents</h1>
+    
+    <div class="form-group">
+        <label for="agencyInput">Agence :</label>
+        <div style="position: relative;">
+            <input type="text" id="agencyInput" placeholder="Tapez pour rechercher une agence...">
+            <div id="agencyDropdown" class="dropdown" style="display: none;"></div>
+        </div>
+        <input type="hidden" id="agencyId" value="">
+    </div>
+    
+    <div class="form-group">
+        <label for="agentInput">Agent :</label>
+        <div style="position: relative;">
+            <input type="text" id="agentInput" placeholder="Sélectionnez d'abord une agence..." disabled>
+            <div id="agentDropdown" class="dropdown" style="display: none;"></div>
+            <div id="agentLoading" class="loading" style="display: none;">Chargement des agents...</div>
+        </div>
+        <input type="hidden" id="agentId" value="">
+    </div>
+    
+    <div id="result">
+        <h3>Sélection :</h3>
+        <p><strong>Agence :</strong> <span id="selectedAgency">Aucune</span></p>
+        <p><strong>Agent :</strong> <span id="selectedAgent">Aucun</span></p>
+    </div>
+
+    <script>
+        let agencySearchTimeout;
+        let agentSearchTimeout;
+        let currentAgencyId = null;
+        
+        // Éléments DOM
+        const agencyInput = document.getElementById('agencyInput');
+        const agencyDropdown = document.getElementById('agencyDropdown');
+        const agencyId = document.getElementById('agencyId');
+        const agentInput = document.getElementById('agentInput');
+        const agentDropdown = document.getElementById('agentDropdown');
+        const agentLoading = document.getElementById('agentLoading');
+        const agentId = document.getElementById('agentId');
+        const selectedAgency = document.getElementById('selectedAgency');
+        const selectedAgent = document.getElementById('selectedAgent');
+        
+        // Autocomplétion des agences
+        agencyInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            clearTimeout(agencySearchTimeout);
+            
+            if (query.length < 2) {
+                agencyDropdown.style.display = 'none';
+                return;
+            }
+            
+            agencySearchTimeout = setTimeout(() => {
+                searchAgencies(query);
+            }, 300);
+        });
+        
+        // Autocomplétion des agents
+        agentInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            clearTimeout(agentSearchTimeout);
+            
+            if (!currentAgencyId) {
+                return;
+            }
+            
+            if (query.length < 2) {
+                loadAgentsByAgency(currentAgencyId);
+                return;
+            }
+            
+            agentSearchTimeout = setTimeout(() => {
+                searchAgentsByAgency(currentAgencyId, query);
+            }, 300);
+        });
+        
+        function searchAgencies(query) {
+            fetch('/crm.rebencia.com/test_direct.php?action=agencies', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'query=' + encodeURIComponent(query)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.agencies) {
+                    showAgencyDropdown(data.agencies);
+                } else {
+                    agencyDropdown.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur recherche agences:', error);
+                agencyDropdown.style.display = 'none';
+            });
+        }
+        
+        function showAgencyDropdown(agencies) {
+            agencyDropdown.innerHTML = '';
+            
+            agencies.forEach(agency => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = agency.display || agency.name;
+                item.onclick = function() {
+                    selectAgency(agency);
+                };
+                agencyDropdown.appendChild(item);
+            });
+            
+            agencyDropdown.style.display = 'block';
+        }
+        
+        function selectAgency(agency) {
+            agencyInput.value = agency.name;
+            agencyId.value = agency.id;
+            currentAgencyId = agency.id;
+            agencyDropdown.style.display = 'none';
+            selectedAgency.textContent = agency.name;
+            
+            // Activer le champ agent
+            agentInput.disabled = false;
+            agentInput.placeholder = 'Tapez pour rechercher un agent...';
+            
+            // Charger les agents
+            loadAgentsByAgency(agency.id);
+        }
+        
+        function loadAgentsByAgency(agencyId) {
+            searchAgentsByAgency(agencyId, '');
+        }
+        
+        function searchAgentsByAgency(agencyId, query = '') {
+            agentLoading.style.display = 'block';
+            
+            fetch('/crm.rebencia.com/test_direct.php?action=agents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'agency_id=' + encodeURIComponent(agencyId) + '&query=' + encodeURIComponent(query)
+            })
+            .then(response => response.json())
+            .then(data => {
+                agentLoading.style.display = 'none';
+                
+                if (data.success && data.agents) {
+                    showAgentDropdown(data.agents);
+                } else {
+                    console.error('Erreur agents:', data.message);
+                    agentDropdown.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                agentLoading.style.display = 'none';
+                console.error('Erreur recherche agents:', error);
+                agentDropdown.style.display = 'none';
+            });
+        }
+        
+        function showAgentDropdown(agents) {
+            agentDropdown.innerHTML = '';
+            
+            if (agents.length === 0) {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = 'Aucun agent trouvé';
+                agentDropdown.appendChild(item);
+            } else {
+                agents.forEach(agent => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.textContent = agent.display || agent.name;
+                    item.onclick = function() {
+                        selectAgent(agent);
+                    };
+                    agentDropdown.appendChild(item);
+                });
+            }
+            
+            agentDropdown.style.display = 'block';
+        }
+        
+        function selectAgent(agent) {
+            agentInput.value = agent.name;
+            agentId.value = agent.id;
+            agentDropdown.style.display = 'none';
+            selectedAgent.textContent = agent.name;
+        }
+        
+        // Fermer les dropdowns si on clique ailleurs
+        document.addEventListener('click', function(e) {
+            if (!agencyInput.contains(e.target) && !agencyDropdown.contains(e.target)) {
+                agencyDropdown.style.display = 'none';
+            }
+            if (!agentInput.contains(e.target) && !agentDropdown.contains(e.target)) {
+                agentDropdown.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
