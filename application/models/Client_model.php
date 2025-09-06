@@ -1,9 +1,7 @@
-    public function get_all_clients() {
-        return $this->db->get('clients')->result();
-    }
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Client_model extends CI_Model {
+    protected $table = 'crm_clients';
     public function insert_client($data) {
         // Gestion de l'upload du document identité
         if (!empty($_FILES['identite_doc']['name'])) {
@@ -16,11 +14,11 @@ class Client_model extends CI_Model {
                 $data['identite_doc'] = $fileData['file_name'];
             }
         }
-        return $this->db->insert('clients', $data);
+        return $this->db->insert($this->table, $data);
     }
 
     public function get_client($id) {
-        return $this->db->get_where('clients', ['id' => $id])->row();
+        return $this->db->get_where($this->table, ['id' => $id])->row();
     }
 
     public function update_client($id, $data) {
@@ -36,14 +34,18 @@ class Client_model extends CI_Model {
             }
         }
         $this->db->where('id', $id);
-        return $this->db->update('clients', $data);
+        return $this->db->update($this->table, $data);
     }
 
     public function delete_client($id) {
         $this->db->where('id', $id);
-        return $this->db->delete('clients');
+        return $this->db->delete($this->table);
     }
-    protected $table = 'crm_clients';
+    
+    public function get_all_clients() {
+        if(!$this->db->table_exists($this->table)) return [];
+        return $this->db->get($this->table)->result();
+    }
     
     public function all($limit=100,$offset=0,$filters=[]) {
         if(!$this->db->table_exists($this->table)) return [];
