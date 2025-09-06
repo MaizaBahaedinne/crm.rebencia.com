@@ -44,12 +44,13 @@
         redirect('client');
     }
 
-    public function view($id) {
+
+    public function crm_clients() {
         $this->load->model('Client_model');
-        $client = $this->Client_model->get_client($id);
-        $this->load->view('include/header');
-        $this->load->view('client/form', ['client' => $client]);
-        $this->load->view('include/footer');
+        $clients = $this->Client_model->get_all_clients();
+        $this->load->view('includes/header');
+        $this->load->view('client/list_grid', ['clients' => $clients]);
+        $this->load->view('includes/footer');
     }
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH.'libraries/BaseController.php';
