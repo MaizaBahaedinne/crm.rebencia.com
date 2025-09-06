@@ -329,4 +329,43 @@ class Agent_model extends CI_Model {
         return $agent;
     }
 
+    /**
+     * Retourne un agent par son user_id WordPress
+     * @param int $user_id
+     * @return object|null
+     */
+    public function get_agent_by_user_id($user_id) {
+        if (!$user_id) return null;
+
+        $this->wp_db->select("
+            p.ID as agent_id,
+            p.post_title as agent_name,
+            p.post_content as agent_description,
+            p.post_status as post_status,
+            p.post_date as created_date,
+            u.ID as user_id,
+            u.user_login,
+            u.user_email,
+            a.ID as agency_id,
+            a.post_title as agency_name,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar
+        ", FALSE);
+
+        $this->wp_db->from($this->users_table . ' u')
+            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'inner')
+            ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
+            ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->where('u.ID', $user_id)
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, u.ID, u.user_login, u.user_email, a.ID, a.post_title');
+
+        return $this->wp_db->get()->row();
+    }
+
 }

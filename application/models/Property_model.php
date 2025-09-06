@@ -109,6 +109,48 @@ class Property_model extends CI_Model {
     public function get_property($property_id) {
         return $this->wp_db->where('ID', $property_id)->get('wp_Hrg8P_posts')->row();
     }
+    
+    // Métadonnées d'une propriété
+    public function get_property_metas($property_id) {
+        return $this->wp_db->where('post_id', $property_id)->get('wp_Hrg8P_postmeta')->result();
+    }
+    
+    // Propriétés similaires
+    public function get_similar_properties($property_id, $limit = 4) {
+        $current_property = $this->get_property($property_id);
+        if (!$current_property) return [];
+        
+        $this->wp_db->select('p.*, pm1.meta_value as fave_property_price, pm2.meta_value as fave_property_address');
+        $this->wp_db->from('wp_Hrg8P_posts p');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm1', 'p.ID = pm1.post_id AND pm1.meta_key = "fave_property_price"', 'left');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm2', 'p.ID = pm2.post_id AND pm2.meta_key = "fave_property_address"', 'left');
+        $this->wp_db->where('p.post_type', 'property');
+        $this->wp_db->where('p.post_status', 'publish');
+        $this->wp_db->where('p.ID !=', $property_id);
+        $this->wp_db->order_by('p.post_date', 'DESC');
+        $this->wp_db->limit($limit);
+        
+        return $this->wp_db->get()->result();
+    }
+    
+    // Recherche de propriétés
+    public function search_properties($term, $limit = 10) {
+        $this->wp_db->select('p.*, pm1.meta_value as fave_property_price, pm2.meta_value as fave_property_address');
+        $this->wp_db->from('wp_Hrg8P_posts p');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm1', 'p.ID = pm1.post_id AND pm1.meta_key = "fave_property_price"', 'left');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm2', 'p.ID = pm2.post_id AND pm2.meta_key = "fave_property_address"', 'left');
+        $this->wp_db->where('p.post_type', 'property');
+        $this->wp_db->where('p.post_status', 'publish');
+        $this->wp_db->group_start();
+        $this->wp_db->like('p.post_title', $term);
+        $this->wp_db->or_like('p.post_content', $term);
+        $this->wp_db->or_like('pm2.meta_value', $term);
+        $this->wp_db->group_end();
+        $this->wp_db->order_by('p.post_date', 'DESC');
+        $this->wp_db->limit($limit);
+        
+        return $this->wp_db->get()->result();
+    }
     // Propriétés d'un agent
     public function get_properties_by_agent($agent_id) {
         // À adapter selon structure
