@@ -118,7 +118,7 @@ class Property_model extends CI_Model {
     // Propriétés d'une agence
     public function get_properties_by_agency($agency_id, $limit = null) {
         // Récupérer les agents de l'agence depuis crm_agents (base WordPress)
-        $this->wp_db->select('agent_id, user_id');
+        $this->wp_db->select('*');
         $this->wp_db->from('crm_agents');
         $this->wp_db->where('agency_id', $agency_id);
         $agents_query = $this->wp_db->get();
@@ -128,11 +128,21 @@ class Property_model extends CI_Model {
             return [];
         }
         
-        // Collecter les user_ids des agents
+        // Collecter les user_ids des agents (avec détection flexible des colonnes)
         $agent_user_ids = [];
         foreach ($agents as $agent) {
+            // Essayer différentes colonnes possibles pour user_id
+            $user_id = null;
             if (!empty($agent->user_id)) {
-                $agent_user_ids[] = $agent->user_id;
+                $user_id = $agent->user_id;
+            } elseif (!empty($agent->wp_user_id)) {
+                $user_id = $agent->wp_user_id;
+            } elseif (!empty($agent->id)) {
+                $user_id = $agent->id;
+            }
+            
+            if ($user_id) {
+                $agent_user_ids[] = $user_id;
             }
         }
         
