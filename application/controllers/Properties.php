@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . '/libraries/BaseController.php';
+
+s
 class Properties extends BaseController {
     
     public function __construct() {
@@ -11,10 +13,8 @@ class Properties extends BaseController {
         $this->load->helper('url');
         
         // Vérifier l'authentification
-        $isLoggedIn = $this->session->userdata('isLoggedIn');
-        if (!isset($isLoggedIn) || $isLoggedIn != TRUE) {
-            redirect('login');
-        }
+        $this->isLoggedIn();
+       
     }
     
     // Liste des propriétés
