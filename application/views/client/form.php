@@ -1,7 +1,34 @@
 <div class="container-fluid">
     <form method="post" action="<?= isset($client) ? base_url('client/update/'.$client->id) : base_url('client/add') ?>" class="row g-3" enctype="multipart/form-data">
-        <div class="col-md-4">
+        
+        <!-- Agence et Agent -->
+        <div class="col-md-6">
+            <select name="agency_id" class="form-select" required>
+                <option value="">Sélectionner une agence</option>
+                <?php if(isset($agencies) && !empty($agencies)): foreach($agencies as $agency): ?>
+                    <option value="<?= $agency->id ?>" <?= (isset($client) && $client->agency_id==$agency->id)?'selected':''; ?>>
+                        <?= htmlspecialchars($agency->nom ?? $agency->name ?? $agency->libelle) ?>
+                    </option>
+                <?php endforeach; endif; ?>
+            </select>
+        </div>
+        
+        <div class="col-md-6">
+            <select name="agent_id" class="form-select" required>
+                <option value="">Sélectionner un agent</option>
+                <?php if(isset($agents) && !empty($agents)): foreach($agents as $agent): ?>
+                    <option value="<?= $agent->id ?>" <?= (isset($client) && $client->agent_id==$agent->id)?'selected':''; ?>>
+                        <?= htmlspecialchars($agent->nom ?? $agent->name ?? $agent->prenom) ?>
+                    </option>
+                <?php endforeach; endif; ?>
+            </select>
+        </div>
+
+        <div class="col-md-6">
             <input type="text" name="nom" class="form-control" placeholder="Nom complet / Raison sociale" value="<?= isset($client) ? htmlspecialchars($client->nom) : '' ?>" required>
+        </div>
+        <div class="col-md-6">
+            <input type="text" name="prenom" class="form-control" placeholder="Prénom" value="<?= isset($client) ? htmlspecialchars($client->prenom) : '' ?>">
         </div>
         <div class="col-md-4">
             <select name="type_client" class="form-select" required>
