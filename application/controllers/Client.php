@@ -72,6 +72,135 @@ class Client extends BaseController {
     }
 
     /**
+     * Version améliorée avec toutes les données disponibles
+     */
+    public function search_agencies_enhanced() {
+        header('Content-Type: application/json');
+        ob_clean();
+        
+        $query = $this->input->post('query');
+        
+        if (!$query || strlen($query) < 2) {
+            echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
+            exit;
+        }
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            if (!$wp_db) {
+                throw new Exception('Impossible de se connecter à la base WordPress');
+            }
+            
+            // Récupérer les agences avec le nombre d'agents
+            $agencies = $wp_db->select('DISTINCT agency_id, agency_name, COUNT(user_id) as agent_count')
+                ->from($wp_db->dbprefix . 'crm_agents')
+                ->like('agency_name', $query)
+                ->where('agency_name IS NOT NULL')
+                ->where('agency_name !=', '')
+                ->group_by('agency_id, agency_name')
+                ->order_by('agency_name', 'ASC')
+                ->limit(10)
+                ->get()->result();
+            
+            $filtered_agencies = [];
+            foreach ($agencies as $agency) {
+                $filtered_agencies[] = [
+                    'id' => $agency->agency_id,
+                    'name' => $agency->agency_name,
+                    'agent_count' => $agency->agent_count,
+                    'display' => $agency->agency_name . " ({$agency->agent_count} agent" . ($agency->agent_count > 1 ? 's' : '') . ")"
+                ];
+            }
+            
+            echo json_encode([
+                'success' => true, 
+                'agencies' => $filtered_agencies,
+                'count' => count($filtered_agencies)
+            ]);
+            
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Erreur lors de la recherche: ' . $e->getMessage()
+            ]);
+        }
+        
+        exit;
+    }
+
+    /**
+     * Version agents avec informations de contact complètes
+     */
+    public function search_agents_enhanced() {
+        header('Content-Type: application/json');
+        ob_clean();
+        
+        $agency_id = $this->input->post('agency_id');
+        $query = $this->input->post('query');
+        
+        if (!$agency_id) {
+            echo json_encode(['success' => false, 'message' => 'ID agence requis']);
+            exit;
+        }
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            if (!$wp_db) {
+                throw new Exception('Impossible de se connecter à la base WordPress');
+            }
+            
+            $wp_db->select('user_id, agent_name, agent_email, phone, mobile, position, agency_name')
+                ->from($wp_db->dbprefix . 'crm_agents')
+                ->where('agency_id', $agency_id)
+                ->where('agent_name IS NOT NULL')
+                ->where('agent_name !=', '');
+            
+            // Si une query est fournie, filtrer par nom
+            if ($query && strlen($query) >= 2) {
+                $wp_db->like('agent_name', $query);
+            }
+            
+            $agents = $wp_db->order_by('agent_name', 'ASC')->limit(10)->get()->result();
+            
+            $filtered_agents = [];
+            foreach ($agents as $agent) {
+                $contact_info = [];
+                if (!empty($agent->phone)) $contact_info[] = $agent->phone;
+                if (!empty($agent->mobile)) $contact_info[] = $agent->mobile;
+                if (!empty($agent->agent_email)) $contact_info[] = $agent->agent_email;
+                
+                $display_name = $agent->agent_name;
+                if (!empty($agent->position)) {
+                    $display_name .= " - " . $agent->position;
+                }
+                if (!empty($contact_info)) {
+                    $display_name .= " (" . implode(' / ', array_slice($contact_info, 0, 2)) . ")";
+                }
+                
+                $filtered_agents[] = [
+                    'id' => $agent->user_id,
+                    'name' => $agent->agent_name,
+                    'display' => $display_name,
+                    'email' => $agent->agent_email,
+                    'phone' => $agent->phone,
+                    'mobile' => $agent->mobile,
+                    'position' => $agent->position,
+                    'agency' => $agent->agency_name
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'agents' => $filtered_agents]);
+            
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche des agents: ' . $e->getMessage()]);
+        }
+        
+        exit;
+    }
+
+    /**
      * Version de test sans vérification de session
      */
     public function search_agencies_no_auth() {
@@ -384,6 +513,78 @@ class Client extends BaseController {
                 'success' => false,
                 'message' => $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Affichage détaillé des données crm_agents pour une agence
+     */
+    public function debug_agency_details() {
+        $agency_id = $this->input->get('agency_id') ?: 18907; // Par défaut Agence Ben arous
+        
+        echo "<h3>Détails de l'agence ID: {$agency_id}</h3>";
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $agents = $wp_db->select('*')
+                ->from($wp_db->dbprefix . 'crm_agents')
+                ->where('agency_id', $agency_id)
+                ->get()->result();
+            
+            if (empty($agents)) {
+                echo "<p>Aucun agent trouvé pour cette agence.</p>";
+                return;
+            }
+            
+            echo "<h4>Agents trouvés: " . count($agents) . "</h4>";
+            
+            foreach ($agents as $agent) {
+                echo "<div style='border: 1px solid #ccc; margin: 10px 0; padding: 10px; border-radius: 5px;'>";
+                echo "<h5>" . htmlspecialchars($agent->agent_name) . " (ID: {$agent->user_id})</h5>";
+                echo "<p><strong>Agence:</strong> " . htmlspecialchars($agent->agency_name) . "</p>";
+                echo "<p><strong>Email:</strong> " . htmlspecialchars($agent->agent_email ?? 'N/A') . "</p>";
+                echo "<p><strong>Téléphone:</strong> " . htmlspecialchars($agent->phone ?? 'N/A') . "</p>";
+                echo "<p><strong>Mobile:</strong> " . htmlspecialchars($agent->mobile ?? 'N/A') . "</p>";
+                echo "<p><strong>Position:</strong> " . htmlspecialchars($agent->position ?? 'N/A') . "</p>";
+                echo "<p><strong>WhatsApp:</strong> " . htmlspecialchars($agent->whatsapp ?? 'N/A') . "</p>";
+                echo "<p><strong>Date d'inscription:</strong> " . htmlspecialchars($agent->registration_date ?? 'N/A') . "</p>";
+                echo "</div>";
+            }
+            
+            // Afficher aussi la requête SQL complexe d'origine en commentaire
+            echo "<hr><h4>Informations techniques</h4>";
+            echo "<p>Cette table <code>crm_agents</code> est générée par la requête complexe suivante :</p>";
+            echo "<details><summary>Voir la requête SQL complète</summary>";
+            echo "<pre style='background: #f5f5f5; padding: 10px; font-size: 11px; overflow-x: auto;'>";
+            echo htmlspecialchars("SELECT 
+    u.ID AS user_id,
+    u.user_login AS user_login,
+    u.user_email AS user_email,
+    u.user_status AS user_status,
+    u.user_registered AS registration_date,
+    p.ID AS agent_post_id,
+    p.post_title AS agent_name,
+    p.post_status AS post_status,
+    pm_email.meta_value AS agent_email,
+    a.ID AS agency_id,
+    a.post_title AS agency_name,
+    MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) AS phone,
+    MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) AS mobile,
+    MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) AS whatsapp,
+    MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position
+FROM wp_Hrg8P_users u
+LEFT JOIN wp_Hrg8P_postmeta pm_email ON pm_email.meta_value = u.user_email
+LEFT JOIN wp_Hrg8P_posts p ON p.ID = pm_email.post_id AND p.post_type = 'houzez_agent'
+LEFT JOIN wp_Hrg8P_postmeta pm_agency ON pm_agency.post_id = p.ID AND pm_agency.meta_key = 'fave_agent_agencies'
+LEFT JOIN wp_Hrg8P_posts a ON a.ID = pm_agency.meta_value AND a.post_type = 'houzez_agency'
+LEFT JOIN wp_Hrg8P_postmeta pm_contact ON pm_contact.post_id = p.ID
+WHERE p.post_type = 'houzez_agent'
+GROUP BY u.ID, p.ID, a.ID");
+            echo "</pre></details>";
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
         }
     }
 
