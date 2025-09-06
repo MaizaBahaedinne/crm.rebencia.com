@@ -9,6 +9,7 @@ require APPPATH.'libraries/BaseController.php';
 class Client extends BaseController {
     public function __construct(){
         parent::__construct();
+        $this->isLoggedIn();
     // Remplace par clients WordPress (Houzez)
     $this->load->model('wp_client_model');
     $this->load->model('client_model');
