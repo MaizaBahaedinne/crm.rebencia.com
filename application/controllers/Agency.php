@@ -82,9 +82,17 @@ class Agency extends BaseController {
     // Voir les agents d'une agence
     public function agents($agency_id) {
         $this->isLoggedIn();
-    $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
-    $data['agency'] = $this->agency_model->get_agency($agency_id);
-        $this->loadViews('dashboard/agent/list', $this->global, $data, NULL);
+        
+        $data = $this->global;
+        $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
+        $data['agency'] = $this->agency_model->get_agency($agency_id);
+        
+        if (empty($data['agency'])) {
+            show_404();
+            return;
+        }
+        
+        $this->loadViews('dashboard/agency/agents_list', $data, NULL, NULL);
     }
 
     // Statistiques agence
