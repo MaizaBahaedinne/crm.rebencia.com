@@ -220,6 +220,276 @@ class Client extends BaseController {
     }
 
     /**
+     * Debug pour examiner la table crm_agents
+     */
+    public function debug_crm_agents_table() {
+        $this->isLoggedIn();
+        
+        echo "<h3>Debug: Table wp_Hrg8P_crm_agents</h3>";
+        
+        try {
+            // Charger la DB WordPress directement
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $crm_agents_table = $wp_db->dbprefix . 'crm_agents';
+            
+            echo "<h4>1. Vérification de l'existence de la table</h4>";
+            $tables = $wp_db->list_tables();
+            
+            if (in_array($crm_agents_table, $tables)) {
+                echo "<p>✅ Table <strong>$crm_agents_table</strong> existe</p>";
+                
+                // Compter les enregistrements
+                $count = $wp_db->count_all($crm_agents_table);
+                echo "<p><strong>Nombre d'agents dans la table:</strong> $count</p>";
+                
+                if ($count > 0) {
+                    echo "<h4>2. Structure de la table</h4>";
+                    
+                    // Récupérer la structure
+                    $fields = $wp_db->field_data($crm_agents_table);
+                    echo "<table border='1' style='border-collapse: collapse;'>";
+                    echo "<tr><th>Nom du champ</th><th>Type</th><th>Max Length</th></tr>";
+                    foreach ($fields as $field) {
+                        echo "<tr>";
+                        echo "<td>{$field->name}</td>";
+                        echo "<td>{$field->type}</td>";
+                        echo "<td>{$field->max_length}</td>";
+                        echo "</tr>";
+                    }
+                    echo "</table>";
+                    
+                    echo "<h4>3. Exemples de données</h4>";
+                    
+                    // Récupérer quelques enregistrements
+                    $sample_agents = $wp_db->select('*')
+                        ->from($crm_agents_table)
+                        ->limit(10)
+                        ->get()->result();
+                    
+                    if (!empty($sample_agents)) {
+                        // Créer un tableau HTML avec toutes les colonnes
+                        $first_agent = $sample_agents[0];
+                        $columns = array_keys((array)$first_agent);
+                        
+                        echo "<table border='1' style='border-collapse: collapse; width: 100%; font-size: 12px;'>";
+                        echo "<tr>";
+                        foreach ($columns as $column) {
+                            echo "<th>$column</th>";
+                        }
+                        echo "</tr>";
+                        
+                        foreach ($sample_agents as $agent) {
+                            echo "<tr>";
+                            foreach ($columns as $column) {
+                                $value = $agent->$column ?? '';
+                                echo "<td>" . htmlspecialchars($value) . "</td>";
+                            }
+                            echo "</tr>";
+                        }
+                        echo "</table>";
+                    }
+                    
+                    echo "<h4>4. Recherche par agence</h4>";
+                    
+                    // Chercher les agents de l'agence 3
+                    $agents_agency_3 = $wp_db->select('*')
+                        ->from($crm_agents_table)
+                        ->where('agency_id', 3)
+                        ->get()->result();
+                    
+                    echo "<p><strong>Agents pour agence ID 3:</strong> " . count($agents_agency_3) . "</p>";
+                    
+                    if (!empty($agents_agency_3)) {
+                        echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                        $columns = array_keys((array)$agents_agency_3[0]);
+                        echo "<tr>";
+                        foreach ($columns as $column) {
+                            echo "<th>$column</th>";
+                        }
+                        echo "</tr>";
+                        
+                        foreach ($agents_agency_3 as $agent) {
+                            echo "<tr>";
+                            foreach ($columns as $column) {
+                                $value = $agent->$column ?? '';
+                                echo "<td>" . htmlspecialchars($value) . "</td>";
+                            }
+                            echo "</tr>";
+                        }
+                        echo "</table>";
+                    }
+                    
+                    // Chercher aussi avec d'autres noms de colonnes possibles
+                    echo "<h4>5. Test avec différents noms de colonnes</h4>";
+                    
+                    $possible_agency_columns = ['agency_id', 'houzez_agency_id', 'fave_agency_id', 'parent_agency'];
+                    
+                    foreach ($possible_agency_columns as $col) {
+                        try {
+                            $test_agents = $wp_db->select('COUNT(*) as count')
+                                ->from($crm_agents_table)
+                                ->where($col, 3)
+                                ->get()->row();
+                            
+                            echo "<p><strong>Agents avec $col = 3:</strong> " . ($test_agents->count ?? 0) . "</p>";
+                        } catch (Exception $e) {
+                            echo "<p><strong>Colonne $col:</strong> n'existe pas</p>";
+                        }
+                    }
+                }
+                
+            } else {
+                echo "<p>❌ Table <strong>$crm_agents_table</strong> n'existe pas</p>";
+                echo "<p>Tables disponibles contenant 'agent' ou 'crm':</p>";
+                
+                $relevant_tables = array_filter($tables, function($table) {
+                    return (stripos($table, 'agent') !== false || stripos($table, 'crm') !== false);
+                });
+                
+                if (!empty($relevant_tables)) {
+                    echo "<ul>";
+                    foreach ($relevant_tables as $table) {
+                        echo "<li>$table</li>";
+                    }
+                    echo "</ul>";
+                } else {
+                    echo "<p>Aucune table pertinente trouvée.</p>";
+                }
+            }
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
+        }
+    }
+
+    /**
+     * Debug avancé pour analyser les agents et leurs métadonnées
+     */
+    public function debug_agents_detailed() {
+        $this->isLoggedIn();
+        
+        echo "<h3>Debug: Analyse détaillée des agents</h3>";
+        
+        try {
+            // Charger la DB WordPress directement
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $users_table = $wp_db->dbprefix . 'users';
+            $usermeta_table = $wp_db->dbprefix . 'usermeta';
+            $capabilities_key = $wp_db->dbprefix . 'capabilities';
+            
+            echo "<h4>1. Tous les utilisateurs avec rôle agent</h4>";
+            
+            // Chercher tous les agents (sans filtre d'agence)
+            $agents = $wp_db->select('u.ID, u.user_login, u.display_name, u.user_email')
+                ->from($users_table . ' u')
+                ->join($usermeta_table . ' m', 'u.ID = m.user_id')
+                ->where('m.meta_key', $capabilities_key)
+                ->like('m.meta_value', 'houzez_agent')
+                ->get()->result();
+            
+            echo "<p><strong>Agents trouvés (tous):</strong> " . count($agents) . "</p>";
+            
+            if (!empty($agents)) {
+                echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                echo "<tr><th>ID</th><th>Login</th><th>Display Name</th><th>Email</th></tr>";
+                foreach ($agents as $agent) {
+                    echo "<tr>";
+                    echo "<td>{$agent->ID}</td>";
+                    echo "<td>{$agent->user_login}</td>";
+                    echo "<td>{$agent->display_name}</td>";
+                    echo "<td>{$agent->user_email}</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+                
+                echo "<h4>2. Métadonnées des agents</h4>";
+                
+                $agent_ids = array_map(function($a) { return $a->ID; }, $agents);
+                
+                // Récupérer toutes les métadonnées des agents
+                $agent_metas = $wp_db->select('user_id, meta_key, meta_value')
+                    ->from($usermeta_table)
+                    ->where_in('user_id', $agent_ids)
+                    ->where("(meta_key LIKE '%agency%' OR meta_key LIKE '%houzez%' OR meta_key = 'first_name' OR meta_key = 'last_name')")
+                    ->order_by('user_id, meta_key')
+                    ->get()->result();
+                
+                if (!empty($agent_metas)) {
+                    echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                    echo "<tr><th>User ID</th><th>Meta Key</th><th>Meta Value</th></tr>";
+                    foreach ($agent_metas as $meta) {
+                        echo "<tr>";
+                        echo "<td>{$meta->user_id}</td>";
+                        echo "<td>{$meta->meta_key}</td>";
+                        echo "<td>" . htmlspecialchars($meta->meta_value) . "</td>";
+                        echo "</tr>";
+                    }
+                    echo "</table>";
+                } else {
+                    echo "<p>Aucune métadonnée pertinente trouvée pour les agents.</p>";
+                }
+            }
+            
+            echo "<h4>3. Recherche alternative - meta_keys contenant 'agency'</h4>";
+            
+            // Rechercher tous les meta_keys contenant 'agency'
+            $agency_keys = $wp_db->select('DISTINCT meta_key, COUNT(*) as count')
+                ->from($usermeta_table)
+                ->like('meta_key', 'agency')
+                ->group_by('meta_key')
+                ->get()->result();
+            
+            if (!empty($agency_keys)) {
+                echo "<table border='1' style='border-collapse: collapse;'>";
+                echo "<tr><th>Meta Key</th><th>Count</th></tr>";
+                foreach ($agency_keys as $key) {
+                    echo "<tr><td>{$key->meta_key}</td><td>{$key->count}</td></tr>";
+                }
+                echo "</table>";
+                
+                // Tester avec le premier meta_key trouvé
+                if (isset($agency_keys[0])) {
+                    $test_key = $agency_keys[0]->meta_key;
+                    echo "<h4>4. Test avec meta_key '$test_key'</h4>";
+                    
+                    $test_agents = $wp_db->select('u.ID, u.user_login, u.display_name, m2.meta_value as agency_ref')
+                        ->from($users_table . ' u')
+                        ->join($usermeta_table . ' m1', 'u.ID = m1.user_id')
+                        ->join($usermeta_table . ' m2', 'u.ID = m2.user_id')
+                        ->where('m1.meta_key', $capabilities_key)
+                        ->like('m1.meta_value', 'houzez_agent')
+                        ->where('m2.meta_key', $test_key)
+                        ->where('m2.meta_value', '3') // Tester avec l'agence ID 3
+                        ->get()->result();
+                    
+                    echo "<p><strong>Agents trouvés avec $test_key = 3:</strong> " . count($test_agents) . "</p>";
+                    
+                    if (!empty($test_agents)) {
+                        echo "<table border='1' style='border-collapse: collapse;'>";
+                        echo "<tr><th>ID</th><th>Login</th><th>Display Name</th><th>Agency Ref</th></tr>";
+                        foreach ($test_agents as $agent) {
+                            echo "<tr>";
+                            echo "<td>{$agent->ID}</td>";
+                            echo "<td>{$agent->user_login}</td>";
+                            echo "<td>{$agent->display_name}</td>";
+                            echo "<td>{$agent->agency_ref}</td>";
+                            echo "</tr>";
+                        }
+                        echo "</table>";
+                    }
+                }
+            } else {
+                echo "<p>Aucune meta_key contenant 'agency' trouvée.</p>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
+        }
+    }
+
+    /**
      * Test simple pour vérifier les données HOUZEZ
      */
     public function test_houzez_data() {

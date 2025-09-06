@@ -29,37 +29,53 @@ class Agent_model extends CI_Model {
         $this->capabilities_key = $this->wp_db->dbprefix('capabilities'); // ex: wp_Hrg8P_capabilities
     }
 
-    // Tous les agents (basé sur le rôle houzez_agent)
+    // Tous les agents (basé sur la table crm_agents)
     public function get_all_agents() {
-        $agents = $this->wp_db->select('u.ID,u.user_login,u.user_email,u.display_name,u.user_registered')
-            ->from($this->users_table.' u')
-            ->join($this->usermeta_table.' m', 'u.ID = m.user_id AND m.meta_key = '.$this->wp_db->escape($this->capabilities_key), 'inner', false)
-            ->like('m.meta_value', 'houzez_agent')
-            ->get()->result();
-
-        if (empty($agents)) return [];
-        
-        $this->_add_agent_metadata($agents);
-        return $agents;
+        return $this->wp_db->get('crm_agents')->result();
     }
     
 
-    // Agents d'une agence
+    // Agents d'une agence (en utilisant la table crm_agents)
     public function get_agents_by_agency($agency_id) {
         if (!$agency_id) return [];
         
-        // Récupérer les agents qui ont le rôle houzez_agent ET appartiennent à l'agence
-        $agents = $this->wp_db->select('u.ID,u.user_login,u.user_email,u.display_name,u.user_registered')
-            ->from($this->users_table.' u')
-            ->join($this->usermeta_table.' m1', 'u.ID = m1.user_id AND m1.meta_key = '.$this->wp_db->escape($this->capabilities_key), 'inner', false)
-            ->join($this->usermeta_table.' m2', 'u.ID = m2.user_id AND m2.meta_key = "houzez_agency_id"', 'inner', false)
-            ->like('m1.meta_value', 'houzez_agent')
-            ->where('m2.meta_value', $agency_id)
-            ->get()->result();
-
-        if (empty($agents)) return [];
+        // Essayer d'abord avec agency_id
+        $agents = $this->wp_db->where('agency_id', $agency_id)
+            ->get('crm_agents')->result();
         
-        $this->_add_agent_metadata($agents);
+        // Si pas de résultats, essayer avec d'autres noms de colonnes possibles
+        if (empty($agents)) {
+            $possible_columns = ['houzez_agency_id', 'fave_agency_id', 'parent_agency'];
+            
+            foreach ($possible_columns as $column) {
+                try {
+                    $agents = $this->wp_db->where($column, $agency_id)
+                        ->get('crm_agents')->result();
+                    
+                    if (!empty($agents)) {
+                        break; // Si on trouve des résultats, on s'arrête
+                    }
+                } catch (Exception $e) {
+                    // Colonne n'existe pas, continuer avec la suivante
+                    continue;
+                }
+            }
+        }
+        
+        // Ajouter un nom d'affichage cohérent
+        foreach ($agents as $agent) {
+            // Construire un nom complet pour l'affichage
+            if (isset($agent->first_name) && isset($agent->last_name)) {
+                $agent->full_name = trim($agent->first_name . ' ' . $agent->last_name);
+            } elseif (isset($agent->display_name)) {
+                $agent->full_name = $agent->display_name;
+            } elseif (isset($agent->user_login)) {
+                $agent->full_name = $agent->user_login;
+            } else {
+                $agent->full_name = 'Agent #' . ($agent->ID ?? $agent->id ?? 'inconnu');
+            }
+        }
+        
         return $agents;
     }
     

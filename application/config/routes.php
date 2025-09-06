@@ -83,6 +83,8 @@ $route['client/search_agents_by_agency'] = 'Client/search_agents_by_agency';
 $route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
 
 // Routes de debug
+$route['client/debug_crm_agents_table'] = 'Client/debug_crm_agents_table';
+$route['client/debug_agents_detailed'] = 'Client/debug_agents_detailed';
 $route['client/test_houzez_data'] = 'Client/test_houzez_data';
 $route['client/debug_wordpress_structure'] = 'Client/debug_wordpress_structure';
 $route['client/debug_agencies'] = 'Client/debug_agencies';
