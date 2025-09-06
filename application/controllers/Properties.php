@@ -7,9 +7,9 @@ class Properties extends BaseController {
     
     public function __construct() {
         parent::__construct();
-        $this->load->model('property_model');
-        $this->load->model('agency_model');
-        $this->load->model('agent_model');
+        $this->load->model('Property_model');
+        $this->load->model('Agency_model');
+        $this->load->model('Agent_model');
     }
 
     
