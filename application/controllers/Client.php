@@ -36,6 +36,7 @@ class Client extends BaseController {
 
 
         public function add() {
+            $this->isLoggedIn();
         if ($this->input->post()) {
             $data = [
                 'nom' => $this->input->post('nom'),
@@ -54,6 +55,7 @@ class Client extends BaseController {
     }
 
     public function edit($id) {
+        $this->isLoggedIn();
     $this->load->model('client_model');
     $client = $this->client_model->get_client($id);
         $this->load->view('include/header');
@@ -62,6 +64,7 @@ class Client extends BaseController {
     }
 
     public function update($id) {
+        $this->isLoggedIn();
         if ($this->input->post()) {
             $data = [
                 'nom' => $this->input->post('nom'),
@@ -76,6 +79,7 @@ class Client extends BaseController {
     }
 
     public function delete($id) {
+        $this->isLoggedIn();
     $this->load->model('client_model');
     $this->client_model->delete_client($id);
         redirect('client');
@@ -83,6 +87,7 @@ class Client extends BaseController {
 
 
     public function crm_clients() {
+        $this->isLoggedIn();
     $this->load->model('client_model');
     $clients = $this->client_model->get_all_clients();
         $this->load->view('includes/header');
