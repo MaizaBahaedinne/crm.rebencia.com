@@ -77,15 +77,78 @@ class Agent_model extends CI_Model {
     }
 
     /**
-     * Agents d'une agence spécifique
+     * Agents d'une agence spécifique depuis la table crm_agents
      * @param int $agency_id
      * @return object[]
      */
     public function get_agents_by_agency($agency_id) {
         if (!$agency_id) return [];
-            
         
-        return $this->get_all_agents(['agency_id' => $agency_id]);
+        // Récupérer les agents depuis la table crm_agents
+        $crm_agents = $this->wp_db->where('agency_id', $agency_id)
+            ->get('crm_agents')->result();
+        
+        if (empty($crm_agents)) return [];
+        
+        // Pour chaque agent CRM, enrichir avec les données HOUZEZ
+        $enriched_agents = [];
+        foreach ($crm_agents as $crm_agent) {
+            // Récupérer les données complètes de l'agent depuis HOUZEZ si disponible
+            if (!empty($crm_agent->email)) {
+                $houzez_agent = $this->get_houzez_agent_by_email($crm_agent->email);
+                if ($houzez_agent) {
+                    // Fusionner les données CRM et HOUZEZ
+                    $agent = clone $houzez_agent;
+                    $agent->crm_id = $crm_agent->id ?? $crm_agent->ID;
+                    $agent->agency_id = $crm_agent->agency_id;
+                } else {
+                    // Utiliser seulement les données CRM
+                    $agent = clone $crm_agent;
+                    $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
+                    $agent->agent_email = $crm_agent->email ?? '';
+                }
+            } else {
+                // Pas d'email, utiliser seulement les données CRM
+                $agent = clone $crm_agent;
+                $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
+                $agent->agent_email = $crm_agent->email ?? '';
+            }
+            
+            $enriched_agents[] = $agent;
+        }
+        
+        return $enriched_agents;
+    }
+    
+    /**
+     * Récupère un agent HOUZEZ par email
+     * @param string $email
+     * @return object|null
+     */
+    private function get_houzez_agent_by_email($email) {
+        if (empty($email)) return null;
+        
+        $this->wp_db->select("
+            p.ID as agent_id,
+            p.post_title as agent_name,
+            p.post_content as agent_description,
+            p.post_status as post_status,
+            p.post_date as created_date,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar
+        ", FALSE);
+        
+        $agent = $this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->where('p.post_type', 'houzez_agent')
+            ->having('MAX(CASE WHEN pm.meta_key = "fave_agent_email" THEN pm.meta_value END) =', $email)
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date')
+            ->get()->row();
+            
+        return $agent;
     }
 
     /**

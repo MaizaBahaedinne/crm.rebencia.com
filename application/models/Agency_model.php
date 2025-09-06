@@ -229,11 +229,10 @@ class Agency_model extends CI_Model {
         ];
     }
 
-    /** Compte les agents liés via usermeta.houzez_agency_id */
+    /** Compte les agents liés via la table crm_agents avec agency_id */
     public function count_agents($agency_id) {
-        return (int)$this->wp_db->from($this->users_table.' u')
-            ->join($this->usermeta_table.' m', 'u.ID = m.user_id AND m.meta_key = "houzez_agency_id"', 'inner', false)
-            ->where('m.meta_value', (int)$agency_id)
+        return (int)$this->wp_db->from('crm_agents')
+            ->where('agency_id', (int)$agency_id)
             ->count_all_results();
     }
 
