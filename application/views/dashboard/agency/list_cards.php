@@ -198,17 +198,17 @@
                                         <div class="d-flex align-items-start">
                                             <div class="flex-grow-1 overflow-hidden">
                                                 <h5 class="text-truncate font-size-15">
-                                                    <a href="<?php echo base_url('agency/view/' . $agency->ID); ?>" class="text-dark">
-                                                        <?php echo htmlspecialchars($agency->display_name ?: $agency->agency_name ?: 'Agence #' . $agency->ID); ?>
+                                                    <a href="<?php echo base_url('agency/view/' . $agency->agency_id); ?>" class="text-dark">
+                                                        <?php echo htmlspecialchars($agency->agency_name ?: 'Agence #' . $agency->agency_id); ?>
                                                     </a>
                                                 </h5>
                                                 <p class="text-muted mb-2">
                                                     <i class="ri-mail-line me-1"></i> 
-                                                    <?php echo htmlspecialchars($agency->agency_email ?: $agency->user_email ?: 'Email non fourni'); ?>
+                                                    <?php echo htmlspecialchars($agency->agency_email ?: 'Email non fourni'); ?>
                                                 </p>
                                                 <p class="text-muted mb-2">
                                                     <i class="ri-phone-line me-1"></i> 
-                                                    <?php echo htmlspecialchars($agency->agency_phone ?: 'Téléphone non fourni'); ?>
+                                                    <?php echo htmlspecialchars($agency->phone ?: 'Téléphone non fourni'); ?>
                                                 </p>
                                                 <p class="text-muted mb-3">
                                                     <i class="ri-map-pin-line me-1"></i> 
@@ -218,15 +218,15 @@
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <div class="dropdown">
-                                                    <a class="btn btn-sm btn-light" href="#" role="button" id="dropdownMenuLink<?php echo $agency->ID; ?>" data-bs-toggle="dropdown">
+                                                    <a class="btn btn-sm btn-light" href="#" role="button" id="dropdownMenuLink<?php echo $agency->agency_id; ?>" data-bs-toggle="dropdown">
                                                         <i class="ri-more-2-fill"></i>
                                                     </a>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink<?php echo $agency->ID; ?>">
-                                                        <li><a class="dropdown-item" href="<?php echo base_url('agency/view/' . $agency->ID); ?>">
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink<?php echo $agency->agency_id; ?>">
+                                                        <li><a class="dropdown-item" href="<?php echo base_url('agency/view/' . $agency->agency_id); ?>">
                                                             <i class="ri-eye-line me-2"></i>Voir détails</a></li>
-                                                        <li><a class="dropdown-item" href="<?php echo base_url('agency/agents/' . $agency->ID); ?>">
+                                                        <li><a class="dropdown-item" href="<?php echo base_url('agency/agents/' . $agency->agency_id); ?>">
                                                             <i class="ri-user-3-line me-2"></i>Agents (<?php echo $agency->agents_count ?? 0; ?>)</a></li>
-                                                        <li><a class="dropdown-item" href="<?php echo base_url('agency/properties/' . $agency->ID); ?>">
+                                                        <li><a class="dropdown-item" href="<?php echo base_url('agency/properties/' . $agency->agency_id); ?>">
                                                             <i class="ri-home-line me-2"></i>Propriétés</a></li>
                                                     </ul>
                                                 </div>
@@ -256,18 +256,18 @@
 
                                         <div class="mt-3">
                                             <div class="d-flex gap-2">
-                                                <a href="<?php echo base_url('agency/view/' . $agency->ID); ?>" class="btn btn-primary btn-sm flex-fill">
+                                                <a href="<?php echo base_url('agency/view/' . $agency->agency_id); ?>" class="btn btn-primary btn-sm flex-fill">
                                                     <i class="ri-eye-line me-1"></i>Détails
                                                 </a>
-                                                <a href="<?php echo base_url('agency/agents/' . $agency->ID); ?>" class="btn btn-soft-info btn-sm flex-fill">
+                                                <a href="<?php echo base_url('agency/agents/' . $agency->agency_id); ?>" class="btn btn-soft-info btn-sm flex-fill">
                                                     <i class="ri-user-3-line me-1"></i>Agents
                                                 </a>
                                             </div>
                                         </div>
 
-                                        <?php if (!empty($agency->agency_website)) : ?>
+                                        <?php if (!empty($agency->website)) : ?>
                                         <div class="mt-2">
-                                            <a href="<?php echo $agency->agency_website; ?>" target="_blank" class="btn btn-link btn-sm p-0">
+                                            <a href="<?php echo $agency->website; ?>" target="_blank" class="btn btn-link btn-sm p-0">
                                                 <i class="ri-external-link-line me-1"></i>Site web
                                             </a>
                                         </div>
@@ -277,7 +277,7 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <small class="text-muted">
                                                 <i class="ri-calendar-line me-1"></i>
-                                                Membre depuis <?php echo date('M Y', strtotime($agency->user_registered ?? 'now')); ?>
+                                                Membre depuis <?php echo date('M Y', strtotime($agency->created_date ?? 'now')); ?>
                                             </small>
                                             <span class="badge bg-success-subtle text-success">Active</span>
                                         </div>
@@ -330,18 +330,18 @@
                                                     <div class="d-flex align-items-center">
                                                         <div class="avatar-sm me-3">
                                                             <div class="avatar-title bg-primary-subtle text-primary rounded">
-                                                                <?php echo strtoupper(substr($agency->display_name ?: 'A', 0, 2)); ?>
+                                                                <?php echo strtoupper(substr($agency->agency_name ?: 'A', 0, 2)); ?>
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <h6 class="mb-1"><?php echo htmlspecialchars($agency->display_name ?: 'Agence #' . $agency->ID); ?></h6>
-                                                            <p class="text-muted mb-0 small">ID: <?php echo $agency->ID; ?></p>
+                                                            <h6 class="mb-1"><?php echo htmlspecialchars($agency->agency_name ?: 'Agence #' . $agency->agency_id); ?></h6>
+                                                            <p class="text-muted mb-0 small">ID: <?php echo $agency->agency_id; ?></p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="mb-1"><?php echo htmlspecialchars($agency->agency_email ?: $agency->user_email ?: '-'); ?></p>
-                                                    <p class="text-muted mb-0 small"><?php echo htmlspecialchars($agency->agency_phone ?: '-'); ?></p>
+                                                    <p class="mb-1"><?php echo htmlspecialchars($agency->agency_email ?: '-'); ?></p>
+                                                    <p class="text-muted mb-0 small"><?php echo htmlspecialchars($agency->phone ?: '-'); ?></p>
                                                 </td>
                                                 <td>
                                                     <span class="text-muted">
@@ -360,10 +360,10 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="btn-group btn-group-sm" role="group">
-                                                        <a href="<?php echo base_url('agency/view/' . $agency->ID); ?>" class="btn btn-outline-primary">
+                                                        <a href="<?php echo base_url('agency/view/' . $agency->agency_id); ?>" class="btn btn-outline-primary">
                                                             <i class="ri-eye-line"></i>
                                                         </a>
-                                                        <a href="<?php echo base_url('agency/agents/' . $agency->ID); ?>" class="btn btn-outline-info">
+                                                        <a href="<?php echo base_url('agency/agents/' . $agency->agency_id); ?>" class="btn btn-outline-info">
                                                             <i class="ri-user-3-line"></i>
                                                         </a>
                                                     </div>
