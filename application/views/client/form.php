@@ -223,7 +223,7 @@
                                         <i class="ri-save-line align-bottom me-1"></i> 
                                         <?= isset($client) ? 'Modifier' : 'Ajouter' ?> le client
                                     </button>
-                                    <?php if(isset($client)): ?>
+                                    <?php if(isset($client) && isset($client->id)): ?>
                                         <a href="<?= base_url('client/delete/'.$client->id) ?>" class="btn btn-danger" onclick="return confirm('Supprimer ce client ?')">
                                             <i class="ri-delete-bin-line align-bottom me-1"></i> Supprimer
                                         </a>
