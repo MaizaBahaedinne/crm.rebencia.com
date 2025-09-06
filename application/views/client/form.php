@@ -106,20 +106,20 @@
                                         <label class="form-label">Type d'identité</label>
                                         <select name="identite_type" class="form-select">
                                             <option value="">Sélectionner le type</option>
-                                            <option value="CIN" <?= (isset($client) && $client->identite_type=='CIN')?'selected':''; ?>>CIN</option>
-                                            <option value="Passeport" <?= (isset($client) && $client->identite_type=='Passeport')?'selected':''; ?>>Passeport</option>
-                                            <option value="Titre de séjour" <?= (isset($client) && $client->identite_type=='Titre de séjour')?'selected':''; ?>>Titre de séjour</option>
-                                            <option value="Registre de commerce" <?= (isset($client) && $client->identite_type=='Registre de commerce')?'selected':''; ?>>Registre de commerce</option>
+                                            <option value="CIN" <?= (isset($client) && isset($client->identite_type) && $client->identite_type=='CIN')?'selected':''; ?>>CIN</option>
+                                            <option value="Passeport" <?= (isset($client) && isset($client->identite_type) && $client->identite_type=='Passeport')?'selected':''; ?>>Passeport</option>
+                                            <option value="Titre de séjour" <?= (isset($client) && isset($client->identite_type) && $client->identite_type=='Titre de séjour')?'selected':''; ?>>Titre de séjour</option>
+                                            <option value="Registre de commerce" <?= (isset($client) && isset($client->identite_type) && $client->identite_type=='Registre de commerce')?'selected':''; ?>>Registre de commerce</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Numéro d'identité</label>
-                                        <input type="text" name="identite_numero" class="form-control" placeholder="Numéro d'identité / RC" value="<?= isset($client) ? htmlspecialchars($client->identite_numero) : '' ?>">
+                                        <input type="text" name="identite_numero" class="form-control" placeholder="Numéro d'identité / RC" value="<?= isset($client) && isset($client->identite_numero) ? htmlspecialchars($client->identite_numero) : '' ?>">
                                     </div>
                                     <div class="col-md-12">
                                         <label class="form-label">Document d'identité</label>
                                         <input type="file" name="identite_doc" class="form-control" accept="application/pdf,image/*">
-                                        <?php if(isset($client) && !empty($client->identite_doc)): ?>
+                                        <?php if(isset($client) && isset($client->identite_doc) && !empty($client->identite_doc)): ?>
                                             <div class="mt-2">
                                                 <a href="<?= base_url('uploads/clients/'.$client->identite_doc) ?>" target="_blank" class="text-primary">
                                                     <i class="ri-file-text-line me-1"></i>Document existant
