@@ -8,7 +8,76 @@ require APPPATH.'libraries/BaseController.php';
  */
 class Client extends BaseController {
     public function __construct(){
-        parent::__construct();
+                    // Test avec différents noms de colonnes
+                    echo "<h4>5. Test avec différents noms de colonnes</h4>";
+                    
+                    $possible_agency_columns = ['agency_id'];
+                    
+                    foreach ($possible_agency_columns as $col) {
+                        try {
+                            $test_agents = $wp_db->select('COUNT(*) as count')
+                                ->from($crm_agents_table)
+                                ->where($col, 3)
+                                ->get()->row();
+                            
+                            echo "<p><strong>Agents avec $col = 3:</strong> " . ($test_agents->count ?? 0) . "</p>";
+                        } catch (Exception $e) {
+                            echo "<p><strong>Colonne $col:</strong> n'existe pas ou erreur: " . $e->getMessage() . "</p>";
+                        }
+                    }
+                    
+                    // Test avec l'ID d'agence réel trouvé (18907)
+                    echo "<h4>6. Test avec l'ID d'agence réel (18907)</h4>";
+                    
+                    $real_agents = $wp_db->select('*')
+                        ->from($crm_agents_table)
+                        ->where('agency_id', 18907)
+                        ->get()->result();
+                    
+                    echo "<p><strong>Agents pour agence ID 18907:</strong> " . count($real_agents) . "</p>";
+                    
+                    if (!empty($real_agents)) {
+                        echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                        echo "<tr><th>User ID</th><th>Agent Name</th><th>Email</th><th>Agency ID</th><th>Agency Name</th></tr>";
+                        
+                        foreach ($real_agents as $agent) {
+                            echo "<tr>";
+                            echo "<td>{$agent->user_id}</td>";
+                            echo "<td>" . htmlspecialchars($agent->agent_name) . "</td>";
+                            echo "<td>" . htmlspecialchars($agent->agent_email) . "</td>";
+                            echo "<td>{$agent->agency_id}</td>";
+                            echo "<td>" . htmlspecialchars($agent->agency_name) . "</td>";
+                            echo "</tr>";
+                        }
+                        echo "</table>";
+                    }
+                    
+                    // Correspondance entre IDs utilisateurs WordPress et IDs posts d'agences
+                    echo "<h4>7. Correspondance agences WordPress vs Houzez Posts</h4>";
+                    
+                    $wp_agencies = $wp_db->select('u.ID as user_id, u.display_name')
+                        ->from($wp_db->dbprefix . 'users u')
+                        ->join($wp_db->dbprefix . 'usermeta m', 'u.ID = m.user_id')
+                        ->where('m.meta_key', $wp_db->dbprefix . 'capabilities')
+                        ->like('m.meta_value', 'houzez_agency')
+                        ->get()->result();
+                    
+                    echo "<table border='1' style='border-collapse: collapse;'>";
+                    echo "<tr><th>WordPress User ID</th><th>Display Name</th><th>Agents dans crm_agents</th></tr>";
+                    
+                    foreach ($wp_agencies as $wp_agency) {
+                        $agent_count = $wp_db->select('COUNT(*) as count')
+                            ->from($crm_agents_table)
+                            ->where('agency_id', $wp_agency->user_id)
+                            ->get()->row();
+                        
+                        echo "<tr>";
+                        echo "<td>{$wp_agency->user_id}</td>";
+                        echo "<td>" . htmlspecialchars($wp_agency->display_name) . "</td>";
+                        echo "<td>" . ($agent_count->count ?? 0) . "</td>";
+                        echo "</tr>";
+                    }
+                    echo "</table>";_construct();
         $this->isLoggedIn();
     // Remplace par clients WordPress (Houzez)
     $this->load->model('wp_client_model');
@@ -184,6 +253,84 @@ class Client extends BaseController {
     }
 
     /**
+     * Solution alternative : utiliser crm_agents pour agences ET agents
+     */
+    public function search_agencies_from_crm() {
+        $this->isLoggedIn();
+        
+        $query = $this->input->post('query');
+        
+        if (!$query || strlen($query) < 2) {
+            echo json_encode(['success' => false, 'message' => 'Minimum 2 caractères requis']);
+            return;
+        }
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            // Récupérer les agences distinctes de la table crm_agents
+            $agencies = $wp_db->select('DISTINCT agency_id, agency_name')
+                ->from($wp_db->dbprefix . 'crm_agents')
+                ->like('agency_name', $query)
+                ->get()->result();
+            
+            $filtered_agencies = [];
+            foreach ($agencies as $agency) {
+                $filtered_agencies[] = [
+                    'id' => $agency->agency_id,
+                    'name' => $agency->agency_name
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'agencies' => $filtered_agencies]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Solution alternative : récupérer agents directement de crm_agents
+     */
+    public function search_agents_from_crm() {
+        $this->isLoggedIn();
+        
+        $agency_id = $this->input->post('agency_id');
+        $query = $this->input->post('query');
+        
+        if (!$agency_id) {
+            echo json_encode(['success' => false, 'message' => 'ID agence requis']);
+            return;
+        }
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $wp_db->select('user_id, agent_name, agent_email, agency_name')
+                ->from($wp_db->dbprefix . 'crm_agents')
+                ->where('agency_id', $agency_id);
+            
+            // Si une query est fournie, filtrer par nom
+            if ($query && strlen($query) >= 2) {
+                $wp_db->like('agent_name', $query);
+            }
+            
+            $agents = $wp_db->get()->result();
+            
+            $filtered_agents = [];
+            foreach ($agents as $agent) {
+                $filtered_agents[] = [
+                    'id' => $agent->user_id,
+                    'name' => $agent->agent_name
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'agents' => $filtered_agents]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche des agents: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
      * Méthode AJAX pour la recherche d'agences (autocomplétion)
      */
     public function search_agencies() {
@@ -216,6 +363,94 @@ class Client extends BaseController {
             echo json_encode(['success' => true, 'agencies' => $filtered_agencies]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erreur lors de la recherche: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Test simple pour vérifier le mapping agences-agents
+     */
+    public function test_agency_agent_mapping() {
+        $this->isLoggedIn();
+        
+        echo "<h3>Test: Mapping Agences WordPress ↔ Agents HOUZEZ</h3>";
+        
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $users_table = $wp_db->dbprefix . 'users';
+            $usermeta_table = $wp_db->dbprefix . 'usermeta';
+            $crm_agents_table = $wp_db->dbprefix . 'crm_agents';
+            $capabilities_key = $wp_db->dbprefix . 'capabilities';
+            
+            echo "<h4>1. Agences WordPress</h4>";
+            
+            // Récupérer les agences WordPress
+            $wp_agencies = $wp_db->select('u.ID, u.user_login, u.display_name')
+                ->from($users_table . ' u')
+                ->join($usermeta_table . ' m', 'u.ID = m.user_id')
+                ->where('m.meta_key', $capabilities_key)
+                ->like('m.meta_value', 'houzez_agency')
+                ->get()->result();
+            
+            echo "<table border='1' style='border-collapse: collapse;'>";
+            echo "<tr><th>WP User ID</th><th>Login</th><th>Display Name</th><th>Agents associés</th></tr>";
+            
+            foreach ($wp_agencies as $agency) {
+                // Chercher les agents pour cette agence dans crm_agents
+                $agents_count = $wp_db->select('COUNT(*) as count')
+                    ->from($crm_agents_table)
+                    ->where('agency_id', $agency->ID)
+                    ->get()->row();
+                
+                echo "<tr>";
+                echo "<td>{$agency->ID}</td>";
+                echo "<td>{$agency->user_login}</td>";
+                echo "<td>" . htmlspecialchars($agency->display_name) . "</td>";
+                echo "<td>" . ($agents_count->count ?? 0) . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+            
+            echo "<h4>2. Tous les agents dans crm_agents</h4>";
+            
+            $all_agents = $wp_db->select('user_id, agent_name, agency_id, agency_name')
+                ->from($crm_agents_table)
+                ->get()->result();
+            
+            echo "<table border='1' style='border-collapse: collapse;'>";
+            echo "<tr><th>User ID</th><th>Agent Name</th><th>Agency ID (dans crm_agents)</th><th>Agency Name</th><th>WP Agency existe?</th></tr>";
+            
+            foreach ($all_agents as $agent) {
+                // Vérifier si l'agency_id correspond à un utilisateur WordPress
+                $wp_agency_exists = $wp_db->select('display_name')
+                    ->from($users_table)
+                    ->where('ID', $agent->agency_id)
+                    ->get()->row();
+                
+                echo "<tr>";
+                echo "<td>{$agent->user_id}</td>";
+                echo "<td>" . htmlspecialchars($agent->agent_name) . "</td>";
+                echo "<td>{$agent->agency_id}</td>";
+                echo "<td>" . htmlspecialchars($agent->agency_name) . "</td>";
+                echo "<td>" . ($wp_agency_exists ? "✅ " . htmlspecialchars($wp_agency_exists->display_name) : "❌ Non trouvé") . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+            
+            echo "<h4>3. Recommandation</h4>";
+            echo "<p>D'après les données, il semble que:</p>";
+            echo "<ul>";
+            echo "<li><strong>agency_id</strong> dans crm_agents fait référence aux <strong>posts d'agences</strong> (ID 18907)</li>";
+            echo "<li>Pas aux <strong>utilisateurs WordPress</strong> (ID 3, 12)</li>";
+            echo "<li>Il faut soit:</li>";
+            echo "<ul>";
+            echo "<li>Trouver la table de correspondance entre posts d'agences et utilisateurs WordPress</li>";
+            echo "<li>Ou utiliser directement les données de crm_agents pour l'autocomplétion</li>";
+            echo "</ul>";
+            echo "</ul>";
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
         }
     }
 

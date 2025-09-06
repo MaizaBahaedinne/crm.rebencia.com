@@ -82,7 +82,12 @@ $route['client/search_agencies'] = 'Client/search_agencies';
 $route['client/search_agents_by_agency'] = 'Client/search_agents_by_agency';
 $route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
 
+// Routes alternatives utilisant crm_agents directement
+$route['client/search_agencies_from_crm'] = 'Client/search_agencies_from_crm';
+$route['client/search_agents_from_crm'] = 'Client/search_agents_from_crm';
+
 // Routes de debug
+$route['client/test_agency_agent_mapping'] = 'Client/test_agency_agent_mapping';
 $route['client/debug_crm_agents_table'] = 'Client/debug_crm_agents_table';
 $route['client/debug_agents_detailed'] = 'Client/debug_agents_detailed';
 $route['client/test_houzez_data'] = 'Client/test_houzez_data';

@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function searchAgencies(query) {
-        fetch('<?= base_url("client/search_agencies") ?>', {
+        fetch('<?= base_url("client/search_agencies_from_crm") ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function searchAgentsByAgency(agencyId, query = '') {
         agentLoading.style.display = 'block';
         
-        fetch('<?= base_url("client/search_agents_by_agency") ?>', {
+        fetch('<?= base_url("client/search_agents_from_crm") ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
