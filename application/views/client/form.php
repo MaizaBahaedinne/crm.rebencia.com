@@ -37,8 +37,8 @@
                                             <option value="">Sélectionner une agence</option>
                                             <?php if(isset($agencies) && !empty($agencies)): foreach($agencies as $agency): ?>
                                                 <?php 
-                                                $agency_id = isset($agency->id) ? $agency->id : '';
-                                                $agency_name = isset($agency->nom) ? $agency->nom : (isset($agency->name) ? $agency->name : (isset($agency->libelle) ? $agency->libelle : 'Agence'));
+                                                $agency_id = isset($agency->ID) ? $agency->ID : (isset($agency->id) ? $agency->id : '');
+                                                $agency_name = isset($agency->display_name) ? $agency->display_name : (isset($agency->nom) ? $agency->nom : (isset($agency->name) ? $agency->name : (isset($agency->libelle) ? $agency->libelle : 'Agence')));
                                                 ?>
                                                 <option value="<?= $agency_id ?>" <?= (isset($client) && isset($client->agency_id) && $client->agency_id==$agency_id)?'selected':''; ?>>
                                                     <?= htmlspecialchars($agency_name) ?>
@@ -53,8 +53,8 @@
                                             <option value="">Sélectionner un agent</option>
                                             <?php if(isset($agents) && !empty($agents)): foreach($agents as $agent): ?>
                                                 <?php 
-                                                $agent_id = isset($agent->id) ? $agent->id : '';
-                                                $agent_name = isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent'));
+                                                $agent_id = isset($agent->ID) ? $agent->ID : (isset($agent->id) ? $agent->id : '');
+                                                $agent_name = isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')));
                                                 ?>
                                                 <option value="<?= $agent_id ?>" <?= (isset($client) && isset($client->agent_id) && $client->agent_id==$agent_id)?'selected':''; ?>>
                                                     <?= htmlspecialchars($agent_name) ?>
