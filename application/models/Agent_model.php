@@ -24,46 +24,54 @@ class Agent_model extends CI_Model {
 
     /**
      * Retourne tous les agents HOUZEZ avec leurs informations complètes
+     * Utilise une requête optimisée similaire à celle fournie
      * @param array $filters Filtres de recherche
      * @return object[]
      */
     public function get_all_agents($filters = []) {
-        // Requête pour récupérer tous les agents HOUZEZ depuis la table posts
+        // Requête optimisée pour récupérer tous les agents HOUZEZ avec leurs informations complètes
         $this->wp_db->select("
+            u.ID as user_id,
+            u.user_login as user_login,
+            u.user_email as user_email,
+            u.user_status as user_status,
+            u.user_registered as registration_date,
             p.ID as agent_id,
             p.post_title as agent_name,
-            p.post_content as agent_description,
             p.post_status as post_status,
-            p.post_date as created_date,
+            pm_email.meta_value as agent_email,
             a.ID as agency_id,
             a.post_title as agency_name,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_instagram' THEN pm.meta_value END) as instagram
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) as phone,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) as mobile,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) as whatsapp,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) as skype,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_facebook' THEN pm_contact.meta_value END) as facebook,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_twitter' THEN pm_contact.meta_value END) as twitter,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_linkedin' THEN pm_contact.meta_value END) as linkedin,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_instagram' THEN pm_contact.meta_value END) as instagram,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_zip' THEN pm_contact.meta_value END) as postal_code
         ", FALSE);
         
-        $this->wp_db->from($this->posts_table . ' p')
+        $this->wp_db->from($this->users_table . ' u')
+            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email', 'left')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'left')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
-            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
-            ->where('p.post_type', 'houzez_agent')
-            ->where('p.post_status', 'publish');
+            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->where('p.post_type', 'houzez_agent');
 
         // Appliquer les filtres
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $this->wp_db->group_start()
                 ->like('p.post_title', $search)
-                ->or_like('p.post_content', $search)
+                ->or_like('u.user_email', $search)
+                ->or_like('u.user_login', $search)
                 ->group_end();
         }
 
@@ -71,53 +79,65 @@ class Agent_model extends CI_Model {
             $this->wp_db->where('a.ID', $filters['agency_id']);
         }
 
-        $this->wp_db->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, a.ID, a.post_title');
+        $this->wp_db->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_status, pm_email.meta_value, a.ID, a.post_title');
 
         return $this->wp_db->get()->result();
     }
 
     /**
-     * Agents d'une agence spécifique depuis la table crm_agents
+     * Agents d'une agence spécifique - approche hybride CRM + HOUZEZ
      * @param int $agency_id
      * @return object[]
      */
     public function get_agents_by_agency($agency_id) {
         if (!$agency_id) return [];
         
-        // Récupérer les agents depuis la table crm_agents
-        $crm_agents = $this->wp_db->where('agency_id', $agency_id)
-            ->get('crm_agents')->result();
+        // Récupérer tous les agents HOUZEZ de l'agence via la requête optimisée
+        $houzez_agents = $this->get_all_agents(['agency_id' => $agency_id]);
         
-        if (empty($crm_agents)) return [];
+        // Récupérer aussi les agents CRM de cette agence
+        $crm_agents = $this->wp_db->select('*')
+            ->from('crm_agents')
+            ->where('agency_id', $agency_id)
+            ->get()->result();
         
-        // Pour chaque agent CRM, enrichir avec les données HOUZEZ
-        $enriched_agents = [];
-        foreach ($crm_agents as $crm_agent) {
-            // Récupérer les données complètes de l'agent depuis HOUZEZ si disponible
-            if (!empty($crm_agent->email)) {
-                $houzez_agent = $this->get_houzez_agent_by_email($crm_agent->email);
-                if ($houzez_agent) {
-                    // Fusionner les données CRM et HOUZEZ
-                    $agent = clone $houzez_agent;
-                    $agent->crm_id = $crm_agent->id ?? $crm_agent->ID;
-                    $agent->agency_id = $crm_agent->agency_id;
-                } else {
-                    // Utiliser seulement les données CRM
-                    $agent = clone $crm_agent;
-                    $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
-                    $agent->agent_email = $crm_agent->email ?? '';
-                }
-            } else {
-                // Pas d'email, utiliser seulement les données CRM
-                $agent = clone $crm_agent;
-                $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
-                $agent->agent_email = $crm_agent->email ?? '';
+        // Fusionner les deux sources : priorité à HOUZEZ, compléter avec CRM
+        $all_agents = [];
+        $processed_emails = [];
+        
+        // D'abord ajouter tous les agents HOUZEZ
+        foreach ($houzez_agents as $agent) {
+            if (!empty($agent->agent_email)) {
+                $processed_emails[] = strtolower($agent->agent_email);
             }
-            
-            $enriched_agents[] = $agent;
+            $all_agents[] = $agent;
         }
         
-        return $enriched_agents;
+        // Ajouter les agents CRM qui ne sont pas déjà dans HOUZEZ
+        foreach ($crm_agents as $crm_agent) {
+            $email = strtolower($crm_agent->email ?? '');
+            if (!empty($email) && !in_array($email, $processed_emails)) {
+                // Créer un objet agent compatible avec les données CRM
+                $agent = new stdClass();
+                $agent->user_id = null;
+                $agent->user_login = null;
+                $agent->user_email = $crm_agent->email;
+                $agent->agent_id = null;
+                $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
+                $agent->agent_email = $crm_agent->email;
+                $agent->phone = $crm_agent->phone ?? '';
+                $agent->mobile = $crm_agent->mobile ?? '';
+                $agent->position = $crm_agent->position ?? 'Agent immobilier';
+                $agent->agency_id = $agency_id;
+                $agent->agency_name = null; // Sera rempli si nécessaire
+                $agent->crm_id = $crm_agent->id ?? $crm_agent->ID ?? null;
+                $agent->is_crm_only = true;
+                
+                $all_agents[] = $agent;
+            }
+        }
+        
+        return $all_agents;
     }
     
     /**
