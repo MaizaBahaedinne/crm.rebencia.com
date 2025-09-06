@@ -220,6 +220,184 @@ class Client extends BaseController {
     }
 
     /**
+     * Test simple pour vérifier les données HOUZEZ
+     */
+    public function test_houzez_data() {
+        $this->isLoggedIn();
+        
+        echo "<h3>Test: Données HOUZEZ directes</h3>";
+        
+        try {
+            // Charger la DB WordPress directement
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            $users_table = $wp_db->dbprefix . 'users';
+            $usermeta_table = $wp_db->dbprefix . 'usermeta';
+            $capabilities_key = $wp_db->dbprefix . 'capabilities';
+            
+            echo "<h4>1. Recherche d'agences (méthode simple)</h4>";
+            
+            // Recherche simple des agences
+            $agencies = $wp_db->select('u.ID, u.user_login, u.display_name, u.user_email')
+                ->from($users_table . ' u')
+                ->join($usermeta_table . ' m', 'u.ID = m.user_id')
+                ->where('m.meta_key', $capabilities_key)
+                ->like('m.meta_value', 'houzez_agency')
+                ->get()->result();
+            
+            echo "<p><strong>Agences trouvées:</strong> " . count($agencies) . "</p>";
+            
+            if (!empty($agencies)) {
+                echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                echo "<tr><th>ID</th><th>Login</th><th>Display Name</th><th>Email</th></tr>";
+                foreach ($agencies as $agency) {
+                    echo "<tr>";
+                    echo "<td>{$agency->ID}</td>";
+                    echo "<td>{$agency->user_login}</td>";
+                    echo "<td>{$agency->display_name}</td>";
+                    echo "<td>{$agency->user_email}</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+                
+                // Tester avec la première agence
+                $first_agency = $agencies[0];
+                echo "<h4>2. Recherche d'agents pour l'agence ID {$first_agency->ID}</h4>";
+                
+                $agents = $wp_db->select('u.ID, u.user_login, u.display_name, u.user_email')
+                    ->from($users_table . ' u')
+                    ->join($usermeta_table . ' m1', 'u.ID = m1.user_id')
+                    ->join($usermeta_table . ' m2', 'u.ID = m2.user_id')
+                    ->where('m1.meta_key', $capabilities_key)
+                    ->like('m1.meta_value', 'houzez_agent')
+                    ->where('m2.meta_key', 'houzez_agency_id')
+                    ->where('m2.meta_value', $first_agency->ID)
+                    ->get()->result();
+                
+                echo "<p><strong>Agents trouvés:</strong> " . count($agents) . "</p>";
+                
+                if (!empty($agents)) {
+                    echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                    echo "<tr><th>ID</th><th>Login</th><th>Display Name</th><th>Email</th></tr>";
+                    foreach ($agents as $agent) {
+                        echo "<tr>";
+                        echo "<td>{$agent->ID}</td>";
+                        echo "<td>{$agent->user_login}</td>";
+                        echo "<td>{$agent->display_name}</td>";
+                        echo "<td>{$agent->user_email}</td>";
+                        echo "</tr>";
+                    }
+                    echo "</table>";
+                }
+            }
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
+        }
+    }
+
+    /**
+     * Méthode de debug pour examiner la structure de la DB WordPress
+     */
+    public function debug_wordpress_structure() {
+        $this->isLoggedIn();
+        
+        echo "<h3>Debug: Structure WordPress/HOUZEZ</h3>";
+        
+        try {
+            // Charger la DB WordPress
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            echo "<h4>1. Configuration de connexion</h4>";
+            echo "<p><strong>Database:</strong> " . $wp_db->database . "</p>";
+            echo "<p><strong>Prefix:</strong> " . $wp_db->dbprefix . "</p>";
+            
+            // Tester la connexion
+            echo "<h4>2. Test de connexion</h4>";
+            $tables = $wp_db->list_tables();
+            echo "<p><strong>Nombre de tables trouvées:</strong> " . count($tables) . "</p>";
+            
+            // Vérifier les tables users et usermeta
+            $users_table = $wp_db->dbprefix . 'users';
+            $usermeta_table = $wp_db->dbprefix . 'usermeta';
+            
+            echo "<h4>3. Tables utilisateurs</h4>";
+            if (in_array($users_table, $tables)) {
+                $user_count = $wp_db->count_all($users_table);
+                echo "<p>✅ Table <strong>$users_table</strong> existe avec $user_count utilisateurs</p>";
+            } else {
+                echo "<p>❌ Table <strong>$users_table</strong> n'existe pas</p>";
+            }
+            
+            if (in_array($usermeta_table, $tables)) {
+                $meta_count = $wp_db->count_all($usermeta_table);
+                echo "<p>✅ Table <strong>$usermeta_table</strong> existe avec $meta_count métadonnées</p>";
+            } else {
+                echo "<p>❌ Table <strong>$usermeta_table</strong> n'existe pas</p>";
+            }
+            
+            // Vérifier les rôles HOUZEZ
+            echo "<h4>4. Rôles HOUZEZ</h4>";
+            $capabilities_key = $wp_db->dbprefix . 'capabilities';
+            
+            $agency_roles = $wp_db->select('COUNT(*) as count')
+                ->from($usermeta_table)
+                ->where('meta_key', $capabilities_key)
+                ->like('meta_value', 'houzez_agency')
+                ->get()->row();
+            
+            $agent_roles = $wp_db->select('COUNT(*) as count')
+                ->from($usermeta_table)
+                ->where('meta_key', $capabilities_key)
+                ->like('meta_value', 'houzez_agent')
+                ->get()->row();
+            
+            echo "<p><strong>Utilisateurs avec rôle houzez_agency:</strong> " . ($agency_roles->count ?? 0) . "</p>";
+            echo "<p><strong>Utilisateurs avec rôle houzez_agent:</strong> " . ($agent_roles->count ?? 0) . "</p>";
+            
+            // Examiner quelques exemples de capabilities
+            echo "<h4>5. Exemples de capabilities</h4>";
+            $sample_caps = $wp_db->select('user_id, meta_value')
+                ->from($usermeta_table)
+                ->where('meta_key', $capabilities_key)
+                ->limit(5)
+                ->get()->result();
+            
+            if (!empty($sample_caps)) {
+                echo "<table border='1' style='border-collapse: collapse;'>";
+                echo "<tr><th>User ID</th><th>Capabilities</th></tr>";
+                foreach ($sample_caps as $cap) {
+                    echo "<tr><td>{$cap->user_id}</td><td>" . htmlspecialchars($cap->meta_value) . "</td></tr>";
+                }
+                echo "</table>";
+            }
+            
+            // Vérifier les meta_keys liés aux agences
+            echo "<h4>6. Meta keys des agences</h4>";
+            $agency_meta_keys = $wp_db->select('DISTINCT meta_key, COUNT(*) as count')
+                ->from($usermeta_table)
+                ->like('meta_key', 'agency')
+                ->or_like('meta_key', 'houzez_agency')
+                ->group_by('meta_key')
+                ->get()->result();
+            
+            if (!empty($agency_meta_keys)) {
+                echo "<table border='1' style='border-collapse: collapse;'>";
+                echo "<tr><th>Meta Key</th><th>Count</th></tr>";
+                foreach ($agency_meta_keys as $meta) {
+                    echo "<tr><td>{$meta->meta_key}</td><td>{$meta->count}</td></tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p>Aucune meta_key liée aux agences trouvée</p>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
+        }
+    }
+
+    /**
      * Méthode de debug pour lister toutes les agences
      */
     public function debug_agencies() {
