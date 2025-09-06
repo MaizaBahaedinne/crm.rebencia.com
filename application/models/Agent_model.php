@@ -115,16 +115,26 @@ class Agent_model extends CI_Model {
         
         // Ajouter les agents CRM qui ne sont pas déjà dans HOUZEZ
         foreach ($crm_agents as $crm_agent) {
-            $email = strtolower($crm_agent->email ?? '');
-            if (!empty($email) && !in_array($email, $processed_emails)) {
+            // Extraire l'email selon la structure réelle de la table
+            $email = null;
+            if (isset($crm_agent->email) && !empty($crm_agent->email)) {
+                $email = $crm_agent->email;
+            } elseif (isset($crm_agent->agent_email) && !empty($crm_agent->agent_email)) {
+                $email = $crm_agent->agent_email;
+            } elseif (isset($crm_agent->user_email) && !empty($crm_agent->user_email)) {
+                $email = $crm_agent->user_email;
+            }
+            
+            $email_lower = strtolower($email ?? '');
+            if (!empty($email) && !in_array($email_lower, $processed_emails)) {
                 // Créer un objet agent compatible avec les données CRM
                 $agent = new stdClass();
                 $agent->user_id = null;
                 $agent->user_login = null;
-                $agent->user_email = $crm_agent->email;
+                $agent->user_email = $email;
                 $agent->agent_id = null;
                 $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
-                $agent->agent_email = $crm_agent->email;
+                $agent->agent_email = $email;
                 $agent->phone = $crm_agent->phone ?? '';
                 $agent->mobile = $crm_agent->mobile ?? '';
                 $agent->position = $crm_agent->position ?? 'Agent immobilier';

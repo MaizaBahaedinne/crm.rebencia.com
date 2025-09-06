@@ -314,16 +314,34 @@ class Agency_model extends CI_Model {
      * @return array
      */
     private function get_agency_agent_ids($agency_id) {
-        // Récupérer les emails des agents CRM de cette agence
-        $crm_agents = $this->wp_db->select('email')
+        // Récupérer les données des agents CRM de cette agence
+        // Utilisation de * pour récupérer toutes les colonnes disponibles
+        $crm_agents = $this->wp_db->select('*')
             ->from('crm_agents')
             ->where('agency_id', (int)$agency_id)
-            ->where('email !=', '')
             ->get()->result();
         
         if (empty($crm_agents)) return [];
         
-        $emails = array_map(function($agent) { return $agent->email; }, $crm_agents);
+        // Extraire les emails selon la structure réelle de la table
+        $emails = [];
+        foreach ($crm_agents as $agent) {
+            // Tenter différents noms de colonnes possibles pour l'email
+            $email = null;
+            if (isset($agent->email) && !empty($agent->email)) {
+                $email = $agent->email;
+            } elseif (isset($agent->agent_email) && !empty($agent->agent_email)) {
+                $email = $agent->agent_email;
+            } elseif (isset($agent->user_email) && !empty($agent->user_email)) {
+                $email = $agent->user_email;
+            }
+            
+            if ($email) {
+                $emails[] = $email;
+            }
+        }
+        
+        if (empty($emails)) return [];
         
         // Trouver les post IDs des agents HOUZEZ correspondants
         $this->wp_db->select('p.ID')
