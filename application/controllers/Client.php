@@ -220,6 +220,87 @@ class Client extends BaseController {
     }
 
     /**
+     * Méthode de debug pour lister toutes les agences
+     */
+    public function debug_agencies() {
+        $this->isLoggedIn();
+        
+        echo "<h3>Debug: Liste des agences</h3>";
+        
+        try {
+            $agencies = $this->agency_model->get_all_agencies();
+            
+            echo "<p><strong>Nombre d'agences trouvées:</strong> " . count($agencies) . "</p>";
+            
+            if (!empty($agencies)) {
+                echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                echo "<tr><th>ID</th><th>Login</th><th>Display Name</th><th>Email</th><th>Test Agents</th></tr>";
+                
+                foreach ($agencies as $agency) {
+                    $agency_id = $agency->ID ?? 'N/A';
+                    echo "<tr>";
+                    echo "<td>$agency_id</td>";
+                    echo "<td>" . ($agency->user_login ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agency->display_name ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agency->user_email ?? 'N/A') . "</td>";
+                    echo "<td><a href='" . base_url("client/debug_agents_by_agency?agency_id=$agency_id") . "' target='_blank'>Voir agents</a></td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p><em>Aucune agence trouvée.</em></p>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
+        }
+    }
+
+    /**
+     * Méthode de debug pour vérifier les agents d'une agence
+     */
+    public function debug_agents_by_agency() {
+        $this->isLoggedIn();
+        
+        $agency_id = $this->input->get('agency_id');
+        
+        if (!$agency_id) {
+            echo "Paramètre agency_id requis";
+            return;
+        }
+        
+        echo "<h3>Debug: Agents de l'agence ID = $agency_id</h3>";
+        
+        try {
+            $agents = $this->agent_model->get_agents_by_agency($agency_id);
+            
+            echo "<p><strong>Nombre d'agents trouvés:</strong> " . count($agents) . "</p>";
+            
+            if (!empty($agents)) {
+                echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                echo "<tr><th>ID</th><th>Login</th><th>Display Name</th><th>Email</th><th>Full Name</th><th>Agency ID</th></tr>";
+                
+                foreach ($agents as $agent) {
+                    echo "<tr>";
+                    echo "<td>" . ($agent->ID ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agent->user_login ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agent->display_name ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agent->user_email ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agent->full_name ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agent->houzez_agency_id ?? 'N/A') . "</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p><em>Aucun agent trouvé pour cette agence.</em></p>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<p><strong>Erreur:</strong> " . $e->getMessage() . "</p>";
+        }
+    }
+
+    /**
      * Méthode AJAX pour la recherche d'agents par agence (autocomplétion)
      */
     public function search_agents_by_agency() {
@@ -239,7 +320,7 @@ class Client extends BaseController {
             
             foreach ($agents as $agent) {
                 $agent_id = isset($agent->ID) ? $agent->ID : (isset($agent->id) ? $agent->id : '');
-                $agent_name = isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')));
+                $agent_name = isset($agent->full_name) ? $agent->full_name : (isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent'))));
                 
                 // Si pas de query ou si le nom correspond à la recherche
                 if (!$query || strlen($query) < 2 || stripos($agent_name, $query) !== false) {
@@ -275,7 +356,7 @@ class Client extends BaseController {
             $agents_data = [];
             foreach ($agents as $agent) {
                 $agent_id = isset($agent->ID) ? $agent->ID : (isset($agent->id) ? $agent->id : '');
-                $agent_name = isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent')));
+                $agent_name = isset($agent->full_name) ? $agent->full_name : (isset($agent->display_name) ? $agent->display_name : (isset($agent->nom) ? $agent->nom : (isset($agent->name) ? $agent->name : (isset($agent->prenom) ? $agent->prenom : 'Agent'))));
                 
                 $agents_data[] = [
                     'id' => $agent_id,

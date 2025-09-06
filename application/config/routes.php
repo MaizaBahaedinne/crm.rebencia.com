@@ -82,6 +82,10 @@ $route['client/search_agencies'] = 'Client/search_agencies';
 $route['client/search_agents_by_agency'] = 'Client/search_agents_by_agency';
 $route['client/get_agents_by_agency'] = 'Client/get_agents_by_agency';
 
+// Routes de debug
+$route['client/debug_agencies'] = 'Client/debug_agencies';
+$route['client/debug_agents_by_agency'] = 'Client/debug_agents_by_agency';
+
 /*********** TRANSACTIONS *******************/
 $route['transactions'] = 'Transaction/index';
 $route['transactions/sales'] = 'Transaction/sales';
