@@ -38,6 +38,7 @@ class Agent_model extends CI_Model {
             u.user_registered as registration_date,
             p.ID as agent_id,
             p.post_title as agent_name,
+            p.post_content as description,
             p.post_status as post_status,
             pm_email.meta_value as agent_email,
             a.ID as agency_id,
@@ -53,17 +54,24 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_twitter' THEN pm_contact.meta_value END) as twitter,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_linkedin' THEN pm_contact.meta_value END) as linkedin,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_instagram' THEN pm_contact.meta_value END) as instagram,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_zip' THEN pm_contact.meta_value END) as postal_code
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_address' THEN pm_contact.meta_value END) as address,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_zip' THEN pm_contact.meta_value END) as postal_code,
+            (SELECT COUNT(*) FROM {$this->posts_table} prop 
+             INNER JOIN {$this->postmeta_table} pm_prop ON prop.ID = pm_prop.post_id 
+             WHERE pm_prop.meta_key = 'fave_property_agent' 
+             AND pm_prop.meta_value = p.ID 
+             AND prop.post_type = 'property' 
+             AND prop.post_status = 'publish'
+            ) as properties_count
         ", FALSE);
         
         $this->wp_db->from($this->users_table . ' u')
-            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email', 'left')
-            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'left')
+            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent" AND p.post_status = "publish"', 'inner')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
-            ->where('p.post_type', 'houzez_agent');
+            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left');
 
         // Appliquer les filtres
         if (!empty($filters['search'])) {
@@ -75,13 +83,58 @@ class Agent_model extends CI_Model {
                 ->group_end();
         }
 
-        if (!empty($filters['agency_id'])) {
-            $this->wp_db->where('a.ID', $filters['agency_id']);
+        if (!empty($filters['agency'])) {
+            $this->wp_db->where('a.ID', $filters['agency']);
         }
 
-        $this->wp_db->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_status, pm_email.meta_value, a.ID, a.post_title');
+        if (!empty($filters['status'])) {
+            if ($filters['status'] == 'active') {
+                $this->wp_db->where('u.user_status', '0');
+            } else if ($filters['status'] == 'inactive') {
+                $this->wp_db->where('u.user_status', '1');
+            }
+        }
 
-        return $this->wp_db->get()->result();
+        $this->wp_db->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_content, p.post_status, pm_email.meta_value, a.ID, a.post_title');
+
+        // Appliquer le tri
+        if (!empty($filters['sort'])) {
+            switch ($filters['sort']) {
+                case 'name_desc':
+                    $this->wp_db->order_by('p.post_title', 'DESC');
+                    break;
+                case 'properties_desc':
+                    $this->wp_db->order_by('properties_count', 'DESC');
+                    break;
+                case 'recent':
+                    $this->wp_db->order_by('u.user_registered', 'DESC');
+                    break;
+                default: // 'name_asc'
+                    $this->wp_db->order_by('p.post_title', 'ASC');
+            }
+        } else {
+            $this->wp_db->order_by('p.post_title', 'ASC');
+        }
+
+        $agents = $this->wp_db->get()->result();
+        
+        // Post-traitement pour ajouter des champs calculés
+        foreach ($agents as $agent) {
+            // Avatar par défaut si vide
+            if (empty($agent->agent_avatar)) {
+                $agent->agent_avatar = base_url('assets/images/users/avatar-1.jpg');
+            }
+            
+            // Déterminer si l'agent est actif
+            $agent->is_active = ($agent->user_status == '0' && $agent->post_status == 'publish');
+            
+            // Formater la date d'inscription
+            if ($agent->registration_date) {
+                $agent->registration_date = date('Y-m-d H:i:s', strtotime($agent->registration_date));
+            }
+        }
+
+        return $agents;
     }
 
     /**
@@ -179,6 +232,157 @@ class Agent_model extends CI_Model {
             ->get()->row();
             
         return $agent;
+    }
+
+    /**
+     * Retourne un agent spécifique par user_id
+     * @param int $user_id
+     * @return object|null
+     */
+    public function get_agent_by_user_id($user_id) {
+        $this->wp_db->select("
+            u.ID as user_id,
+            u.user_login as user_login,
+            u.user_email as user_email,
+            u.user_status as user_status,
+            u.user_registered as registration_date,
+            p.ID as agent_id,
+            p.post_title as agent_name,
+            p.post_content as description,
+            p.post_status as post_status,
+            pm_email.meta_value as agent_email,
+            a.ID as agency_id,
+            a.post_title as agency_name,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_instagram' THEN pm.meta_value END) as instagram,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_address' THEN pm.meta_value END) as address,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_zip' THEN pm.meta_value END) as postal_code,
+            (SELECT COUNT(*) FROM {$this->posts_table} prop 
+             INNER JOIN {$this->postmeta_table} pm_prop ON prop.ID = pm_prop.post_id 
+             WHERE pm_prop.meta_key = 'fave_property_agent' 
+             AND pm_prop.meta_value = p.ID 
+             AND prop.post_type = 'property' 
+             AND prop.post_status = 'publish'
+            ) as properties_count
+        ", FALSE);
+        
+        $agent = $this->wp_db->from($this->users_table . ' u')
+            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'inner')
+            ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
+            ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->where('u.ID', $user_id)
+            ->where('p.post_status', 'publish')
+            ->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_content, p.post_status, pm_email.meta_value, a.ID, a.post_title')
+            ->get()->row();
+
+        if ($agent) {
+            // Avatar par défaut si vide
+            if (empty($agent->agent_avatar)) {
+                $agent->agent_avatar = base_url('assets/images/users/avatar-1.jpg');
+            }
+            
+            // Déterminer si l'agent est actif
+            $agent->is_active = ($agent->user_status == '0' && $agent->post_status == 'publish');
+            
+            // Ajouter des statistiques supplémentaires
+            $agent->total_views = $this->get_agent_total_views($agent->agent_id);
+            $agent->contacts_count = $this->get_agent_contacts_count($agent->agent_id);
+        }
+
+        return $agent;
+    }
+
+    /**
+     * Récupère les propriétés d'un agent
+     * @param int $agent_id
+     * @param int $limit
+     * @return object[]
+     */
+    public function get_agent_properties($agent_id, $limit = null) {
+        $this->load->model('Property_model');
+        
+        $this->wp_db->select("
+            p.ID,
+            p.post_title as title,
+            p.post_content as description,
+            p.post_date,
+            p.post_status,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_price' THEN pm.meta_value END) as price,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_size' THEN pm.meta_value END) as size,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_bedrooms' THEN pm.meta_value END) as bedrooms,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_bathrooms' THEN pm.meta_value END) as bathrooms,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_address' THEN pm.meta_value END) as location,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_images' THEN pm.meta_value END) as images,
+            (SELECT guid FROM {$this->posts_table} img WHERE img.ID = (
+                SELECT meta_value FROM {$this->postmeta_table} thumb 
+                WHERE thumb.post_id = p.ID AND thumb.meta_key = '_thumbnail_id' LIMIT 1
+            )) as thumbnail,
+            (SELECT name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+             INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+             INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+             WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_status' LIMIT 1) as status,
+            (SELECT name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+             INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+             INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+             WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_type' LIMIT 1) as property_type,
+            COALESCE((SELECT meta_value FROM {$this->postmeta_table} WHERE post_id = p.ID AND meta_key = 'fave_total_property_views'), 0) as views
+        ", FALSE);
+
+        $this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm', 'p.ID = pm.post_id', 'left')
+            ->join($this->postmeta_table . ' pm_agent', 'p.ID = pm_agent.post_id AND pm_agent.meta_key = "fave_property_agent"', 'inner')
+            ->where('pm_agent.meta_value', $agent_id)
+            ->where('p.post_type', 'property')
+            ->where('p.post_status', 'publish')
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_date, p.post_status')
+            ->order_by('p.post_date', 'DESC');
+
+        if ($limit) {
+            $this->wp_db->limit($limit);
+        }
+
+        return $this->wp_db->get()->result();
+    }
+
+    /**
+     * Récupère les vues totales des propriétés d'un agent
+     * @param int $agent_id
+     * @return int
+     */
+    private function get_agent_total_views($agent_id) {
+        $result = $this->wp_db->select_sum('CAST(pm_views.meta_value AS UNSIGNED)', 'total_views')
+            ->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm_agent', 'p.ID = pm_agent.post_id AND pm_agent.meta_key = "fave_property_agent"', 'inner')
+            ->join($this->postmeta_table . ' pm_views', 'p.ID = pm_views.post_id AND pm_views.meta_key = "fave_total_property_views"', 'left')
+            ->where('pm_agent.meta_value', $agent_id)
+            ->where('p.post_type', 'property')
+            ->where('p.post_status', 'publish')
+            ->get()->row();
+
+        return (int)($result->total_views ?? 0);
+    }
+
+    /**
+     * Récupère le nombre de contacts d'un agent
+     * @param int $agent_id
+     * @return int
+     */
+    private function get_agent_contacts_count($agent_id) {
+        // Cette méthode pourrait être étendue pour compter les contacts réels
+        // Pour l'instant, on retourne une valeur factice
+        return rand(5, 25);
     }
 
     /**
