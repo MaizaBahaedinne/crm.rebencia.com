@@ -232,7 +232,14 @@ class Property_model extends CI_Model {
                 }
             } elseif ($result->meta_key == 'fave_property_images') {
                 // Les images de galerie sont stockées sérialisées
-                $gallery_images = maybe_unserialize($result->meta_value);
+                $gallery_data = $result->meta_value;
+                // Équivalent de maybe_unserialize() de WordPress
+                if (is_serialized($gallery_data)) {
+                    $gallery_images = unserialize($gallery_data);
+                } else {
+                    $gallery_images = $gallery_data;
+                }
+                
                 if (is_array($gallery_images)) {
                     $images['gallery'] = [];
                     foreach ($gallery_images as $image_id) {
@@ -365,5 +372,52 @@ class Property_model extends CI_Model {
             'sold' => 0,
             'rented' => 0
         ];
+    }
+    
+    /**
+     * Vérifie si une chaîne est sérialisée (équivalent WordPress)
+     */
+    private function is_serialized($data) {
+        // Si ce n'est pas une chaîne, ce n'est pas sérialisé
+        if (!is_string($data)) {
+            return false;
+        }
+        
+        $data = trim($data);
+        if ('N;' == $data) {
+            return true;
+        }
+        
+        if (strlen($data) < 4) {
+            return false;
+        }
+        
+        if (':' !== $data[1]) {
+            return false;
+        }
+        
+        $lastc = substr($data, -1);
+        if (';' !== $lastc && '}' !== $lastc) {
+            return false;
+        }
+        
+        $token = $data[0];
+        switch ($token) {
+            case 's':
+                if ('"' !== substr($data, -2, 1)) {
+                    return false;
+                }
+                // Pas de break intentionnel
+            case 'a':
+            case 'O':
+                return (bool) preg_match("/^{$token}:[0-9]+:/s", $data);
+            case 'b':
+            case 'i':
+            case 'd':
+                $end = '';
+                return (bool) preg_match("/^{$token}:[0-9.E+-]+;{$end}$/", $data);
+        }
+        
+        return false;
     }
 }
