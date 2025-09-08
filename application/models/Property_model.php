@@ -211,23 +211,24 @@ class Property_model extends CI_Model {
         return $result ? $result : (object)['name' => 'Non défini', 'slug' => 'undefined'];
     }
     
-    // Récupérer les images d'une propriété
+    // Récupérer les images d'une propriété (utilise la requête SQL fournie par l'utilisateur)
     public function get_property_images($property_id) {
-        $this->wp_db->select('p.ID as property_id, p.post_title, m.meta_key, m.meta_value');
-        $this->wp_db->from('wp_Hrg8P_posts p');
-        $this->wp_db->join('wp_Hrg8P_postmeta m', 'p.ID = m.post_id', 'inner');
-        $this->wp_db->where('p.post_type', 'property');
-        $this->wp_db->where('p.ID', $property_id);
-        $this->wp_db->where_in('m.meta_key', ['_thumbnail_id', 'fave_property_images']);
+        // Utiliser exactement la requête fournie par l'utilisateur
+        $query = "SELECT p.ID as property_id, p.post_title, m.meta_key, m.meta_value 
+                  FROM wp_Hrg8P_posts p 
+                  JOIN wp_Hrg8P_postmeta m ON p.ID = m.post_id 
+                  WHERE p.post_type = 'property' 
+                  AND p.ID = ? 
+                  AND (m.meta_key = '_thumbnail_id' OR m.meta_key = 'fave_property_images')";
         
-        $results = $this->wp_db->get()->result();
+        $results = $this->wp_db->query($query, [$property_id])->result();
         
         // Debug: afficher ce qui est récupéré
         error_log("DEBUG Property Images for ID $property_id - Found " . count($results) . " meta records");
         
         $images = [];
         foreach ($results as $result) {
-            error_log("  Meta: {$result->meta_key} = {$result->meta_value}");
+            error_log("  Meta: {$result->meta_key} = " . substr($result->meta_value, 0, 100) . "...");
             
             if ($result->meta_key == '_thumbnail_id') {
                 // Récupérer l'URL de l'image principale
@@ -239,28 +240,46 @@ class Property_model extends CI_Model {
             } elseif ($result->meta_key == 'fave_property_images') {
                 // Les images de galerie sont stockées sérialisées
                 $gallery_data = $result->meta_value;
-                error_log("  Raw gallery data: " . substr($gallery_data, 0, 200) . "...");
+                error_log("  Raw gallery data length: " . strlen($gallery_data));
                 
-                // Équivalent de maybe_unserialize() de WordPress
+                // Tenter plusieurs approches de désérialisation
+                $gallery_images = null;
+                
+                // 1. Vérifier si c'est sérialisé PHP
                 if ($this->is_serialized($gallery_data)) {
-                    $gallery_images = unserialize($gallery_data);
-                    error_log("  Unserialized gallery: " . print_r($gallery_images, true));
-                } else {
-                    $gallery_images = $gallery_data;
-                    error_log("  Gallery data not serialized, using as-is");
+                    $gallery_images = @unserialize($gallery_data);
+                    error_log("  Unserialized as PHP: " . print_r($gallery_images, true));
                 }
                 
-                if (is_array($gallery_images)) {
+                // 2. Vérifier si c'est JSON
+                if (!$gallery_images) {
+                    $json_data = @json_decode($gallery_data, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $gallery_images = $json_data;
+                        error_log("  Decoded as JSON: " . print_r($gallery_images, true));
+                    }
+                }
+                
+                // 3. Vérifier si c'est une liste d'IDs séparés par des virgules
+                if (!$gallery_images && strpos($gallery_data, ',') !== false) {
+                    $gallery_images = explode(',', $gallery_data);
+                    $gallery_images = array_map('trim', $gallery_images);
+                    error_log("  Split by comma: " . print_r($gallery_images, true));
+                }
+                
+                if (is_array($gallery_images) && !empty($gallery_images)) {
                     $images['gallery'] = [];
                     foreach ($gallery_images as $image_id) {
-                        $image_url = $this->get_attachment_url($image_id);
-                        error_log("    Gallery image ID $image_id -> URL: $image_url");
-                        if ($image_url) {
-                            $images['gallery'][] = $image_url;
+                        if (!empty($image_id) && is_numeric($image_id)) {
+                            $image_url = $this->get_attachment_url($image_id);
+                            error_log("    Gallery image ID $image_id -> URL: $image_url");
+                            if ($image_url) {
+                                $images['gallery'][] = $image_url;
+                            }
                         }
                     }
                 } else {
-                    error_log("  Gallery images is not an array: " . gettype($gallery_images));
+                    error_log("  Gallery images is not a valid array: " . print_r($gallery_images, true));
                 }
             }
         }
