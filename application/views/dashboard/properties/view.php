@@ -117,76 +117,116 @@
                 <div class="col-lg-8">
                     <!-- Property Images Gallery -->
                     <div class="card mb-4">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">
                                 <i class="ri-image-line me-1"></i>Galerie photos
                             </h5>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <input type="radio" class="btn-check" name="viewMode" id="carouselView" checked>
+                                <label class="btn btn-outline-primary" for="carouselView">
+                                    <i class="ri-slideshow-line"></i> Carousel
+                                </label>
+                                <input type="radio" class="btn-check" name="viewMode" id="gridView">
+                                <label class="btn btn-outline-primary" for="gridView">
+                                    <i class="ri-layout-grid-line"></i> Toutes
+                                </label>
+                            </div>
                         </div>
                         <div class="card-body p-0">
-                            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner">
-                                    <?php 
-                                    $all_images = [];
-                                    
-                                    // Ajouter l'image principale si elle existe
-                                    if (!empty($property_images['thumbnail'])) {
-                                        $all_images[] = $property_images['thumbnail'];
+                            <?php 
+                            $all_images = [];
+                            
+                            // Ajouter l'image principale si elle existe
+                            if (!empty($property_images['thumbnail'])) {
+                                $all_images[] = $property_images['thumbnail'];
+                            }
+                            
+                            // Ajouter les images de galerie si elles existent
+                            if (!empty($property_images['gallery'])) {
+                                foreach ($property_images['gallery'] as $gallery_img) {
+                                    if (!in_array($gallery_img, $all_images)) {
+                                        $all_images[] = $gallery_img;
                                     }
-                                    
-                                    // Ajouter les images de galerie si elles existent
-                                    if (!empty($property_images['gallery'])) {
-                                        foreach ($property_images['gallery'] as $gallery_img) {
-                                            if (!in_array($gallery_img, $all_images)) {
-                                                $all_images[] = $gallery_img;
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                    
-                                    <?php if (!empty($all_images)) : ?>
-                                        <?php foreach ($all_images as $index => $image) : ?>
-                                        <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                                            <img src="<?php echo $image; ?>" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Property Image <?php echo $index + 1; ?>">
-                                        </div>
-                                        <?php endforeach; ?>
-                                    <?php else : ?>
-                                        <div class="carousel-item active">
-                                            <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="height: 400px;">
-                                                <div class="text-center">
-                                                    <i class="ri-image-line fs-1"></i>
-                                                    <p class="mt-2">Aucune image disponible</p>
+                                }
+                            }
+                            ?>
+                            
+                            <!-- Vue Carousel -->
+                            <div id="carouselContainer" class="gallery-view">
+                                <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        <?php if (!empty($all_images)) : ?>
+                                            <?php foreach ($all_images as $index => $image) : ?>
+                                            <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
+                                                <img src="<?php echo $image; ?>" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Property Image <?php echo $index + 1; ?>">
+                                            </div>
+                                            <?php endforeach; ?>
+                                        <?php else : ?>
+                                            <div class="carousel-item active">
+                                                <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="height: 400px;">
+                                                    <div class="text-center">
+                                                        <i class="ri-image-line fs-1"></i>
+                                                        <p class="mt-2">Aucune image disponible</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if (!empty($all_images) && count($all_images) > 1) : ?>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </button>
                                     <?php endif; ?>
                                 </div>
+                                
+                                <!-- Thumbnails Gallery -->
                                 <?php if (!empty($all_images) && count($all_images) > 1) : ?>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon"></span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon"></span>
-                                </button>
+                                <div class="mt-3 px-3">
+                                    <div class="row g-2">
+                                        <?php foreach ($all_images as $index => $image) : ?>
+                                        <div class="col-2">
+                                            <img src="<?php echo $image; ?>" 
+                                                 class="img-fluid rounded thumbnail-gallery cursor-pointer <?php echo $index === 0 ? 'border border-primary border-2' : 'border'; ?>" 
+                                                 style="height: 60px; object-fit: cover; width: 100%;" 
+                                                 onclick="goToSlide(<?php echo $index; ?>)"
+                                                 data-slide="<?php echo $index; ?>"
+                                                 alt="Thumbnail <?php echo $index + 1; ?>">
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
                                 <?php endif; ?>
                             </div>
                             
-                            <!-- Thumbnails Gallery -->
-                            <?php if (!empty($all_images) && count($all_images) > 1) : ?>
-                            <div class="mt-3">
-                                <div class="row g-2">
-                                    <?php foreach ($all_images as $index => $image) : ?>
-                                    <div class="col-2">
-                                        <img src="<?php echo $image; ?>" 
-                                             class="img-fluid rounded thumbnail-gallery cursor-pointer <?php echo $index === 0 ? 'border border-primary border-2' : 'border'; ?>" 
-                                             style="height: 60px; object-fit: cover; width: 100%;" 
-                                             onclick="goToSlide(<?php echo $index; ?>)"
-                                             data-slide="<?php echo $index; ?>"
-                                             alt="Thumbnail <?php echo $index + 1; ?>">
+                            <!-- Vue Grille - Toutes les images -->
+                            <div id="gridContainer" class="gallery-view d-none p-3">
+                                <?php if (!empty($all_images)) : ?>
+                                    <div class="row g-3">
+                                        <?php foreach ($all_images as $index => $image) : ?>
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="image-container position-relative">
+                                                <img src="<?php echo $image; ?>" 
+                                                     class="img-fluid rounded shadow-sm w-100 gallery-image" 
+                                                     style="height: 200px; object-fit: cover; cursor: pointer;" 
+                                                     alt="Property Image <?php echo $index + 1; ?>"
+                                                     onclick="openLightbox(<?php echo $index; ?>)">
+                                                <div class="image-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 opacity-0 rounded">
+                                                    <i class="ri-zoom-in-line text-white fs-4"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                    <?php endforeach; ?>
-                                </div>
+                                <?php else : ?>
+                                    <div class="text-center py-5">
+                                        <i class="ri-image-line fs-1 text-muted"></i>
+                                        <p class="text-muted mt-2">Aucune image disponible</p>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -515,6 +555,44 @@
     </div>
 </div>
 
+<!-- Lightbox Modal pour voir les images en grand -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white" id="imageModalTitle">Image de la propriété</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="lightboxCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <?php if (!empty($all_images)) : ?>
+                            <?php foreach ($all_images as $index => $image) : ?>
+                            <div class="carousel-item">
+                                <img src="<?php echo $image; ?>" class="d-block w-100 rounded" style="max-height: 80vh; object-fit: contain;" alt="Property Image <?php echo $index + 1; ?>">
+                            </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!empty($all_images) && count($all_images) > 1) : ?>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#lightboxCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#lightboxCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    <div class="carousel-indicators">
+                        <?php foreach ($all_images as $index => $image) : ?>
+                        <button type="button" data-bs-target="#lightboxCarousel" data-bs-slide-to="<?php echo $index; ?>" class="<?php echo $index === 0 ? 'active' : ''; ?>"></button>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .property-description {
     line-height: 1.6;
@@ -569,9 +647,37 @@
     opacity: 0.8;
     transform: scale(1.05);
 }
+
+.gallery-image:hover .image-overlay {
+    opacity: 1 !important;
+}
+
+.image-container:hover .image-overlay {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
 </style>
 
 <script>
+// Variables globales
+let allImages = <?php echo json_encode($all_images ?? []); ?>;
+
+// Basculer entre les vues carousel et grille
+document.getElementById('carouselView').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('carouselContainer').classList.remove('d-none');
+        document.getElementById('gridContainer').classList.add('d-none');
+    }
+});
+
+document.getElementById('gridView').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('carouselContainer').classList.add('d-none');
+        document.getElementById('gridContainer').classList.remove('d-none');
+    }
+});
+
+// Navigation du carousel principal
 function goToSlide(slideIndex) {
     // Aller à la slide spécifiée
     const carousel = new bootstrap.Carousel(document.getElementById('propertyCarousel'));
@@ -589,6 +695,18 @@ function goToSlide(slideIndex) {
     });
 }
 
+// Ouvrir la lightbox avec une image spécifique
+function openLightbox(imageIndex) {
+    const lightboxCarousel = new bootstrap.Carousel(document.getElementById('lightboxCarousel'));
+    lightboxCarousel.to(imageIndex);
+    
+    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+    modal.show();
+    
+    // Mettre à jour le titre
+    document.getElementById('imageModalTitle').textContent = `Image ${imageIndex + 1} sur ${allImages.length}`;
+}
+
 // Écouter les changements de slide du carousel pour synchroniser les thumbnails
 document.getElementById('propertyCarousel').addEventListener('slide.bs.carousel', function (e) {
     const slideIndex = e.to;
@@ -601,5 +719,25 @@ document.getElementById('propertyCarousel').addEventListener('slide.bs.carousel'
             thumb.classList.add('border');
         }
     });
+});
+
+// Mettre à jour le titre de la lightbox lors du changement d'image
+document.getElementById('lightboxCarousel').addEventListener('slide.bs.carousel', function (e) {
+    const imageIndex = e.to;
+    document.getElementById('imageModalTitle').textContent = `Image ${imageIndex + 1} sur ${allImages.length}`;
+});
+
+// Navigation au clavier dans la lightbox
+document.addEventListener('keydown', function(e) {
+    const modal = document.getElementById('imageModal');
+    if (modal.classList.contains('show')) {
+        if (e.key === 'ArrowLeft') {
+            const carousel = bootstrap.Carousel.getInstance(document.getElementById('lightboxCarousel'));
+            carousel.prev();
+        } else if (e.key === 'ArrowRight') {
+            const carousel = bootstrap.Carousel.getInstance(document.getElementById('lightboxCarousel'));
+            carousel.next();
+        }
+    }
 });
 </script>
