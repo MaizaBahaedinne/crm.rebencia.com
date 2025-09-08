@@ -572,4 +572,50 @@ class Agent_model extends CI_Model {
         return $this->wp_db->get()->row();
     }
 
+    /**
+     * Recherche d'agents par terme
+     * @param string $term
+     * @param int $limit
+     * @return object[]
+     */
+    public function search_agents($term, $limit = 10) {
+        if (empty($term)) return [];
+
+        $this->wp_db->select("
+            u.ID as user_id,
+            u.user_email,
+            p.ID as agent_id,
+            p.post_title as agent_name,
+            pm_email.meta_value as agent_email,
+            a.post_title as agency_name,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar
+        ", FALSE);
+        
+        $this->wp_db->from($this->users_table . ' u')
+            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent" AND p.post_status = "publish"', 'inner')
+            ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
+            ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->group_start()
+                ->like('p.post_title', $term)
+                ->or_like('u.user_email', $term)
+                ->or_like('u.user_login', $term)
+            ->group_end()
+            ->group_by('u.ID, u.user_email, p.ID, p.post_title, pm_email.meta_value, a.post_title')
+            ->limit($limit);
+
+        $agents = $this->wp_db->get()->result();
+        
+        // Post-traitement pour ajouter des champs par défaut
+        foreach ($agents as $agent) {
+            if (empty($agent->agent_avatar)) {
+                $agent->agent_avatar = base_url('assets/images/users/avatar-1.jpg');
+            }
+        }
+
+        return $agents;
+    }
+
 }

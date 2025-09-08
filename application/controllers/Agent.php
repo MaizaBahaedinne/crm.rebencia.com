@@ -104,11 +104,11 @@ class Agent extends BaseController {
         header('Content-Type: application/json');
         echo json_encode($agents);
     }
-}
-    }
+
     public function edit($id) {
         // ... logique modif agent ...
     }
+    
     public function delete($id) {
         // ... logique suppression agent ...
     }
