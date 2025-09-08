@@ -234,7 +234,7 @@ class Property_model extends CI_Model {
                 // Les images de galerie sont stockées sérialisées
                 $gallery_data = $result->meta_value;
                 // Équivalent de maybe_unserialize() de WordPress
-                if (is_serialized($gallery_data)) {
+                if ($this->is_serialized($gallery_data)) {
                     $gallery_images = unserialize($gallery_data);
                 } else {
                     $gallery_images = $gallery_data;
