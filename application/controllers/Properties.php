@@ -29,7 +29,7 @@ class Properties extends BaseController {
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
         // Récupérer les propriétés
-        $properties = $this->property_model->get_properties();
+        $properties = $this->property_model->get_all_properties($data['filters']);
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->ID);
             $property->status = $this->property_model->get_property_status($property->ID);
