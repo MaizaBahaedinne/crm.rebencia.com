@@ -222,36 +222,50 @@ class Property_model extends CI_Model {
         
         $results = $this->wp_db->get()->result();
         
+        // Debug: afficher ce qui est récupéré
+        error_log("DEBUG Property Images for ID $property_id - Found " . count($results) . " meta records");
+        
         $images = [];
         foreach ($results as $result) {
+            error_log("  Meta: {$result->meta_key} = {$result->meta_value}");
+            
             if ($result->meta_key == '_thumbnail_id') {
                 // Récupérer l'URL de l'image principale
                 $thumbnail_url = $this->get_attachment_url($result->meta_value);
+                error_log("  Thumbnail URL for ID {$result->meta_value}: $thumbnail_url");
                 if ($thumbnail_url) {
                     $images['thumbnail'] = $thumbnail_url;
                 }
             } elseif ($result->meta_key == 'fave_property_images') {
                 // Les images de galerie sont stockées sérialisées
                 $gallery_data = $result->meta_value;
+                error_log("  Raw gallery data: " . substr($gallery_data, 0, 200) . "...");
+                
                 // Équivalent de maybe_unserialize() de WordPress
                 if ($this->is_serialized($gallery_data)) {
                     $gallery_images = unserialize($gallery_data);
+                    error_log("  Unserialized gallery: " . print_r($gallery_images, true));
                 } else {
                     $gallery_images = $gallery_data;
+                    error_log("  Gallery data not serialized, using as-is");
                 }
                 
                 if (is_array($gallery_images)) {
                     $images['gallery'] = [];
                     foreach ($gallery_images as $image_id) {
                         $image_url = $this->get_attachment_url($image_id);
+                        error_log("    Gallery image ID $image_id -> URL: $image_url");
                         if ($image_url) {
                             $images['gallery'][] = $image_url;
                         }
                     }
+                } else {
+                    error_log("  Gallery images is not an array: " . gettype($gallery_images));
                 }
             }
         }
         
+        error_log("Final images result: " . print_r($images, true));
         return $images;
     }
     

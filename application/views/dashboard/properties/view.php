@@ -136,19 +136,29 @@
                             <?php 
                             $all_images = [];
                             
+                            // DEBUG: Afficher les données récupérées
+                            echo "<!-- DEBUG: property_images = " . print_r($property_images ?? [], true) . " -->";
+                            
                             // Ajouter l'image principale si elle existe
                             if (!empty($property_images['thumbnail'])) {
                                 $all_images[] = $property_images['thumbnail'];
+                                echo "<!-- DEBUG: Added thumbnail: {$property_images['thumbnail']} -->";
                             }
                             
                             // Ajouter les images de galerie si elles existent
                             if (!empty($property_images['gallery'])) {
+                                echo "<!-- DEBUG: Found gallery with " . count($property_images['gallery']) . " images -->";
                                 foreach ($property_images['gallery'] as $gallery_img) {
                                     if (!in_array($gallery_img, $all_images)) {
                                         $all_images[] = $gallery_img;
+                                        echo "<!-- DEBUG: Added gallery image: $gallery_img -->";
                                     }
                                 }
+                            } else {
+                                echo "<!-- DEBUG: No gallery images found -->";
                             }
+                            
+                            echo "<!-- DEBUG: Total images: " . count($all_images) . " -->";
                             ?>
                             
                             <!-- Vue Carousel -->
