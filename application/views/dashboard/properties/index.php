@@ -122,8 +122,10 @@
                             <!-- Property Image -->
                             <div class="position-relative">
                                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <?php if (!empty($property->featured_image)) : ?>
-                                        <img src="<?php echo $property->featured_image; ?>" alt="<?php echo htmlspecialchars($property->nom); ?>" class="img-fluid rounded-top">
+                                    <?php if (!empty($property->images['thumbnail'])) : ?>
+                                        <img src="<?php echo $property->images['thumbnail']; ?>" alt="<?php echo htmlspecialchars($property->post_title); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <?php elseif (!empty($property->images['gallery']) && count($property->images['gallery']) > 0) : ?>
+                                        <img src="<?php echo $property->images['gallery'][0]; ?>" alt="<?php echo htmlspecialchars($property->post_title); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
                                     <?php else : ?>
                                         <div class="text-center text-muted">
                                             <i class="ri-home-line fs-1"></i>
@@ -168,10 +170,10 @@
                                     </span>
                                 </div>
                                 <!-- Price Badge -->
-                                <?php if (!empty($property->prix_demande) && is_numeric($property->prix_demande)) : ?>
+                                <?php if (!empty($property->fave_property_price) && is_numeric($property->fave_property_price)) : ?>
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <span class="badge bg-primary fs-6">
-                                        <?php echo number_format($property->prix_demande, 0, ',', ' '); ?> TND
+                                        <?php echo number_format($property->fave_property_price, 0, ',', ' '); ?> TND
                                     </span>
                                 </div>
                                 <?php endif; ?>
@@ -181,7 +183,7 @@
                                 <!-- Property Title -->
                                 <h5 class="card-title">
                                     <a href="<?php echo base_url('properties/view/' . $property->ID); ?>" class="text-decoration-none">
-                                        <?php echo htmlspecialchars($property->nom ?: 'Propriété sans titre'); ?>
+                                        <?php echo htmlspecialchars($property->post_title ?: 'Propriété sans titre'); ?>
                                     </a>
                                 </h5>
 

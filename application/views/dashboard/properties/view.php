@@ -25,8 +25,10 @@
                             <div class="row align-items-center">
                                 <div class="col-auto">
                                     <div class="avatar-lg">
-                                        <?php if (!empty($property->featured_image)) : ?>
-                                            <img src="<?php echo $property->featured_image; ?>" alt="Property" class="img-fluid rounded">
+                                        <?php if (!empty($property_images['thumbnail'])) : ?>
+                                            <img src="<?php echo $property_images['thumbnail']; ?>" alt="Property" class="img-fluid rounded">
+                                        <?php elseif (!empty($property_images['gallery']) && count($property_images['gallery']) > 0) : ?>
+                                            <img src="<?php echo $property_images['gallery'][0]; ?>" alt="Property" class="img-fluid rounded">
                                         <?php else : ?>
                                             <div class="avatar-title bg-primary-subtle text-primary fs-22 rounded">
                                                 <i class="ri-home-line"></i>
@@ -123,8 +125,26 @@
                         <div class="card-body p-0">
                             <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-inner">
-                                    <?php if (!empty($property->gallery_images)) : ?>
-                                        <?php foreach ($property->gallery_images as $index => $image) : ?>
+                                    <?php 
+                                    $all_images = [];
+                                    
+                                    // Ajouter l'image principale si elle existe
+                                    if (!empty($property_images['thumbnail'])) {
+                                        $all_images[] = $property_images['thumbnail'];
+                                    }
+                                    
+                                    // Ajouter les images de galerie si elles existent
+                                    if (!empty($property_images['gallery'])) {
+                                        foreach ($property_images['gallery'] as $gallery_img) {
+                                            if (!in_array($gallery_img, $all_images)) {
+                                                $all_images[] = $gallery_img;
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    
+                                    <?php if (!empty($all_images)) : ?>
+                                        <?php foreach ($all_images as $index => $image) : ?>
                                         <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
                                             <img src="<?php echo $image; ?>" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Property Image <?php echo $index + 1; ?>">
                                         </div>
@@ -140,7 +160,7 @@
                                         </div>
                                     <?php endif; ?>
                                 </div>
-                                <?php if (!empty($property->gallery_images) && count($property->gallery_images) > 1) : ?>
+                                <?php if (!empty($all_images) && count($all_images) > 1) : ?>
                                 <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
                                     <span class="carousel-control-prev-icon"></span>
                                 </button>

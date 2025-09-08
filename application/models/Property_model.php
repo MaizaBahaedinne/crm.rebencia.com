@@ -210,6 +210,62 @@ class Property_model extends CI_Model {
         $result = $this->wp_db->get()->row();
         return $result ? $result : (object)['name' => 'Non défini', 'slug' => 'undefined'];
     }
+    
+    // Récupérer les images d'une propriété
+    public function get_property_images($property_id) {
+        $this->wp_db->select('p.ID as property_id, p.post_title, m.meta_key, m.meta_value');
+        $this->wp_db->from('wp_Hrg8P_posts p');
+        $this->wp_db->join('wp_Hrg8P_postmeta m', 'p.ID = m.post_id', 'inner');
+        $this->wp_db->where('p.post_type', 'property');
+        $this->wp_db->where('p.ID', $property_id);
+        $this->wp_db->where_in('m.meta_key', ['_thumbnail_id', 'fave_property_images']);
+        
+        $results = $this->wp_db->get()->result();
+        
+        $images = [];
+        foreach ($results as $result) {
+            if ($result->meta_key == '_thumbnail_id') {
+                // Récupérer l'URL de l'image principale
+                $thumbnail_url = $this->get_attachment_url($result->meta_value);
+                if ($thumbnail_url) {
+                    $images['thumbnail'] = $thumbnail_url;
+                }
+            } elseif ($result->meta_key == 'fave_property_images') {
+                // Les images de galerie sont stockées sérialisées
+                $gallery_images = maybe_unserialize($result->meta_value);
+                if (is_array($gallery_images)) {
+                    $images['gallery'] = [];
+                    foreach ($gallery_images as $image_id) {
+                        $image_url = $this->get_attachment_url($image_id);
+                        if ($image_url) {
+                            $images['gallery'][] = $image_url;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $images;
+    }
+    
+    // Récupérer l'URL d'un attachement WordPress
+    private function get_attachment_url($attachment_id) {
+        if (!$attachment_id) return null;
+        
+        $this->wp_db->select('meta_value');
+        $this->wp_db->from('wp_Hrg8P_postmeta');
+        $this->wp_db->where('post_id', $attachment_id);
+        $this->wp_db->where('meta_key', '_wp_attached_file');
+        
+        $result = $this->wp_db->get()->row();
+        
+        if ($result && $result->meta_value) {
+            // Construire l'URL complète
+            return '/wp-content/uploads/' . $result->meta_value;
+        }
+        
+        return null;
+    }
     // Propriétés d'un agent
     public function get_properties_by_agent($agent_id) {
         // À adapter selon structure
