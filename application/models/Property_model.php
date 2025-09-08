@@ -267,8 +267,8 @@ class Property_model extends CI_Model {
         $result = $this->wp_db->get()->row();
         
         if ($result && $result->meta_value) {
-            // Construire l'URL complète
-            return '/wp-content/uploads/' . $result->meta_value;
+            // Construire l'URL complète vers le site officiel rebencia.com
+            return 'https://rebencia.com/wp-content/uploads/' . $result->meta_value;
         }
         
         return null;
