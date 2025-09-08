@@ -151,6 +151,65 @@ class Property_model extends CI_Model {
         
         return $this->wp_db->get()->result();
     }
+    
+    // Récupérer tous les statuts de propriétés depuis HOUZEZ
+    public function get_property_statuses() {
+        $this->wp_db->select('t.term_id, t.name, t.slug');
+        $this->wp_db->from('wp_Hrg8P_terms t');
+        $this->wp_db->join('wp_Hrg8P_term_taxonomy tt', 't.term_id = tt.term_id', 'inner');
+        $this->wp_db->where('tt.taxonomy', 'property_status');
+        $this->wp_db->order_by('t.name', 'ASC');
+        
+        return $this->wp_db->get()->result();
+    }
+    
+    // Récupérer tous les types de propriétés depuis HOUZEZ
+    public function get_property_types() {
+        $this->wp_db->select('t.term_id, t.name, t.slug');
+        $this->wp_db->from('wp_Hrg8P_terms t');
+        $this->wp_db->join('wp_Hrg8P_term_taxonomy tt', 't.term_id = tt.term_id', 'inner');
+        $this->wp_db->where('tt.taxonomy', 'property_type');
+        $this->wp_db->order_by('t.name', 'ASC');
+        
+        return $this->wp_db->get()->result();
+    }
+    
+    // Récupérer les villes/zones depuis HOUZEZ
+    public function get_property_cities() {
+        $this->wp_db->select('t.term_id, t.name, t.slug');
+        $this->wp_db->from('wp_Hrg8P_terms t');
+        $this->wp_db->join('wp_Hrg8P_term_taxonomy tt', 't.term_id = tt.term_id', 'inner');
+        $this->wp_db->where('tt.taxonomy', 'property_city');
+        $this->wp_db->order_by('t.name', 'ASC');
+        
+        return $this->wp_db->get()->result();
+    }
+    
+    // Récupérer le statut d'une propriété spécifique
+    public function get_property_status($property_id) {
+        $this->wp_db->select('t.name, t.slug');
+        $this->wp_db->from('wp_Hrg8P_terms t');
+        $this->wp_db->join('wp_Hrg8P_term_taxonomy tt', 't.term_id = tt.term_id', 'inner');
+        $this->wp_db->join('wp_Hrg8P_term_relationships tr', 'tt.term_taxonomy_id = tr.term_taxonomy_id', 'inner');
+        $this->wp_db->where('tt.taxonomy', 'property_status');
+        $this->wp_db->where('tr.object_id', $property_id);
+        
+        $result = $this->wp_db->get()->row();
+        return $result ? $result : (object)['name' => 'Non défini', 'slug' => 'undefined'];
+    }
+    
+    // Récupérer le type d'une propriété spécifique
+    public function get_property_type($property_id) {
+        $this->wp_db->select('t.name, t.slug');
+        $this->wp_db->from('wp_Hrg8P_terms t');
+        $this->wp_db->join('wp_Hrg8P_term_taxonomy tt', 't.term_id = tt.term_id', 'inner');
+        $this->wp_db->join('wp_Hrg8P_term_relationships tr', 'tt.term_taxonomy_id = tr.term_taxonomy_id', 'inner');
+        $this->wp_db->where('tt.taxonomy', 'property_type');
+        $this->wp_db->where('tr.object_id', $property_id);
+        
+        $result = $this->wp_db->get()->row();
+        return $result ? $result : (object)['name' => 'Non défini', 'slug' => 'undefined'];
+    }
     // Propriétés d'un agent
     public function get_properties_by_agent($agent_id) {
         // À adapter selon structure

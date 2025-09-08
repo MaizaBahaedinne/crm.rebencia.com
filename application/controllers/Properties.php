@@ -15,49 +15,65 @@ class Properties extends BaseController {
     
     // Liste des propriétés
     public function index() {
-        $this->isLoggedIn();
-        $filters = $this->input->get();
-        $data['properties'] = $this->Property_model->get_all_properties($filters);
-        $data['agencies'] = $this->Agency_model->get_agencies_with_stats();
-        $data['agents'] = $this->Agent_model->get_all_agents();
-        $data['filters'] = $filters;
+        $data = $this->loadPage('properties', 'Liste des propriétés', 'properties');
         
-        $this->loadViews('dashboard/properties/index', $this->global, $data, NULL);
+        if (isset($_GET['ajax'])) {
+            $properties = $this->Property_model->get_properties();
+            foreach ($properties as $property) {
+                $property->metas = $this->Property_model->get_property_metas($property->ID);
+                $property->status = $this->Property_model->get_property_status($property->ID);
+                $property->type = $this->Property_model->get_property_type($property->ID);
+            }
+            $data['properties'] = $properties;
+        } else {
+            $data['properties'] = [];
+        }
+        
+        // Récupérer les données pour les filtres
+        $data['property_statuses'] = $this->Property_model->get_property_statuses();
+        $data['property_types'] = $this->Property_model->get_property_types();
+        $data['property_cities'] = $this->Property_model->get_property_cities();
+        
+        $this->loadViews($data, 'dashboard/properties/index');
     }
     
     // Vue détaillée d'une propriété
-    public function view($property_id) {
-        $this->isLoggedIn();
-        $property = $this->Property_model->get_property($property_id);
+    public function view($property_id = null) {
+        if (!$property_id) {
+            show_404();
+        }
         
+        $property = $this->Property_model->get_property($property_id);
         if (!$property) {
             show_404();
         }
         
-        // Enrichir avec les métadonnées
+        $data = $this->loadPage('properties', 'Détails propriété', 'properties');
+        $data['property'] = $property;
+        
+        // Récupérer les métadonnées de la propriété
         $property_metas = $this->Property_model->get_property_metas($property_id);
         foreach ($property_metas as $meta) {
-            $property->{$meta->meta_key} = $meta->meta_value;
+            $data['property']->{$meta->meta_key} = $meta->meta_value;
         }
         
-        // Récupérer l'agent propriétaire
+        // Récupérer statut et type de la propriété
+        $data['property_status'] = $this->Property_model->get_property_status($property_id);
+        $data['property_type'] = $this->Property_model->get_property_type($property_id);
+        
+        // Récupérer les informations de l'agent
         $agent = $this->Agent_model->get_agent_by_user_id($property->post_author);
+        $data['agent'] = $agent;
         
-        // Récupérer l'agence de l'agent
-        $agency = null;
-        if ($agent && !empty($agent->agency_id)) {
+        if ($agent) {
             $agency = $this->Agency_model->get_agency_details($agent->agency_id);
+            $data['agency'] = $agency;
         }
         
-        // Propriétés similaires
         $similar_properties = $this->Property_model->get_similar_properties($property_id, 4);
-        
-        $data['property'] = $property;
-        $data['agent'] = $agent;
-        $data['agency'] = $agency;
         $data['similar_properties'] = $similar_properties;
         
-        $this->loadViews('dashboard/properties/view', $this->global, $data, NULL);
+        $this->loadViews($data, 'dashboard/properties/view');
     }
     
     // AJAX - Liste filtrée

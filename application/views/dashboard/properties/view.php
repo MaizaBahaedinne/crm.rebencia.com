@@ -42,17 +42,38 @@
                                     </p>
                                     <div class="d-flex flex-wrap gap-3">
                                         <?php 
-                                        $status_labels = [
-                                            'for-sale' => ['label' => 'À vendre', 'class' => 'warning'],
-                                            'for-rent' => ['label' => 'À louer', 'class' => 'info'], 
-                                            'sold' => ['label' => 'Vendu', 'class' => 'success'],
-                                            'rented' => ['label' => 'Loué', 'class' => 'secondary']
-                                        ];
-                                        $status = $property->fave_property_status ?? 'unknown';
-                                        $status_info = isset($status_labels[$status]) ? $status_labels[$status] : ['label' => 'Statut inconnu', 'class' => 'light'];
+                                        // Utilisation du vrai statut depuis la base de données
+                                        $status_name = 'Statut inconnu';
+                                        $status_class = 'secondary';
+                                        
+                                        if (isset($property_status) && $property_status) {
+                                            $status_name = $property_status->name;
+                                            // Couleurs basées sur le slug du statut
+                                            switch(strtolower($property_status->slug)) {
+                                                case 'for-sale':
+                                                case 'a-vendre':
+                                                    $status_class = 'warning'; 
+                                                    break;
+                                                case 'for-rent':
+                                                case 'a-louer':
+                                                    $status_class = 'info'; 
+                                                    break;
+                                                case 'sold':
+                                                case 'vendu':
+                                                    $status_class = 'success'; 
+                                                    break;
+                                                case 'rented':
+                                                case 'loue':
+                                                    $status_class = 'dark'; 
+                                                    break;
+                                                default: 
+                                                    $status_class = 'secondary'; 
+                                                    break;
+                                            }
+                                        }
                                         ?>
-                                        <span class="badge bg-<?php echo $status_info['class']; ?>-subtle text-<?php echo $status_info['class']; ?>">
-                                            <?php echo $status_info['label']; ?>
+                                        <span class="badge bg-<?php echo $status_class; ?>-subtle text-<?php echo $status_class; ?>">
+                                            <?php echo htmlspecialchars($status_name); ?>
                                         </span>
                                         <?php if (!empty($property->fave_property_price) && is_numeric($property->fave_property_price)) : ?>
                                         <span class="badge bg-success-subtle text-success fs-6">
@@ -312,8 +333,12 @@
                                     <span class="text-muted">Type</span>
                                     <strong>
                                         <?php 
-                                        $bedrooms = $property->fave_property_bedrooms ?? 0;
-                                        echo $bedrooms > 0 ? 'S+' . $bedrooms : 'Non spécifié';
+                                        if (isset($property_type) && $property_type) {
+                                            echo htmlspecialchars($property_type->name);
+                                        } else {
+                                            $bedrooms = $property->fave_property_bedrooms ?? 0;
+                                            echo $bedrooms > 0 ? 'S+' . $bedrooms : 'Non spécifié';
+                                        }
                                         ?>
                                     </strong>
                                 </div>
@@ -325,8 +350,8 @@
                                 <?php endif; ?>
                                 <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                                     <span class="text-muted">Statut</span>
-                                    <span class="badge bg-<?php echo $status_info['class']; ?>">
-                                        <?php echo $status_info['label']; ?>
+                                    <span class="badge bg-<?php echo $status_class; ?>">
+                                        <?php echo htmlspecialchars($status_name); ?>
                                     </span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center px-0">

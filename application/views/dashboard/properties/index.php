@@ -31,21 +31,33 @@
                                     <label for="type_bien" class="form-label">Type</label>
                                     <select class="form-select" id="type_bien" name="type_bien">
                                         <option value="">Tous types</option>
-                                        <option value="S+1" <?php echo ($filters['type_bien'] ?? '') == 'S+1' ? 'selected' : ''; ?>>Studio</option>
-                                        <option value="S+2" <?php echo ($filters['type_bien'] ?? '') == 'S+2' ? 'selected' : ''; ?>>S+2</option>
-                                        <option value="S+3" <?php echo ($filters['type_bien'] ?? '') == 'S+3' ? 'selected' : ''; ?>>S+3</option>
-                                        <option value="S+4" <?php echo ($filters['type_bien'] ?? '') == 'S+4' ? 'selected' : ''; ?>>S+4</option>
-                                        <option value="S+5" <?php echo ($filters['type_bien'] ?? '') == 'S+5' ? 'selected' : ''; ?>>S+5+</option>
+                                        <?php if (isset($property_types)) : ?>
+                                            <?php foreach ($property_types as $type): ?>
+                                                <option value="<?= $type->slug ?>" <?php echo ($filters['type_bien'] ?? '') == $type->slug ? 'selected' : ''; ?>><?= $type->name ?></option>
+                                            <?php endforeach; ?>
+                                        <?php else : ?>
+                                            <option value="S+1" <?php echo ($filters['type_bien'] ?? '') == 'S+1' ? 'selected' : ''; ?>>Studio</option>
+                                            <option value="S+2" <?php echo ($filters['type_bien'] ?? '') == 'S+2' ? 'selected' : ''; ?>>S+2</option>
+                                            <option value="S+3" <?php echo ($filters['type_bien'] ?? '') == 'S+3' ? 'selected' : ''; ?>>S+3</option>
+                                            <option value="S+4" <?php echo ($filters['type_bien'] ?? '') == 'S+4' ? 'selected' : ''; ?>>S+4</option>
+                                            <option value="S+5" <?php echo ($filters['type_bien'] ?? '') == 'S+5' ? 'selected' : ''; ?>>S+5+</option>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
                                     <label for="statut_houzez" class="form-label">Statut</label>
                                     <select class="form-select" id="statut_houzez" name="statut_houzez">
                                         <option value="">Tous statuts</option>
-                                        <option value="for-sale" <?php echo ($filters['statut_houzez'] ?? '') == 'for-sale' ? 'selected' : ''; ?>>À vendre</option>
-                                        <option value="for-rent" <?php echo ($filters['statut_houzez'] ?? '') == 'for-rent' ? 'selected' : ''; ?>>À louer</option>
-                                        <option value="sold" <?php echo ($filters['statut_houzez'] ?? '') == 'sold' ? 'selected' : ''; ?>>Vendu</option>
-                                        <option value="rented" <?php echo ($filters['statut_houzez'] ?? '') == 'rented' ? 'selected' : ''; ?>>Loué</option>
+                                        <?php if (isset($property_statuses)) : ?>
+                                            <?php foreach ($property_statuses as $status): ?>
+                                                <option value="<?= $status->slug ?>" <?php echo ($filters['statut_houzez'] ?? '') == $status->slug ? 'selected' : ''; ?>><?= $status->name ?></option>
+                                            <?php endforeach; ?>
+                                        <?php else : ?>
+                                            <option value="for-sale" <?php echo ($filters['statut_houzez'] ?? '') == 'for-sale' ? 'selected' : ''; ?>>À vendre</option>
+                                            <option value="for-rent" <?php echo ($filters['statut_houzez'] ?? '') == 'for-rent' ? 'selected' : ''; ?>>À louer</option>
+                                            <option value="sold" <?php echo ($filters['statut_houzez'] ?? '') == 'sold' ? 'selected' : ''; ?>>Vendu</option>
+                                            <option value="rented" <?php echo ($filters['statut_houzez'] ?? '') == 'rented' ? 'selected' : ''; ?>>Loué</option>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -121,28 +133,38 @@
                                 </div>
                                 <!-- Status Badge -->
                                 <div class="position-absolute top-0 start-0 m-2">
-                                    <span class="badge bg-<?php 
-                                        $status_color = 'light';
-                                        switch($property->statut_houzez ?? 'unknown') {
-                                            case 'for-sale': $status_color = 'warning'; break;
-                                            case 'for-rent': $status_color = 'info'; break; 
-                                            case 'sold': $status_color = 'success'; break;
-                                            case 'rented': $status_color = 'secondary'; break;
-                                            default: $status_color = 'light'; break;
+                                    <?php 
+                                    $status_name = 'Non défini';
+                                    $status_color = 'secondary';
+                                    
+                                    if (isset($property->status) && $property->status) {
+                                        $status_name = $property->status->name;
+                                        // Couleurs basées sur le slug du statut
+                                        switch(strtolower($property->status->slug)) {
+                                            case 'for-sale':
+                                            case 'a-vendre':
+                                                $status_color = 'warning'; 
+                                                break;
+                                            case 'for-rent':
+                                            case 'a-louer':
+                                                $status_color = 'info'; 
+                                                break;
+                                            case 'sold':
+                                            case 'vendu':
+                                                $status_color = 'success'; 
+                                                break;
+                                            case 'rented':
+                                            case 'loue':
+                                                $status_color = 'dark'; 
+                                                break;
+                                            default: 
+                                                $status_color = 'secondary'; 
+                                                break;
                                         }
-                                        echo $status_color;
-                                    ?>">
-                                        <?php 
-                                        $status_label = 'Statut inconnu';
-                                        switch($property->statut_houzez ?? 'unknown') {
-                                            case 'for-sale': $status_label = 'À vendre'; break;
-                                            case 'for-rent': $status_label = 'À louer'; break;
-                                            case 'sold': $status_label = 'Vendu'; break; 
-                                            case 'rented': $status_label = 'Loué'; break;
-                                            default: $status_label = 'Statut inconnu'; break;
-                                        }
-                                        echo $status_label;
-                                        ?>
+                                    }
+                                    ?>
+                                    <span class="badge bg-<?php echo $status_color; ?>">
+                                        <?php echo htmlspecialchars($status_name); ?>
                                     </span>
                                 </div>
                                 <!-- Price Badge -->
@@ -167,7 +189,15 @@
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <small class="text-muted">Type:</small><br>
-                                        <span class="fw-medium"><?php echo htmlspecialchars($property->type_bien ?: 'Non spécifié'); ?></span>
+                                        <span class="fw-medium">
+                                            <?php 
+                                            if (isset($property->type) && $property->type) {
+                                                echo htmlspecialchars($property->type->name);
+                                            } else {
+                                                echo htmlspecialchars($property->type_bien ?: 'Non spécifié'); 
+                                            }
+                                            ?>
+                                        </span>
                                     </div>
                                     <div class="col-6">
                                         <small class="text-muted">Surface:</small><br>
