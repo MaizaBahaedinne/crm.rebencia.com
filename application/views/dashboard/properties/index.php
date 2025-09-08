@@ -133,6 +133,20 @@
                                         </div>
                                     <?php endif; ?>
                                 </div>
+                                
+                                <!-- Images Count Badge -->
+                                <?php 
+                                $total_images = 0;
+                                if (!empty($property->images['thumbnail'])) $total_images++;
+                                if (!empty($property->images['gallery'])) $total_images += count($property->images['gallery']);
+                                if ($total_images > 1) : ?>
+                                <div class="position-absolute bottom-0 start-0 m-2">
+                                    <span class="badge bg-dark bg-opacity-75">
+                                        <i class="ri-camera-line me-1"></i><?php echo $total_images; ?>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
+                                
                                 <!-- Status Badge -->
                                 <div class="position-absolute top-0 start-0 m-2">
                                     <?php 

@@ -169,6 +169,24 @@
                                 </button>
                                 <?php endif; ?>
                             </div>
+                            
+                            <!-- Thumbnails Gallery -->
+                            <?php if (!empty($all_images) && count($all_images) > 1) : ?>
+                            <div class="mt-3">
+                                <div class="row g-2">
+                                    <?php foreach ($all_images as $index => $image) : ?>
+                                    <div class="col-2">
+                                        <img src="<?php echo $image; ?>" 
+                                             class="img-fluid rounded thumbnail-gallery cursor-pointer <?php echo $index === 0 ? 'border border-primary border-2' : 'border'; ?>" 
+                                             style="height: 60px; object-fit: cover; width: 100%;" 
+                                             onclick="goToSlide(<?php echo $index; ?>)"
+                                             data-slide="<?php echo $index; ?>"
+                                             alt="Thumbnail <?php echo $index + 1; ?>">
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -541,4 +559,47 @@
 .list-group-item:last-child {
     border-bottom: none !important;
 }
+
+.thumbnail-gallery {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.thumbnail-gallery:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
 </style>
+
+<script>
+function goToSlide(slideIndex) {
+    // Aller à la slide spécifiée
+    const carousel = new bootstrap.Carousel(document.getElementById('propertyCarousel'));
+    carousel.to(slideIndex);
+    
+    // Mettre à jour les borders des thumbnails
+    document.querySelectorAll('.thumbnail-gallery').forEach((thumb, index) => {
+        if (index === slideIndex) {
+            thumb.classList.add('border-primary', 'border-2');
+            thumb.classList.remove('border');
+        } else {
+            thumb.classList.remove('border-primary', 'border-2');
+            thumb.classList.add('border');
+        }
+    });
+}
+
+// Écouter les changements de slide du carousel pour synchroniser les thumbnails
+document.getElementById('propertyCarousel').addEventListener('slide.bs.carousel', function (e) {
+    const slideIndex = e.to;
+    document.querySelectorAll('.thumbnail-gallery').forEach((thumb, index) => {
+        if (index === slideIndex) {
+            thumb.classList.add('border-primary', 'border-2');
+            thumb.classList.remove('border');
+        } else {
+            thumb.classList.remove('border-primary', 'border-2');
+            thumb.classList.add('border');
+        }
+    });
+});
+</script>
