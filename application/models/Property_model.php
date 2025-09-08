@@ -453,4 +453,33 @@ class Property_model extends CI_Model {
         
         return false;
     }
+
+    /**
+     * Compte les propriétés d'un agent par son user_id
+     * @param int $user_id
+     * @return int
+     */
+    public function count_properties_by_agent($user_id) {
+        if (!$user_id) return 0;
+        
+        // D'abord, récupérer l'agent_id à partir du user_id
+        $agent_query = $this->wp_db->select('p.ID as agent_id')
+            ->from('wp_Hrg8P_users u')
+            ->join('wp_Hrg8P_postmeta pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
+            ->join('wp_Hrg8P_posts p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'inner')
+            ->where('u.ID', $user_id)
+            ->get()->row();
+        
+        if (!$agent_query) return 0;
+        
+        $agent_id = $agent_query->agent_id;
+        
+        // Compter les propriétés de cet agent
+        return (int)$this->wp_db->from('wp_Hrg8P_posts p')
+            ->join('wp_Hrg8P_postmeta pm', 'p.ID = pm.post_id AND pm.meta_key = "fave_property_agent"', 'inner')
+            ->where('pm.meta_value', $agent_id)
+            ->where('p.post_type', 'property')
+            ->where('p.post_status', 'publish')
+            ->count_all_results();
+    }
 }
