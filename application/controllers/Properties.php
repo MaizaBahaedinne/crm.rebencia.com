@@ -3,103 +3,105 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/BaseController.php';
 
+/**
+ * @property Property_model $property_model
+ * @property Agency_model $agency_model
+ * @property Agent_model $agent_model
+ * @property CI_Input $input
+ */
 class Properties extends BaseController {
     
     public function __construct() {
         parent::__construct();
-        $this->load->model('Property_model');
-        $this->load->model('Agency_model');
-        $this->load->model('Agent_model');
+        $this->load->model('Property_model', 'property_model');
+        $this->load->model('Agency_model', 'agency_model');
+        $this->load->model('Agent_model', 'agent_model');
     }
 
     
     // Liste des propriétés
     public function index() {
-        $data = $this->loadPage('properties', 'Liste des propriétés', 'properties');
+        $this->isLoggedIn();
         
-        if (isset($_GET['ajax'])) {
-            $properties = $this->Property_model->get_properties();
-            foreach ($properties as $property) {
-                $property->metas = $this->Property_model->get_property_metas($property->ID);
-                $property->status = $this->Property_model->get_property_status($property->ID);
-                $property->type = $this->Property_model->get_property_type($property->ID);
-            }
-            $data['properties'] = $properties;
-        } else {
-            $data['properties'] = [];
+        // Préparer les données pour la vue
+        $data = $this->global;
+        $data['pageTitle'] = 'Liste des propriétés';
+        $data['filters'] = $_GET; // Récupérer les filtres de l'URL
+        
+        // Récupérer les propriétés
+        $properties = $this->property_model->get_properties();
+        foreach ($properties as $property) {
+            $property->metas = $this->property_model->get_property_metas($property->ID);
+            $property->status = $this->property_model->get_property_status($property->ID);
+            $property->type = $this->property_model->get_property_type($property->ID);
         }
+        $data['properties'] = $properties;
         
         // Récupérer les données pour les filtres
-        $data['property_statuses'] = $this->Property_model->get_property_statuses();
-        $data['property_types'] = $this->Property_model->get_property_types();
-        $data['property_cities'] = $this->Property_model->get_property_cities();
+        $data['property_statuses'] = $this->property_model->get_property_statuses();
+        $data['property_types'] = $this->property_model->get_property_types();
+        $data['property_cities'] = $this->property_model->get_property_cities();
         
-        $this->loadViews($data, 'dashboard/properties/index');
+        $this->loadViews('dashboard/properties/index', $data, $data);
     }
     
     // Vue détaillée d'une propriété
+    // Détails d'une propriété
     public function view($property_id = null) {
+        $this->isLoggedIn();
+        
         if (!$property_id) {
             show_404();
         }
         
-        $property = $this->Property_model->get_property($property_id);
+        $property = $this->property_model->get_property($property_id);
         if (!$property) {
             show_404();
         }
         
-        $data = $this->loadPage('properties', 'Détails propriété', 'properties');
+        // Préparer les données pour la vue
+        $data = $this->global;
+        $data['pageTitle'] = 'Détails propriété';
         $data['property'] = $property;
         
         // Récupérer les métadonnées de la propriété
-        $property_metas = $this->Property_model->get_property_metas($property_id);
+        $property_metas = $this->property_model->get_property_metas($property_id);
         foreach ($property_metas as $meta) {
             $data['property']->{$meta->meta_key} = $meta->meta_value;
         }
         
         // Récupérer statut et type de la propriété
-        $data['property_status'] = $this->Property_model->get_property_status($property_id);
-        $data['property_type'] = $this->Property_model->get_property_type($property_id);
+        $data['property_status'] = $this->property_model->get_property_status($property_id);
+        $data['property_type'] = $this->property_model->get_property_type($property_id);
         
         // Récupérer les informations de l'agent
-        $agent = $this->Agent_model->get_agent_by_user_id($property->post_author);
+        $agent = $this->agent_model->get_agent_by_user_id($property->post_author);
         $data['agent'] = $agent;
         
         if ($agent) {
-            $agency = $this->Agency_model->get_agency_details($agent->agency_id);
+            $agency = $this->agency_model->get_agency_details($agent->agency_id);
             $data['agency'] = $agency;
         }
         
-        $similar_properties = $this->Property_model->get_similar_properties($property_id, 4);
+        $similar_properties = $this->property_model->get_similar_properties($property_id, 4);
         $data['similar_properties'] = $similar_properties;
         
-        $this->loadViews($data, 'dashboard/properties/view');
+        $this->loadViews('dashboard/properties/view', $data, $data);
     }
     
-    // AJAX - Liste filtrée
-    public function ajax_list() {
+        // AJAX pour récupérer toutes les propriétés avec filtres
+    public function get_all_properties() {
         $filters = $this->input->get();
-        $data['properties'] = $this->Property_model->get_all_properties($filters);
-        $this->load->view('dashboard/properties/ajax_list', $data);
+        $data['properties'] = $this->property_model->get_all_properties($filters);
+        header('Content-Type: application/json');
+        echo json_encode($data);
     }
     
-    // AJAX - Recherche autocomplete
-    public function ajax_search() {
+    // AJAX pour recherche de propriétés
+    public function search_properties() {
         $term = $this->input->get('term');
-        $properties = $this->Property_model->search_properties($term, 10);
-        
-        $results = [];
-        foreach ($properties as $property) {
-            $results[] = [
-                'id' => $property->ID,
-                'label' => $property->post_title,
-                'value' => $property->post_title,
-                'address' => isset($property->fave_property_address) ? $property->fave_property_address : '',
-                'price' => isset($property->fave_property_price) ? $property->fave_property_price : ''
-            ];
-        }
-        
+        $properties = $this->property_model->search_properties($term, 10);
         header('Content-Type: application/json');
-        echo json_encode($results);
+        echo json_encode($properties);
     }
 }
