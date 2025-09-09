@@ -100,7 +100,7 @@
 
             <!-- Statistics Row -->
             <div class="row">
-                <div class="col-xl-3 col-md-6">
+                <div class="col-xl-2 col-md-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
@@ -111,18 +111,69 @@
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Propriétés</p>
-                                    <h4 class="mb-0"><?php echo $agent->properties_count; ?></h4>
+                                    <h4 class="mb-0"><?php echo $agent->properties_count ?? 0; ?></h4>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-3 col-md-6">
+                <div class="col-xl-2 col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-info-subtle text-info rounded-circle fs-3">
+                                        <i class="ri-calculator-line"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-1">Estimations</p>
+                                    <h4 class="mb-0"><?php echo $agent->estimations_count ?? 0; ?></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-sm flex-shrink-0">
                                     <span class="avatar-title bg-success-subtle text-success rounded-circle fs-3">
+                                        <i class="ri-exchange-line"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-1">Transactions</p>
+                                    <h4 class="mb-0"><?php echo $agent->transactions_count ?? 0; ?></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-3">
+                                        <i class="ri-money-dollar-circle-line"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-1">Commissions</p>
+                                    <h4 class="mb-0"><?php echo number_format($agent->total_commission ?? 0, 0, ',', ' '); ?> TND</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-secondary-subtle text-secondary rounded-circle fs-3">
                                         <i class="ri-eye-line"></i>
                                     </span>
                                 </div>
@@ -134,35 +185,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-3 col-md-6">
+                <div class="col-xl-2 col-md-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-info-subtle text-info rounded-circle fs-3">
-                                        <i class="ri-mail-line"></i>
+                                    <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-3">
+                                        <i class="ri-contacts-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Contacts</p>
                                     <h4 class="mb-0"><?php echo $agent->contacts_count ?? 0; ?></h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-3">
-                                        <i class="ri-star-line"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Note Moyenne</p>
-                                    <h4 class="mb-0">4.8/5</h4>
                                 </div>
                             </div>
                         </div>
@@ -282,6 +316,35 @@
                         </div>
                     </div>
                     <?php endif; ?>
+
+                    <!-- Monthly Performance -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Performance du mois</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h4 class="text-info"><?php echo $agent->estimations_this_month ?? 0; ?></h4>
+                                        <p class="text-muted mb-0 small">Estimations</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-success"><?php echo $agent->transactions_this_month ?? 0; ?></h4>
+                                    <p class="text-muted mb-0 small">Transactions</p>
+                                </div>
+                            </div>
+
+                            <?php if (($agent->avg_estimation_value ?? 0) > 0) : ?>
+                            <hr>
+                            <div class="text-center">
+                                <h6 class="text-muted mb-1">Valeur moyenne des estimations</h6>
+                                <h5 class="text-primary mb-0"><?php echo number_format($agent->avg_estimation_value, 0, ',', ' '); ?> TND</h5>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Agent Properties -->
@@ -357,6 +420,168 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Estimations & Transactions Row -->
+            <div class="row mt-4">
+                <!-- Estimations Section -->
+                <div class="col-xl-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-calculator-line me-2 text-info"></i>Estimations Récentes (<?php echo count($estimations ?? []); ?>)
+                            </h5>
+                            <a href="<?php echo base_url('estimations?agent=' . $agent->user_id); ?>" class="btn btn-info btn-sm">
+                                Voir toutes
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <?php if (!empty($estimations)) : ?>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($estimations as $estimation) : ?>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1"><?php echo htmlspecialchars($estimation->type_bien); ?></h6>
+                                            <p class="text-muted small mb-1">
+                                                <i class="ri-map-pin-line me-1"></i>
+                                                <?php echo htmlspecialchars($estimation->adresse); ?>
+                                            </p>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="text-muted small">
+                                                    <i class="ri-ruler-line me-1"></i><?php echo $estimation->superficie; ?> m²
+                                                </span>
+                                                <?php if ($estimation->zone_nom) : ?>
+                                                <span class="badge bg-light text-dark"><?php echo htmlspecialchars($estimation->zone_nom); ?></span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-info fs-6">
+                                                <?php echo number_format($estimation->prix_estime, 0, ',', ' '); ?> TND
+                                            </div>
+                                            <small class="text-muted">
+                                                <?php echo date('d/m/Y', strtotime($estimation->date_creation)); ?>
+                                            </small>
+                                            <br>
+                                            <span class="badge bg-<?php 
+                                                echo $estimation->statut == 'valide' ? 'success' : 
+                                                    ($estimation->statut == 'rejete' ? 'danger' : 'warning'); 
+                                            ?>-subtle text-<?php 
+                                                echo $estimation->statut == 'valide' ? 'success' : 
+                                                    ($estimation->statut == 'rejete' ? 'danger' : 'warning'); 
+                                            ?>">
+                                                <?php echo ucfirst($estimation->statut); ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <?php if (($agent->estimations_count ?? 0) > count($estimations)) : ?>
+                            <div class="text-center mt-3">
+                                <a href="<?php echo base_url('estimations?agent=' . $agent->user_id); ?>" class="btn btn-outline-info">
+                                    Voir les <?php echo ($agent->estimations_count ?? 0) - count($estimations); ?> estimations restantes
+                                </a>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php else : ?>
+                            <div class="text-center py-4">
+                                <div class="avatar-lg mx-auto mb-3">
+                                    <div class="avatar-title bg-info-subtle text-info rounded-circle fs-24">
+                                        <i class="ri-calculator-line"></i>
+                                    </div>
+                                </div>
+                                <h6 class="mb-2">Aucune estimation</h6>
+                                <p class="text-muted">Cet agent n'a pas encore créé d'estimations.</p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions Section -->
+                <div class="col-xl-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-exchange-line me-2 text-success"></i>Transactions Récentes (<?php echo count($transactions ?? []); ?>)
+                            </h5>
+                            <a href="<?php echo base_url('transactions?agent=' . $agent->user_id); ?>" class="btn btn-success btn-sm">
+                                Voir toutes
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <?php if (!empty($transactions)) : ?>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($transactions as $transaction) : ?>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <?php echo ucfirst($transaction->type); ?>
+                                                <?php if ($transaction->property_type) : ?>
+                                                - <?php echo htmlspecialchars($transaction->property_type); ?>
+                                                <?php endif; ?>
+                                            </h6>
+                                            <?php if ($transaction->property_address) : ?>
+                                            <p class="text-muted small mb-1">
+                                                <i class="ri-map-pin-line me-1"></i>
+                                                <?php echo htmlspecialchars($transaction->property_address); ?>
+                                            </p>
+                                            <?php endif; ?>
+                                            <?php if ($transaction->client_nom || $transaction->client_prenom) : ?>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="text-muted small">
+                                                    <i class="ri-user-line me-1"></i>
+                                                    <?php echo htmlspecialchars(trim($transaction->client_prenom . ' ' . $transaction->client_nom)); ?>
+                                                </span>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-success fs-6">
+                                                <?php echo number_format($transaction->montant ?? 0, 0, ',', ' '); ?> TND
+                                            </div>
+                                            <?php if ($transaction->commission) : ?>
+                                            <div class="small text-muted">
+                                                Commission: <?php echo number_format($transaction->commission, 0, ',', ' '); ?> TND
+                                            </div>
+                                            <?php endif; ?>
+                                            <small class="text-muted">
+                                                <?php echo date('d/m/Y', strtotime($transaction->date_cloture)); ?>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <?php if (($agent->transactions_count ?? 0) > count($transactions)) : ?>
+                            <div class="text-center mt-3">
+                                <a href="<?php echo base_url('transactions?agent=' . $agent->user_id); ?>" class="btn btn-outline-success">
+                                    Voir les <?php echo ($agent->transactions_count ?? 0) - count($transactions); ?> transactions restantes
+                                </a>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php else : ?>
+                            <div class="text-center py-4">
+                                <div class="avatar-lg mx-auto mb-3">
+                                    <div class="avatar-title bg-success-subtle text-success rounded-circle fs-24">
+                                        <i class="ri-exchange-line"></i>
+                                    </div>
+                                </div>
+                                <h6 class="mb-2">Aucune transaction</h6>
+                                <p class="text-muted">Cet agent n'a pas encore finalisé de transactions.</p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Debug Links (pour développement) -->
             <?php if (ENVIRONMENT === 'development' || ($this->session->userdata('user_type') === 'admin')) : ?>
             <div class="row mt-3">

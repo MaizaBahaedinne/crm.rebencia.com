@@ -301,6 +301,27 @@ class Agent extends BaseController {
             // Utiliser la méthode améliorée qui teste différentes approches
             $data['properties'] = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email, 6);
         }
+
+        // Récupérer les estimations de l'agent (limité à 5)
+        $data['estimations'] = [];
+        if ($agent->user_id) {
+            $data['estimations'] = $this->agent_model->get_agent_estimations($agent->user_id, 5);
+        }
+
+        // Récupérer les transactions de l'agent (limité à 5)
+        $data['transactions'] = [];
+        if ($agent->user_id) {
+            $data['transactions'] = $this->agent_model->get_agent_transactions($agent->user_id, 5);
+        }
+
+        // Récupérer les statistiques complètes
+        if ($agent->agent_id) {
+            $complete_stats = $this->agent_model->get_agent_complete_stats($agent->agent_id);
+            // Fusionner avec les stats existantes
+            foreach ($complete_stats as $key => $value) {
+                $agent->$key = $value;
+            }
+        }
         
         $this->loadViews('dashboard/agents/view', $data, $data);
     }

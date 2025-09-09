@@ -745,4 +745,143 @@ class Agent_model extends CI_Model {
         return $unique_properties;
     }
 
+    /**
+     * Récupère les estimations d'un agent
+     * @param int $agent_id
+     * @param int $limit
+     * @return array
+     */
+    public function get_agent_estimations($agent_id, $limit = null) {
+        if (!$this->db->table_exists('crm_properties')) {
+            return [];
+        }
+
+        $this->db->select('
+            p.id,
+            p.type_bien,
+            p.adresse,
+            p.superficie,
+            p.prix_estime,
+            p.statut,
+            p.date_creation,
+            p.agent_id,
+            z.nom as zone_nom
+        ');
+        
+        $this->db->from('crm_properties p');
+        $this->db->join('crm_zones z', 'z.id = p.zone_id', 'left');
+        $this->db->where('p.agent_id', $agent_id);
+        $this->db->order_by('p.date_creation', 'DESC');
+        
+        if ($limit) {
+            $this->db->limit($limit);
+        }
+        
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Récupère les transactions d'un agent
+     * @param int $agent_id
+     * @param int $limit
+     * @return array
+     */
+    public function get_agent_transactions($agent_id, $limit = null) {
+        if (!$this->db->table_exists('crm_transactions')) {
+            return [];
+        }
+
+        $this->db->select('
+            t.*,
+            p.adresse as property_address,
+            p.type_bien as property_type,
+            c.nom as client_nom,
+            c.prenom as client_prenom,
+            c.email as client_email
+        ');
+        
+        $this->db->from('crm_transactions t');
+        $this->db->join('crm_properties p', 'p.id = t.property_id', 'left');
+        $this->db->join('crm_clients c', 'c.id = t.client_id', 'left');
+        $this->db->where('t.agent_id', $agent_id);
+        $this->db->order_by('t.date_cloture', 'DESC');
+        
+        if ($limit) {
+            $this->db->limit($limit);
+        }
+        
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Statistiques complètes d'un agent incluant estimations et transactions
+     * @param int $agent_id
+     * @return array
+     */
+    public function get_agent_complete_stats($agent_id) {
+        $stats = [
+            'properties_count' => 0,
+            'estimations_count' => 0,
+            'transactions_count' => 0,
+            'total_commission' => 0,
+            'avg_estimation_value' => 0,
+            'transactions_this_month' => 0,
+            'estimations_this_month' => 0
+        ];
+
+        // Compter les propriétés HOUZEZ
+        $properties_count = (int)$this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm', 'p.ID = pm.post_id AND pm.meta_key = "fave_property_agent"', 'inner')
+            ->where('pm.meta_value', $agent_id)
+            ->where('p.post_type', 'property')
+            ->where('p.post_status', 'publish')
+            ->count_all_results();
+        $stats['properties_count'] = $properties_count;
+
+        // Compter les estimations CRM
+        if ($this->db->table_exists('crm_properties')) {
+            $estimations = $this->db->where('agent_id', $agent_id)->get('crm_properties');
+            $stats['estimations_count'] = $estimations->num_rows();
+            
+            if ($estimations->num_rows() > 0) {
+                $avg_price = $this->db->select_avg('prix_estime')
+                    ->where('agent_id', $agent_id)
+                    ->where('prix_estime >', 0)
+                    ->get('crm_properties')
+                    ->row();
+                $stats['avg_estimation_value'] = (float)($avg_price->prix_estime ?? 0);
+            }
+
+            // Estimations de ce mois
+            $this_month = date('Y-m-01');
+            $stats['estimations_this_month'] = $this->db
+                ->where('agent_id', $agent_id)
+                ->where('date_creation >=', $this_month)
+                ->count_all_results('crm_properties');
+        }
+
+        // Compter les transactions CRM
+        if ($this->db->table_exists('crm_transactions')) {
+            $transactions = $this->db->where('agent_id', $agent_id)->get('crm_transactions');
+            $stats['transactions_count'] = $transactions->num_rows();
+
+            if ($transactions->num_rows() > 0) {
+                $total_commission = $this->db->select_sum('commission')
+                    ->where('agent_id', $agent_id)
+                    ->get('crm_transactions')
+                    ->row();
+                $stats['total_commission'] = (float)($total_commission->commission ?? 0);
+            }
+
+            // Transactions de ce mois
+            $this_month = date('Y-m-01');
+            $stats['transactions_this_month'] = $this->db
+                ->where('agent_id', $agent_id)
+                ->where('date_cloture >=', $this_month)
+                ->count_all_results('crm_transactions');
+        }
+
+        return $stats;
+    }
+
 }
