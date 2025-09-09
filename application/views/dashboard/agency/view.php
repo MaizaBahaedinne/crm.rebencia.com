@@ -1,6 +1,21 @@
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
+            
+            <style>
+                .agency-description p {
+                    margin-bottom: 1rem;
+                    line-height: 1.6;
+                    color: #6c757d;
+                }
+                .agency-description b {
+                    color: #495057 !important;
+                }
+                .agency-description p:last-child {
+                    margin-bottom: 0;
+                }
+            </style>
+            
             <!-- Page Title -->
             <div class="row">
                 <div class="col-12">
@@ -36,7 +51,38 @@
                                 </div>
                                 <div class="col">
                                     <h4 class="mb-1"><?php echo htmlspecialchars($agency->agency_name); ?></h4>
-                                    <p class="text-muted mb-2"><?php echo htmlspecialchars($agency->agency_description ?: 'Aucune description disponible'); ?></p>
+                                    <?php 
+                                    // Fonction pour nettoyer le contenu WordPress Gutenberg
+                                    function clean_gutenberg_content($content) {
+                                        if (empty($content)) return 'Aucune description disponible';
+                                        
+                                        // Supprimer les blocs WordPress Gutenberg
+                                        $content = preg_replace('/<!-- wp:[\s\S]*? -->/m', '', $content);
+                                        $content = preg_replace('/<!-- \/wp:[\s\S]*? -->/m', '', $content);
+                                        
+                                        // Nettoyer les balises HTML vides
+                                        $content = preg_replace('/<p>\s*<\/p>/i', '', $content);
+                                        $content = preg_replace('/<p><\/p>/i', '', $content);
+                                        
+                                        // Convertir les balises <strong> en <b> et ajouter des classes Bootstrap
+                                        $content = str_replace('<strong>', '<b class="fw-bold text-dark">', $content);
+                                        $content = str_replace('</strong>', '</b>', $content);
+                                        
+                                        // Ajouter des classes aux paragraphes
+                                        $content = preg_replace('/<p>/i', '<p class="mb-2">', $content);
+                                        
+                                        // Nettoyer les espaces multiples
+                                        $content = preg_replace('/\s+/', ' ', $content);
+                                        $content = trim($content);
+                                        
+                                        return $content ?: 'Aucune description disponible';
+                                    }
+                                    
+                                    $clean_description = clean_gutenberg_content($agency->agency_description);
+                                    ?>
+                                    <div class="text-muted mb-2">
+                                        <?php echo $clean_description; ?>
+                                    </div>
                                     <div class="d-flex flex-wrap gap-3">
                                         <?php if (!empty($agency->agency_email)) : ?>
                                         <span class="badge bg-info-subtle text-info">
@@ -148,6 +194,26 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Agency Description Section -->
+            <?php if (!empty($agency->agency_description) && strlen(trim(strip_tags($agency->agency_description))) > 50) : ?>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-information-line me-2"></i>À propos de <?php echo htmlspecialchars($agency->agency_name); ?>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="agency-description">
+                                <?php echo clean_gutenberg_content($agency->agency_description); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="row">
                 <!-- Agency Details -->
