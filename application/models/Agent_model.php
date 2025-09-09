@@ -759,19 +759,20 @@ class Agent_model extends CI_Model {
         $this->db->select('
             p.id,
             p.type_bien,
-            p.adresse,
-            p.superficie,
-            p.prix_estime,
-            p.statut,
-            p.date_creation,
+            p.zone_id,
+            p.surface_habitable as superficie,
+            p.valeur_estimee as prix_estime,
+            p.statut_dossier as statut,
+            p.created_at as date_creation,
             p.agent_id,
-            z.nom as zone_nom
+            z.nom as zone_nom,
+            z.nom as adresse
         ');
         
         $this->db->from('crm_properties p');
         $this->db->join('crm_zones z', 'z.id = p.zone_id', 'left');
         $this->db->where('p.agent_id', $agent_id);
-        $this->db->order_by('p.date_creation', 'DESC');
+        $this->db->order_by('p.created_at', 'DESC');
         
         if ($limit) {
             $this->db->limit($limit);
@@ -793,7 +794,7 @@ class Agent_model extends CI_Model {
 
         $this->db->select('
             t.*,
-            p.adresse as property_address,
+            z.nom as property_address,
             p.type_bien as property_type,
             c.nom as client_nom,
             c.prenom as client_prenom,
@@ -802,6 +803,7 @@ class Agent_model extends CI_Model {
         
         $this->db->from('crm_transactions t');
         $this->db->join('crm_properties p', 'p.id = t.property_id', 'left');
+        $this->db->join('crm_zones z', 'z.id = p.zone_id', 'left');
         $this->db->join('crm_clients c', 'c.id = t.client_id', 'left');
         $this->db->where('t.agent_id', $agent_id);
         $this->db->order_by('t.date_cloture', 'DESC');
@@ -844,19 +846,19 @@ class Agent_model extends CI_Model {
             $stats['estimations_count'] = $estimations->num_rows();
             
             if ($estimations->num_rows() > 0) {
-                $avg_price = $this->db->select_avg('prix_estime')
+                $avg_price = $this->db->select_avg('valeur_estimee')
                     ->where('agent_id', $agent_id)
-                    ->where('prix_estime >', 0)
+                    ->where('valeur_estimee >', 0)
                     ->get('crm_properties')
                     ->row();
-                $stats['avg_estimation_value'] = (float)($avg_price->prix_estime ?? 0);
+                $stats['avg_estimation_value'] = (float)($avg_price->valeur_estimee ?? 0);
             }
 
             // Estimations de ce mois
             $this_month = date('Y-m-01');
             $stats['estimations_this_month'] = $this->db
                 ->where('agent_id', $agent_id)
-                ->where('date_creation >=', $this_month)
+                ->where('created_at >=', $this_month)
                 ->count_all_results('crm_properties');
         }
 
