@@ -18,7 +18,14 @@ class Agent extends BaseController {
         $this->load->model('Property_model', 'property_model');
     }
 
-    // Liste des agents avec vraies données
+    // Test simple
+    public function test() {
+        echo "Agent controller fonctionne !";
+        echo "<br>Date: " . date('Y-m-d H:i:s');
+        echo "<br><a href='" . base_url('agents') . "'>Retour aux agents</a>";
+    }
+
+        // Liste des agents avec vraies données
     public function index() {
         $this->isLoggedIn();
         
@@ -27,26 +34,26 @@ class Agent extends BaseController {
         $data['pageTitle'] = 'Liste des agents';
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
-        // Récupérer tous les agents avec leurs informations complètes
-        $agents = $this->agent_model->get_all_agents();
-        
-        // Enrichir les données d'agents avec statistiques
-        foreach ($agents as $agent) {
-            // Compter les propriétés de chaque agent
-            $agent->properties_count = $this->property_model->count_properties_by_agent($agent->user_id);
+        try {
+            // Récupérer tous les agents avec leurs informations complètes
+            $agents = $this->agent_model->get_all_agents($data['filters']);
             
-            // Avatar par défaut si pas d'image
-            if (empty($agent->agent_avatar)) {
-                $agent->agent_avatar = 'https://ui-avatars.com/api/?name=' . urlencode($agent->agent_name) . '&background=405189&color=fff&size=100';
+            // Ajouter le nombre de propriétés pour chaque agent
+            foreach ($agents as $agent) {
+                if (!isset($agent->properties_count) || $agent->properties_count === null) {
+                    $agent->properties_count = $this->property_model->count_properties_by_agent($agent->user_id);
+                }
             }
             
-            // Statut actif/inactif
-            $agent->is_active = ($agent->post_status == 'publish') ? true : false;
+            $data['agents'] = $agents;
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error in Agent index: ' . $e->getMessage());
+            $data['agents'] = [];
+            $data['error'] = 'Erreur lors du chargement des agents: ' . $e->getMessage();
         }
         
-        $data['agents'] = $agents;
-        
-        // Récupérer les agences pour les filtres
+        // Récupérer la liste des agences pour les filtres
         $data['agencies'] = $this->agency_model->get_all_agencies();
         
         $this->loadViews('dashboard/agents/index', $data, $data);
@@ -96,7 +103,7 @@ class Agent extends BaseController {
             $data['properties'] = $this->agent_model->get_agent_properties($agent->agent_id, 6);
         }
         
-        $this->loadViews('dashboard/agents/view', $data, $data);
+        $this->loadViews('dashboard/agents/view_simple', $data, $data);
     }
 
     // AJAX pour récupérer tous les agents avec filtres

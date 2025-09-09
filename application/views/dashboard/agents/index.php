@@ -160,6 +160,17 @@
                 </div>
             </div>
 
+            <!-- Error Display -->
+            <?php if (isset($error)) : ?>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <i class="ri-error-warning-line me-2"></i><?php echo $error; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Agents Grid -->
             <div class="row" id="agentsContainer">
                 <?php if (!empty($agents)) : ?>
