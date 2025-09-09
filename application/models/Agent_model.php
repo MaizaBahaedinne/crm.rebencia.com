@@ -345,7 +345,7 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN media.guid END) as agent_avatar,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
@@ -368,7 +368,7 @@ class Agent_model extends CI_Model {
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_author_custom_picture" AND media.post_type = "attachment"', 'left')
             ->where('u.ID', $user_id)
             ->where('p.post_status', 'publish')
             ->group_by('u.ID, u.user_login, u.user_email, u.user_status, u.user_registered, p.ID, p.post_title, p.post_content, p.post_status, pm_email.meta_value, a.ID, a.post_title')
@@ -498,7 +498,7 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN media.guid END) as agent_avatar,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
@@ -509,7 +509,7 @@ class Agent_model extends CI_Model {
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_author_custom_picture" AND media.post_type = "attachment"', 'left')
             ->where('p.ID', $agent_id)
             ->where('p.post_type', 'houzez_agent')
             ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, a.ID, a.post_title');
@@ -641,7 +641,7 @@ class Agent_model extends CI_Model {
             p.post_title as agent_name,
             pm_email.meta_value as agent_email,
             a.post_title as agency_name,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar
+            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN media.guid END) as agent_avatar
         ", FALSE);
         
         $this->wp_db->from($this->users_table . ' u')
@@ -650,7 +650,7 @@ class Agent_model extends CI_Model {
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_author_custom_picture" AND media.post_type = "attachment"', 'left')
             ->group_start()
                 ->like('p.post_title', $term)
                 ->or_like('u.user_email', $term)

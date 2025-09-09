@@ -27,7 +27,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <img src="<?php echo $agent->agent_avatar ?? base_url('assets/images/users/avatar-1.jpg'); ?>" 
+                                    <img src="<?php echo get_agent_avatar_url($agent); ?>" 
                                          alt="<?php echo htmlspecialchars($agent->agent_name ?? 'Agent'); ?>" 
                                          class="img-fluid rounded-circle" style="max-width: 150px;">
                                 </div>

@@ -40,13 +40,7 @@
                             <div class="row align-items-center">
                                 <div class="col-auto">
                                     <div class="avatar-lg">
-                                        <?php if (!empty($agency->agency_logo)) : ?>
-                                            <img src="<?php echo $agency->agency_logo; ?>" alt="<?php echo htmlspecialchars($agency->agency_name); ?>" class="img-fluid rounded">
-                                        <?php else : ?>
-                                            <div class="avatar-title bg-primary-subtle text-primary fs-22 rounded">
-                                                <?php echo strtoupper(substr($agency->agency_name, 0, 2)); ?>
-                                            </div>
-                                        <?php endif; ?>
+                                        <img src="<?php echo get_agency_logo_url($agency); ?>" alt="<?php echo htmlspecialchars($agency->agency_name); ?>" class="img-fluid rounded">
                                     </div>
                                 </div>
                                 <div class="col">
@@ -334,13 +328,7 @@
                                     <div class="col-md-6 col-lg-4 mb-3">
                                         <div class="d-flex align-items-center p-2 border rounded">
                                             <div class="avatar-sm me-3">
-                                                <?php if (!empty($agent->agent_avatar)) : ?>
-                                                    <img src="<?php echo $agent->agent_avatar; ?>" alt="" class="img-fluid rounded-circle">
-                                                <?php else : ?>
-                                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                        <?php echo strtoupper(substr($agent->agent_name ?? 'A', 0, 2)); ?>
-                                                    </div>
-                                                <?php endif; ?>
+                                                <img src="<?php echo get_agent_avatar_url($agent); ?>" alt="" class="img-fluid rounded-circle">
                                             </div>
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-1"><?php echo htmlspecialchars($agent->agent_name ?: 'Agent sans nom'); ?></h6>

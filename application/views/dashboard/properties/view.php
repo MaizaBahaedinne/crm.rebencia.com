@@ -460,13 +460,7 @@
                         </div>
                         <div class="card-body text-center">
                             <div class="avatar-lg mx-auto mb-3">
-                                <?php if (!empty($agent->agent_avatar)) : ?>
-                                    <img src="<?php echo $agent->agent_avatar; ?>" alt="Agent" class="img-fluid rounded-circle">
-                                <?php else : ?>
-                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                        <?php echo strtoupper(substr($agent->agent_name ?? 'A', 0, 2)); ?>
-                                    </div>
-                                <?php endif; ?>
+                                <img src="<?php echo get_agent_avatar_url($agent); ?>" alt="Agent" class="img-fluid rounded-circle">
                             </div>
                             <h6 class="mb-1"><?php echo htmlspecialchars($agent->agent_name ?? 'Agent non identifié'); ?></h6>
                             <p class="text-muted mb-3"><?php echo htmlspecialchars($agent->position ?? 'Agent immobilier'); ?></p>
@@ -498,13 +492,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="avatar-sm me-3">
-                                    <?php if (!empty($agency->agency_logo)) : ?>
-                                        <img src="<?php echo $agency->agency_logo; ?>" alt="Agency" class="img-fluid rounded">
-                                    <?php else : ?>
-                                        <div class="avatar-title bg-warning-subtle text-warning rounded">
-                                            <i class="ri-building-line"></i>
-                                        </div>
-                                    <?php endif; ?>
+                                    <img src="<?php echo get_agency_logo_url($agency); ?>" alt="Agency" class="img-fluid rounded">
                                 </div>
                                 <div>
                                     <h6 class="mb-1">

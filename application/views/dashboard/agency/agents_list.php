@@ -107,13 +107,7 @@
                                                         </div>
                                                         <div class="text-center">
                                                             <div class="avatar-lg mx-auto">
-                                                                <?php if (!empty($agent->agent_avatar)) : ?>
-                                                                    <img src="<?php echo $agent->agent_avatar; ?>" alt="" class="img-fluid rounded-circle">
-                                                                <?php else : ?>
-                                                                    <div class="avatar-title bg-primary-subtle text-primary fs-20 rounded-circle">
-                                                                        <?php echo strtoupper(substr($agent->agent_name ?? 'A', 0, 2)); ?>
-                                                                    </div>
-                                                                <?php endif; ?>
+                                                                <img src="<?php echo get_agent_avatar_url($agent); ?>" alt="" class="img-fluid rounded-circle">
                                                             </div>
                                                             <div class="mt-3">
                                                                 <h5 class="mb-1 agent-name">
@@ -162,13 +156,7 @@
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 <div class="avatar-xs me-3">
-                                                                    <?php if (!empty($agent->agent_avatar)) : ?>
-                                                                        <img src="<?php echo $agent->agent_avatar; ?>" alt="" class="img-fluid rounded-circle">
-                                                                    <?php else : ?>
-                                                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                                            <?php echo strtoupper(substr($agent->agent_name ?? 'A', 0, 2)); ?>
-                                                                        </div>
-                                                                    <?php endif; ?>
+                                                                        <img src="<?php echo get_agent_avatar_url($agent); ?>" alt="" class="img-fluid rounded-circle">
                                                                 </div>
                                                                 <div>
                                                                     <h6 class="mb-1 agent-name"><?php echo htmlspecialchars($agent->agent_name ?: 'Agent sans nom'); ?></h6>
