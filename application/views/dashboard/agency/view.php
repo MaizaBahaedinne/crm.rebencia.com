@@ -323,26 +323,14 @@
                         </div>
                         <div class="card-body">
                             <?php if (!empty($agents)) : ?>
-                                <!-- DEBUG TEMPORAIRE -->
-                                <?php if (isset($_GET['debug'])) : ?>
-                                <div class="alert alert-info">
-                                    <h6>Debug Agents (<?php echo count($agents); ?> agents trouvés)</h6>
-                                    <?php foreach (array_slice($agents, 0, 3) as $i => $agent) : ?>
-                                        <p><strong>Agent <?php echo $i+1; ?>:</strong><br>
-                                        - Nom: <?php echo htmlspecialchars($agent->agent_name ?? 'N/A'); ?><br>
-                                        - Email: <?php echo htmlspecialchars($agent->agent_email ?? 'N/A'); ?><br>
-                                        - Avatar brut: <?php echo htmlspecialchars($agent->agent_avatar ?? 'N/A'); ?><br>
-                                        - Avatar helper: <?php echo htmlspecialchars(get_agent_avatar_url($agent)); ?></p>
-                                    <?php endforeach; ?>
-                                </div>
-                                <?php endif; ?>
-                                <!-- FIN DEBUG -->
                                 <div class="row">
                                     <?php foreach (array_slice($agents, 0, 6) as $agent) : ?>
                                     <div class="col-md-6 col-lg-4 mb-3">
                                         <div class="d-flex align-items-center p-2 border rounded">
                                             <div class="avatar-sm me-3">
-                                                <img src="<?php echo get_agent_avatar_url($agent); ?>" alt="" class="img-fluid rounded-circle">
+                                                <img src="<?php echo get_agent_avatar_url($agent); ?>" alt="<?php echo htmlspecialchars($agent->agent_name ?? 'Agent'); ?>" class="img-fluid rounded-circle" 
+                                                     onerror="this.onerror=null; this.src='<?php echo base_url('assets/images/users/avatar-1.jpg'); ?>';"
+                                                     style="width: 40px; height: 40px; object-fit: cover;">
                                             </div>
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-1"><?php echo htmlspecialchars($agent->agent_name ?: 'Agent sans nom'); ?></h6>
