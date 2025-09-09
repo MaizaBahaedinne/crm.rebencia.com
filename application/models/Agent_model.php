@@ -579,4 +579,170 @@ class Agent_model extends CI_Model {
         return $agents;
     }
 
+    /**
+     * Méthode améliorée pour récupérer les propriétés d'un agent
+     * Teste différentes approches pour trouver les associations
+     * @param int $agent_id
+     * @param string $agent_email
+     * @param int $limit
+     * @return object[]
+     */
+    public function get_agent_properties_enhanced($agent_id, $agent_email = null, $limit = null) {
+        $properties = [];
+        
+        // Méthode 1: Par agent_id dans fave_property_agent
+        $this->wp_db->select("
+            p.ID,
+            p.post_title as title,
+            p.post_content as description,
+            p.post_date,
+            p.post_status,
+            p.post_name as slug,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_price' THEN pm.meta_value END) as price,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_size' THEN pm.meta_value END) as size,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_bedrooms' THEN pm.meta_value END) as bedrooms,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_bathrooms' THEN pm.meta_value END) as bathrooms,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_address' THEN pm.meta_value END) as location,
+            MAX(CASE WHEN pm.meta_key = 'fave_property_images' THEN pm.meta_value END) as images,
+            (SELECT guid FROM {$this->posts_table} img WHERE img.ID = (
+                SELECT meta_value FROM {$this->postmeta_table} thumb 
+                WHERE thumb.post_id = p.ID AND thumb.meta_key = '_thumbnail_id' LIMIT 1
+            )) as thumbnail,
+            (SELECT t.name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+             INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+             INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+             WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_status' LIMIT 1) as status,
+            (SELECT t.name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+             INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+             INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+             WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_type' LIMIT 1) as property_type,
+            COALESCE((SELECT meta_value FROM {$this->postmeta_table} WHERE post_id = p.ID AND meta_key = 'fave_total_property_views'), 0) as views,
+            'agent_id' as found_by
+        ", FALSE);
+
+        $method1 = $this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm', 'p.ID = pm.post_id', 'left')
+            ->join($this->postmeta_table . ' pm_agent', 'p.ID = pm_agent.post_id AND pm_agent.meta_key = "fave_property_agent"', 'inner')
+            ->where('pm_agent.meta_value', $agent_id)
+            ->where('p.post_type', 'property')
+            ->where('p.post_status', 'publish')
+            ->group_by('p.ID, p.post_title, p.post_content, p.post_date, p.post_status, p.post_name')
+            ->order_by('p.post_date', 'DESC');
+
+        if ($limit) $method1->limit($limit);
+        $properties = array_merge($properties, $method1->get()->result());
+
+        // Si pas de résultats et qu'on a un email, essayons par email
+        if (empty($properties) && $agent_email) {
+            
+            // Méthode 2: Par email dans fave_property_agent
+            $this->wp_db->select("
+                p.ID,
+                p.post_title as title,
+                p.post_content as description,
+                p.post_date,
+                p.post_status,
+                p.post_name as slug,
+                MAX(CASE WHEN pm.meta_key = 'fave_property_price' THEN pm.meta_value END) as price,
+                MAX(CASE WHEN pm.meta_key = 'fave_property_size' THEN pm.meta_value END) as size,
+                MAX(CASE WHEN pm.meta_key = 'fave_property_bedrooms' THEN pm.meta_value END) as bedrooms,
+                MAX(CASE WHEN pm.meta_key = 'fave_property_bathrooms' THEN pm.meta_value END) as bathrooms,
+                MAX(CASE WHEN pm.meta_key = 'fave_property_address' THEN pm.meta_value END) as location,
+                MAX(CASE WHEN pm.meta_key = 'fave_property_images' THEN pm.meta_value END) as images,
+                (SELECT guid FROM {$this->posts_table} img WHERE img.ID = (
+                    SELECT meta_value FROM {$this->postmeta_table} thumb 
+                    WHERE thumb.post_id = p.ID AND thumb.meta_key = '_thumbnail_id' LIMIT 1
+                )) as thumbnail,
+                (SELECT t.name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+                 INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+                 INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+                 WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_status' LIMIT 1) as status,
+                (SELECT t.name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+                 INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+                 INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+                 WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_type' LIMIT 1) as property_type,
+                COALESCE((SELECT meta_value FROM {$this->postmeta_table} WHERE post_id = p.ID AND meta_key = 'fave_total_property_views'), 0) as views,
+                'email' as found_by
+            ", FALSE);
+
+            $method2 = $this->wp_db->from($this->posts_table . ' p')
+                ->join($this->postmeta_table . ' pm', 'p.ID = pm.post_id', 'left')
+                ->join($this->postmeta_table . ' pm_agent', 'p.ID = pm_agent.post_id AND pm_agent.meta_key = "fave_property_agent"', 'inner')
+                ->where('pm_agent.meta_value', $agent_email)
+                ->where('p.post_type', 'property')
+                ->where('p.post_status', 'publish')
+                ->group_by('p.ID, p.post_title, p.post_content, p.post_date, p.post_status, p.post_name')
+                ->order_by('p.post_date', 'DESC');
+
+            if ($limit) $method2->limit($limit);
+            $properties = array_merge($properties, $method2->get()->result());
+        }
+
+        // Méthode 3: Recherche par author_id (post_author)
+        if (empty($properties)) {
+            
+            // D'abord, trouver le user_id WordPress correspondant à l'agent
+            $user_id = $this->wp_db->select('u.ID')
+                ->from($this->users_table . ' u')
+                ->join($this->postmeta_table . ' pm', 'pm.meta_value = u.user_email AND pm.meta_key = "fave_agent_email"', 'inner')
+                ->join($this->posts_table . ' p', 'p.ID = pm.post_id AND p.post_type = "houzez_agent"', 'inner')
+                ->where('p.ID', $agent_id)
+                ->get()->row();
+
+            if ($user_id) {
+                $this->wp_db->select("
+                    p.ID,
+                    p.post_title as title,
+                    p.post_content as description,
+                    p.post_date,
+                    p.post_status,
+                    p.post_name as slug,
+                    MAX(CASE WHEN pm.meta_key = 'fave_property_price' THEN pm.meta_value END) as price,
+                    MAX(CASE WHEN pm.meta_key = 'fave_property_size' THEN pm.meta_value END) as size,
+                    MAX(CASE WHEN pm.meta_key = 'fave_property_bedrooms' THEN pm.meta_value END) as bedrooms,
+                    MAX(CASE WHEN pm.meta_key = 'fave_property_bathrooms' THEN pm.meta_value END) as bathrooms,
+                    MAX(CASE WHEN pm.meta_key = 'fave_property_address' THEN pm.meta_value END) as location,
+                    MAX(CASE WHEN pm.meta_key = 'fave_property_images' THEN pm.meta_value END) as images,
+                    (SELECT guid FROM {$this->posts_table} img WHERE img.ID = (
+                        SELECT meta_value FROM {$this->postmeta_table} thumb 
+                        WHERE thumb.post_id = p.ID AND thumb.meta_key = '_thumbnail_id' LIMIT 1
+                    )) as thumbnail,
+                    (SELECT t.name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+                     INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+                     INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+                     WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_status' LIMIT 1) as status,
+                    (SELECT t.name FROM {$this->wp_db->dbprefix}term_taxonomy tt 
+                     INNER JOIN {$this->wp_db->dbprefix}terms t ON tt.term_id = t.term_id 
+                     INNER JOIN {$this->wp_db->dbprefix}term_relationships tr ON tt.term_taxonomy_id = tr.term_taxonomy_id 
+                     WHERE tr.object_id = p.ID AND tt.taxonomy = 'property_type' LIMIT 1) as property_type,
+                    COALESCE((SELECT meta_value FROM {$this->postmeta_table} WHERE post_id = p.ID AND meta_key = 'fave_total_property_views'), 0) as views,
+                    'post_author' as found_by
+                ", FALSE);
+
+                $method3 = $this->wp_db->from($this->posts_table . ' p')
+                    ->join($this->postmeta_table . ' pm', 'p.ID = pm.post_id', 'left')
+                    ->where('p.post_author', $user_id->ID)
+                    ->where('p.post_type', 'property')
+                    ->where('p.post_status', 'publish')
+                    ->group_by('p.ID, p.post_title, p.post_content, p.post_date, p.post_status, p.post_name')
+                    ->order_by('p.post_date', 'DESC');
+
+                if ($limit) $method3->limit($limit);
+                $properties = array_merge($properties, $method3->get()->result());
+            }
+        }
+
+        // Dédoublonnage par ID
+        $unique_properties = [];
+        $seen_ids = [];
+        foreach ($properties as $property) {
+            if (!in_array($property->ID, $seen_ids)) {
+                $seen_ids[] = $property->ID;
+                $unique_properties[] = $property;
+            }
+        }
+
+        return $unique_properties;
+    }
+
 }

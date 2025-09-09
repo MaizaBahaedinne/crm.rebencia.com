@@ -357,6 +357,28 @@
                     </div>
                 </div>
             </div>
+            <!-- Debug Links (pour développement) -->
+            <?php if (ENVIRONMENT === 'development' || ($this->session->userdata('user_type') === 'admin')) : ?>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning-subtle">
+                            <h6 class="card-title mb-0 text-warning"><i class="ri-bug-line me-1"></i>Outils de débogage</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="btn-group" role="group">
+                                <a href="<?php echo base_url('agents/debug_properties/' . $agent->user_id); ?>" class="btn btn-outline-warning btn-sm">
+                                    <i class="ri-search-line me-1"></i>Debug Propriétés
+                                </a>
+                                <a href="<?php echo base_url('agents/explore_structure'); ?>" class="btn btn-outline-info btn-sm">
+                                    <i class="ri-database-line me-1"></i>Explorer Structure
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
