@@ -323,6 +323,20 @@
                         </div>
                         <div class="card-body">
                             <?php if (!empty($agents)) : ?>
+                                <!-- DEBUG TEMPORAIRE -->
+                                <?php if (isset($_GET['debug'])) : ?>
+                                <div class="alert alert-info">
+                                    <h6>Debug Agents (<?php echo count($agents); ?> agents trouvés)</h6>
+                                    <?php foreach (array_slice($agents, 0, 3) as $i => $agent) : ?>
+                                        <p><strong>Agent <?php echo $i+1; ?>:</strong><br>
+                                        - Nom: <?php echo htmlspecialchars($agent->agent_name ?? 'N/A'); ?><br>
+                                        - Email: <?php echo htmlspecialchars($agent->agent_email ?? 'N/A'); ?><br>
+                                        - Avatar brut: <?php echo htmlspecialchars($agent->agent_avatar ?? 'N/A'); ?><br>
+                                        - Avatar helper: <?php echo htmlspecialchars(get_agent_avatar_url($agent)); ?></p>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?php endif; ?>
+                                <!-- FIN DEBUG -->
                                 <div class="row">
                                     <?php foreach (array_slice($agents, 0, 6) as $agent) : ?>
                                     <div class="col-md-6 col-lg-4 mb-3">
