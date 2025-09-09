@@ -18,6 +18,7 @@ class Properties extends BaseController {
         $this->load->model('Agent_model', 'agent_model');
     }
 
+    
     // Liste des propriétés
     public function index() {
         $this->isLoggedIn();
@@ -28,12 +29,11 @@ class Properties extends BaseController {
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
         // Récupérer les propriétés
-        $properties = $this->property_model->get_all_properties();
+        $properties = $this->property_model->get_all_properties($data['filters']);
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->ID);
             $property->status = $this->property_model->get_property_status($property->ID);
             $property->type = $this->property_model->get_property_type($property->ID);
-            $property->images = $this->property_model->get_property_images($property->ID);
         }
         $data['properties'] = $properties;
         
@@ -44,7 +44,8 @@ class Properties extends BaseController {
         
         $this->loadViews('dashboard/properties/index', $data, $data);
     }
-
+    
+    // Vue détaillée d'une propriété
     // Détails d'une propriété
     public function view($property_id = null) {
         $this->isLoggedIn();
@@ -73,9 +74,6 @@ class Properties extends BaseController {
         $data['property_status'] = $this->property_model->get_property_status($property_id);
         $data['property_type'] = $this->property_model->get_property_type($property_id);
         
-        // Récupérer les images de la propriété
-        $data['property_images'] = $this->property_model->get_property_images($property_id);
-        
         // Récupérer les informations de l'agent
         $agent = $this->agent_model->get_agent_by_user_id($property->post_author);
         $data['agent'] = $agent;
@@ -90,8 +88,8 @@ class Properties extends BaseController {
         
         $this->loadViews('dashboard/properties/view', $data, $data);
     }
-
-    // AJAX pour récupérer toutes les propriétés avec filtres
+    
+        // AJAX pour récupérer toutes les propriétés avec filtres
     public function get_all_properties() {
         $filters = $this->input->get();
         $data['properties'] = $this->property_model->get_all_properties($filters);
