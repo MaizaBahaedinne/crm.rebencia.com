@@ -20,64 +20,56 @@
             <!-- Agent Profile Header -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card border-0 shadow-sm overflow-hidden">
-                        <div class="card-body p-0">
-                            <!-- Cover Photo -->
-                            <div class="profile-cover-img bg-primary" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                <div class="position-absolute top-0 end-0 p-3">
-                                    <div class="dropdown">
-                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            <i class="ri-more-line"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="mailto:<?php echo $agent->agent_email; ?>"><i class="ri-mail-line me-2"></i>Envoyer email</a></li>
-                                            <li><a class="dropdown-item" href="<?php echo base_url('properties?agent=' . $agent->user_id); ?>"><i class="ri-home-line me-2"></i>Voir ses propriétés</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Modifier</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
                             <!-- Profile Info -->
-                            <div class="p-4 pt-5" style="margin-top: -75px;">
-                                <div class="d-flex align-items-end">
-                                    <div class="avatar-xxl flex-shrink-0 me-4">
-                                        <img src="<?php echo $agent->agent_avatar; ?>" alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
-                                             class="img-fluid rounded-circle border border-4 border-white shadow">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex flex-wrap align-items-center justify-content-between">
-                                            <div>
-                                                <h4 class="mb-1"><?php echo htmlspecialchars($agent->agent_name); ?></h4>
-                                                <p class="text-muted mb-1"><?php echo htmlspecialchars($agent->agent_email); ?></p>
-                                                <?php if (!empty($agent->position)) : ?>
-                                                <p class="text-muted mb-2"><i class="ri-briefcase-line me-1"></i><?php echo htmlspecialchars($agent->position); ?></p>
+                            <div class="d-flex align-items-start">
+                                <div class="avatar-xxl flex-shrink-0 me-4">
+                                    <img src="<?php echo $agent->agent_avatar; ?>" alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
+                                         class="img-fluid rounded-circle border border-3 border-primary shadow-sm">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-wrap align-items-start justify-content-between">
+                                        <div>
+                                            <h4 class="mb-2"><?php echo htmlspecialchars($agent->agent_name); ?></h4>
+                                            <p class="text-muted mb-2"><i class="ri-mail-line me-1"></i><?php echo htmlspecialchars($agent->agent_email); ?></p>
+                                            <?php if (!empty($agent->position)) : ?>
+                                            <p class="text-muted mb-3"><i class="ri-briefcase-line me-1"></i><?php echo htmlspecialchars($agent->position); ?></p>
+                                            <?php endif; ?>
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <span class="badge bg-<?php echo $agent->is_active ? 'success' : 'danger'; ?>-subtle text-<?php echo $agent->is_active ? 'success' : 'danger'; ?>">
+                                                    <i class="ri-<?php echo $agent->is_active ? 'check' : 'close'; ?>-line me-1"></i><?php echo $agent->is_active ? 'Actif' : 'Inactif'; ?>
+                                                </span>
+                                                <?php if ($agent->agency_name): ?>
+                                                <span class="badge bg-primary-subtle text-primary">
+                                                    <i class="ri-building-line me-1"></i><?php echo htmlspecialchars($agent->agency_name); ?>
+                                                </span>
                                                 <?php endif; ?>
-                                                <div class="d-flex align-items-center gap-2 mb-2">
-                                                    <span class="badge bg-<?php echo $agent->is_active ? 'success' : 'danger'; ?>-subtle text-<?php echo $agent->is_active ? 'success' : 'danger'; ?>">
-                                                        <?php echo $agent->is_active ? 'Actif' : 'Inactif'; ?>
-                                                    </span>
-                                                    <?php if ($agent->agency_name): ?>
-                                                    <span class="badge bg-primary-subtle text-primary">
-                                                        <i class="ri-building-line me-1"></i><?php echo htmlspecialchars($agent->agency_name); ?>
-                                                    </span>
-                                                    <?php endif; ?>
-                                                </div>
                                             </div>
-                                            <div class="text-end">
-                                                <div class="d-flex gap-2 mb-2">
-                                                    <?php if (!empty($agent->phone)) : ?>
-                                                    <a href="tel:<?php echo $agent->phone; ?>" class="btn btn-primary btn-sm">
-                                                        <i class="ri-phone-line me-1"></i><?php echo $agent->phone; ?>
-                                                    </a>
-                                                    <?php endif; ?>
-                                                    <?php if (!empty($agent->mobile)) : ?>
-                                                    <a href="tel:<?php echo $agent->mobile; ?>" class="btn btn-success btn-sm">
-                                                        <i class="ri-smartphone-line me-1"></i><?php echo $agent->mobile; ?>
-                                                    </a>
-                                                    <?php endif; ?>
-                                                </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="dropdown mb-3">
+                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="ri-more-line me-1"></i>Actions
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="mailto:<?php echo $agent->agent_email; ?>"><i class="ri-mail-line me-2"></i>Envoyer email</a></li>
+                                                    <li><a class="dropdown-item" href="<?php echo base_url('properties?agent=' . $agent->user_id); ?>"><i class="ri-home-line me-2"></i>Voir ses propriétés</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Modifier</a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                                <?php if (!empty($agent->phone)) : ?>
+                                                <a href="tel:<?php echo $agent->phone; ?>" class="btn btn-primary btn-sm">
+                                                    <i class="ri-phone-line me-1"></i><?php echo $agent->phone; ?>
+                                                </a>
+                                                <?php endif; ?>
+                                                <?php if (!empty($agent->mobile)) : ?>
+                                                <a href="tel:<?php echo $agent->mobile; ?>" class="btn btn-success btn-sm">
+                                                    <i class="ri-smartphone-line me-1"></i><?php echo $agent->mobile; ?>
+                                                </a>
+                                                <?php endif; ?>
                                                 <?php if (!empty($agent->whatsapp)) : ?>
                                                 <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $agent->whatsapp); ?>" class="btn btn-success btn-sm" target="_blank">
                                                     <i class="ri-whatsapp-line me-1"></i>WhatsApp
