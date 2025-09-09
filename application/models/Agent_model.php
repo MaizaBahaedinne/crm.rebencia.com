@@ -34,11 +34,11 @@ class Agent_model extends CI_Model {
      * @return string|null URL de l'avatar
      */
     private function get_wordpress_avatar($user_id, $user_email) {
-        // Méthode 1: Chercher dans wp_usermeta pour l'avatar personnalisé
+        // Méthode 1: Chercher dans wp_usermeta pour l'avatar HOUZEZ
         $avatar_meta = $this->wp_db->select('meta_value')
             ->from($this->usermeta_table)
             ->where('user_id', $user_id)
-            ->where_in('meta_key', ['wp_user_avatar', 'avatar', 'profile_picture'])
+            ->where_in('meta_key', ['fave_author_custom_picture', 'wp_user_avatar', 'avatar', 'profile_picture'])
             ->get()->row();
 
         if ($avatar_meta && !empty($avatar_meta->meta_value)) {
@@ -51,11 +51,14 @@ class Agent_model extends CI_Model {
                     ->get()->row();
                 
                 if ($attachment) {
-                    return $attachment->guid;
+                    // Corriger l'URL vers le domaine de production
+                    $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $attachment->guid);
+                    return str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
                 }
             } else {
-                // Si c'est déjà une URL
-                return $avatar_meta->meta_value;
+                // Si c'est déjà une URL, la corriger
+                $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $avatar_meta->meta_value);
+                return str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
             }
         }
 
@@ -70,12 +73,14 @@ class Agent_model extends CI_Model {
                 AND pm2.meta_key = "fave_agent_email" 
                 AND pm2.meta_value = "' . $this->wp_db->escape_str($user_email) . '"
             )', NULL, FALSE)
-            ->where('pm.meta_key', 'fave_agent_picture')
+            ->where('pm.meta_key', 'fave_author_custom_picture')
             ->where('media.post_type', 'attachment')
             ->get()->row();
 
         if ($profile_picture) {
-            return $profile_picture->guid;
+            // Corriger l'URL vers le domaine de production
+            $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $profile_picture->guid);
+            return str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
         }
 
         // Méthode 3: Utiliser Gravatar comme fallback
@@ -117,7 +122,7 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) as whatsapp,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) as skype,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN 
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_author_custom_picture' THEN 
                 CASE 
                     WHEN media.guid IS NOT NULL THEN 
                         REPLACE(media.guid, 'http://localhost/', 'https://rebencia.com/')
@@ -147,7 +152,7 @@ class Agent_model extends CI_Model {
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left');
+            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_author_custom_picture" AND media.post_type = "attachment"', 'left');
 
         // Appliquer les filtres
         if (!empty($filters['search'])) {
@@ -296,12 +301,18 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
-            MAX(CASE WHEN pm.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar
+            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN 
+                CASE 
+                    WHEN media.guid IS NOT NULL THEN 
+                        REPLACE(media.guid, 'http://localhost/', 'https://rebencia.com/')
+                    ELSE NULL
+                END
+            END) as agent_avatar
         ", FALSE);
         
         $agent = $this->wp_db->from($this->posts_table . ' p')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value AND pm.meta_key = "fave_author_custom_picture" AND media.post_type = "attachment"', 'left')
             ->where('p.post_type', 'houzez_agent')
             ->having('MAX(CASE WHEN pm.meta_key = "fave_agent_email" THEN pm.meta_value END) =', $email)
             ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date')
