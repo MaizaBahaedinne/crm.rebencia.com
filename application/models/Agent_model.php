@@ -92,8 +92,6 @@ class Agent_model extends CI_Model {
         return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
     }
 
-}
-
     /**
      * Retourne tous les agents HOUZEZ avec leurs informations complètes
      * Utilise une requête optimisée similaire à celle fournie
