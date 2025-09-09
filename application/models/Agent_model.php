@@ -118,7 +118,12 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) as skype,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN 
-                COALESCE(media.guid, CONCAT('https://www.gravatar.com/avatar/', MD5(LOWER(u.user_email)), '?d=identicon&s=200'))
+                CASE 
+                    WHEN media.guid IS NOT NULL THEN 
+                        REPLACE(media.guid, 'http://localhost/', 'https://rebencia.com/')
+                    ELSE 
+                        CONCAT('https://www.gravatar.com/avatar/', MD5(LOWER(u.user_email)), '?d=identicon&s=200')
+                END
             END) as agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_facebook' THEN pm_contact.meta_value END) as facebook,

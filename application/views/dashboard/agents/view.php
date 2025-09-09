@@ -28,9 +28,18 @@
                                     <?php
                                     // Fonction pour obtenir l'avatar avec fallback Gravatar
                                     function get_agent_avatar($agent) {
-                                        if (!empty($agent->agent_avatar) && filter_var($agent->agent_avatar, FILTER_VALIDATE_URL)) {
-                                            return $agent->agent_avatar;
+                                        if (!empty($agent->agent_avatar)) {
+                                            $avatar_url = $agent->agent_avatar;
+                                            
+                                            // Corriger les URLs locales vers le domaine de production
+                                            $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $avatar_url);
+                                            $avatar_url = str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
+                                            
+                                            if (filter_var($avatar_url, FILTER_VALIDATE_URL)) {
+                                                return $avatar_url;
+                                            }
                                         }
+                                        
                                         // Fallback vers Gravatar
                                         $email = !empty($agent->agent_email) ? $agent->agent_email : $agent->user_email;
                                         if (!empty($email)) {
