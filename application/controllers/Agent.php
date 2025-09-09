@@ -53,38 +53,48 @@ class Agent extends BaseController {
     }
 
     // Détails d'un agent
-    public function view($agent_id = null) {
+    public function view($user_id = null) {
         $this->isLoggedIn();
         
-        if (!$agent_id) {
+        if (!$user_id) {
             show_404();
         }
         
-        $agent = $this->agent_model->get_agent($agent_id);
+        // Debugging
+        log_message('debug', 'Agent view: user_id = ' . $user_id);
+        
+        $agent = $this->agent_model->get_agent_by_user_id($user_id);
+        
+        // Debugging
+        log_message('debug', 'Agent found: ' . ($agent ? 'Yes' : 'No'));
         if (!$agent) {
-            show_404();
+            log_message('debug', 'No agent found for user_id: ' . $user_id);
+        }
+        
+        // Si pas d'agent trouvé, créons une page de débogage temporaire
+        if (!$agent) {
+            $data = $this->global;
+            $data['pageTitle'] = 'Agent Debug';
+            $data['user_id'] = $user_id;
+            $data['debug_info'] = 'Aucun agent trouvé pour user_id: ' . $user_id;
+            
+            // Testons quelques agents existants
+            $data['all_agents'] = $this->agent_model->get_all_agents();
+            
+            $this->loadViews('dashboard/agents/debug', $data, $data);
+            return;
         }
         
         // Préparer les données pour la vue
         $data = $this->global;
-        $data['pageTitle'] = 'Détails agent';
+        $data['pageTitle'] = 'Profil Agent - ' . $agent->agent_name;
         $data['agent'] = $agent;
         
-        // Récupérer les propriétés de l'agent
-        $data['agent_properties'] = $this->property_model->get_properties_by_agent($agent->user_id);
-        
-        // Récupérer l'agence de l'agent
-        if ($agent->agency_id) {
-            $data['agency'] = $this->agency_model->get_agency_details($agent->agency_id);
+        // Récupérer les propriétés de l'agent (limité à 6 pour la vue)
+        $data['properties'] = [];
+        if ($agent->agent_id) {
+            $data['properties'] = $this->agent_model->get_agent_properties($agent->agent_id, 6);
         }
-        
-        // Statistiques de l'agent
-        $data['stats'] = [
-            'total_properties' => count($data['agent_properties']),
-            'active_listings' => count(array_filter($data['agent_properties'], function($p) { return $p->post_status == 'publish'; })),
-            'properties_sold' => 0, // À calculer selon votre logique
-            'properties_rented' => 0 // À calculer selon votre logique
-        ];
         
         $this->loadViews('dashboard/agents/view', $data, $data);
     }
