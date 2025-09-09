@@ -91,104 +91,107 @@
             </div>
 
             <!-- Statistics Row -->
-            <div class="row">
-                <div class="col-xl-2 col-md-4">
-                    <div class="card border-0 shadow-sm">
+            <div class="row g-3">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-3">
+                                <div class="avatar-md flex-shrink-0">
+                                    <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
                                         <i class="ri-home-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Propriétés</p>
-                                    <h4 class="mb-0"><?php echo $agent->properties_count ?? 0; ?></h4>
+                                    <h3 class="mb-0 text-primary"><?php echo $agent->properties_count ?? 0; ?></h3>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-2 col-md-4">
-                    <div class="card border-0 shadow-sm">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-info-subtle text-info rounded-circle fs-3">
+                                <div class="avatar-md flex-shrink-0">
+                                    <span class="avatar-title bg-info-subtle text-info rounded-circle fs-2">
                                         <i class="ri-calculator-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Estimations</p>
-                                    <h4 class="mb-0"><?php echo $agent->estimations_count ?? 0; ?></h4>
+                                    <h3 class="mb-0 text-info"><?php echo $agent->estimations_count ?? 0; ?></h3>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-2 col-md-4">
-                    <div class="card border-0 shadow-sm">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-success-subtle text-success rounded-circle fs-3">
+                                <div class="avatar-md flex-shrink-0">
+                                    <span class="avatar-title bg-success-subtle text-success rounded-circle fs-2">
                                         <i class="ri-exchange-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Transactions</p>
-                                    <h4 class="mb-0"><?php echo $agent->transactions_count ?? 0; ?></h4>
+                                    <h3 class="mb-0 text-success"><?php echo $agent->transactions_count ?? 0; ?></h3>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-2 col-md-4">
-                    <div class="card border-0 shadow-sm">
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-3">
+                                <div class="avatar-md flex-shrink-0">
+                                    <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-2">
                                         <i class="ri-money-dollar-circle-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Commissions</p>
-                                    <h4 class="mb-0"><?php echo number_format($agent->total_commission ?? 0, 0, ',', ' '); ?> TND</h4>
+                                    <h3 class="mb-0 text-warning"><?php echo number_format($agent->total_commission ?? 0, 0, ',', ' '); ?> <small class="fs-6">TND</small></h3>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-2 col-md-4">
-                    <div class="card border-0 shadow-sm">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-secondary-subtle text-secondary rounded-circle fs-3">
+                                <div class="avatar-md flex-shrink-0">
+                                    <span class="avatar-title bg-secondary-subtle text-secondary rounded-circle fs-2">
                                         <i class="ri-eye-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Vues Totales</p>
-                                    <h4 class="mb-0"><?php echo number_format($agent->total_views ?? 0); ?></h4>
+                                    <h3 class="mb-0 text-secondary"><?php echo number_format($agent->total_views ?? 0); ?></h3>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-2 col-md-4">
-                    <div class="card border-0 shadow-sm">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-3">
+                                <div class="avatar-md flex-shrink-0">
+                                    <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-2">
                                         <i class="ri-contacts-line"></i>
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-1">Contacts</p>
-                                    <h4 class="mb-0"><?php echo $agent->contacts_count ?? 0; ?></h4>
+                                    <h3 class="mb-0 text-danger"><?php echo $agent->contacts_count ?? 0; ?></h3>
                                 </div>
                             </div>
                         </div>
