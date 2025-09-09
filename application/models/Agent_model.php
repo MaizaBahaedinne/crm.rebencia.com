@@ -391,6 +391,9 @@ class Agent_model extends CI_Model {
             // Ajouter des statistiques supplémentaires
             $agent->total_views = $this->get_agent_total_views($agent->agent_id);
             $agent->contacts_count = $this->get_agent_contacts_count($agent->agent_id);
+            
+            // Nettoyer les données manifestement fausses
+            $agent = $this->clean_agent_data($agent);
         }
 
         return $agent;
@@ -514,7 +517,7 @@ class Agent_model extends CI_Model {
             ->where('p.post_type', 'houzez_agent')
             ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, a.ID, a.post_title');
 
-        return $this->wp_db->get()->row();
+        return $this->clean_agent_data($this->wp_db->get()->row());
     }
 
     /**
@@ -976,6 +979,100 @@ class Agent_model extends CI_Model {
         }
 
         return $stats;
+    }
+
+    /**
+     * Nettoie et corrige les données d'un agent
+     * @param object $agent
+     * @return object
+     */
+    public function clean_agent_data($agent) {
+        if (!$agent) return $agent;
+        
+        // Correction des données manifestement fausses ou de test
+        $fake_data_patterns = [
+            'phone' => ['123 456 789', '321 456 9874', '000 000 000'],
+            'mobile' => ['123 456 789', '321 456 9874', '000 000 000'],
+            'whatsapp' => ['123 456 789', '321 456 9874', '000 000 000']
+        ];
+        
+        foreach ($fake_data_patterns as $field => $fake_values) {
+            if (isset($agent->$field) && in_array($agent->$field, $fake_values)) {
+                $agent->$field = ''; // Vider les données manifestement fausses
+            }
+        }
+        
+        // Correction des URLs avec fautes de frappe
+        if (!empty($agent->website)) {
+            // Correction rebencia.com mal écrit
+            $agent->website = str_replace('rebenecia.com', 'rebencia.com', $agent->website);
+            
+            // Ajouter https:// si manquant
+            if (!preg_match('/^https?:\/\//', $agent->website)) {
+                $agent->website = 'https://' . $agent->website;
+            }
+        }
+        
+        // Nettoyer les données de contact suspectes
+        if (!empty($agent->contacts_count) && $agent->contacts_count == 14) {
+            // Cette valeur semble suspecte, la remettre à 0 pour éviter la confusion
+            $agent->contacts_count = 0;
+        }
+        
+        return $agent;
+    }
+
+    /**
+     * Corrige les métadonnées erronées dans WordPress pour un agent spécifique
+     * @param int $agent_id
+     * @return bool
+     */
+    public function fix_agent_metadata($agent_id) {
+        if (!$agent_id) return false;
+        
+        $corrections = [
+            // Corrections pour l'agent Montasar Barkouti ou autres
+            'fave_agent_mobile' => '', // Vider le mobile s'il est faux
+            'fave_agent_whatsapp' => '', // Vider le WhatsApp s'il est faux
+            'fave_agent_website' => 'https://rebencia.com' // Corriger l'URL
+        ];
+        
+        foreach ($corrections as $meta_key => $meta_value) {
+            // Vérifier si la métadonnée existe et contient des données suspectes
+            $current_value = $this->wp_db->select('meta_value')
+                ->from($this->postmeta_table)
+                ->where('post_id', $agent_id)
+                ->where('meta_key', $meta_key)
+                ->get()->row();
+                
+            if ($current_value) {
+                $current = $current_value->meta_value;
+                
+                // Définir les conditions de correction
+                $needs_correction = false;
+                
+                if ($meta_key == 'fave_agent_mobile' || $meta_key == 'fave_agent_whatsapp') {
+                    // Corriger les numéros manifestement faux
+                    if (in_array($current, ['123 456 789', '321 456 9874', '000 000 000'])) {
+                        $needs_correction = true;
+                    }
+                } elseif ($meta_key == 'fave_agent_website') {
+                    // Corriger les URLs avec fautes de frappe
+                    if (strpos($current, 'rebenecia.com') !== false) {
+                        $meta_value = str_replace('rebenecia.com', 'rebencia.com', $current);
+                        $needs_correction = true;
+                    }
+                }
+                
+                if ($needs_correction) {
+                    $this->wp_db->where('post_id', $agent_id)
+                        ->where('meta_key', $meta_key)
+                        ->update($this->postmeta_table, ['meta_value' => $meta_value]);
+                }
+            }
+        }
+        
+        return true;
     }
 
 }

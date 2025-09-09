@@ -365,4 +365,68 @@ class Agent extends BaseController {
     $data['agent'] = $this->agent_model->get_agent($agent_id);
     $this->loadViews('dashboard/agent/stats', $this->global, $data, NULL);
     }
+
+    /**
+     * Corrige les données erronées d'un agent (méthode de maintenance)
+     * Accessible via /agent/fix_data/USER_ID
+     */
+    public function fix_data($user_id = null) {
+        // Cette méthode ne doit être accessible qu'aux administrateurs
+        $this->isLoggedIn();
+        
+        if (!$user_id) {
+            echo "Usage: /agent/fix_data/USER_ID";
+            return;
+        }
+        
+        echo "<h2>Correction des données pour l'agent User ID: $user_id</h2>";
+        
+        // Récupérer l'agent avant correction
+        $agent_before = $this->agent_model->get_agent_by_user_id($user_id);
+        if (!$agent_before) {
+            echo "<p>Aucun agent trouvé pour l'User ID: $user_id</p>";
+            return;
+        }
+        
+        echo "<h3>Données AVANT correction:</h3>";
+        echo "<ul>";
+        echo "<li><strong>Nom:</strong> " . htmlspecialchars($agent_before->agent_name) . "</li>";
+        echo "<li><strong>Email:</strong> " . htmlspecialchars($agent_before->agent_email) . "</li>";
+        echo "<li><strong>Mobile:</strong> " . htmlspecialchars($agent_before->mobile ?? 'N/A') . "</li>";
+        echo "<li><strong>WhatsApp:</strong> " . htmlspecialchars($agent_before->whatsapp ?? 'N/A') . "</li>";
+        echo "<li><strong>Site Web:</strong> " . htmlspecialchars($agent_before->website ?? 'N/A') . "</li>";
+        echo "<li><strong>Contacts:</strong> " . ($agent_before->contacts_count ?? 'N/A') . "</li>";
+        echo "</ul>";
+        
+        // Appliquer les corrections
+        $correction_result = $this->agent_model->fix_agent_metadata($agent_before->agent_id);
+        
+        if ($correction_result) {
+            echo "<p style='color: green;'>✅ Corrections appliquées avec succès</p>";
+            
+            // Récupérer l'agent après correction (vider le cache)
+            $agent_after = $this->agent_model->get_agent_by_user_id($user_id);
+            
+            echo "<h3>Données APRÈS correction:</h3>";
+            echo "<ul>";
+            echo "<li><strong>Nom:</strong> " . htmlspecialchars($agent_after->agent_name) . "</li>";
+            echo "<li><strong>Email:</strong> " . htmlspecialchars($agent_after->agent_email) . "</li>";
+            echo "<li><strong>Mobile:</strong> " . htmlspecialchars($agent_after->mobile ?? 'N/A') . "</li>";
+            echo "<li><strong>WhatsApp:</strong> " . htmlspecialchars($agent_after->whatsapp ?? 'N/A') . "</li>";
+            echo "<li><strong>Site Web:</strong> " . htmlspecialchars($agent_after->website ?? 'N/A') . "</li>";
+            echo "<li><strong>Contacts:</strong> " . ($agent_after->contacts_count ?? 'N/A') . "</li>";
+            echo "</ul>";
+            
+            echo "<h3>Actions effectuées:</h3>";
+            echo "<ul>";
+            echo "<li>Nettoyage des numéros de téléphone suspects (321 456 9874, etc.)</li>";
+            echo "<li>Correction de l'URL 'rebenecia.com' vers 'rebencia.com'</li>";
+            echo "<li>Remise à zéro du nombre de contacts suspicieux</li>";
+            echo "</ul>";
+            
+            echo "<p><a href='" . base_url('agents/view/' . $user_id) . "' class='btn btn-primary'>Voir le profil corrigé</a></p>";
+        } else {
+            echo "<p style='color: red;'>❌ Erreur lors de la correction</p>";
+        }
+    }
 }
