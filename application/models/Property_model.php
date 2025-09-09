@@ -210,6 +210,102 @@ class Property_model extends CI_Model {
         $result = $this->wp_db->get()->row();
         return $result ? $result : (object)['name' => 'Non défini', 'slug' => 'undefined'];
     }
+    
+    // Récupérer les images d'une propriété (utilise la requête SQL fournie par l'utilisateur)
+    public function get_property_images($property_id) {
+        // Utiliser exactement la requête fournie par l'utilisateur
+        $query = "SELECT p.ID as property_id, p.post_title, m.meta_key, m.meta_value 
+                  FROM wp_Hrg8P_posts p 
+                  JOIN wp_Hrg8P_postmeta m ON p.ID = m.post_id 
+                  WHERE p.post_type = 'property' 
+                  AND p.ID = ? 
+                  AND (m.meta_key = '_thumbnail_id' OR m.meta_key = 'fave_property_images')";
+        
+        $results = $this->wp_db->query($query, [$property_id])->result();
+        
+        // Debug: afficher ce qui est récupéré
+        error_log("DEBUG Property Images for ID $property_id - Found " . count($results) . " meta records");
+        
+        $images = [];
+        foreach ($results as $result) {
+            error_log("  Meta: {$result->meta_key} = " . substr($result->meta_value, 0, 100) . "...");
+            
+            if ($result->meta_key == '_thumbnail_id') {
+                // Récupérer l'URL de l'image principale
+                $thumbnail_url = $this->get_attachment_url($result->meta_value);
+                error_log("  Thumbnail URL for ID {$result->meta_value}: $thumbnail_url");
+                if ($thumbnail_url) {
+                    $images['thumbnail'] = $thumbnail_url;
+                }
+            } elseif ($result->meta_key == 'fave_property_images') {
+                // Les images de galerie sont stockées sérialisées
+                $gallery_data = $result->meta_value;
+                error_log("  Raw gallery data length: " . strlen($gallery_data));
+                
+                // Tenter plusieurs approches de désérialisation
+                $gallery_images = null;
+                
+                // 1. Vérifier si c'est sérialisé PHP
+                if ($this->is_serialized($gallery_data)) {
+                    $gallery_images = @unserialize($gallery_data);
+                    error_log("  Unserialized as PHP: " . print_r($gallery_images, true));
+                }
+                
+                // 2. Vérifier si c'est JSON
+                if (!$gallery_images) {
+                    $json_data = @json_decode($gallery_data, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $gallery_images = $json_data;
+                        error_log("  Decoded as JSON: " . print_r($gallery_images, true));
+                    }
+                }
+                
+                // 3. Vérifier si c'est une liste d'IDs séparés par des virgules
+                if (!$gallery_images && strpos($gallery_data, ',') !== false) {
+                    $gallery_images = explode(',', $gallery_data);
+                    $gallery_images = array_map('trim', $gallery_images);
+                    error_log("  Split by comma: " . print_r($gallery_images, true));
+                }
+                
+                if (is_array($gallery_images) && !empty($gallery_images)) {
+                    $images['gallery'] = [];
+                    foreach ($gallery_images as $image_id) {
+                        if (!empty($image_id) && is_numeric($image_id)) {
+                            $image_url = $this->get_attachment_url($image_id);
+                            error_log("    Gallery image ID $image_id -> URL: $image_url");
+                            if ($image_url) {
+                                $images['gallery'][] = $image_url;
+                            }
+                        }
+                    }
+                } else {
+                    error_log("  Gallery images is not a valid array: " . print_r($gallery_images, true));
+                }
+            }
+        }
+        
+        error_log("Final images result: " . print_r($images, true));
+        return $images;
+    }
+    
+    // Récupérer l'URL d'un attachement WordPress
+    private function get_attachment_url($attachment_id) {
+        if (!$attachment_id) return null;
+        
+        $this->wp_db->select('meta_value');
+        $this->wp_db->from('wp_Hrg8P_postmeta');
+        $this->wp_db->where('post_id', $attachment_id);
+        $this->wp_db->where('meta_key', '_wp_attached_file');
+        
+        $result = $this->wp_db->get()->row();
+        
+        if ($result && $result->meta_value) {
+            // Construire l'URL complète vers le site officiel rebencia.com
+            return 'https://rebencia.com/wp-content/uploads/' . $result->meta_value;
+        }
+        
+        return null;
+    }
     // Propriétés d'un agent
     public function get_properties_by_agent($agent_id) {
         // À adapter selon structure
@@ -309,5 +405,81 @@ class Property_model extends CI_Model {
             'sold' => 0,
             'rented' => 0
         ];
+    }
+    
+    /**
+     * Vérifie si une chaîne est sérialisée (équivalent WordPress)
+     */
+    private function is_serialized($data) {
+        // Si ce n'est pas une chaîne, ce n'est pas sérialisé
+        if (!is_string($data)) {
+            return false;
+        }
+        
+        $data = trim($data);
+        if ('N;' == $data) {
+            return true;
+        }
+        
+        if (strlen($data) < 4) {
+            return false;
+        }
+        
+        if (':' !== $data[1]) {
+            return false;
+        }
+        
+        $lastc = substr($data, -1);
+        if (';' !== $lastc && '}' !== $lastc) {
+            return false;
+        }
+        
+        $token = $data[0];
+        switch ($token) {
+            case 's':
+                if ('"' !== substr($data, -2, 1)) {
+                    return false;
+                }
+                // Pas de break intentionnel
+            case 'a':
+            case 'O':
+                return (bool) preg_match("/^{$token}:[0-9]+:/s", $data);
+            case 'b':
+            case 'i':
+            case 'd':
+                $end = '';
+                return (bool) preg_match("/^{$token}:[0-9.E+-]+;{$end}$/", $data);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Compte les propriétés d'un agent par son user_id
+     * @param int $user_id
+     * @return int
+     */
+    public function count_properties_by_agent($user_id) {
+        if (!$user_id) return 0;
+        
+        // D'abord, récupérer l'agent_id à partir du user_id
+        $agent_query = $this->wp_db->select('p.ID as agent_id')
+            ->from('wp_Hrg8P_users u')
+            ->join('wp_Hrg8P_postmeta pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
+            ->join('wp_Hrg8P_posts p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent"', 'inner')
+            ->where('u.ID', $user_id)
+            ->get()->row();
+        
+        if (!$agent_query) return 0;
+        
+        $agent_id = $agent_query->agent_id;
+        
+        // Compter les propriétés de cet agent
+        return (int)$this->wp_db->from('wp_Hrg8P_posts p')
+            ->join('wp_Hrg8P_postmeta pm', 'p.ID = pm.post_id AND pm.meta_key = "fave_property_agent"', 'inner')
+            ->where('pm.meta_value', $agent_id)
+            ->where('p.post_type', 'property')
+            ->where('p.post_status', 'publish')
+            ->count_all_results();
     }
 }
