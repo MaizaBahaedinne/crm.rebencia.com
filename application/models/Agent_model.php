@@ -24,12 +24,83 @@ class Agent_model extends CI_Model {
 
     /**
      * Retourne tous les agents HOUZEZ avec leurs informations complètes
+     * Utilise une requête optimisée similaire à        return $stats;
+    }
+
+    /**
+     * Récupère l'avatar WordPress pour un utilisateur
+     * @param int $user_id ID utilisateur WordPress
+     * @param string $user_email Email de l'utilisateur
+     * @return string|null URL de l'avatar
+     */
+    private function get_wordpress_avatar($user_id, $user_email) {
+        // Méthode 1: Chercher dans wp_usermeta pour l'avatar personnalisé
+        $avatar_meta = $this->wp_db->select('meta_value')
+            ->from($this->usermeta_table)
+            ->where('user_id', $user_id)
+            ->where_in('meta_key', ['wp_user_avatar', 'avatar', 'profile_picture'])
+            ->get()->row();
+
+        if ($avatar_meta && !empty($avatar_meta->meta_value)) {
+            // Si c'est un ID d'attachment, récupérer l'URL
+            if (is_numeric($avatar_meta->meta_value)) {
+                $attachment = $this->wp_db->select('guid')
+                    ->from($this->posts_table)
+                    ->where('ID', $avatar_meta->meta_value)
+                    ->where('post_type', 'attachment')
+                    ->get()->row();
+                
+                if ($attachment) {
+                    return $attachment->guid;
+                }
+            } else {
+                // Si c'est déjà une URL
+                return $avatar_meta->meta_value;
+            }
+        }
+
+        // Méthode 2: Chercher s'il y a une image de profil attachée directement
+        $profile_picture = $this->wp_db->select('media.guid')
+            ->from($this->postmeta_table . ' pm')
+            ->join($this->posts_table . ' media', 'media.ID = pm.meta_value', 'inner')
+            ->where('pm.post_id IN (
+                SELECT p.ID FROM ' . $this->posts_table . ' p
+                INNER JOIN ' . $this->postmeta_table . ' pm2 ON pm2.post_id = p.ID
+                WHERE p.post_type = "houzez_agent" 
+                AND pm2.meta_key = "fave_agent_email" 
+                AND pm2.meta_value = "' . $this->wp_db->escape_str($user_email) . '"
+            )', NULL, FALSE)
+            ->where('pm.meta_key', 'fave_agent_picture')
+            ->where('media.post_type', 'attachment')
+            ->get()->row();
+
+        if ($profile_picture) {
+            return $profile_picture->guid;
+        }
+
+        // Méthode 3: Utiliser Gravatar comme fallback
+        return $this->get_gravatar_url($user_email);
+    }
+
+    /**
+     * Génère l'URL Gravatar pour un email
+     * @param string $email
+     * @return string
+     */
+    private function get_gravatar_url($email) {
+        $hash = md5(strtolower(trim($email)));
+        return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
+    }
+
+}
+
+    /**
+     * Retourne tous les agents HOUZEZ avec leurs informations complètes
      * Utilise une requête optimisée similaire à celle fournie
      * @param array $filters Filtres de recherche
      * @return object[]
      */
     public function get_all_agents($filters = []) {
-        // Requête optimisée pour récupérer tous les agents HOUZEZ avec leurs informations complètes
         $this->wp_db->select("
             u.ID as user_id,
             u.user_login as user_login,
@@ -48,7 +119,9 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) as whatsapp,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) as skype,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) as agent_avatar,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN 
+                COALESCE(media.guid, CONCAT('https://www.gravatar.com/avatar/', MD5(LOWER(u.user_email)), '?d=identicon&s=200'))
+            END) as agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_facebook' THEN pm_contact.meta_value END) as facebook,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_twitter' THEN pm_contact.meta_value END) as twitter,
@@ -289,6 +362,11 @@ class Agent_model extends CI_Model {
 
         if ($agent) {
             // Avatar par défaut si vide
+            if (empty($agent->agent_avatar)) {
+                $agent->agent_avatar = $this->get_wordpress_avatar($agent->user_id, $agent->user_email);
+            }
+            
+            // Si toujours vide, utiliser l'avatar par défaut
             if (empty($agent->agent_avatar)) {
                 $agent->agent_avatar = base_url('assets/images/users/avatar-1.jpg');
             }

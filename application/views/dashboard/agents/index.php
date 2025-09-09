@@ -181,7 +181,26 @@
                                 <!-- Agent Header -->
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="avatar-lg flex-shrink-0">
-                                        <img src="<?php echo $agent->agent_avatar; ?>" alt="<?php echo htmlspecialchars($agent->agent_name); ?>" class="img-fluid rounded-circle">
+                                        <?php
+                                        // Fonction pour obtenir l'avatar avec fallback Gravatar
+                                        function get_agent_avatar_list($agent) {
+                                            if (!empty($agent->agent_avatar) && filter_var($agent->agent_avatar, FILTER_VALIDATE_URL)) {
+                                                return $agent->agent_avatar;
+                                            }
+                                            // Fallback vers Gravatar
+                                            $email = !empty($agent->agent_email) ? $agent->agent_email : $agent->user_email;
+                                            if (!empty($email)) {
+                                                $hash = md5(strtolower(trim($email)));
+                                                return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
+                                            }
+                                            // Dernier fallback
+                                            return base_url('assets/images/users/avatar-1.jpg');
+                                        }
+                                        $avatar_url = get_agent_avatar_list($agent);
+                                        ?>
+                                        <img src="<?php echo $avatar_url; ?>" alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
+                                             class="img-fluid rounded-circle"
+                                             onerror="this.onerror=null; this.src='<?php echo base_url('assets/images/users/avatar-1.jpg'); ?>';">
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h5 class="mb-1">
