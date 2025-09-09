@@ -51,13 +51,16 @@
                                             <div>
                                                 <h4 class="mb-1"><?php echo htmlspecialchars($agent->agent_name); ?></h4>
                                                 <p class="text-muted mb-1"><?php echo htmlspecialchars($agent->agent_email); ?></p>
+                                                <?php if (!empty($agent->position)) : ?>
+                                                <p class="text-muted mb-2"><i class="ri-briefcase-line me-1"></i><?php echo htmlspecialchars($agent->position); ?></p>
+                                                <?php endif; ?>
                                                 <div class="d-flex align-items-center gap-2 mb-2">
                                                     <span class="badge bg-<?php echo $agent->is_active ? 'success' : 'danger'; ?>-subtle text-<?php echo $agent->is_active ? 'success' : 'danger'; ?>">
                                                         <?php echo $agent->is_active ? 'Actif' : 'Inactif'; ?>
                                                     </span>
                                                     <?php if ($agent->agency_name): ?>
                                                     <span class="badge bg-primary-subtle text-primary">
-                                                        <?php echo htmlspecialchars($agent->agency_name); ?>
+                                                        <i class="ri-building-line me-1"></i><?php echo htmlspecialchars($agent->agency_name); ?>
                                                     </span>
                                                     <?php endif; ?>
                                                 </div>
@@ -78,6 +81,11 @@
                                                 <?php if (!empty($agent->whatsapp)) : ?>
                                                 <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $agent->whatsapp); ?>" class="btn btn-success btn-sm" target="_blank">
                                                     <i class="ri-whatsapp-line me-1"></i>WhatsApp
+                                                </a>
+                                                <?php endif; ?>
+                                                <?php if (!empty($agent->website)) : ?>
+                                                <a href="<?php echo $agent->website; ?>" class="btn btn-info btn-sm" target="_blank">
+                                                    <i class="ri-global-line me-1"></i>Site Web
                                                 </a>
                                                 <?php endif; ?>
                                             </div>
@@ -196,6 +204,22 @@
                                             <td class="pe-0"><?php echo htmlspecialchars($agent->whatsapp); ?></td>
                                         </tr>
                                         <?php endif; ?>
+                                        <?php if (!empty($agent->website)) : ?>
+                                        <tr>
+                                            <td class="ps-0 text-muted">Site Web:</td>
+                                            <td class="pe-0">
+                                                <a href="<?php echo $agent->website; ?>" target="_blank" class="text-decoration-none">
+                                                    <?php echo htmlspecialchars($agent->website); ?> <i class="ri-external-link-line"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (!empty($agent->position)) : ?>
+                                        <tr>
+                                            <td class="ps-0 text-muted">Poste:</td>
+                                            <td class="pe-0"><?php echo htmlspecialchars($agent->position); ?></td>
+                                        </tr>
+                                        <?php endif; ?>
                                         <?php if (!empty($agent->address)) : ?>
                                         <tr>
                                             <td class="ps-0 text-muted">Adresse:</td>
@@ -219,8 +243,8 @@
                             <?php if (!empty($agent->description)) : ?>
                             <hr>
                             <div>
-                                <h6>Description</h6>
-                                <p class="text-muted"><?php echo nl2br(htmlspecialchars($agent->description)); ?></p>
+                                <h6>Bio</h6>
+                                <div class="text-muted"><?php echo strip_tags($agent->description, '<p><br><strong><em><ul><li><ol>'); ?></div>
                             </div>
                             <?php endif; ?>
                         </div>

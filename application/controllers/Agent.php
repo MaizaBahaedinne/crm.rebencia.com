@@ -25,6 +25,20 @@ class Agent extends BaseController {
         echo "<br><a href='" . base_url('agents') . "'>Retour aux agents</a>";
     }
 
+    // Debug JSON d'un agent
+    public function json($user_id = 7) {
+        $this->isLoggedIn();
+        header('Content-Type: application/json; charset=utf-8');
+        
+        $agent = $this->agent_model->get_agent_by_user_id($user_id);
+        
+        if ($agent) {
+            echo json_encode($agent, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['error' => 'Agent non trouvé'], JSON_PRETTY_PRINT);
+        }
+    }
+
         // Liste des agents avec vraies données
     public function index() {
         $this->isLoggedIn();
@@ -103,7 +117,7 @@ class Agent extends BaseController {
             $data['properties'] = $this->agent_model->get_agent_properties($agent->agent_id, 6);
         }
         
-        $this->loadViews('dashboard/agents/view_simple', $data, $data);
+        $this->loadViews('dashboard/agents/view', $data, $data);
     }
 
     // AJAX pour récupérer tous les agents avec filtres
