@@ -97,50 +97,50 @@
             <!-- Statistics Row -->
             <div class="row g-3">
                 <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100 hover-card">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="avatar-md flex-shrink-0 me-3">
                                         <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
                                             <i class="ri-home-line"></i>
                                         </span>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <p class="text-uppercase fw-medium text-muted mb-1">Propriétés</p>
-                                        <h3 class="mb-0 text-primary"><?php echo $agent->properties_count ?? 0; ?></h3>
-                                        <small class="text-muted">
+                                    <div class="flex-grow-1">
+                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Propriétés</p>
+                                        <h3 class="mb-1 text-primary"><?php echo $agent->properties_count ?? 0; ?></h3>
+                                        <small class="text-muted fs-12">
                                             <?php if (($agent->properties_count ?? 0) == 0) : ?>
-                                                Aucune propriété trouvée
+                                                Aucune propriété
                                             <?php else : ?>
                                                 <?php echo ($agent->properties_count > 1) ? 'propriétés actives' : 'propriété active'; ?>
                                             <?php endif; ?>
                                         </small>
                                     </div>
                                 </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="showPropertiesDetails(<?php echo $agent->user_id; ?>)">
+                                <div class="text-end">
+                                    <a href="#" class="btn btn-sm btn-soft-primary" onclick="showPropertiesDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
                                         <i class="ri-eye-line"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100 hover-card">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="avatar-md flex-shrink-0 me-3">
                                         <span class="avatar-title bg-info-subtle text-info rounded-circle fs-2">
                                             <i class="ri-calculator-line"></i>
                                         </span>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <p class="text-uppercase fw-medium text-muted mb-1">Estimations</p>
-                                        <h3 class="mb-0 text-info"><?php echo $agent->estimations_count ?? 0; ?></h3>
-                                        <small class="text-muted">
+                                    <div class="flex-grow-1">
+                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Estimations</p>
+                                        <h3 class="mb-1 text-info"><?php echo $agent->estimations_count ?? 0; ?></h3>
+                                        <small class="text-muted fs-12">
                                             <?php if (($agent->estimations_count ?? 0) == 0) : ?>
                                                 Aucune estimation
                                             <?php else : ?>
@@ -149,10 +149,10 @@
                                         </small>
                                     </div>
                                 </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-info" onclick="showEstimationsDetails(<?php echo $agent->user_id; ?>)">
+                                <div class="text-end">
+                                    <a href="#" class="btn btn-sm btn-soft-info" onclick="showEstimationsDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
                                         <i class="ri-eye-line"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -162,16 +162,16 @@
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="avatar-md flex-shrink-0 me-3">
                                         <span class="avatar-title bg-success-subtle text-success rounded-circle fs-2">
                                             <i class="ri-exchange-line"></i>
                                         </span>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <p class="text-uppercase fw-medium text-muted mb-1">Transactions</p>
-                                        <h3 class="mb-0 text-success"><?php echo $agent->transactions_count ?? 0; ?></h3>
-                                        <small class="text-muted">
+                                    <div class="flex-grow-1">
+                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Transactions</p>
+                                        <h3 class="mb-1 text-success"><?php echo $agent->transactions_count ?? 0; ?></h3>
+                                        <small class="text-muted fs-12">
                                             <?php if (($agent->transactions_count ?? 0) == 0) : ?>
                                                 Aucune transaction
                                             <?php else : ?>
@@ -180,10 +180,10 @@
                                         </small>
                                     </div>
                                 </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-success" onclick="showTransactionsDetails(<?php echo $agent->user_id; ?>)">
+                                <div class="text-end">
+                                    <a href="#" class="btn btn-sm btn-soft-success" onclick="showTransactionsDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
                                         <i class="ri-eye-line"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -230,16 +230,16 @@
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="avatar-md flex-shrink-0 me-3">
                                         <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-2">
                                             <i class="ri-contacts-line"></i>
                                         </span>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <p class="text-uppercase fw-medium text-muted mb-1">Contacts</p>
-                                        <h3 class="mb-0 text-danger"><?php echo $agent->contacts_count ?? 0; ?></h3>
-                                        <small class="text-muted">
+                                    <div class="flex-grow-1">
+                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Contacts</p>
+                                        <h3 class="mb-1 text-danger"><?php echo $agent->contacts_count ?? 0; ?></h3>
+                                        <small class="text-muted fs-12">
                                             <?php if (($agent->contacts_count ?? 0) == 0) : ?>
                                                 Aucun contact
                                             <?php else : ?>
@@ -248,10 +248,10 @@
                                         </small>
                                     </div>
                                 </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="showContactsDetails(<?php echo $agent->user_id; ?>)">
+                                <div class="text-end">
+                                    <a href="#" class="btn btn-sm btn-soft-danger" onclick="showContactsDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
                                         <i class="ri-eye-line"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                                 </div>
@@ -680,6 +680,107 @@
 .profile-cover-img {
     position: relative;
 }
+
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.btn-soft-primary {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: transparent;
+    color: #0d6efd;
+}
+
+.btn-soft-primary:hover {
+    background-color: rgba(13, 110, 253, 0.2);
+    color: #0d6efd;
+}
+
+.btn-soft-info {
+    background-color: rgba(13, 202, 240, 0.1);
+    border-color: transparent;
+    color: #0dcaf0;
+}
+
+.btn-soft-info:hover {
+    background-color: rgba(13, 202, 240, 0.2);
+    color: #0dcaf0;
+}
+
+.btn-soft-success {
+    background-color: rgba(25, 135, 84, 0.1);
+    border-color: transparent;
+    color: #198754;
+}
+
+.btn-soft-success:hover {
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #198754;
+}
+
+.btn-soft-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: transparent;
+    color: #dc3545;
+}
+
+.btn-soft-danger:hover {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.stats-card {
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    border-left-color: var(--vz-primary);
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+.agent-info-card {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.fs-11 {
+    font-size: 0.6875rem !important;
+}
+
+.fs-12 {
+    font-size: 0.75rem !important;
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .hover-card:hover {
+        transform: none;
+    }
+}
 </style>
 
 <!-- Modales pour les détails -->
@@ -769,62 +870,79 @@
 
 <script>
 function showPropertiesDetails(userId) {
-    $('#propertiesModal').modal('show');
+    // Utilisation de Bootstrap 5 modal (sans jQuery)
+    const modal = new bootstrap.Modal(document.getElementById('propertiesModal'));
+    modal.show();
     
-    $.ajax({
-        url: '<?php echo base_url("agent/get_properties_details/"); ?>' + userId,
-        type: 'GET',
-        success: function(response) {
-            $('#propertiesContent').html(response);
-        },
-        error: function() {
-            $('#propertiesContent').html('<div class="alert alert-danger">Erreur lors du chargement des propriétés</div>');
-        }
-    });
+    // Fetch API au lieu de jQuery AJAX
+    fetch('<?php echo base_url("agent/get_properties_details/"); ?>' + userId)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('propertiesContent').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('propertiesContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des propriétés</div>';
+        });
 }
 
 function showEstimationsDetails(userId) {
-    $('#estimationsModal').modal('show');
+    const modal = new bootstrap.Modal(document.getElementById('estimationsModal'));
+    modal.show();
     
-    $.ajax({
-        url: '<?php echo base_url("agent/get_estimations_details/"); ?>' + userId,
-        type: 'GET',
-        success: function(response) {
-            $('#estimationsContent').html(response);
-        },
-        error: function() {
-            $('#estimationsContent').html('<div class="alert alert-danger">Erreur lors du chargement des estimations</div>');
-        }
-    });
+    fetch('<?php echo base_url("agent/get_estimations_details/"); ?>' + userId)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('estimationsContent').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('estimationsContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des estimations</div>';
+        });
 }
 
 function showTransactionsDetails(userId) {
-    $('#transactionsModal').modal('show');
+    const modal = new bootstrap.Modal(document.getElementById('transactionsModal'));
+    modal.show();
     
-    $.ajax({
-        url: '<?php echo base_url("agent/get_transactions_details/"); ?>' + userId,
-        type: 'GET',
-        success: function(response) {
-            $('#transactionsContent').html(response);
-        },
-        error: function() {
-            $('#transactionsContent').html('<div class="alert alert-danger">Erreur lors du chargement des transactions</div>');
-        }
-    });
+    fetch('<?php echo base_url("agent/get_transactions_details/"); ?>' + userId)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('transactionsContent').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('transactionsContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des transactions</div>';
+        });
 }
 
 function showContactsDetails(userId) {
-    $('#contactsModal').modal('show');
+    const modal = new bootstrap.Modal(document.getElementById('contactsModal'));
+    modal.show();
     
-    $.ajax({
-        url: '<?php echo base_url("agent/get_contacts_details/"); ?>' + userId,
-        type: 'GET',
-        success: function(response) {
-            $('#contactsContent').html(response);
-        },
-        error: function() {
-            $('#contactsContent').html('<div class="alert alert-danger">Erreur lors du chargement des contacts</div>');
-        }
-    });
+    fetch('<?php echo base_url("agent/get_contacts_details/"); ?>' + userId)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('contactsContent').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('contactsContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des contacts</div>';
+        });
+}
+
+function resetContactsCount(userId) {
+    if (confirm('Êtes-vous sûr de vouloir remettre à zéro le compteur de contacts ?')) {
+        fetch('<?php echo base_url("agent/reset_contacts_count/"); ?>' + userId, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erreur lors de la remise à zéro');
+            }
+        })
+        .catch(error => {
+            alert('Erreur lors de la remise à zéro');
+        });
+    }
 }
 </script>
