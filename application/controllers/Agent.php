@@ -429,4 +429,189 @@ class Agent extends BaseController {
             echo "<p style='color: red;'>❌ Erreur lors de la correction</p>";
         }
     }
+
+    /**
+     * Récupère les détails des propriétés d'un agent (AJAX)
+     */
+    public function get_properties_details($user_id) {
+        $this->isLoggedIn();
+        
+        $agent = $this->agent_model->get_agent_by_user_id($user_id);
+        if (!$agent) {
+            echo '<div class="alert alert-danger">Agent non trouvé</div>';
+            return;
+        }
+
+        // Récupérer les propriétés détaillées
+        $properties = [];
+        if ($agent->agent_id) {
+            $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email, 20);
+        }
+
+        if (empty($properties)) {
+            echo '<div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-information-line fs-4 me-2"></i>
+                        <div>
+                            <h6 class="mb-1">Aucune propriété trouvée</h6>
+                            <p class="mb-0 small">Cet agent n\'a actuellement aucune propriété associée dans le système HOUZEZ.</p>
+                            <hr class="my-2">
+                            <p class="mb-0 small text-muted">
+                                <strong>Causes possibles :</strong><br>
+                                • Aucune propriété assignée à cet agent<br>
+                                • Propriétés non publiées<br>
+                                • Problème de correspondance des IDs
+                            </p>
+                        </div>
+                    </div>
+                  </div>';
+            return;
+        }
+
+        echo '<div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Type</th>
+                            <th>Prix</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        foreach ($properties as $property) {
+            $price = !empty($property->price) ? number_format($property->price, 0, ',', ' ') . ' TND' : 'Non spécifié';
+            $status_class = $property->status == 'publish' ? 'success' : 'warning';
+            
+            echo '<tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <img src="' . get_property_featured_image_url($property) . '" 
+                                     alt="' . htmlspecialchars($property->post_title) . '" 
+                                     class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            </div>
+                            <div>
+                                <h6 class="mb-0">' . htmlspecialchars($property->post_title) . '</h6>
+                                <small class="text-muted">ID: ' . $property->ID . '</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>' . htmlspecialchars($property->type ?? 'N/A') . '</td>
+                    <td>' . $price . '</td>
+                    <td><span class="badge bg-' . $status_class . '">' . ucfirst($property->status ?? 'N/A') . '</span></td>
+                    <td>' . date('d/m/Y', strtotime($property->post_date)) . '</td>
+                  </tr>';
+        }
+
+        echo '</tbody></table></div>';
+        
+        echo '<div class="mt-3">
+                <p class="text-muted small">Total: ' . count($properties) . ' propriété(s) trouvée(s)</p>
+              </div>';
+    }
+
+    /**
+     * Récupère les détails des estimations d'un agent (AJAX)
+     */
+    public function get_estimations_details($user_id) {
+        $this->isLoggedIn();
+        
+        $agent = $this->agent_model->get_agent_by_user_id($user_id);
+        if (!$agent) {
+            echo '<div class="alert alert-danger">Agent non trouvé</div>';
+            return;
+        }
+
+        // Récupérer les estimations
+        $estimations = [];
+        if ($agent->user_id) {
+            $estimations = $this->agent_model->get_agent_estimations($agent->user_id, 20);
+        }
+
+        if (empty($estimations)) {
+            echo '<div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-calculator-line fs-4 me-2"></i>
+                        <div>
+                            <h6 class="mb-1">Aucune estimation trouvée</h6>
+                            <p class="mb-0 small">Cet agent n\'a actuellement aucune estimation dans le système CRM.</p>
+                            <hr class="my-2">
+                            <p class="mb-0 small text-muted">
+                                <strong>Pour créer des estimations :</strong><br>
+                                • Utiliser le module Estimations du CRM<br>
+                                • Assigner l\'agent aux nouvelles estimations
+                            </p>
+                        </div>
+                    </div>
+                  </div>';
+            return;
+        }
+
+        // Afficher le tableau des estimations (à implémenter selon la structure)
+        echo '<p>Fonctionnalité en développement - ' . count($estimations) . ' estimations trouvées</p>';
+    }
+
+    /**
+     * Récupère les détails des transactions d'un agent (AJAX)
+     */
+    public function get_transactions_details($user_id) {
+        $this->isLoggedIn();
+        
+        echo '<div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <i class="ri-exchange-line fs-4 me-2"></i>
+                    <div>
+                        <h6 class="mb-1">Aucune transaction trouvée</h6>
+                        <p class="mb-0 small">Le module Transactions est en cours de développement.</p>
+                        <hr class="my-2">
+                        <p class="mb-0 small text-muted">
+                            <strong>Prochainement :</strong><br>
+                            • Suivi des ventes et achats<br>
+                            • Calcul des commissions<br>
+                            • Historique complet
+                        </p>
+                    </div>
+                </div>
+              </div>';
+    }
+
+    /**
+     * Récupère les détails des contacts d'un agent (AJAX)
+     */
+    public function get_contacts_details($user_id) {
+        $this->isLoggedIn();
+        
+        $agent = $this->agent_model->get_agent_by_user_id($user_id);
+        if (!$agent) {
+            echo '<div class="alert alert-danger">Agent non trouvé</div>';
+            return;
+        }
+
+        // Pour le moment, afficher une explication du nombre 16
+        echo '<div class="alert alert-warning">
+                <div class="d-flex align-items-center">
+                    <i class="ri-contacts-line fs-4 me-2"></i>
+                    <div>
+                        <h6 class="mb-1">Contacts: ' . ($agent->contacts_count ?? 0) . '</h6>
+                        <p class="mb-0 small">Cette valeur peut provenir de données de test ou de calculs incorrects.</p>
+                        <hr class="my-2">
+                        <p class="mb-0 small text-muted">
+                            <strong>Action recommandée :</strong><br>
+                            • Vérifier la source des données<br>
+                            • Nettoyer les données de test<br>
+                            • Implémenter un vrai système de contacts
+                        </p>
+                    </div>
+                </div>
+              </div>';
+              
+        echo '<div class="mt-3">
+                <button class="btn btn-warning btn-sm" onclick="resetContactsCount(' . $user_id . ')">
+                    <i class="ri-refresh-line me-1"></i>Remettre à zéro
+                </button>
+              </div>';
+    }
 }

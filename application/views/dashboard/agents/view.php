@@ -99,32 +99,29 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-md flex-shrink-0">
-                                    <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
-                                        <i class="ri-home-line"></i>
-                                    </span>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-md flex-shrink-0">
+                                        <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
+                                            <i class="ri-home-line"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="text-uppercase fw-medium text-muted mb-1">Propriétés</p>
+                                        <h3 class="mb-0 text-primary"><?php echo $agent->properties_count ?? 0; ?></h3>
+                                        <small class="text-muted">
+                                            <?php if (($agent->properties_count ?? 0) == 0) : ?>
+                                                Aucune propriété trouvée
+                                            <?php else : ?>
+                                                <?php echo ($agent->properties_count > 1) ? 'propriétés actives' : 'propriété active'; ?>
+                                            <?php endif; ?>
+                                        </small>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Propriétés</p>
-                                    <h3 class="mb-0 text-primary"><?php echo $agent->properties_count ?? 0; ?></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-md flex-shrink-0">
-                                    <span class="avatar-title bg-info-subtle text-info rounded-circle fs-2">
-                                        <i class="ri-calculator-line"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Estimations</p>
-                                    <h3 class="mb-0 text-info"><?php echo $agent->estimations_count ?? 0; ?></h3>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="showPropertiesDetails(<?php echo $agent->user_id; ?>)">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -133,15 +130,60 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-md flex-shrink-0">
-                                    <span class="avatar-title bg-success-subtle text-success rounded-circle fs-2">
-                                        <i class="ri-exchange-line"></i>
-                                    </span>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-md flex-shrink-0">
+                                        <span class="avatar-title bg-info-subtle text-info rounded-circle fs-2">
+                                            <i class="ri-calculator-line"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="text-uppercase fw-medium text-muted mb-1">Estimations</p>
+                                        <h3 class="mb-0 text-info"><?php echo $agent->estimations_count ?? 0; ?></h3>
+                                        <small class="text-muted">
+                                            <?php if (($agent->estimations_count ?? 0) == 0) : ?>
+                                                Aucune estimation
+                                            <?php else : ?>
+                                                Total estimations
+                                            <?php endif; ?>
+                                        </small>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Transactions</p>
-                                    <h3 class="mb-0 text-success"><?php echo $agent->transactions_count ?? 0; ?></h3>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-info" onclick="showEstimationsDetails(<?php echo $agent->user_id; ?>)">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-md flex-shrink-0">
+                                        <span class="avatar-title bg-success-subtle text-success rounded-circle fs-2">
+                                            <i class="ri-exchange-line"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="text-uppercase fw-medium text-muted mb-1">Transactions</p>
+                                        <h3 class="mb-0 text-success"><?php echo $agent->transactions_count ?? 0; ?></h3>
+                                        <small class="text-muted">
+                                            <?php if (($agent->transactions_count ?? 0) == 0) : ?>
+                                                Aucune transaction
+                                            <?php else : ?>
+                                                Total transactions
+                                            <?php endif; ?>
+                                        </small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-success" onclick="showTransactionsDetails(<?php echo $agent->user_id; ?>)">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -187,15 +229,31 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-md flex-shrink-0">
-                                    <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-2">
-                                        <i class="ri-contacts-line"></i>
-                                    </span>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-md flex-shrink-0">
+                                        <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-2">
+                                            <i class="ri-contacts-line"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="text-uppercase fw-medium text-muted mb-1">Contacts</p>
+                                        <h3 class="mb-0 text-danger"><?php echo $agent->contacts_count ?? 0; ?></h3>
+                                        <small class="text-muted">
+                                            <?php if (($agent->contacts_count ?? 0) == 0) : ?>
+                                                Aucun contact
+                                            <?php else : ?>
+                                                Total contacts
+                                            <?php endif; ?>
+                                        </small>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Contacts</p>
-                                    <h3 class="mb-0 text-danger"><?php echo $agent->contacts_count ?? 0; ?></h3>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="showContactsDetails(<?php echo $agent->user_id; ?>)">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                </div>
+                            </div>
                                 </div>
                             </div>
                         </div>
@@ -623,3 +681,150 @@
     position: relative;
 }
 </style>
+
+<!-- Modales pour les détails -->
+<!-- Modal Propriétés -->
+<div class="modal fade" id="propertiesModal" tabindex="-1" aria-labelledby="propertiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="propertiesModalLabel">
+                    <i class="ri-home-line me-2"></i>Détails des Propriétés
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="propertiesContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Estimations -->
+<div class="modal fade" id="estimationsModal" tabindex="-1" aria-labelledby="estimationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="estimationsModalLabel">
+                    <i class="ri-calculator-line me-2"></i>Détails des Estimations
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="estimationsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Transactions -->
+<div class="modal fade" id="transactionsModal" tabindex="-1" aria-labelledby="transactionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionsModalLabel">
+                    <i class="ri-exchange-line me-2"></i>Détails des Transactions
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="transactionsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Contacts -->
+<div class="modal fade" id="contactsModal" tabindex="-1" aria-labelledby="contactsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactsModalLabel">
+                    <i class="ri-contacts-line me-2"></i>Détails des Contacts
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="contactsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showPropertiesDetails(userId) {
+    $('#propertiesModal').modal('show');
+    
+    $.ajax({
+        url: '<?php echo base_url("agent/get_properties_details/"); ?>' + userId,
+        type: 'GET',
+        success: function(response) {
+            $('#propertiesContent').html(response);
+        },
+        error: function() {
+            $('#propertiesContent').html('<div class="alert alert-danger">Erreur lors du chargement des propriétés</div>');
+        }
+    });
+}
+
+function showEstimationsDetails(userId) {
+    $('#estimationsModal').modal('show');
+    
+    $.ajax({
+        url: '<?php echo base_url("agent/get_estimations_details/"); ?>' + userId,
+        type: 'GET',
+        success: function(response) {
+            $('#estimationsContent').html(response);
+        },
+        error: function() {
+            $('#estimationsContent').html('<div class="alert alert-danger">Erreur lors du chargement des estimations</div>');
+        }
+    });
+}
+
+function showTransactionsDetails(userId) {
+    $('#transactionsModal').modal('show');
+    
+    $.ajax({
+        url: '<?php echo base_url("agent/get_transactions_details/"); ?>' + userId,
+        type: 'GET',
+        success: function(response) {
+            $('#transactionsContent').html(response);
+        },
+        error: function() {
+            $('#transactionsContent').html('<div class="alert alert-danger">Erreur lors du chargement des transactions</div>');
+        }
+    });
+}
+
+function showContactsDetails(userId) {
+    $('#contactsModal').modal('show');
+    
+    $.ajax({
+        url: '<?php echo base_url("agent/get_contacts_details/"); ?>' + userId,
+        type: 'GET',
+        success: function(response) {
+            $('#contactsContent').html(response);
+        },
+        error: function() {
+            $('#contactsContent').html('<div class="alert alert-danger">Erreur lors du chargement des contacts</div>');
+        }
+    });
+}
+</script>
