@@ -6,9 +6,9 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Sign In | Rebencia - CRM</title>
+    <title>Connexion | Rebencia - CRM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Système CRM Premium pour l'Immobilier" name="description" />
     <meta content="Themesbrand" name="author" />
     <!-- App favicon -->
     <link rel="shortcut icon" href="<?php echo base_url() ?>assets/images/favicon.ico">
@@ -60,13 +60,13 @@
                                                     </div>
                                                     <div class="carousel-inner text-center text-white-50 pb-5">
                                                         <div class="carousel-item active">
-                                                            <p class="fs-15 fst-italic">" Great! Clean code, clean design, easy for customization. Thanks very much! "</p>
+                                                            <p class="fs-15 fst-italic">" Excellent ! Code propre, design épuré, facile à personnaliser. Merci beaucoup ! "</p>
                                                         </div>
                                                         <div class="carousel-item">
-                                                            <p class="fs-15 fst-italic">" The theme is really great with an amazing customer support."</p>
+                                                            <p class="fs-15 fst-italic">" Le thème est vraiment fantastique avec un support client incroyable."</p>
                                                         </div>
                                                         <div class="carousel-item">
-                                                            <p class="fs-15 fst-italic">" Great! Clean code, clean design, easy for customization. Thanks very much! "</p>
+                                                            <p class="fs-15 fst-italic">" Interface moderne et intuitive, parfaite pour notre équipe immobilière ! "</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -80,8 +80,8 @@
                                 <div class="col-lg-6">
                                     <div class="p-lg-5 p-4">
                                         <div>
-                                            <h5 class="text-primary">Welcome Back !</h5>
-                                            <p class="text-muted">Sign in to continue to Velzon.</p>
+                                            <h5 class="text-primary">Bon retour !</h5>
+                                            <p class="text-muted">Connectez-vous pour accéder à Rebencia CRM.</p>
                                         </div>
 
                                         <div class="mt-4">
@@ -93,28 +93,28 @@
                                                         </div>
                                                     <?php endif; ?>
                                                 <div class="mb-3">
-                                                    <label for="username" class="form-label">Username</label>
-                                                    <input type="text" class="form-control" name="email" id="username" placeholder="Enter username">
+                                                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                                                    <input type="text" class="form-control" name="email" id="username" placeholder="Entrez votre nom d'utilisateur">
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <div class="float-end">
-                                                        <a href="auth-pass-reset-cover.html" class="text-muted">Forgot password?</a>
+                                                        <a href="auth-pass-reset-cover.html" class="text-muted">Mot de passe oublié ?</a>
                                                     </div>
-                                                    <label class="form-label" for="password-input">Password</label>
+                                                    <label class="form-label" for="password-input">Mot de passe</label>
                                                     <div class="position-relative auth-pass-inputgroup mb-3">
-                                                        <input type="password" name="password" class="form-control pe-5 password-input" placeholder="Enter password" id="password-input">
+                                                        <input type="password" name="password" class="form-control pe-5 password-input" placeholder="Entrez votre mot de passe" id="password-input">
                                                         <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon material-shadow-none" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" value="" id="auth-remember-check">
-                                                    <label class="form-check-label" for="auth-remember-check">Remember me</label>
+                                                    <label class="form-check-label" for="auth-remember-check">Se souvenir de moi</label>
                                                 </div>
 
                                                 <div class="mt-4">
-                                                    <button class="btn btn-success w-100" type="submit">Sign In</button>
+                                                    <button class="btn btn-success w-100" type="submit">Se connecter</button>
                                                 </div>
 
                                                 
@@ -147,7 +147,7 @@
                     <div class="col-lg-12">
                         <div class="text-center">
                             <p class="mb-0">&copy;
-                                <script>document.write(new Date().getFullYear())</script> Velzon. Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand
+                                <script>document.write(new Date().getFullYear())</script> Rebencia CRM. Développé avec <i class="mdi mdi-heart text-danger"></i> par l'équipe Rebencia
                             </p>
                         </div>
                     </div>
