@@ -117,27 +117,27 @@ class Agent_model extends CI_Model {
             pm_email.meta_value as agent_email,
             a.ID as agency_id,
             a.post_title as agency_name,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) as phone,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) as mobile,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) as whatsapp,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_skype' THEN pm_contact.meta_value END) as skype,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_author_custom_picture' THEN 
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN 
                 CASE 
-                    WHEN pm_contact.meta_value IS NOT NULL AND pm_contact.meta_value != '' THEN 
+                    WHEN pm.meta_value IS NOT NULL AND pm.meta_value != '' THEN 
                         (SELECT REPLACE(guid, 'http://localhost/', 'https://rebencia.com/') 
                          FROM {$this->posts_table} 
-                         WHERE ID = pm_contact.meta_value AND post_type = 'attachment' LIMIT 1)
+                         WHERE ID = pm.meta_value AND post_type = 'attachment' LIMIT 1)
                     ELSE NULL
                 END
             END) as agent_avatar,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_facebook' THEN pm_contact.meta_value END) as facebook,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_twitter' THEN pm_contact.meta_value END) as twitter,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_linkedin' THEN pm_contact.meta_value END) as linkedin,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_instagram' THEN pm_contact.meta_value END) as instagram,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_address' THEN pm_contact.meta_value END) as address,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_zip' THEN pm_contact.meta_value END) as postal_code,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_instagram' THEN pm.meta_value END) as instagram,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_address' THEN pm.meta_value END) as address,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_zip' THEN pm.meta_value END) as postal_code,
             (SELECT COUNT(*) FROM {$this->posts_table} prop 
              INNER JOIN {$this->postmeta_table} pm_prop ON prop.ID = pm_prop.post_id 
              WHERE pm_prop.meta_key = 'fave_property_agent' 
@@ -152,7 +152,7 @@ class Agent_model extends CI_Model {
             ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent" AND p.post_status = "publish"', 'inner')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
-            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left');
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left');
 
         // Appliquer les filtres
         if (!empty($filters['search'])) {

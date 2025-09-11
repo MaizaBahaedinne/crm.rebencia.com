@@ -18,6 +18,67 @@ class Agent extends BaseController {
         $this->load->model('Property_model', 'property_model');
     }
 
+    // Debug avatar comparison
+    public function debug_avatar_comparison($user_id = 7) {
+        $this->isLoggedIn();
+        
+        // Charger le helper avatar
+        $this->load->helper('avatar');
+        
+        echo "<h2>Comparaison Avatars - User ID: $user_id</h2>";
+        
+        // Méthode 1: get_all_agents (pour la liste)
+        $agents_list = $this->agent_model->get_all_agents();
+        $agent_from_list = null;
+        foreach($agents_list as $agent) {
+            if($agent->user_id == $user_id) {
+                $agent_from_list = $agent;
+                break;
+            }
+        }
+        
+        // Méthode 2: get_agent_by_user_id (pour la vue)
+        $agent_from_view = $this->agent_model->get_agent_by_user_id($user_id);
+        
+        echo "<table border='1' style='width:100%; border-collapse: collapse;'>";
+        echo "<tr><th>Source</th><th>Agent Avatar (DB)</th><th>Helper Result</th><th>Preview</th></tr>";
+        
+        if($agent_from_list) {
+            $avatar_url_list = get_agent_avatar_url($agent_from_list);
+            echo "<tr>";
+            echo "<td><strong>Liste (get_all_agents)</strong></td>";
+            echo "<td><small>" . htmlspecialchars($agent_from_list->agent_avatar ?? 'NULL') . "</small></td>";
+            echo "<td><small>" . htmlspecialchars($avatar_url_list) . "</small></td>";
+            echo "<td><img src='$avatar_url_list' style='width:50px;height:50px;border-radius:50%;' /></td>";
+            echo "</tr>";
+        }
+        
+        if($agent_from_view) {
+            $avatar_url_view = get_agent_avatar_url($agent_from_view);
+            echo "<tr>";
+            echo "<td><strong>Vue (get_agent_by_user_id)</strong></td>";
+            echo "<td><small>" . htmlspecialchars($agent_from_view->agent_avatar ?? 'NULL') . "</small></td>";
+            echo "<td><small>" . htmlspecialchars($avatar_url_view) . "</small></td>";
+            echo "<td><img src='$avatar_url_view' style='width:50px;height:50px;border-radius:50%;' /></td>";
+            echo "</tr>";
+        }
+        
+        echo "</table>";
+        
+        echo "<hr><h3>Résultat attendu :</h3>";
+        echo "<p>Les deux avatars doivent être <strong>identiques</strong></p>";
+        
+        if($agent_from_list && $agent_from_view) {
+            $avatars_match = ($agent_from_list->agent_avatar === $agent_from_view->agent_avatar);
+            echo "<p><strong>Status :</strong> " . ($avatars_match ? 
+                "<span style='color:green;'>✅ AVATARS SYNCHRONISÉS</span>" : 
+                "<span style='color:red;'>❌ AVATARS DIFFÉRENTS</span>") . "</p>";
+        }
+        
+        echo "<br><a href='" . base_url('agents') . "'>← Retour à la liste</a>";
+        echo " | <a href='" . base_url('agents/view/' . $user_id) . "'>Vue détaillée →</a>";
+    }
+
     // Debug avatar
     public function debug_avatars() {
         $this->isLoggedIn();
