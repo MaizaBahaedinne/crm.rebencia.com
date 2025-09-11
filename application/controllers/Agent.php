@@ -490,19 +490,19 @@ class Agent extends BaseController {
                         <div class="d-flex align-items-center">
                             <div class="me-2">
                                 <img src="' . get_property_featured_image_url($property) . '" 
-                                     alt="' . htmlspecialchars($property->post_title) . '" 
+                                     alt="' . htmlspecialchars($property->title ?? 'Propriété') . '" 
                                      class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
                             </div>
                             <div>
-                                <h6 class="mb-0">' . htmlspecialchars($property->post_title) . '</h6>
+                                <h6 class="mb-0">' . htmlspecialchars($property->title ?? 'Titre non disponible') . '</h6>
                                 <small class="text-muted">ID: ' . $property->ID . '</small>
                             </div>
                         </div>
                     </td>
-                    <td>' . htmlspecialchars($property->type ?? 'N/A') . '</td>
+                    <td>' . htmlspecialchars($property->property_type ?? 'N/A') . '</td>
                     <td>' . $price . '</td>
                     <td><span class="badge bg-' . $status_class . '">' . ucfirst($property->status ?? 'N/A') . '</span></td>
-                    <td>' . date('d/m/Y', strtotime($property->post_date)) . '</td>
+                    <td>' . (!empty($property->post_date) ? date('d/m/Y', strtotime($property->post_date)) : 'N/A') . '</td>
                   </tr>';
         }
 
