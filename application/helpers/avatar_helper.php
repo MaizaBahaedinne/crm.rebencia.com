@@ -14,7 +14,8 @@ if (!function_exists('get_agent_avatar_url')) {
      * @return string URL de l'avatar
      */
     function get_agent_avatar_url($agent) {
-        if (!empty($agent->agent_avatar)) {
+        // Méthode 1: Avatar déjà dans l'objet
+        if (!empty($agent->agent_avatar) && $agent->agent_avatar !== 'NULL' && strlen($agent->agent_avatar) > 10) {
             $avatar_url = $agent->agent_avatar;
             
             // Correction de l'URL si elle contient localhost
@@ -26,8 +27,9 @@ if (!function_exists('get_agent_avatar_url')) {
             }
         }
         
-        // Fallback vers Gravatar
-        $email = !empty($agent->agent_email) ? $agent->agent_email : (isset($agent->user_email) ? $agent->user_email : '');
+        // Méthode 2: Fallback vers Gravatar
+        $email = !empty($agent->agent_email) ? $agent->agent_email : 
+                (!empty($agent->user_email) ? $agent->user_email : '');
         if (!empty($email)) {
             $hash = md5(strtolower(trim($email)));
             return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";

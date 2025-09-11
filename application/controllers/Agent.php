@@ -18,6 +18,30 @@ class Agent extends BaseController {
         $this->load->model('Property_model', 'property_model');
     }
 
+    // Debug avatar
+    public function debug_avatars() {
+        $this->isLoggedIn();
+        
+        // Charger le helper avatar
+        $this->load->helper('avatar');
+        
+        // Préparer les données pour la vue
+        $data = $this->global;
+        $data['pageTitle'] = 'Debug Avatars Agents';
+        
+        try {
+            // Récupérer quelques agents pour le debug
+            $agents = $this->agent_model->get_all_agents(['limit' => 10]);
+            $data['agents'] = $agents;
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error in Agent debug_avatars: ' . $e->getMessage());
+            $data['agents'] = [];
+        }
+
+        $this->loadViews("dashboard/agents/debug_avatars", $data);
+    }
+
     // Test simple
     public function test() {
         echo "Agent controller fonctionne !";
@@ -225,6 +249,9 @@ class Agent extends BaseController {
     public function index() {
         $this->isLoggedIn();
         
+        // Charger le helper avatar
+        $this->load->helper('avatar');
+        
         // Préparer les données pour la vue
         $data = $this->global;
         $data['pageTitle'] = 'Liste des agents';
@@ -233,6 +260,13 @@ class Agent extends BaseController {
         try {
             // Récupérer tous les agents avec leurs informations complètes
             $agents = $this->agent_model->get_all_agents($data['filters']);
+            
+            // Debug: Vérifier les avatars
+            foreach ($agents as $agent) {
+                if (empty($agent->agent_avatar)) {
+                    log_message('error', 'Avatar manquant pour agent: ' . $agent->agent_name . ' (ID: ' . $agent->agent_id . ')');
+                }
+            }
             
             // Ajouter le nombre de propriétés pour chaque agent
             foreach ($agents as $agent) {

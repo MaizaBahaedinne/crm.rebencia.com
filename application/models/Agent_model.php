@@ -124,10 +124,11 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_website' THEN pm_contact.meta_value END) as website,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_author_custom_picture' THEN 
                 CASE 
-                    WHEN media.guid IS NOT NULL THEN 
-                        REPLACE(media.guid, 'http://localhost/', 'https://rebencia.com/')
-                    ELSE 
-                        CONCAT('https://www.gravatar.com/avatar/', MD5(LOWER(u.user_email)), '?d=identicon&s=200')
+                    WHEN pm_contact.meta_value IS NOT NULL AND pm_contact.meta_value != '' THEN 
+                        (SELECT REPLACE(guid, 'http://localhost/', 'https://rebencia.com/') 
+                         FROM {$this->posts_table} 
+                         WHERE ID = pm_contact.meta_value AND post_type = 'attachment' LIMIT 1)
+                    ELSE NULL
                 END
             END) as agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) as position,
@@ -151,8 +152,7 @@ class Agent_model extends CI_Model {
             ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent" AND p.post_status = "publish"', 'inner')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
-            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_author_custom_picture" AND media.post_type = "attachment"', 'left');
+            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left');
 
         // Appliquer les filtres
         if (!empty($filters['search'])) {
