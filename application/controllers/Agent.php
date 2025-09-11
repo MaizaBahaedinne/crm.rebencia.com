@@ -295,6 +295,9 @@ class Agent extends BaseController {
     public function view($user_id = null) {
         $this->isLoggedIn();
         
+        // Charger le helper avatar
+        $this->load->helper('avatar');
+        
         if (!$user_id) {
             show_404();
         }
