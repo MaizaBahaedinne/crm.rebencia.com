@@ -1,23 +1,75 @@
-# Avatar System Update - Summary
+# Correction Avatars Agents - Rapport Final
 
-## Modifications apportées
+## 🚨 **Problème identifié :**
+Les photos des agents ne se chargent pas sur la page https://crm.rebencia.com/agents
 
-### 1. Modèle Agent_model.php
-- ✅ Remplacement de toutes les références `fave_agent_picture` par `fave_author_custom_picture`
-- ✅ Correction des requêtes SQL dans les méthodes :
-  - `get_agent_by_user_id()`
-  - `get_agent_profile()`
-  - `search_agents()`
-- ✅ Utilisation de la bonne clé meta HOUZEZ pour les avatars des agents
+## 🔍 **Analyse du problème :**
 
-### 2. Helper Avatar (nouveau)
-- ✅ Création d'`application/helpers/avatar_helper.php`
-- ✅ Fonctions centralisées pour gérer les avatars :
-  - `get_agent_avatar_url()` : URL avatar agent avec fallback Gravatar
-  - `get_agency_logo_url()` : URL logo agence
-  - `get_property_featured_image_url()` : URL image propriété
-  - `render_avatar_img()` : Génère HTML pour avatar agent
-  - `render_agency_logo_img()` : Génère HTML pour logo agence
+### **Causes identifiées :**
+1. Helper avatar pas chargé dans le contrôleur
+2. Jointure SQL défaillante avec table media
+3. URLs d'avatar mal formées (localhost vs production)
+4. Données avatar manquantes en base
+
+## ✅ **Corrections apportées :**
+
+### **1. Chargement du helper avatar**
+```php
+// Dans Agent::index()
+$this->load->helper('avatar');
+```
+
+### **2. Amélioration du helper avatar**
+- ✅ **Validation renforcée** : `$agent->agent_avatar !== 'NULL'`
+- ✅ **Correction URLs** : localhost → rebencia.com  
+- ✅ **Fallback Gravatar** amélioré
+- ✅ **Avatar par défaut** si tout échoue
+
+### **3. Correction requête SQL**
+```sql
+-- Avant (jointure complexe)
+LEFT JOIN wp_posts media ON media.ID = pm_contact.meta_value
+
+-- Après (sous-requête fiable)
+(SELECT REPLACE(guid, 'http://localhost/', 'https://rebencia.com/') 
+ FROM wp_posts 
+ WHERE ID = pm_contact.meta_value AND post_type = 'attachment')
+```
+
+### **4. Debug tools ajoutés**
+- 🔧 **Page debug** : `/agents/debug_avatars`
+- 📝 **Logs d'erreur** pour avatars manquants
+- 🎯 **Vue détaillée** des URLs générées
+
+## 🎯 **Solution hiérarchique :**
+
+### **Priorité 1 :** Avatar WordPress
+```php
+if (!empty($agent->agent_avatar)) {
+    return corrected_url($agent->agent_avatar);
+}
+```
+
+### **Priorité 2 :** Gravatar basé sur email
+```php
+$hash = md5(strtolower($agent->agent_email));
+return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
+```
+
+### **Priorité 3 :** Avatar par défaut
+```php
+return base_url('assets/images/users/avatar-1.jpg');
+```
+
+---
+**Date correction :** 11 septembre 2025  
+**Fichiers modifiés :**
+- `/application/controllers/Agent.php` 
+- `/application/helpers/avatar_helper.php`
+- `/application/models/Agent_model.php`
+- `/application/views/dashboard/agents/debug_avatars.php` (nouveau)
+
+**Test URL :** https://crm.rebencia.com/agents/debug_avatars
   - `render_property_image_img()` : Génère HTML pour image propriété
 - ✅ Correction automatique des URLs localhost vers rebencia.com
 - ✅ Support Gravatar avec fallback vers avatar par défaut
