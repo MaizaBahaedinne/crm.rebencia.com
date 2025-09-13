@@ -222,7 +222,7 @@ class Agent extends BaseController {
         }
     }
 
-    // Détails d'un agent
+        // Détails d'un agent
     public function view($user_id = null) {
         $this->isLoggedIn();
         
@@ -265,7 +265,6 @@ class Agent extends BaseController {
         }
 
         $this->loadViews("dashboard/agents/view", $this->global, $data, NULL);
-    }
     }
 
     // AJAX pour récupérer tous les agents avec filtres
