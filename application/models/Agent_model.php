@@ -1225,4 +1225,45 @@ class Agent_model extends CI_Model {
         return true;
     }
 
+    /**
+     * Test de la nouvelle méthode pour récupérer les avatars avec _thumbnail_id et fave_author_custom_picture
+     * Basé sur votre requête SQL proposée
+     */
+    public function get_agents_with_better_avatars() {
+        $this->wp_db->select("
+            a.ID as agent_id,
+            a.post_title as agent_name,
+            a.post_status,
+            a.post_date,
+            -- Image avec priorité : _thumbnail_id puis fave_author_custom_picture
+            COALESCE(
+                (SELECT REPLACE(i1.guid, 'http://localhost/', 'https://rebencia.com/') 
+                 FROM {$this->postmeta_table} m1 
+                 INNER JOIN {$this->posts_table} i1 ON m1.meta_value = i1.ID 
+                 WHERE m1.post_id = a.ID 
+                 AND m1.meta_key = '_thumbnail_id' 
+                 AND i1.post_type = 'attachment' 
+                 LIMIT 1),
+                (SELECT REPLACE(i2.guid, 'http://localhost/', 'https://rebencia.com/') 
+                 FROM {$this->postmeta_table} m2 
+                 INNER JOIN {$this->posts_table} i2 ON m2.meta_value = i2.ID 
+                 WHERE m2.post_id = a.ID 
+                 AND m2.meta_key = 'fave_author_custom_picture' 
+                 AND i2.post_type = 'attachment' 
+                 LIMIT 1),
+                NULL
+            ) as agent_avatar,
+            -- Emails et autres infos
+            (SELECT meta_value FROM {$this->postmeta_table} WHERE post_id = a.ID AND meta_key = 'fave_agent_email' LIMIT 1) as agent_email,
+            (SELECT meta_value FROM {$this->postmeta_table} WHERE post_id = a.ID AND meta_key = 'fave_agent_phone' LIMIT 1) as phone
+        ", FALSE);
+        
+        $this->wp_db->from($this->posts_table . ' a')
+            ->where('a.post_type', 'houzez_agent')
+            ->where('a.post_status', 'publish')
+            ->order_by('a.post_title', 'ASC');
+            
+        return $this->wp_db->get()->result();
+    }
+
 }
