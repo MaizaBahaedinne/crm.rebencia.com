@@ -350,12 +350,115 @@
                                 <!-- Properties Tab -->
                                 <div class="tab-pane fade" id="properties" role="tabpanel">
                                     <div id="properties-content">
-                                        <div class="text-center py-5">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Chargement...</span>
-                                            </div>
-                                            <p class="mt-2 text-muted">Chargement des propriétés...</p>
+                                        <!-- Debug Info -->
+                                        <div class="alert alert-info">
+                                            <strong>Debug:</strong> 
+                                            Agent ID: <?php echo $agent->agent_id ?? 'N/A'; ?> | 
+                                            Properties count: <?php echo count($properties ?? []); ?> |
+                                            Properties type: <?php echo gettype($properties ?? null); ?>
+                                            <?php if (!empty($properties)): ?>
+                                                <br>First property: <?php echo json_encode($properties[0]); ?>
+                                            <?php endif; ?>
                                         </div>
+                                        
+                                        <?php if (!empty($properties) && is_array($properties)) : ?>
+                                            <div class="row g-3">
+                                                <?php foreach ($properties as $property) : ?>
+                                                    <div class="col-lg-4 col-md-6">
+                                                        <div class="card border-0 shadow-sm hover-card h-100">
+                                                            <?php if (!empty($property->thumbnail)) : ?>
+                                                                <div class="property-image position-relative">
+                                                                    <img src="<?php echo $property->thumbnail; ?>" 
+                                                                         class="card-img-top" 
+                                                                         style="height: 200px; object-fit: cover;" 
+                                                                         alt="<?php echo htmlspecialchars($property->title); ?>">
+                                                                    <div class="property-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-3">
+                                                                        <span class="badge bg-primary text-white">
+                                                                            <?php echo ucfirst($property->property_type ?? 'Propriété'); ?>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            <?php else : ?>
+                                                                <div class="property-placeholder bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                                    <i class="ri-home-line fs-1 text-muted"></i>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                            
+                                                            <div class="card-body">
+                                                                <h6 class="property-title mb-2">
+                                                                    <?php 
+                                                                    $property_url = !empty($property->slug) ? 
+                                                                        'https://rebencia.com/property/' . $property->slug : '#';
+                                                                    ?>
+                                                                    <a href="<?php echo $property_url; ?>" class="text-decoration-none text-dark" target="_blank">
+                                                                        <?php echo htmlspecialchars($property->title); ?>
+                                                                    </a>
+                                                                </h6>
+                                                                
+                                                                <div class="property-location mb-2">
+                                                                    <i class="ri-map-pin-line text-muted me-1"></i>
+                                                                    <small class="text-muted"><?php echo htmlspecialchars($property->location ?? 'Localisation non spécifiée'); ?></small>
+                                                                </div>
+                                                                
+                                                                <?php if (!empty($property->price)) : ?>
+                                                                    <div class="property-price mb-3">
+                                                                        <span class="text-primary fw-bold fs-5">
+                                                                            <?php echo number_format($property->price, 0, ',', ' ') . ' €'; ?>
+                                                                        </span>
+                                                                    </div>
+                                                                <?php endif; ?>
+                                                                
+                                                                <div class="property-details">
+                                                                    <div class="row g-2 text-center">
+                                                                        <?php if (!empty($property->bedrooms)) : ?>
+                                                                        <div class="col-4">
+                                                                            <div class="detail-item">
+                                                                                <i class="ri-hotel-bed-line text-primary"></i>
+                                                                                <small class="d-block text-muted"><?php echo $property->bedrooms; ?> ch</small>
+                                                                            </div>
+                                                                        </div>
+                                                                        <?php endif; ?>
+                                                                        
+                                                                        <?php if (!empty($property->bathrooms)) : ?>
+                                                                        <div class="col-4">
+                                                                            <div class="detail-item">
+                                                                                <i class="ri-drop-line text-info"></i>
+                                                                                <small class="d-block text-muted"><?php echo $property->bathrooms; ?> sdb</small>
+                                                                            </div>
+                                                                        </div>
+                                                                        <?php endif; ?>
+                                                                        
+                                                                        <?php if (!empty($property->size)) : ?>
+                                                                        <div class="col-4">
+                                                                            <div class="detail-item">
+                                                                                <i class="ri-ruler-line text-success"></i>
+                                                                                <small class="d-block text-muted"><?php echo $property->size; ?> m²</small>
+                                                                            </div>
+                                                                        </div>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="mt-3">
+                                                                    <a href="<?php echo $property_url; ?>" class="btn btn-primary btn-sm w-100" target="_blank">
+                                                                        <i class="ri-eye-line me-1"></i>Voir détails
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php else : ?>
+                                            <div class="text-center py-5">
+                                                <i class="ri-home-line fs-1 text-muted mb-3"></i>
+                                                <h5 class="text-muted">Aucune propriété trouvée</h5>
+                                                <p class="text-muted">Cet agent n'a actuellement aucune propriété assignée.</p>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
+                                                    <i class="ri-refresh-line me-1"></i>Actualiser
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 
@@ -777,6 +880,33 @@
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
+
+.property-image {
+    overflow: hidden;
+}
+
+.property-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+}
+
+.property-title a:hover {
+    color: #667eea !important;
+}
+
+.property-placeholder {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.detail-item {
+    padding: 0.5rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+}
+
+.detail-item i {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
 </style>
 
 <script>
@@ -815,46 +945,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadPropertiesTab() {
-    const content = document.getElementById('properties-content');
-    if (content.innerHTML.includes('spinner-border')) {
-        // Simulate loading
-        setTimeout(() => {
-            content.innerHTML = `
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body text-center py-4">
-                                <i class="ri-home-line fs-1 text-primary mb-3"></i>
-                                <h6>Appartement moderne</h6>
-                                <p class="text-muted small">Paris 15ème</p>
-                                <span class="badge bg-primary">450 000 €</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body text-center py-4">
-                                <i class="ri-home-line fs-1 text-success mb-3"></i>
-                                <h6>Villa avec jardin</h6>
-                                <p class="text-muted small">Neuilly-sur-Seine</p>
-                                <span class="badge bg-success">890 000 €</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body text-center py-4">
-                                <i class="ri-home-line fs-1 text-info mb-3"></i>
-                                <h6>Studio rénové</h6>
-                                <p class="text-muted small">Paris 11ème</p>
-                                <span class="badge bg-info">320 000 €</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }, 1000);
-    }
+    // Properties are already loaded from PHP, no need for AJAX
+    console.log('Properties tab loaded');
 }
 
 function loadActivityTab() {
