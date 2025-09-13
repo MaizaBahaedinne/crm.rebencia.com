@@ -32,10 +32,40 @@ class Agent extends BaseController {
         // ... (function body unchanged)
     }
 
-    // Test simple
-    public function test() {
-        echo "Agent controller fonctionne !";
-        echo "<br>Date: " . date('Y-m-d H:i:s');
+    // Test simple de la méthode view
+    public function test_view($user_id = 7) {
+        // Debug temporaire
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        
+        echo "<h1>Test Agent View - ID: $user_id</h1>";
+        
+        // Charger le helper avatar
+        $this->load->helper('avatar');
+        
+        try {
+            echo "DEBUG: Tentative de récupération de l'agent $user_id<br>";
+            
+            // Récupérer les données de l'agent
+            $agent = $this->agent_model->get_agent($user_id);
+            
+            if ($agent) {
+                echo "✅ Agent trouvé !<br>";
+                echo "<pre>" . print_r($agent, true) . "</pre>";
+                
+                // Test des propriétés
+                $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email);
+                echo "✅ " . count($properties) . " propriétés trouvées<br>";
+                
+            } else {
+                echo "❌ Agent non trouvé<br>";
+            }
+            
+        } catch (Exception $e) {
+            echo "❌ Erreur: " . $e->getMessage() . "<br>";
+            echo "<pre>" . $e->getTraceAsString() . "</pre>";
+        }
+        
         echo "<br><a href='" . base_url('agents') . "'>Retour aux agents</a>";
     }
 
