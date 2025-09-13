@@ -152,14 +152,7 @@ class Agent extends BaseController {
 
     // Liste des agents avec vraies données
     public function index() {
-        // Debug temporaire
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
-        
         $this->isLoggedIn();
-        
-        // Debug: vérifier si on arrive ici
-        log_message('debug', 'Agent index: méthode appelée');
         
         // Charger le helper avatar
         $this->load->helper('avatar');
@@ -170,56 +163,22 @@ class Agent extends BaseController {
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
         try {
-            // Debug: tentative de récupération des agents
-            log_message('debug', 'Agent index: récupération des agents...');
-            
-            // Récupérer tous les agents avec leurs informations complètes
-            $agents = $this->agent_model->get_all_agents($data['filters']);
-            
-            log_message('debug', 'Agent index: ' . count($agents) . ' agents récupérés');
-            
-            // Debug: Vérifier les avatars
-            foreach ($agents as $agent) {
-                if (empty($agent->agent_avatar)) {
-                    log_message('error', 'Avatar manquant pour agent: ' . $agent->agent_name . ' (ID: ' . $agent->agent_id . ')');
-                }
-            }
-            
-            // Ajouter le nombre de propriétés pour chaque agent
-            foreach ($agents as $agent) {
-                if (!isset($agent->properties_count) || $agent->properties_count === null) {
-                    // Utiliser la méthode améliorée pour compter les propriétés
-                    $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email);
-                    $agent->properties_count = count($properties);
-                }
-            }
+            // Récupérer tous les agents depuis wp_posts uniquement (sans wp_users)
+            $agents = $this->agent_model->get_all_agents_from_posts($data['filters']);
             
             $data['agents'] = $agents;
             
         } catch (Exception $e) {
             log_message('error', 'Error in Agent index: ' . $e->getMessage());
-            // Debug: afficher l'erreur
-            echo "Erreur dans Agent index: " . htmlspecialchars($e->getMessage());
-            echo "<br>Trace: <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
-            return;
+            $data['agents'] = [];
+            $data['error'] = 'Erreur lors du chargement des agents.';
         }
         
-        try {
-            // Récupérer la liste des agences pour les filtres
-            $data['agencies'] = $this->agency_model->get_all_agencies();
-            
-            log_message('debug', 'Agent index: chargement de la vue...');
-            
-            // Charger la vue
-            $this->loadViews("dashboard/agents/index", $this->global, $data, NULL);
-            
-            log_message('debug', 'Agent index: vue chargée avec succès');
-            
-        } catch (Exception $e) {
-            log_message('error', 'Error loading agents view: ' . $e->getMessage());
-            echo "Erreur lors du chargement de la vue: " . htmlspecialchars($e->getMessage());
-            echo "<br>Trace: <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
-        }
+        // Récupérer la liste des agences pour les filtres
+        $data['agencies'] = $this->agency_model->get_all_agencies();
+        
+        // Charger la vue
+        $this->loadViews("dashboard/agents/index", $this->global, $data, NULL);
     }
 
     // Test simple pour vérifier que le contrôleur fonctionne
@@ -229,15 +188,27 @@ class Agent extends BaseController {
         echo "<p><a href='" . base_url('agents') . "'>→ Liste des agents</a></p>";
         echo "<p><a href='" . base_url('index.php/agents') . "'>→ Liste des agents (avec index.php)</a></p>";
         
-        // Test de la base de données
+        // Test de la nouvelle méthode get_all_agents_from_posts
         try {
-            $agents = $this->agent_model->get_all_agents([]);
-            echo "<p>✅ " . count($agents) . " agents trouvés dans la base</p>";
+            $agents = $this->agent_model->get_all_agents_from_posts([]);
+            echo "<p>✅ " . count($agents) . " agents trouvés dans wp_posts (sans wp_users)</p>";
             
             if (count($agents) > 0) {
-                $first_agent = $agents[0];
-                echo "<p>Premier agent: " . $first_agent->agent_name . " (ID: " . $first_agent->agent_id . ")</p>";
-                echo "<p><a href='" . base_url('index.php/agents/view/' . $first_agent->agent_id) . "'>→ Voir cet agent</a></p>";
+                echo "<h3>Premiers agents trouvés:</h3>";
+                echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                echo "<tr><th>ID</th><th>Nom</th><th>Email</th><th>Agence</th><th>Propriétés</th><th>Test</th></tr>";
+                
+                foreach (array_slice($agents, 0, 5) as $agent) {
+                    echo "<tr>";
+                    echo "<td>" . $agent->agent_id . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agent_name) . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agent_email ?? 'N/A') . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agency_name ?? 'N/A') . "</td>";
+                    echo "<td>" . ($agent->properties_count ?? 0) . "</td>";
+                    echo "<td><a href='" . base_url('index.php/agents/view/' . $agent->agent_id) . "'>Voir</a></td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
             }
         } catch (Exception $e) {
             echo "<p>❌ Erreur: " . $e->getMessage() . "</p>";

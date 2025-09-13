@@ -98,6 +98,88 @@ class Agent_model extends CI_Model {
     }
 
     /**
+     * Retourne tous les agents depuis wp_posts uniquement (sans wp_users)
+     * @param array $filters Filtres de recherche
+     * @return object[]
+     */
+    public function get_all_agents_from_posts($filters = []) {
+        $this->wp_db->select("
+            p.ID as agent_id,
+            p.post_title as agent_name,
+            p.post_content as agent_description,
+            p.post_status as post_status,
+            p.post_date as created_date,
+            p.post_modified as modified_date,
+            a.ID as agency_id,
+            a.post_title as agency_name,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_phone' THEN pm.meta_value END) as phone,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_mobile' THEN pm.meta_value END) as mobile,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_whatsapp' THEN pm.meta_value END) as whatsapp,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
+            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN 
+                CASE 
+                    WHEN pm.meta_value IS NOT NULL AND pm.meta_value != '' THEN 
+                        (SELECT REPLACE(guid, 'http://localhost/', 'https://rebencia.com/') 
+                         FROM {$this->posts_table} 
+                         WHERE ID = pm.meta_value AND post_type = 'attachment' LIMIT 1)
+                    ELSE NULL
+                END
+            END) as agent_avatar,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_instagram' THEN pm.meta_value END) as instagram,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_address' THEN pm.meta_value END) as address,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_zip' THEN pm.meta_value END) as postal_code,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_city' THEN pm.meta_value END) as city,
+            MAX(CASE WHEN pm.meta_key = 'fave_agent_country' THEN pm.meta_value END) as country,
+            (SELECT COUNT(*) FROM {$this->posts_table} prop 
+             INNER JOIN {$this->postmeta_table} pm_prop ON prop.ID = pm_prop.post_id 
+             WHERE pm_prop.meta_key = 'fave_property_agent' 
+             AND pm_prop.meta_value = p.ID 
+             AND prop.post_type = 'property' 
+             AND prop.post_status = 'publish'
+            ) as properties_count
+        ", FALSE);
+        
+        $this->wp_db->from($this->posts_table . ' p')
+            ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
+            ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
+            ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
+            ->where('p.post_type', 'houzez_agent')
+            ->where('p.post_status', 'publish');
+
+        // Appliquer les filtres
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $this->wp_db->group_start()
+                ->like('p.post_title', $search)
+                ->or_like('p.post_content', $search)
+                ->group_end();
+        }
+
+        if (!empty($filters['agency'])) {
+            $this->wp_db->where('a.ID', $filters['agency']);
+        }
+
+        $this->wp_db->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, p.post_modified, a.ID, a.post_title');
+        $this->wp_db->order_by('p.post_title', 'ASC');
+
+        $query = $this->wp_db->get();
+        $agents = $query->result();
+
+        // Nettoyer et améliorer les données
+        foreach ($agents as $agent) {
+            $agent = $this->clean_agent_data($agent);
+        }
+
+        return $agents;
+    }
+
+    /**
      * Retourne tous les agents HOUZEZ avec leurs informations complètes
      * Utilise une requête optimisée similaire à celle fournie
      * @param array $filters Filtres de recherche
