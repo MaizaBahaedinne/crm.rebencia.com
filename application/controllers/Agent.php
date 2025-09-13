@@ -32,60 +32,75 @@ class Agent extends BaseController {
         // ... (function body unchanged)
     }
 
-    // Test simple de la méthode view
-    public function test_view($user_id = 7) {
-        // Debug temporaire
+    // Test avec plusieurs IDs d'agents
+    public function test_agents_ids() {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
         
-        echo "<h1>Test Agent View - ID: $user_id</h1>";
+        echo "<h1>Test Agents - Plusieurs IDs</h1>";
         
-        // Charger le helper avatar
         $this->load->helper('avatar');
         
-        try {
-            echo "<h2>1. Test de récupération de l'agent $user_id</h2>";
+        // Test de quelques IDs courants
+        $test_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30];
+        
+        echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+        echo "<tr><th>ID Test</th><th>Résultat</th><th>Nom</th><th>Email</th><th>Action</th></tr>";
+        
+        foreach ($test_ids as $id) {
+            echo "<tr>";
+            echo "<td>$id</td>";
             
-            // Récupérer les données de l'agent
-            $agent = $this->agent_model->get_agent($user_id);
-            
-            if ($agent) {
-                echo "✅ Agent trouvé !<br>";
-                echo "<pre>" . print_r($agent, true) . "</pre>";
+            try {
+                $agent = $this->agent_model->get_agent($id);
                 
-                // Test des propriétés
-                $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email);
-                echo "✅ " . count($properties) . " propriétés trouvées<br>";
-                
-            } else {
-                echo "❌ Agent $user_id non trouvé<br>";
-                
-                // Récupérer tous les agents pour voir lesquels existent
-                echo "<h2>2. Liste de tous les agents disponibles</h2>";
-                $all_agents = $this->agent_model->get_all_agents([]);
-                
-                if ($all_agents && count($all_agents) > 0) {
-                    echo "✅ " . count($all_agents) . " agents trouvés :<br>";
-                    echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
-                    echo "<tr><th>ID</th><th>Nom</th><th>Email</th><th>Action</th></tr>";
-                    
-                    foreach ($all_agents as $ag) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($ag->agent_id ?? 'N/A') . "</td>";
-                        echo "<td>" . htmlspecialchars($ag->agent_name ?? 'N/A') . "</td>";
-                        echo "<td>" . htmlspecialchars($ag->agent_email ?? 'N/A') . "</td>";
-                        echo "<td><a href='" . base_url('agents/view/' . ($ag->agent_id ?? 0)) . "'>Voir</a></td>";
-                        echo "</tr>";
-                    }
-                    echo "</table>";
+                if ($agent) {
+                    echo "<td style='color: green;'>✅ Trouvé</td>";
+                    echo "<td>" . htmlspecialchars($agent->agent_name ?? 'N/A') . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agent_email ?? 'N/A') . "</td>";
+                    echo "<td><a href='" . base_url('index.php/agents/view/' . $id) . "' target='_blank'>Tester</a></td>";
                 } else {
-                    echo "❌ Aucun agent trouvé dans la base<br>";
+                    echo "<td style='color: red;'>❌ Vide</td>";
+                    echo "<td>-</td>";
+                    echo "<td>-</td>";
+                    echo "<td>-</td>";
                 }
+                
+            } catch (Exception $e) {
+                echo "<td style='color: orange;'>⚠️ Erreur</td>";
+                echo "<td colspan='2'>" . htmlspecialchars($e->getMessage()) . "</td>";
+                echo "<td>-</td>";
             }
             
+            echo "</tr>";
+        }
+        
+        echo "</table>";
+        
+        // Afficher aussi tous les agents via get_all_agents
+        echo "<h2>Via get_all_agents()</h2>";
+        try {
+            $all_agents = $this->agent_model->get_all_agents([]);
+            if ($all_agents && count($all_agents) > 0) {
+                echo "<p>✅ " . count($all_agents) . " agents trouvés</p>";
+                echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                echo "<tr><th>ID</th><th>Nom</th><th>Email</th><th>Agence</th><th>Test</th></tr>";
+                
+                foreach (array_slice($all_agents, 0, 10) as $agent) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($agent->agent_id ?? 'N/A') . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agent_name ?? 'N/A') . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agent_email ?? 'N/A') . "</td>";
+                    echo "<td>" . htmlspecialchars($agent->agency_name ?? 'N/A') . "</td>";
+                    echo "<td><a href='" . base_url('index.php/agents/view/' . ($agent->agent_id ?? 0)) . "' target='_blank'>Voir</a></td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p>❌ Aucun agent trouvé via get_all_agents</p>";
+            }
         } catch (Exception $e) {
-            echo "❌ Erreur: " . $e->getMessage() . "<br>";
-            echo "<pre>" . $e->getTraceAsString() . "</pre>";
+            echo "<p>❌ Erreur get_all_agents: " . htmlspecialchars($e->getMessage()) . "</p>";
         }
         
         echo "<br><a href='" . base_url('agents') . "'>Retour aux agents</a>";
