@@ -152,6 +152,7 @@ class Agent_model extends CI_Model {
         ", FALSE);
         
         $this->wp_db->from($this->posts_table . ' p')
+            ->join('crm_avatar_agents avatar', 'avatar.agent_id = p.ID', 'left')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
@@ -637,15 +638,7 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm.meta_key = 'fave_agent_skype' THEN pm.meta_value END) as skype,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_website' THEN pm.meta_value END) as website,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_position' THEN pm.meta_value END) as position,
-            MAX(CASE WHEN pm.meta_key = 'fave_author_custom_picture' THEN 
-                CASE 
-                    WHEN pm.meta_value IS NOT NULL AND pm.meta_value != '' THEN 
-                        (SELECT REPLACE(guid, 'http://localhost/', 'https://rebencia.com/') 
-                         FROM {$this->posts_table} 
-                         WHERE ID = pm.meta_value AND post_type = 'attachment' LIMIT 1)
-                    ELSE NULL
-                END
-            END) as agent_avatar,
+            avatar.image_url as agent_avatar,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_facebook' THEN pm.meta_value END) as facebook,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_twitter' THEN pm.meta_value END) as twitter,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_linkedin' THEN pm.meta_value END) as linkedin,
@@ -653,6 +646,7 @@ class Agent_model extends CI_Model {
         ", FALSE);
         
         $this->wp_db->from($this->posts_table . ' p')
+            ->join('crm_avatar_agents avatar', 'avatar.agent_id = p.ID', 'left')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
