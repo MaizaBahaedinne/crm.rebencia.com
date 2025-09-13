@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <!-- Modern Stats Cards -->
+            <!-- Modern Stats Cards -->            
             <div class="row mt-4">
                 <div class="col-xl-3 col-md-6">
                     <div class="card border-0 shadow-sm modern-stat-card stat-primary">
@@ -91,7 +91,7 @@
                                     <i class="ri-home-4-line"></i>
                                 </div>
                                 <div class="ms-3 flex-grow-1">
-                                    <div class="stat-number"><?php echo $agent->properties_count ?? 0; ?></div>
+                                    <div class="stat-number"><?php echo count($properties ?? []); ?></div>
                                     <div class="stat-label">Propriétés</div>
                                 </div>
                                 <button class="btn btn-sm btn-light rounded-circle stat-action" 
@@ -111,7 +111,7 @@
                                     <i class="ri-user-heart-line"></i>
                                 </div>
                                 <div class="ms-3 flex-grow-1">
-                                    <div class="stat-number"><?php echo $agent->contacts_count ?? 0; ?></div>
+                                    <div class="stat-number"><?php echo count($estimations ?? []); ?></div>
                                     <div class="stat-label">Clients</div>
                                 </div>
                                 <button class="btn btn-sm btn-light rounded-circle stat-action" 
@@ -151,7 +151,7 @@
                                     <i class="ri-line-chart-line"></i>
                                 </div>
                                 <div class="ms-3 flex-grow-1">
-                                    <div class="stat-number"><?php echo $agent->leads_count ?? 0; ?></div>
+                                    <div class="stat-number"><?php echo count($transactions ?? []); ?></div>
                                     <div class="stat-label">Leads</div>
                                 </div>
                                 <button class="btn btn-sm btn-light rounded-circle stat-action" 
@@ -349,18 +349,7 @@
                                 
                                 <!-- Properties Tab -->
                                 <div class="tab-pane fade" id="properties" role="tabpanel">
-                                    <div id="properties-content">
-                                        <!-- Debug Info -->
-                                        <div class="alert alert-info">
-                                            <strong>Debug:</strong> 
-                                            Agent ID: <?php echo $agent->agent_id ?? 'N/A'; ?> | 
-                                            Properties count: <?php echo count($properties ?? []); ?> |
-                                            Properties type: <?php echo gettype($properties ?? null); ?>
-                                            <?php if (!empty($properties)): ?>
-                                                <br>First property: <?php echo json_encode($properties[0]); ?>
-                                            <?php endif; ?>
-                                        </div>
-                                        
+                                    <div id="properties-content">                                        
                                         <?php if (!empty($properties) && is_array($properties)) : ?>
                                             <div class="row g-3">
                                                 <?php foreach ($properties as $property) : ?>
