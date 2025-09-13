@@ -85,7 +85,14 @@ class Agent extends BaseController {
 
     // Liste des agents avec vraies données
     public function index() {
+        // Debug temporaire
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        
         $this->isLoggedIn();
+        
+        // Debug: vérifier si on arrive ici
+        log_message('debug', 'Agent index: méthode appelée');
         
         // Charger le helper avatar
         $this->load->helper('avatar');
@@ -96,8 +103,13 @@ class Agent extends BaseController {
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
         try {
+            // Debug: tentative de récupération des agents
+            log_message('debug', 'Agent index: récupération des agents...');
+            
             // Récupérer tous les agents avec leurs informations complètes
             $agents = $this->agent_model->get_all_agents($data['filters']);
+            
+            log_message('debug', 'Agent index: ' . count($agents) . ' agents récupérés');
             
             // Debug: Vérifier les avatars
             foreach ($agents as $agent) {
@@ -119,15 +131,28 @@ class Agent extends BaseController {
             
         } catch (Exception $e) {
             log_message('error', 'Error in Agent index: ' . $e->getMessage());
-            $data['agents'] = [];
-            $data['error'] = 'Erreur lors du chargement des agents: ' . $e->getMessage();
+            // Debug: afficher l'erreur
+            echo "Erreur dans Agent index: " . htmlspecialchars($e->getMessage());
+            echo "<br>Trace: <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+            return;
         }
         
-        // Récupérer la liste des agences pour les filtres
-        $data['agencies'] = $this->agency_model->get_all_agencies();
-        
-        // Charger la vue
-        $this->loadViews("dashboard/agents/index", $this->global, $data, NULL);
+        try {
+            // Récupérer la liste des agences pour les filtres
+            $data['agencies'] = $this->agency_model->get_all_agencies();
+            
+            log_message('debug', 'Agent index: chargement de la vue...');
+            
+            // Charger la vue
+            $this->loadViews("dashboard/agents/index", $this->global, $data, NULL);
+            
+            log_message('debug', 'Agent index: vue chargée avec succès');
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error loading agents view: ' . $e->getMessage());
+            echo "Erreur lors du chargement de la vue: " . htmlspecialchars($e->getMessage());
+            echo "<br>Trace: <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+        }
     }
 
     // Détails d'un agent
