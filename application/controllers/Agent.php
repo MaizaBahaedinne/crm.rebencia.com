@@ -51,6 +51,38 @@ class Agent extends BaseController {
         // ... (function body unchanged)
     }
 
+    // Test simple pour debug
+    public function debug_index() {
+        echo "<h1>Debug Page Agents</h1>";
+        echo "<p>Date: " . date('Y-m-d H:i:s') . "</p>";
+        
+        try {
+            echo "<p>✅ Contrôleur Agent chargé</p>";
+            
+            // Test de connexion
+            echo "<p>✅ Test connexion...</p>";
+            
+            // Charger le helper avatar
+            $this->load->helper('avatar');
+            echo "<p>✅ Helper avatar chargé</p>";
+            
+            // Test modèle Agent
+            $agents = $this->agent_model->get_all_agents(['limit' => 1]);
+            echo "<p>✅ Modèle Agent fonctionne - " . count($agents) . " agent(s) trouvé(s)</p>";
+            
+            // Test modèle Agency
+            $agencies = $this->agency_model->get_all_agencies();
+            echo "<p>✅ Modèle Agency fonctionne - " . count($agencies) . " agence(s) trouvée(s)</p>";
+            
+            echo "<p>✅ Tous les tests passent - La page agents devrait fonctionner</p>";
+            echo "<p><a href='" . base_url('agents') . "'>Tester la vraie page agents →</a></p>";
+            
+        } catch (Exception $e) {
+            echo "<p>❌ Erreur: " . htmlspecialchars($e->getMessage()) . "</p>";
+            echo "<p>Trace: <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre></p>";
+        }
+    }
+
     // Liste des agents avec vraies données
     public function index() {
         $this->isLoggedIn();
