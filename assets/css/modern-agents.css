@@ -1,25 +1,19 @@
-/* Modern CRM Styles - Agents Page Enhancement */
-/* Version: 2.0 - Modernisation complète */
+/*
+ * Modern Agents List Styles - Version 2.1
+ * Date: 13 septembre 2025
+ * Description: Styles modernes pour la page de liste des agents avec avatars corrigés
+ */
 
-/* Variables CSS modernes */
+/* CSS Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
     --info-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-    
     --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
     --border-radius: 12px;
-    --border-radius-lg: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    --text-primary: #2c3e50;
-    --text-secondary: #6c757d;
-    --text-muted: #adb5bd;
-    
-    --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 /* Animations */
