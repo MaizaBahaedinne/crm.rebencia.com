@@ -183,6 +183,9 @@ class Agent_model extends CI_Model {
             $agent = $this->clean_agent_data($agent);
         }
 
+        // Affecter les URLs d'avatar pour chaque agent
+        $agents = $this->assign_avatar_urls($agents);
+
         return $agents;
     }
 
@@ -654,7 +657,17 @@ class Agent_model extends CI_Model {
             ->where('p.post_type', 'houzez_agent')
             ->group_by('p.ID, p.post_title, p.post_content, p.post_status, p.post_date, a.ID, a.post_title');
 
-        return $this->clean_agent_data($this->wp_db->get()->row());
+        $agent = $this->wp_db->get()->row();
+        
+        if ($agent) {
+            $agent = $this->clean_agent_data($agent);
+            // Affecter l'URL d'avatar
+            if (!isset($agent->agent_avatar) || empty($agent->agent_avatar)) {
+                $agent->agent_avatar = $this->get_agent_avatar_url_by_id($agent->agent_id);
+            }
+        }
+        
+        return $agent;
     }
 
     /**
@@ -1258,6 +1271,62 @@ class Agent_model extends CI_Model {
             ->order_by('a.post_title', 'ASC');
             
         return $this->wp_db->get()->result();
+    }
+
+    /**
+     * Récupère l'URL de l'avatar d'un agent par son ID
+     * @param int $agent_id
+     * @return string|null
+     */
+    public function get_agent_avatar_url_by_id($agent_id) {
+        $result = $this->wp_db->select('image_url')
+            ->from('crm_avatar_agents')
+            ->where('agent_id', $agent_id)
+            ->get()
+            ->row();
+            
+        return $result ? $result->image_url : null;
+    }
+
+    /**
+     * Affecte l'URL de l'avatar à chaque agent dans la liste
+     * Version optimisée avec une seule requête
+     * @param array $agents
+     * @return array
+     */
+    public function assign_avatar_urls($agents) {
+        if (empty($agents)) {
+            return $agents;
+        }
+        
+        // Récupérer tous les IDs d'agents
+        $agent_ids = array_map(function($agent) {
+            return $agent->agent_id;
+        }, $agents);
+        
+        // Récupérer tous les avatars en une seule requête
+        $avatars = $this->wp_db->select('agent_id, image_url')
+            ->from('crm_avatar_agents')
+            ->where_in('agent_id', $agent_ids)
+            ->get()
+            ->result();
+        
+        // Créer un tableau associatif pour un accès rapide
+        $avatar_map = [];
+        foreach ($avatars as $avatar) {
+            $avatar_map[$avatar->agent_id] = $avatar->image_url;
+        }
+        
+        // Affecter les avatars aux agents
+        foreach ($agents as $agent) {
+            if (!isset($agent->agent_avatar) || empty($agent->agent_avatar)) {
+                $agent->agent_avatar = isset($avatar_map[$agent->agent_id]) 
+                    ? $avatar_map[$agent->agent_id] 
+                    : null;
+            }
+        }
+        
+        return $agents;
     }
 
 }
