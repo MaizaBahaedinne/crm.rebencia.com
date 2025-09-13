@@ -16,7 +16,7 @@
                                         <div class="d-flex align-items-center">
                                             <!-- Avatar with modern styling -->
                                             <div class="profile-avatar-container position-relative me-4">
-                                                <?php $avatar_url = get_agent_avatar_url($agent); ?>
+                                                <?php $avatar_url = !empty($agent->agent_avatar) ? $agent->agent_avatar : base_url('assets/images/users/avatar-1.jpg'); ?>
                                                 <div class="profile-avatar">
                                                     <img src="<?php echo $avatar_url; ?>" 
                                                          alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 

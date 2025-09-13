@@ -265,7 +265,8 @@
                             <div class="agent-card-header">
                                 <div class="agent-avatar-wrapper">
                                     <?php
-                                    $avatar_url = get_agent_avatar_url($agent);
+                                    // Utiliser directement la vue crm_avatar_agents
+                                    $avatar_url = !empty($agent->agent_avatar) ? $agent->agent_avatar : base_url('assets/images/users/avatar-1.jpg');
                                     $fallback_avatar = base_url('assets/images/users/avatar-1.jpg');
                                     ?>
                                     <div class="agent-avatar">
