@@ -32,47 +32,7 @@ if (!function_exists('get_agent_avatar_url')) {
             }
         }
         
-        // Méthode 2: Essayer de récupérer depuis WordPress directement
-        $CI =& get_instance();
-        if (isset($agent->user_id) && !empty($agent->user_id)) {
-            try {
-                $CI->load->database('wordpress');
-                
-                // Chercher l'avatar custom dans les métadonnées
-                $query = $CI->wordpress->query("
-                    SELECT wp_posts.guid 
-                    FROM wp_postmeta 
-                    INNER JOIN wp_posts ON wp_posts.ID = wp_postmeta.meta_value 
-                    WHERE wp_postmeta.post_id = (
-                        SELECT ID FROM wp_posts 
-                        WHERE post_type = 'houzez_agent' 
-                        AND ID IN (
-                            SELECT post_id FROM wp_postmeta 
-                            WHERE meta_key = 'fave_agent_email' 
-                            AND meta_value = ?
-                        )
-                        LIMIT 1
-                    ) 
-                    AND wp_postmeta.meta_key = 'fave_author_custom_picture' 
-                    AND wp_posts.post_type = 'attachment'
-                    LIMIT 1
-                ", array($agent->agent_email ?? $agent->user_email ?? ''));
-                
-                if ($query->num_rows() > 0) {
-                    $avatar_url = $query->row()->guid;
-                    $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $avatar_url);
-                    $avatar_url = str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
-                    
-                    if (filter_var($avatar_url, FILTER_VALIDATE_URL)) {
-                        return $avatar_url;
-                    }
-                }
-            } catch (Exception $e) {
-                log_message('error', 'Error fetching WordPress avatar: ' . $e->getMessage());
-            }
-        }
-        
-        // Méthode 3: Gravatar avec l'email de l'agent
+        // Méthode 2: Gravatar avec l'email de l'agent
         $email = '';
         if (!empty($agent->agent_email)) {
             $email = $agent->agent_email;
@@ -85,7 +45,7 @@ if (!function_exists('get_agent_avatar_url')) {
             return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
         }
         
-        // Méthode 4: Avatar par défaut basé sur le nom
+        // Méthode 3: Avatar par défaut basé sur le nom
         if (!empty($agent->agent_name)) {
             $initials = '';
             $name_parts = explode(' ', trim($agent->agent_name));
