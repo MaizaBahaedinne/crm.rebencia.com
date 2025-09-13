@@ -165,7 +165,6 @@
             </div>
 
             <!-- Modern Content Tabs -->
-            <!-- Modern Content Tabs -->
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
@@ -222,7 +221,7 @@
                                                                 </div>
                                                                 <div class="col-3">
                                                                     <div class="performance-metric">
-                                                                        <div class="metric-value text-success"><?php echo $agent->clients_count ?? 0; ?></div>
+                                                                        <div class="metric-value text-success"><?php echo $agent->contacts_count ?? 0; ?></div>
                                                                         <div class="metric-label">Clients</div>
                                                                     </div>
                                                                 </div>
@@ -467,869 +466,37 @@
                     </div>
                 </div>
             </div>
-            <div class="row g-3">
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 hover-card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
-                                            <i class="ri-home-line"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Propriétés</p>
-                                        <h3 class="mb-1 text-primary"><?php echo $agent->properties_count ?? 0; ?></h3>
-                                        <small class="text-muted fs-12">
-                                            <?php if (($agent->properties_count ?? 0) == 0) : ?>
-                                                Aucune propriété
-                                            <?php else : ?>
-                                                <?php echo ($agent->properties_count > 1) ? 'propriétés actives' : 'propriété active'; ?>
-                                            <?php endif; ?>
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <a href="#" class="btn btn-sm btn-soft-primary" onclick="showPropertiesDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
-                                        <i class="ri-eye-line"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 hover-card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-info-subtle text-info rounded-circle fs-2">
-                                            <i class="ri-calculator-line"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Estimations</p>
-                                        <h3 class="mb-1 text-info"><?php echo $agent->estimations_count ?? 0; ?></h3>
-                                        <small class="text-muted fs-12">
-                                            <?php if (($agent->estimations_count ?? 0) == 0) : ?>
-                                                Aucune estimation
-                                            <?php else : ?>
-                                                Total estimations
-                                            <?php endif; ?>
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <a href="#" class="btn btn-sm btn-soft-info" onclick="showEstimationsDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
-                                        <i class="ri-eye-line"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-success-subtle text-success rounded-circle fs-2">
-                                            <i class="ri-exchange-line"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Transactions</p>
-                                        <h3 class="mb-1 text-success"><?php echo $agent->transactions_count ?? 0; ?></h3>
-                                        <small class="text-muted fs-12">
-                                            <?php if (($agent->transactions_count ?? 0) == 0) : ?>
-                                                Aucune transaction
-                                            <?php else : ?>
-                                                Total transactions
-                                            <?php endif; ?>
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <a href="#" class="btn btn-sm btn-soft-success" onclick="showTransactionsDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
-                                        <i class="ri-eye-line"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row g-3 mt-2">
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-md flex-shrink-0">
-                                    <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-2">
-                                        <i class="ri-money-dollar-circle-line"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Commissions</p>
-                                    <h3 class="mb-0 text-warning"><?php echo number_format($agent->total_commission ?? 0, 0, ',', ' '); ?> <small class="fs-6">TND</small></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-md flex-shrink-0">
-                                    <span class="avatar-title bg-secondary-subtle text-secondary rounded-circle fs-2">
-                                        <i class="ri-eye-line"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Vues Totales</p>
-                                    <h3 class="mb-0 text-secondary"><?php echo number_format($agent->total_views ?? 0); ?></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-2">
-                                            <i class="ri-contacts-line"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-muted mb-1 fs-11">Contacts</p>
-                                        <h3 class="mb-1 text-danger"><?php echo $agent->contacts_count ?? 0; ?></h3>
-                                        <small class="text-muted fs-12">
-                                            <?php if (($agent->contacts_count ?? 0) == 0) : ?>
-                                                Aucun contact
-                                            <?php else : ?>
-                                                Total contacts
-                                            <?php endif; ?>
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <a href="#" class="btn btn-sm btn-soft-danger" onclick="showContactsDetails(<?php echo $agent->user_id; ?>); return false;" title="Voir détails">
-                                        <i class="ri-eye-line"></i>
-                                    </a>
-                                </div>
-                            </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Agent Details & Properties -->
-            <div class="row">
-                <!-- Agent Information -->
-                <div class="col-xl-4">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Informations personnelles</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-borderless mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Email:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->agent_email); ?></td>
-                                        </tr>
-                                        <?php if (!empty($agent->phone)) : ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Téléphone:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->phone); ?></td>
-                                        </tr>
-                                        <?php endif; ?>
-                                        <?php if (!empty($agent->mobile)) : ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Mobile:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->mobile); ?></td>
-                                        </tr>
-                                        <?php endif; ?>
-                                        <?php if (!empty($agent->whatsapp)) : ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">WhatsApp:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->whatsapp); ?></td>
-                                        </tr>
-                                        <?php endif; ?>
-                                        <?php if (!empty($agent->website)) : ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Site Web:</td>
-                                            <td class="pe-0">
-                                                <a href="<?php echo $agent->website; ?>" target="_blank" class="text-decoration-none">
-                                                    <?php echo htmlspecialchars($agent->website); ?> <i class="ri-external-link-line"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <?php endif; ?>
-                                        <?php if (!empty($agent->position)) : ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Poste:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->position); ?></td>
-                                        </tr>
-                                        <?php endif; ?>
-                                        <?php if (!empty($agent->address)) : ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Adresse:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->address); ?></td>
-                                        </tr>
-                                        <?php endif; ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Inscrit le:</td>
-                                            <td class="pe-0"><?php echo date('d/m/Y', strtotime($agent->registration_date)); ?></td>
-                                        </tr>
-                                        <?php if ($agent->agency_name): ?>
-                                        <tr>
-                                            <td class="ps-0 text-muted">Agence:</td>
-                                            <td class="pe-0"><?php echo htmlspecialchars($agent->agency_name); ?></td>
-                                        </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <?php if (!empty($agent->description)) : ?>
-                            <hr>
-                            <div>
-                                <h6>Bio</h6>
-                                <div class="text-muted"><?php echo strip_tags($agent->description, '<p><br><strong><em><ul><li><ol>'); ?></div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Social Media -->
-                    <?php if (!empty($agent->facebook) || !empty($agent->twitter) || !empty($agent->linkedin) || !empty($agent->instagram)) : ?>
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Réseaux sociaux</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex flex-wrap gap-2">
-                                <?php if (!empty($agent->facebook)) : ?>
-                                <a href="<?php echo $agent->facebook; ?>" class="btn btn-primary btn-sm" target="_blank">
-                                    <i class="ri-facebook-line me-1"></i>Facebook
-                                </a>
-                                <?php endif; ?>
-                                <?php if (!empty($agent->twitter)) : ?>
-                                <a href="<?php echo $agent->twitter; ?>" class="btn btn-info btn-sm" target="_blank">
-                                    <i class="ri-twitter-line me-1"></i>Twitter
-                                </a>
-                                <?php endif; ?>
-                                <?php if (!empty($agent->linkedin)) : ?>
-                                <a href="<?php echo $agent->linkedin; ?>" class="btn btn-primary btn-sm" target="_blank">
-                                    <i class="ri-linkedin-line me-1"></i>LinkedIn
-                                </a>
-                                <?php endif; ?>
-                                <?php if (!empty($agent->instagram)) : ?>
-                                <a href="<?php echo $agent->instagram; ?>" class="btn btn-danger btn-sm" target="_blank">
-                                    <i class="ri-instagram-line me-1"></i>Instagram
-                                </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-
-                    <!-- Monthly Performance -->
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Performance du mois</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="border-end">
-                                        <h4 class="text-info"><?php echo $agent->estimations_this_month ?? 0; ?></h4>
-                                        <p class="text-muted mb-0 small">Estimations</p>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <h4 class="text-success"><?php echo $agent->transactions_this_month ?? 0; ?></h4>
-                                    <p class="text-muted mb-0 small">Transactions</p>
-                                </div>
-                            </div>
-
-                            <?php if (($agent->avg_estimation_value ?? 0) > 0) : ?>
-                            <hr>
-                            <div class="text-center">
-                                <h6 class="text-muted mb-1">Valeur moyenne des estimations</h6>
-                                <h5 class="text-primary mb-0"><?php echo number_format($agent->avg_estimation_value, 0, ',', ' '); ?> TND</h5>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agent Properties -->
-                <div class="col-xl-8">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Propriétés de l'agent (<?php echo count($properties); ?>)</h5>
-                            <a href="<?php echo base_url('properties?agent=' . $agent->user_id); ?>" class="btn btn-primary btn-sm">
-                                Voir toutes
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <?php if (!empty($properties)) : ?>
-                            <div class="row">
-                                <?php foreach (array_slice($properties, 0, 6) as $property) : ?>
-                                <div class="col-md-6 col-lg-4 mb-3">
-                                    <div class="card border h-100">
-                                        <div class="position-relative">
-                                            <img src="<?php echo $property->thumbnail; ?>" alt="<?php echo htmlspecialchars($property->title); ?>" class="card-img-top" style="height: 180px; object-fit: cover;">
-                                            <div class="position-absolute top-0 start-0 p-2">
-                                                <span class="badge bg-<?php echo $property->status == 'for-rent' ? 'info' : 'success'; ?>">
-                                                    <?php echo $property->status == 'for-rent' ? 'À louer' : 'À vendre'; ?>
-                                                </span>
-                                            </div>
-                                            <div class="position-absolute top-0 end-0 p-2">
-                                                <span class="badge bg-dark"><?php echo $property->property_type; ?></span>
-                                            </div>
-                                        </div>
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title mb-2">
-                                                <a href="<?php echo base_url('properties/view/' . $property->ID); ?>" class="text-decoration-none">
-                                                    <?php echo htmlspecialchars($property->title); ?>
-                                                </a>
-                                            </h6>
-                                            <p class="text-muted small mb-2">
-                                                <i class="ri-map-pin-line me-1"></i>
-                                                <?php echo htmlspecialchars($property->location); ?>
-                                            </p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div class="fw-bold text-primary">
-                                                    <?php echo number_format($property->price, 0, ',', ' '); ?> TND
-                                                </div>
-                                                <small class="text-muted">
-                                                    <i class="ri-eye-line me-1"></i><?php echo $property->views; ?>
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                            
-                            <?php if (count($properties) > 6) : ?>
-                            <div class="text-center mt-3">
-                                <a href="<?php echo base_url('properties?agent=' . $agent->user_id); ?>" class="btn btn-outline-primary">
-                                    Voir les <?php echo count($properties) - 6; ?> propriétés restantes
-                                </a>
-                            </div>
-                            <?php endif; ?>
-                            
-                            <?php else : ?>
-                            <div class="text-center py-4">
-                                <div class="avatar-lg mx-auto mb-3">
-                                    <div class="avatar-title bg-light text-muted rounded-circle fs-24">
-                                        <i class="ri-home-line"></i>
-                                    </div>
-                                </div>
-                                <h6 class="mb-2">Aucune propriété</h6>
-                                <p class="text-muted">Cet agent n'a pas encore ajouté de propriétés.</p>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Estimations & Transactions Row -->
-            <div class="row mt-4">
-                <!-- Estimations Section -->
-                <div class="col-xl-6">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">
-                                <i class="ri-calculator-line me-2 text-info"></i>Estimations Récentes (<?php echo count($estimations ?? []); ?>)
-                            </h5>
-                            <a href="<?php echo base_url('estimations?agent=' . $agent->user_id); ?>" class="btn btn-info btn-sm">
-                                Voir toutes
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <?php if (!empty($estimations)) : ?>
-                            <div class="list-group list-group-flush">
-                                <?php foreach ($estimations as $estimation) : ?>
-                                <div class="list-group-item border-0 px-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1"><?php echo htmlspecialchars($estimation->type_bien); ?></h6>
-                                            <p class="text-muted small mb-1">
-                                                <i class="ri-map-pin-line me-1"></i>
-                                                <?php echo htmlspecialchars($estimation->adresse); ?>
-                                            </p>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <span class="text-muted small">
-                                                    <i class="ri-ruler-line me-1"></i><?php echo $estimation->superficie; ?> m²
-                                                </span>
-                                                <?php if ($estimation->zone_nom) : ?>
-                                                <span class="badge bg-light text-dark"><?php echo htmlspecialchars($estimation->zone_nom); ?></span>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fw-bold text-info fs-6">
-                                                <?php echo number_format($estimation->prix_estime, 0, ',', ' '); ?> TND
-                                            </div>
-                                            <small class="text-muted">
-                                                <?php echo date('d/m/Y', strtotime($estimation->date_creation)); ?>
-                                            </small>
-                                            <br>
-                                            <span class="badge bg-<?php 
-                                                echo $estimation->statut == 'valide' ? 'success' : 
-                                                    ($estimation->statut == 'rejete' ? 'danger' : 'warning'); 
-                                            ?>-subtle text-<?php 
-                                                echo $estimation->statut == 'valide' ? 'success' : 
-                                                    ($estimation->statut == 'rejete' ? 'danger' : 'warning'); 
-                                            ?>">
-                                                <?php echo ucfirst($estimation->statut); ?>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <?php if (($agent->estimations_count ?? 0) > count($estimations)) : ?>
-                            <div class="text-center mt-3">
-                                <a href="<?php echo base_url('estimations?agent=' . $agent->user_id); ?>" class="btn btn-outline-info">
-                                    Voir les <?php echo ($agent->estimations_count ?? 0) - count($estimations); ?> estimations restantes
-                                </a>
-                            </div>
-                            <?php endif; ?>
-
-                            <?php else : ?>
-                            <div class="text-center py-4">
-                                <div class="avatar-lg mx-auto mb-3">
-                                    <div class="avatar-title bg-info-subtle text-info rounded-circle fs-24">
-                                        <i class="ri-calculator-line"></i>
-                                    </div>
-                                </div>
-                                <h6 class="mb-2">Aucune estimation</h6>
-                                <p class="text-muted">Cet agent n'a pas encore créé d'estimations.</p>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Transactions Section -->
-                <div class="col-xl-6">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">
-                                <i class="ri-exchange-line me-2 text-success"></i>Transactions Récentes (<?php echo count($transactions ?? []); ?>)
-                            </h5>
-                            <a href="<?php echo base_url('transactions?agent=' . $agent->user_id); ?>" class="btn btn-success btn-sm">
-                                Voir toutes
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <?php if (!empty($transactions)) : ?>
-                            <div class="list-group list-group-flush">
-                                <?php foreach ($transactions as $transaction) : ?>
-                                <div class="list-group-item border-0 px-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">
-                                                <?php echo ucfirst($transaction->type); ?>
-                                                <?php if ($transaction->property_type) : ?>
-                                                - <?php echo htmlspecialchars($transaction->property_type); ?>
-                                                <?php endif; ?>
-                                            </h6>
-                                            <?php if ($transaction->property_address) : ?>
-                                            <p class="text-muted small mb-1">
-                                                <i class="ri-map-pin-line me-1"></i>
-                                                <?php echo htmlspecialchars($transaction->property_address); ?>
-                                            </p>
-                                            <?php endif; ?>
-                                            <?php if ($transaction->client_nom || $transaction->client_prenom) : ?>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="text-muted small">
-                                                    <i class="ri-user-line me-1"></i>
-                                                    <?php echo htmlspecialchars(trim($transaction->client_prenom . ' ' . $transaction->client_nom)); ?>
-                                                </span>
-                                            </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fw-bold text-success fs-6">
-                                                <?php echo number_format($transaction->montant ?? 0, 0, ',', ' '); ?> TND
-                                            </div>
-                                            <?php if ($transaction->commission) : ?>
-                                            <div class="small text-muted">
-                                                Commission: <?php echo number_format($transaction->commission, 0, ',', ' '); ?> TND
-                                            </div>
-                                            <?php endif; ?>
-                                            <small class="text-muted">
-                                                <?php echo date('d/m/Y', strtotime($transaction->date_cloture)); ?>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <?php if (($agent->transactions_count ?? 0) > count($transactions)) : ?>
-                            <div class="text-center mt-3">
-                                <a href="<?php echo base_url('transactions?agent=' . $agent->user_id); ?>" class="btn btn-outline-success">
-                                    Voir les <?php echo ($agent->transactions_count ?? 0) - count($transactions); ?> transactions restantes
-                                </a>
-                            </div>
-                            <?php endif; ?>
-
-                            <?php else : ?>
-                            <div class="text-center py-4">
-                                <div class="avatar-lg mx-auto mb-3">
-                                    <div class="avatar-title bg-success-subtle text-success rounded-circle fs-24">
-                                        <i class="ri-exchange-line"></i>
-                                    </div>
-                                </div>
-                                <h6 class="mb-2">Aucune transaction</h6>
-                                <p class="text-muted">Cet agent n'a pas encore finalisé de transactions.</p>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Debug Links (pour développement) -->
-            <?php if (ENVIRONMENT === 'development' || ($this->session->userdata('user_type') === 'admin')) : ?>
-            <div class="row mt-3">
-                <div class="col-12">
-                    <div class="card border-warning">
-                        <div class="card-header bg-warning-subtle">
-                            <h6 class="card-title mb-0 text-warning"><i class="ri-bug-line me-1"></i>Outils de débogage</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="btn-group" role="group">
-                                <a href="<?php echo base_url('agents/debug_properties/' . $agent->user_id); ?>" class="btn btn-outline-warning btn-sm">
-                                    <i class="ri-search-line me-1"></i>Debug Propriétés
-                                </a>
-                                <a href="<?php echo base_url('agents/explore_structure'); ?>" class="btn btn-outline-info btn-sm">
-                                    <i class="ri-database-line me-1"></i>Explorer Structure
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
         </div>
     </div>
 </div>
 
 <style>
-.avatar-xxl {
-    width: 6rem;
-    height: 6rem;
-}
-
-.avatar-xxl img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-cover-img {
-    position: relative;
-}
-
-.hover-card {
-    transition: all 0.3s ease;
-}
-
-.hover-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-}
-
-.btn-soft-primary {
-    background-color: rgba(13, 110, 253, 0.1);
-    border-color: transparent;
-    color: #0d6efd;
-}
-
-.btn-soft-primary:hover {
-    background-color: rgba(13, 110, 253, 0.2);
-    color: #0d6efd;
-}
-
-.btn-soft-info {
-    background-color: rgba(13, 202, 240, 0.1);
-    border-color: transparent;
-    color: #0dcaf0;
-}
-
-.btn-soft-info:hover {
-    background-color: rgba(13, 202, 240, 0.2);
-    color: #0dcaf0;
-}
-
-.btn-soft-success {
-    background-color: rgba(25, 135, 84, 0.1);
-    border-color: transparent;
-    color: #198754;
-}
-
-.btn-soft-success:hover {
-    background-color: rgba(25, 135, 84, 0.2);
-    color: #198754;
-}
-
-.btn-soft-danger {
-    background-color: rgba(220, 53, 69, 0.1);
-    border-color: transparent;
-    color: #dc3545;
-}
-
-.btn-soft-danger:hover {
-    background-color: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
-}
-
-.stats-card {
-    border-left: 3px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.stats-card:hover {
-    border-left-color: var(--vz-primary);
-}
-
-.profile-header {
+/* Enhanced modern CSS styles */
+.hero-gradient {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
-    padding: 2rem;
-    color: white;
-    margin-bottom: 2rem;
-}
-
-.agent-info-card {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.modal-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-bottom: 1px solid #dee2e6;
-}
-
-.fs-11 {
-    font-size: 0.6875rem !important;
-}
-
-.fs-12 {
-    font-size: 0.75rem !important;
-}
-
-@media (max-width: 768px) {
-    .profile-header {
-        padding: 1.5rem;
-        text-align: center;
-    }
-    
-    .hover-card:hover {
-        transform: none;
-    }
-}
-</style>
-
-<!-- Modales pour les détails -->
-<!-- Modal Propriétés -->
-<div class="modal fade" id="propertiesModal" tabindex="-1" aria-labelledby="propertiesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="propertiesModalLabel">
-                    <i class="ri-home-line me-2"></i>Détails des Propriétés
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="propertiesContent">
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Chargement...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Estimations -->
-<div class="modal fade" id="estimationsModal" tabindex="-1" aria-labelledby="estimationsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="estimationsModalLabel">
-                    <i class="ri-calculator-line me-2"></i>Détails des Estimations
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="estimationsContent">
-                <div class="text-center">
-                    <div class="spinner-border text-info" role="status">
-                        <span class="visually-hidden">Chargement...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Transactions -->
-<div class="modal fade" id="transactionsModal" tabindex="-1" aria-labelledby="transactionsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="transactionsModalLabel">
-                    <i class="ri-exchange-line me-2"></i>Détails des Transactions
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="transactionsContent">
-                <div class="text-center">
-                    <div class="spinner-border text-success" role="status">
-                        <span class="visually-hidden">Chargement...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Contacts -->
-<div class="modal fade" id="contactsModal" tabindex="-1" aria-labelledby="contactsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="contactsModalLabel">
-                    <i class="ri-contacts-line me-2"></i>Détails des Contacts
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="contactsContent">
-                <div class="text-center">
-                    <div class="spinner-border text-danger" role="status">
-                        <span class="visually-hidden">Chargement...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function showPropertiesDetails(userId) {
-    // Utilisation de Bootstrap 5 modal (sans jQuery)
-    const modal = new bootstrap.Modal(document.getElementById('propertiesModal'));
-    modal.show();
-    
-    // Fetch API au lieu de jQuery AJAX
-    fetch('<?php echo base_url("agent/get_properties_details/"); ?>' + userId)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('propertiesContent').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('propertiesContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des propriétés</div>';
-        });
-}
-
-function showEstimationsDetails(userId) {
-    const modal = new bootstrap.Modal(document.getElementById('estimationsModal'));
-    modal.show();
-    
-    fetch('<?php echo base_url("agent/get_estimations_details/"); ?>' + userId)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('estimationsContent').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('estimationsContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des estimations</div>';
-        });
-}
-
-function showTransactionsDetails(userId) {
-    const modal = new bootstrap.Modal(document.getElementById('transactionsModal'));
-    modal.show();
-    
-    fetch('<?php echo base_url("agent/get_transactions_details/"); ?>' + userId)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('transactionsContent').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('transactionsContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des transactions</div>';
-        });
-}
-
-function showContactsDetails(userId) {
-    const modal = new bootstrap.Modal(document.getElementById('contactsModal'));
-    modal.show();
-    
-    fetch('<?php echo base_url("agent/get_contacts_details/"); ?>' + userId)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('contactsContent').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('contactsContent').innerHTML = '<div class="alert alert-danger"><i class="ri-error-warning-line me-2"></i>Erreur lors du chargement des contacts</div>';
-        });
-}
-
-function resetContactsCount(userId) {
-    if (confirm('Êtes-vous sûr de vouloir remettre à zéro le compteur de contacts ?')) {
-        fetch('<?php echo base_url("agent/reset_contacts_count/"); ?>' + userId, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erreur lors de la remise à zéro');
-            }
-        })
-        .catch(error => {
-            alert('Erreur lors de la remise à zéro');
-        });
-    }
-}
-</script>
-
-<style>
-/* Modern Profile Styles */
-.modern-profile-card {
-    border-radius: 20px;
+    position: relative;
     overflow: hidden;
+}
+
+.hero-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.hero-gradient > * {
+    position: relative;
+    z-index: 2;
 }
 
 .profile-cover {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 200px;
-    position: relative;
 }
 
 .profile-gradient-overlay {
@@ -1338,11 +505,7 @@ function resetContactsCount(userId) {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
-}
-
-.profile-avatar-container {
-    position: relative;
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .profile-avatar {
@@ -1351,8 +514,7 @@ function resetContactsCount(userId) {
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     overflow: hidden;
-    background: white;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .profile-avatar img {
@@ -1363,152 +525,149 @@ function resetContactsCount(userId) {
 
 .profile-status-indicator {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
+    bottom: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     border: 3px solid white;
 }
 
 .profile-status-indicator.active {
-    background-color: #10b981;
+    background: #28a745;
 }
 
 .profile-status-indicator.inactive {
-    background-color: #ef4444;
+    background: #dc3545;
 }
 
 .text-white-75 {
     color: rgba(255, 255, 255, 0.75) !important;
 }
 
-.btn-modern {
+.modern-stat-card {
+    transition: all 0.3s ease;
     border-radius: 12px;
+}
+
+.modern-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-primary .stat-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.stat-success .stat-icon {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: white;
+}
+
+.stat-info .stat-icon {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+    color: white;
+}
+
+.stat-warning .stat-icon {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.stat-action {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-modern {
+    border-radius: 8px;
     font-weight: 500;
-    padding: 8px 20px;
-    border: none;
     transition: all 0.3s ease;
 }
 
 .btn-modern:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Modern Stats Cards */
-.modern-stat-card {
-    border-radius: 16px;
-    transition: all 0.3s ease;
-    border: none !important;
-}
-
-.modern-stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
-}
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: white;
-}
-
-.stat-primary .stat-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.stat-success .stat-icon {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.stat-info .stat-icon {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-.stat-warning .stat-icon {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.stat-number {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 4px;
-}
-
-.stat-label {
-    font-size: 14px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.stat-action {
-    width: 36px;
-    height: 36px;
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.stat-action:hover {
-    transform: scale(1.1);
-}
-
-/* Modern Tabs */
-.nav-modern {
-    border: none;
-    gap: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .nav-modern .nav-link {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 20px;
-    color: #6b7280;
-    font-weight: 500;
+    border-radius: 10px;
+    margin-right: 0.5rem;
     transition: all 0.3s ease;
+    border: none;
     background: transparent;
 }
 
 .nav-modern .nav-link:hover {
-    background: #f3f4f6;
-    color: #374151;
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
 }
 
 .nav-modern .nav-link.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-/* Performance Metrics */
+.tab-content {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .performance-metric {
-    padding: 16px;
-    border-radius: 12px;
+    padding: 1rem;
+    border-radius: 8px;
     background: white;
-    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .metric-value {
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 4px;
 }
 
 .metric-label {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
 }
 
-/* Activity Timeline */
 .activity-timeline {
     position: relative;
 }
@@ -1516,8 +675,15 @@ function resetContactsCount(userId) {
 .activity-item {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
-    position: relative;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .activity-icon {
@@ -1527,31 +693,31 @@ function resetContactsCount(userId) {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-right: 1rem;
     color: white;
-    font-size: 16px;
-    margin-right: 16px;
-    flex-shrink: 0;
+    font-size: 1.1rem;
 }
 
 .activity-content {
-    flex-grow: 1;
+    flex: 1;
 }
 
 .activity-title {
     font-weight: 500;
-    color: #374151;
-    margin-bottom: 2px;
+    margin-bottom: 0.25rem;
 }
 
 .activity-time {
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 0.8rem;
+    color: #6c757d;
 }
 
-/* Info Items */
 .info-item {
-    padding: 12px 0;
-    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .info-item:last-child {
@@ -1559,98 +725,56 @@ function resetContactsCount(userId) {
 }
 
 .info-label {
-    font-size: 12px;
-    color: #6b7280;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    color: #6c757d;
 }
 
 .info-value {
-    color: #374151;
-    font-weight: 500;
-}
-
-/* Contact Info */
-.contact-info {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    font-weight: 600;
 }
 
 .contact-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .contact-item i {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    background: rgba(102, 126, 234, 0.1);
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    width: 30px;
+    text-align: center;
 }
 
 .contact-label {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 500;
-    margin-bottom: 2px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
 }
 
 .contact-value {
-    color: #374151;
     font-weight: 500;
 }
 
 .contact-value a {
-    color: inherit;
     text-decoration: none;
+    color: inherit;
 }
 
 .contact-value a:hover {
     color: #667eea;
 }
 
-/* Loading States */
-.spinner-border {
-    width: 2rem;
-    height: 2rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .stat-number {
-        font-size: 24px;
-    }
-    
-    .profile-actions {
-        margin-top: 20px;
-    }
-    
-    .profile-actions .btn {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-}
-
-/* Card hover effects */
-.card {
+.hover-card {
     transition: all 0.3s ease;
 }
 
 .hover-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 </style>
@@ -1664,78 +788,97 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('shown.bs.tab', function(e) {
             const targetTab = e.target.getAttribute('data-bs-target');
             
-            // Load content dynamically for properties tab
+            // Load content based on tab
             if (targetTab === '#properties') {
-                loadPropertiesContent();
+                loadPropertiesTab();
+            } else if (targetTab === '#activity') {
+                loadActivityTab();
             }
         });
     });
     
-    // Animate stats on page load
-    animateStats();
+    // Animate stat cards on page load
+    setTimeout(() => {
+        document.querySelectorAll('.modern-stat-card').forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }, index * 100);
+        });
+    }, 100);
 });
 
-function animateStats() {
-    const statNumbers = document.querySelectorAll('.stat-number');
-    statNumbers.forEach(stat => {
-        const targetValue = parseInt(stat.textContent);
-        let currentValue = 0;
-        const increment = targetValue / 30;
-        
-        const timer = setInterval(() => {
-            currentValue += increment;
-            if (currentValue >= targetValue) {
-                stat.textContent = targetValue;
-                clearInterval(timer);
-            } else {
-                stat.textContent = Math.floor(currentValue);
-            }
-        }, 50);
-    });
-}
-
-function loadPropertiesContent() {
-    const propertiesContent = document.getElementById('properties-content');
-    if (propertiesContent.innerHTML.includes('Chargement')) {
-        fetch('<?php echo base_url("agent/get_properties_details/"); ?><?php echo $agent->user_id; ?>')
-            .then(response => response.text())
-            .then(data => {
-                propertiesContent.innerHTML = data;
-            })
-            .catch(error => {
-                propertiesContent.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="ri-error-warning-line fs-1 text-danger"></i>
-                        <p class="text-muted mt-2">Erreur lors du chargement des propriétés</p>
+function loadPropertiesTab() {
+    const content = document.getElementById('properties-content');
+    if (content.innerHTML.includes('spinner-border')) {
+        // Simulate loading
+        setTimeout(() => {
+            content.innerHTML = `
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <i class="ri-home-line fs-1 text-primary mb-3"></i>
+                                <h6>Appartement moderne</h6>
+                                <p class="text-muted small">Paris 15ème</p>
+                                <span class="badge bg-primary">450 000 €</span>
+                            </div>
+                        </div>
                     </div>
-                `;
-            });
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <i class="ri-home-line fs-1 text-success mb-3"></i>
+                                <h6>Villa avec jardin</h6>
+                                <p class="text-muted small">Neuilly-sur-Seine</p>
+                                <span class="badge bg-success">890 000 €</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <i class="ri-home-line fs-1 text-info mb-3"></i>
+                                <h6>Studio rénové</h6>
+                                <p class="text-muted small">Paris 11ème</p>
+                                <span class="badge bg-info">320 000 €</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }, 1000);
     }
 }
 
-// Enhanced modal functions with better UX
-function showPropertiesDetails(userId) {
-    const modal = new bootstrap.Modal(document.getElementById('propertiesModal'));
-    modal.show();
-    
-    document.getElementById('propertiesContent').innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2 text-muted">Chargement des propriétés...</p>
-        </div>
-    `;
-    
-    fetch('<?php echo base_url("agent/get_properties_details/"); ?>' + userId)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('propertiesContent').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('propertiesContent').innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="ri-error-warning-line me-2"></i>
-                    Erreur lors du chargement des propriétés
-                </div>
-            `;
-        });
+function loadActivityTab() {
+    // Activity tab content already loaded
 }
+
+// Modal functions
+function showPropertiesDetails(agentId) {
+    // Function placeholder
+    console.log('Show properties for agent:', agentId);
+}
+
+function showClientsDetails(agentId) {
+    // Function placeholder
+    console.log('Show clients for agent:', agentId);
+}
+
+function showContactsDetails(agentId) {
+    // Function placeholder
+    console.log('Show contacts for agent:', agentId);
+}
+
+function showLeadsDetails(agentId) {
+    // Function placeholder
+    console.log('Show leads for agent:', agentId);
+}
+</script>
