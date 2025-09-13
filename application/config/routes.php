@@ -48,6 +48,7 @@ $route['agency/view/(:num)'] = 'Agency/view/$1';
 
 /*********** AGENTS (HOUZEZ - Consultation) *******************/
 $route['agents'] = 'Agent/index';
+$route['agents/test'] = 'Agent/test';
 $route['agents/view/(:num)'] = 'Agent/view/$1';
 $route['agents/(:num)'] = 'Agent/view/$1';
 $route['agents/(:num)/stats'] = 'Agent/stats/$1';

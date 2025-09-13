@@ -222,7 +222,29 @@ class Agent extends BaseController {
         }
     }
 
-        // Détails d'un agent
+    // Test simple pour vérifier que le contrôleur fonctionne
+    public function test() {
+        echo "<h1>✅ Contrôleur Agent fonctionne !</h1>";
+        echo "<p>Date: " . date('Y-m-d H:i:s') . "</p>";
+        echo "<p><a href='" . base_url('agents') . "'>→ Liste des agents</a></p>";
+        echo "<p><a href='" . base_url('index.php/agents') . "'>→ Liste des agents (avec index.php)</a></p>";
+        
+        // Test de la base de données
+        try {
+            $agents = $this->agent_model->get_all_agents([]);
+            echo "<p>✅ " . count($agents) . " agents trouvés dans la base</p>";
+            
+            if (count($agents) > 0) {
+                $first_agent = $agents[0];
+                echo "<p>Premier agent: " . $first_agent->agent_name . " (ID: " . $first_agent->agent_id . ")</p>";
+                echo "<p><a href='" . base_url('index.php/agents/view/' . $first_agent->agent_id) . "'>→ Voir cet agent</a></p>";
+            }
+        } catch (Exception $e) {
+            echo "<p>❌ Erreur: " . $e->getMessage() . "</p>";
+        }
+    }
+
+    // Détails d'un agent
     public function view($user_id = null) {
         $this->isLoggedIn();
         
