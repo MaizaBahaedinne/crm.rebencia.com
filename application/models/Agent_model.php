@@ -487,8 +487,7 @@ class Agent_model extends CI_Model {
         $query = $this->db->query("
             SELECT COUNT(*) as count 
             FROM crm_clients 
-            WHERE agent_id = ? 
-            AND statut != 'supprime'
+            WHERE agent_id = ?
         ", [$agent_id]);
         
         $result = $query->row();
@@ -501,16 +500,27 @@ class Agent_model extends CI_Model {
      * @return int
      */
     private function get_agent_leads_count($agent_id) {
-        // Compter les leads depuis la table crm_leads
-        $query = $this->db->query("
-            SELECT COUNT(*) as count 
-            FROM crm_leads 
-            WHERE agent_id = ? 
-            AND deleted_at IS NULL
-        ", [$agent_id]);
-        
-        $result = $query->row();
-        return $result ? (int)$result->count : 0;
+        try {
+            // Vérifier si la table crm_leads existe
+            $tables = $this->db->query("SHOW TABLES LIKE 'crm_leads'")->result();
+            if (empty($tables)) {
+                return 0; // Table n'existe pas encore
+            }
+            
+            // Compter les leads depuis la table crm_leads
+            $query = $this->db->query("
+                SELECT COUNT(*) as count 
+                FROM crm_leads 
+                WHERE agent_id = ? 
+                AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
+            ", [$agent_id]);
+            
+            $result = $query->row();
+            return $result ? (int)$result->count : 0;
+        } catch (Exception $e) {
+            // En cas d'erreur, retourner 0
+            return 0;
+        }
     }
 
     /**
