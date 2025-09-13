@@ -14,28 +14,102 @@ if (!function_exists('get_agent_avatar_url')) {
      * @return string URL de l'avatar
      */
     function get_agent_avatar_url($agent) {
-        // Méthode 1: Avatar déjà dans l'objet
-        if (!empty($agent->agent_avatar) && $agent->agent_avatar !== 'NULL' && strlen($agent->agent_avatar) > 10) {
+        // Méthode 1: Avatar déjà dans l'objet et valide
+        if (!empty($agent->agent_avatar) && 
+            $agent->agent_avatar !== 'NULL' && 
+            strlen($agent->agent_avatar) > 10 &&
+            !strpos($agent->agent_avatar, 'avatar-1.jpg')) {
+            
             $avatar_url = $agent->agent_avatar;
             
             // Correction de l'URL si elle contient localhost
             $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $avatar_url);
             $avatar_url = str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
             
+            // Vérifier que l'URL est valide
             if (filter_var($avatar_url, FILTER_VALIDATE_URL)) {
                 return $avatar_url;
             }
         }
         
-        // Méthode 2: Fallback vers Gravatar
-        $email = !empty($agent->agent_email) ? $agent->agent_email : 
-                (!empty($agent->user_email) ? $agent->user_email : '');
-        if (!empty($email)) {
+        // Méthode 2: Essayer de récupérer depuis WordPress directement
+        $CI =& get_instance();
+        if (isset($agent->user_id) && !empty($agent->user_id)) {
+            try {
+                $CI->load->database('wordpress');
+                
+                // Chercher l'avatar custom dans les métadonnées
+                $query = $CI->wordpress->query("
+                    SELECT wp_posts.guid 
+                    FROM wp_postmeta 
+                    INNER JOIN wp_posts ON wp_posts.ID = wp_postmeta.meta_value 
+                    WHERE wp_postmeta.post_id = (
+                        SELECT ID FROM wp_posts 
+                        WHERE post_type = 'houzez_agent' 
+                        AND ID IN (
+                            SELECT post_id FROM wp_postmeta 
+                            WHERE meta_key = 'fave_agent_email' 
+                            AND meta_value = ?
+                        )
+                        LIMIT 1
+                    ) 
+                    AND wp_postmeta.meta_key = 'fave_author_custom_picture' 
+                    AND wp_posts.post_type = 'attachment'
+                    LIMIT 1
+                ", array($agent->agent_email ?? $agent->user_email ?? ''));
+                
+                if ($query->num_rows() > 0) {
+                    $avatar_url = $query->row()->guid;
+                    $avatar_url = str_replace('http://localhost/', 'https://rebencia.com/', $avatar_url);
+                    $avatar_url = str_replace('http://rebencia.com/', 'https://rebencia.com/', $avatar_url);
+                    
+                    if (filter_var($avatar_url, FILTER_VALIDATE_URL)) {
+                        return $avatar_url;
+                    }
+                }
+            } catch (Exception $e) {
+                log_message('error', 'Error fetching WordPress avatar: ' . $e->getMessage());
+            }
+        }
+        
+        // Méthode 3: Gravatar avec l'email de l'agent
+        $email = '';
+        if (!empty($agent->agent_email)) {
+            $email = $agent->agent_email;
+        } elseif (!empty($agent->user_email)) {
+            $email = $agent->user_email;
+        }
+        
+        if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $hash = md5(strtolower(trim($email)));
             return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
         }
         
-        // Avatar par défaut
+        // Méthode 4: Avatar par défaut basé sur le nom
+        if (!empty($agent->agent_name)) {
+            $initials = '';
+            $name_parts = explode(' ', trim($agent->agent_name));
+            foreach (array_slice($name_parts, 0, 2) as $part) {
+                $initials .= strtoupper(substr($part, 0, 1));
+            }
+            
+            if (strlen($initials) > 0) {
+                // Générer une couleur basée sur le nom
+                $colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+                $color_index = abs(crc32($agent->agent_name)) % count($colors);
+                $bg_color = $colors[$color_index];
+                
+                // Créer un avatar SVG avec les initiales
+                $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">';
+                $svg .= '<rect width="200" height="200" fill="' . $bg_color . '"/>';
+                $svg .= '<text x="100" y="120" font-family="Arial, sans-serif" font-size="80" fill="white" text-anchor="middle" font-weight="bold">' . $initials . '</text>';
+                $svg .= '</svg>';
+                
+                return 'data:image/svg+xml;base64,' . base64_encode($svg);
+            }
+        }
+        
+        // Avatar par défaut final
         return base_url('assets/images/users/avatar-1.jpg');
     }
 }
