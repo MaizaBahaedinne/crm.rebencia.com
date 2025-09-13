@@ -54,15 +54,92 @@ class Agent extends BaseController {
     // Liste des agents avec vraies données
     public function index() {
         $this->isLoggedIn();
+        
+        // Charger le helper avatar
         $this->load->helper('avatar');
-        // ... (function body unchanged)
+        
+        // Préparer les données pour la vue
+        $data = $this->global;
+        $data['pageTitle'] = 'Liste des agents';
+        $data['filters'] = $_GET; // Récupérer les filtres de l'URL
+        
+        try {
+            // Récupérer tous les agents avec leurs informations complètes
+            $agents = $this->agent_model->get_all_agents($data['filters']);
+            
+            // Debug: Vérifier les avatars
+            foreach ($agents as $agent) {
+                if (empty($agent->agent_avatar)) {
+                    log_message('error', 'Avatar manquant pour agent: ' . $agent->agent_name . ' (ID: ' . $agent->agent_id . ')');
+                }
+            }
+            
+            // Ajouter le nombre de propriétés pour chaque agent
+            foreach ($agents as $agent) {
+                if (!isset($agent->properties_count) || $agent->properties_count === null) {
+                    // Utiliser la méthode améliorée pour compter les propriétés
+                    $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email);
+                    $agent->properties_count = count($properties);
+                }
+            }
+            
+            $data['agents'] = $agents;
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error in Agent index: ' . $e->getMessage());
+            $data['agents'] = [];
+            $data['error'] = 'Erreur lors du chargement des agents: ' . $e->getMessage();
+        }
+        
+        // Récupérer la liste des agences pour les filtres
+        $data['agencies'] = $this->agency_model->get_all_agencies();
+        
+        // Charger la vue
+        $this->loadViews("dashboard/agents/index", $this->global, $data, NULL);
     }
 
     // Détails d'un agent
     public function view($user_id = null) {
         $this->isLoggedIn();
+        
+        // Charger le helper avatar
         $this->load->helper('avatar');
-        // ... (function body unchanged)
+        
+        if (!$user_id) {
+            show_404();
+            return;
+        }
+
+        $data = $this->global;
+        $data['pageTitle'] = 'Profil Agent';
+
+        try {
+            // Récupérer les données de l'agent
+            $agent = $this->agent_model->get_agent($user_id);
+            if (!$agent) {
+                show_404();
+                return;
+            }
+
+            // Récupérer les propriétés de l'agent
+            $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email);
+            
+            // Données temporaires pour éviter les erreurs
+            $estimations = [];
+            $transactions = [];
+
+            $data['agent'] = $agent;
+            $data['properties'] = $properties;
+            $data['estimations'] = $estimations;
+            $data['transactions'] = $transactions;
+
+        } catch (Exception $e) {
+            log_message('error', 'Error in Agent view: ' . $e->getMessage());
+            show_404();
+            return;
+        }
+
+        $this->loadViews("dashboard/agents/view", $this->global, $data, NULL);
     }
 
     // AJAX pour récupérer tous les agents avec filtres
