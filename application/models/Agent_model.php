@@ -105,9 +105,14 @@ class Agent_model extends CI_Model {
     public function get_all_agents_from_posts($filters = []) {
         $this->wp_db->select("
             p.ID as agent_id,
+            p.ID as user_id,
             p.post_title as agent_name,
             p.post_content as agent_description,
             p.post_status as post_status,
+            CASE 
+                WHEN p.post_status = 'publish' THEN 1 
+                ELSE 0 
+            END as is_active,
             p.post_date as created_date,
             p.post_modified as modified_date,
             a.ID as agency_id,

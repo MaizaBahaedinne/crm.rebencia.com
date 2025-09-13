@@ -273,20 +273,20 @@
                                              alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
                                              class="avatar-img"
                                              onerror="this.onerror=null; this.src='<?php echo $fallback_avatar; ?>';">
-                                        <div class="agent-status <?php echo $agent->is_active ? 'active' : 'inactive'; ?>"></div>
+                                        <div class="agent-status <?php echo ($agent->is_active ?? 1) ? 'active' : 'inactive'; ?>"></div>
                                     </div>
                                 </div>
                                 <div class="agent-info">
                                     <h5 class="agent-name">
-                                        <a href="<?php echo base_url('agents/view/' . $agent->user_id); ?>" class="agent-link">
+                                        <a href="<?php echo base_url('agents/view/' . ($agent->agent_id ?? $agent->user_id ?? 0)); ?>" class="agent-link">
                                             <?php echo htmlspecialchars($agent->agent_name); ?>
                                         </a>
                                     </h5>
                                     <p class="agent-email"><?php echo htmlspecialchars($agent->agent_email); ?></p>
                                     <div class="agent-badges">
-                                        <span class="agent-badge agent-badge-<?php echo $agent->is_active ? 'active' : 'inactive'; ?>">
-                                            <i class="ri-<?php echo $agent->is_active ? 'check' : 'close'; ?>-line me-1"></i>
-                                            <?php echo $agent->is_active ? 'Actif' : 'Inactif'; ?>
+                                        <span class="agent-badge agent-badge-<?php echo ($agent->is_active ?? 1) ? 'active' : 'inactive'; ?>">
+                                            <i class="ri-<?php echo ($agent->is_active ?? 1) ? 'check' : 'close'; ?>-line me-1"></i>
+                                            <?php echo ($agent->is_active ?? 1) ? 'Actif' : 'Inactif'; ?>
                                         </span>
                                         <?php if (!empty($agent->agency_name)) : ?>
                                         <span class="agent-badge agent-badge-agency">
@@ -358,7 +358,7 @@
 
                             <!-- Agent Actions -->
                             <div class="agent-actions">
-                                <a href="<?php echo base_url('agents/view/' . $agent->user_id); ?>" class="btn btn-agent-primary">
+                                <a href="<?php echo base_url('agents/view/' . ($agent->agent_id ?? $agent->user_id ?? 0)); ?>" class="btn btn-agent-primary">
                                     <i class="ri-eye-line me-1"></i>Voir profil
                                 </a>
                                 <div class="dropdown">
@@ -366,7 +366,7 @@
                                         <i class="ri-more-line"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="<?php echo base_url('properties?agent=' . $agent->user_id); ?>">
+                                        <li><a class="dropdown-item" href="<?php echo base_url('properties?agent=' . ($agent->agent_id ?? $agent->user_id ?? 0)); ?>">
                                             <i class="ri-home-line me-2"></i>Ses propriétés
                                         </a></li>
                                         <li><a class="dropdown-item" href="mailto:<?php echo $agent->agent_email; ?>">
