@@ -111,7 +111,7 @@
                                     <i class="ri-user-heart-line"></i>
                                 </div>
                                 <div class="ms-3 flex-grow-1">
-                                    <div class="stat-number"><?php echo $agent->clients_count ?? 0; ?></div>
+                                    <div class="stat-number"><?php echo $agent->contacts_count ?? 0; ?></div>
                                     <div class="stat-label">Clients</div>
                                 </div>
                                 <button class="btn btn-sm btn-light rounded-circle stat-action" 

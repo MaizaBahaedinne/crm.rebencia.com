@@ -398,6 +398,7 @@ class Agent_model extends CI_Model {
             // Ajouter des statistiques supplémentaires
             $agent->total_views = $this->get_agent_total_views($agent->agent_id);
             $agent->contacts_count = $this->get_agent_contacts_count($agent->agent_id);
+            $agent->leads_count = $this->get_agent_leads_count($agent->agent_id);
             
             // Nettoyer les données manifestement fausses
             $agent = $this->clean_agent_data($agent);
@@ -482,9 +483,34 @@ class Agent_model extends CI_Model {
      * @return int
      */
     private function get_agent_contacts_count($agent_id) {
-        // Cette méthode pourrait être étendue pour compter les contacts réels
-        // Pour l'instant, on retourne une valeur factice
-        return rand(5, 25);
+        // Compter les clients depuis la table crm_clients
+        $query = $this->db->query("
+            SELECT COUNT(*) as count 
+            FROM crm_clients 
+            WHERE agent_id = ? 
+            AND statut != 'supprime'
+        ", [$agent_id]);
+        
+        $result = $query->row();
+        return $result ? (int)$result->count : 0;
+    }
+
+    /**
+     * Récupère le nombre de leads d'un agent
+     * @param int $agent_id
+     * @return int
+     */
+    private function get_agent_leads_count($agent_id) {
+        // Compter les leads depuis la table crm_leads
+        $query = $this->db->query("
+            SELECT COUNT(*) as count 
+            FROM crm_leads 
+            WHERE agent_id = ? 
+            AND deleted_at IS NULL
+        ", [$agent_id]);
+        
+        $result = $query->row();
+        return $result ? (int)$result->count : 0;
     }
 
     /**
