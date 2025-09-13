@@ -314,7 +314,7 @@
                                         <i class="ri-calendar-line"></i>
                                     </div>
                                     <div class="stat-content">
-                                        <span class="stat-value"><?php echo date('Y', strtotime($agent->registration_date)); ?></span>
+                                        <span class="stat-value"><?php echo date('Y', strtotime($agent->registration_date ?? $agent->created_date ?? date('Y-m-d'))); ?></span>
                                         <span class="stat-label">Depuis</span>
                                     </div>
                                 </div>

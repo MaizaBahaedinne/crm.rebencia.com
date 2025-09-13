@@ -114,6 +114,7 @@ class Agent_model extends CI_Model {
                 ELSE 0 
             END as is_active,
             p.post_date as created_date,
+            p.post_date as registration_date,
             p.post_modified as modified_date,
             a.ID as agency_id,
             a.post_title as agency_name,
