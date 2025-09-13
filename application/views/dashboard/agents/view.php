@@ -1,53 +1,168 @@
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
-            <!-- Page Title -->
+            <!-- Modern Hero Section -->
             <div class="row">
                 <div class="col-12">
-                    <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                        <h4 class="mb-sm-0">Profil Agent</h4>
-                        <div class="page-title-right">
-                            <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="<?php echo base_url('dashboard'); ?>">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="<?php echo base_url('agents'); ?>">Agents</a></li>
-                                <li class="breadcrumb-item active"><?php echo htmlspecialchars($agent->agent_name); ?></li>
-                            </ol>
+                    <div class="card border-0 shadow-lg overflow-hidden modern-profile-card">
+                        <!-- Background Cover -->
+                        <div class="profile-cover position-relative">
+                            <div class="profile-gradient-overlay"></div>
+                            
+                            <!-- Profile Content -->
+                            <div class="position-relative p-4 p-lg-5">
+                                <div class="row align-items-end">
+                                    <div class="col-lg-8">
+                                        <div class="d-flex align-items-center">
+                                            <!-- Avatar with modern styling -->
+                                            <div class="profile-avatar-container position-relative me-4">
+                                                <?php $avatar_url = get_agent_avatar_url($agent); ?>
+                                                <div class="profile-avatar">
+                                                    <img src="<?php echo $avatar_url; ?>" 
+                                                         alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
+                                                         class="img-fluid rounded-circle"
+                                                         onerror="this.onerror=null; this.src='<?php echo base_url('assets/images/users/avatar-1.jpg'); ?>';">
+                                                </div>
+                                                <div class="profile-status-indicator <?php echo $agent->is_active ? 'active' : 'inactive'; ?>"></div>
+                                            </div>
+                                            
+                                            <!-- Profile Info -->
+                                            <div class="text-white">
+                                                <h2 class="text-white mb-2 fw-bold"><?php echo htmlspecialchars($agent->agent_name); ?></h2>
+                                                <div class="profile-meta mb-3">
+                                                    <?php if (!empty($agent->position)) : ?>
+                                                    <span class="badge bg-white bg-opacity-20 text-white me-2 px-3 py-2">
+                                                        <i class="ri-briefcase-line me-1"></i><?php echo htmlspecialchars($agent->position); ?>
+                                                    </span>
+                                                    <?php endif; ?>
+                                                    <?php if ($agent->agency_name): ?>
+                                                    <span class="badge bg-white bg-opacity-20 text-white px-3 py-2">
+                                                        <i class="ri-building-line me-1"></i><?php echo htmlspecialchars($agent->agency_name); ?>
+                                                    </span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="text-white-75">
+                                                        <i class="ri-mail-line me-1"></i><?php echo htmlspecialchars($agent->agent_email); ?>
+                                                    </span>
+                                                    <?php if (!empty($agent->phone)) : ?>
+                                                    <span class="text-white-75">
+                                                        <i class="ri-phone-line me-1"></i><?php echo htmlspecialchars($agent->phone); ?>
+                                                    </span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quick Actions -->
+                                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                                        <div class="profile-actions">
+                                            <button class="btn btn-light btn-modern me-2" data-bs-toggle="modal" data-bs-target="#editAgentModal">
+                                                <i class="ri-edit-line me-1"></i>Modifier
+                                            </button>
+                                            <div class="btn-group">
+                                                <button class="btn btn-light btn-modern dropdown-toggle" data-bs-toggle="dropdown">
+                                                    <i class="ri-more-line"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#"><i class="ri-mail-send-line me-2"></i>Envoyer email</a></li>
+                                                    <li><a class="dropdown-item" href="#"><i class="ri-phone-line me-2"></i>Appeler</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#"><i class="ri-delete-bin-line me-2"></i>Désactiver</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Agent Profile Header -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <!-- Profile Info -->
-                            <div class="d-flex align-items-start">
-                                <div class="avatar-xxl flex-shrink-0 me-4">
-                                    <?php
-                                    $avatar_url = get_agent_avatar_url($agent);
-                                    ?>
-                                    <img src="<?php echo $avatar_url; ?>" alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
-                                         class="img-fluid rounded-circle border border-3 border-primary shadow-sm"
-                                         onerror="this.onerror=null; this.src='<?php echo base_url('assets/images/users/avatar-1.jpg'); ?>';">
+            <!-- Modern Stats Cards -->
+            <div class="row mt-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm modern-stat-card stat-primary">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon">
+                                    <i class="ri-home-4-line"></i>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex flex-wrap align-items-start justify-content-between">
-                                        <div>
-                                            <h4 class="mb-2"><?php echo htmlspecialchars($agent->agent_name); ?></h4>
-                                            <p class="text-muted mb-2"><i class="ri-mail-line me-1"></i><?php echo htmlspecialchars($agent->agent_email); ?></p>
-                                            <?php if (!empty($agent->position)) : ?>
-                                            <p class="text-muted mb-3"><i class="ri-briefcase-line me-1"></i><?php echo htmlspecialchars($agent->position); ?></p>
-                                            <?php endif; ?>
-                                            <div class="d-flex align-items-center gap-2 mb-3">
-                                                <span class="badge bg-<?php echo $agent->is_active ? 'success' : 'danger'; ?>-subtle text-<?php echo $agent->is_active ? 'success' : 'danger'; ?>">
-                                                    <i class="ri-<?php echo $agent->is_active ? 'check' : 'close'; ?>-line me-1"></i><?php echo $agent->is_active ? 'Actif' : 'Inactif'; ?>
-                                                </span>
-                                                <?php if ($agent->agency_name): ?>
-                                                <span class="badge bg-primary-subtle text-primary">
-                                                    <i class="ri-building-line me-1"></i><?php echo htmlspecialchars($agent->agency_name); ?>
-                                                </span>
+                                <div class="ms-3 flex-grow-1">
+                                    <div class="stat-number"><?php echo $agent->properties_count ?? 0; ?></div>
+                                    <div class="stat-label">Propriétés</div>
+                                </div>
+                                <button class="btn btn-sm btn-light rounded-circle stat-action" 
+                                        onclick="showPropertiesDetails(<?php echo $agent->agent_id; ?>)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm modern-stat-card stat-success">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon">
+                                    <i class="ri-user-heart-line"></i>
+                                </div>
+                                <div class="ms-3 flex-grow-1">
+                                    <div class="stat-number"><?php echo $agent->clients_count ?? 0; ?></div>
+                                    <div class="stat-label">Clients</div>
+                                </div>
+                                <button class="btn btn-sm btn-light rounded-circle stat-action" 
+                                        onclick="showClientsDetails(<?php echo $agent->agent_id; ?>)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm modern-stat-card stat-info">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon">
+                                    <i class="ri-contacts-book-line"></i>
+                                </div>
+                                <div class="ms-3 flex-grow-1">
+                                    <div class="stat-number"><?php echo $agent->contacts_count ?? 0; ?></div>
+                                    <div class="stat-label">Contacts</div>
+                                </div>
+                                <button class="btn btn-sm btn-light rounded-circle stat-action" 
+                                        onclick="showContactsDetails(<?php echo $agent->agent_id; ?>)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm modern-stat-card stat-warning">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon">
+                                    <i class="ri-line-chart-line"></i>
+                                </div>
+                                <div class="ms-3 flex-grow-1">
+                                    <div class="stat-number"><?php echo $agent->leads_count ?? 0; ?></div>
+                                    <div class="stat-label">Leads</div>
+                                </div>
+                                <button class="btn btn-sm btn-light rounded-circle stat-action" 
+                                        onclick="showLeadsDetails(<?php echo $agent->agent_id; ?>)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -94,7 +209,308 @@
                 </div>
             </div>
 
-            <!-- Statistics Row -->
+            <!-- Modern Content Tabs -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header border-0 bg-transparent">
+                            <ul class="nav nav-pills nav-modern" id="agentTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#overview" type="button" role="tab">
+                                        <i class="ri-dashboard-line me-2"></i>Vue d'ensemble
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="properties-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#properties" type="button" role="tab">
+                                        <i class="ri-home-4-line me-2"></i>Propriétés
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="activity-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#activity" type="button" role="tab">
+                                        <i class="ri-time-line me-2"></i>Activités
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="contact-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#contact" type="button" role="tab">
+                                        <i class="ri-contacts-line me-2"></i>Contact
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="tab-content" id="agentTabsContent">
+                                <!-- Overview Tab -->
+                                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                                    <div class="row">
+                                        <!-- Quick Info Panel -->
+                                        <div class="col-lg-8">
+                                            <div class="row g-4">
+                                                <!-- Performance Chart -->
+                                                <div class="col-12">
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title mb-3">
+                                                                <i class="ri-bar-chart-line me-2 text-primary"></i>Performance
+                                                            </h6>
+                                                            <div class="row text-center">
+                                                                <div class="col-3">
+                                                                    <div class="performance-metric">
+                                                                        <div class="metric-value text-primary"><?php echo $agent->properties_count ?? 0; ?></div>
+                                                                        <div class="metric-label">Propriétés</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <div class="performance-metric">
+                                                                        <div class="metric-value text-success"><?php echo $agent->clients_count ?? 0; ?></div>
+                                                                        <div class="metric-label">Clients</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <div class="performance-metric">
+                                                                        <div class="metric-value text-info"><?php echo $agent->contacts_count ?? 0; ?></div>
+                                                                        <div class="metric-label">Contacts</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <div class="performance-metric">
+                                                                        <div class="metric-value text-warning"><?php echo $agent->leads_count ?? 0; ?></div>
+                                                                        <div class="metric-label">Leads</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Recent Activity -->
+                                                <div class="col-12">
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title mb-3">
+                                                                <i class="ri-time-line me-2 text-success"></i>Activité récente
+                                                            </h6>
+                                                            <div class="activity-timeline">
+                                                                <div class="activity-item">
+                                                                    <div class="activity-icon bg-primary">
+                                                                        <i class="ri-home-line"></i>
+                                                                    </div>
+                                                                    <div class="activity-content">
+                                                                        <div class="activity-title">Nouvelle propriété ajoutée</div>
+                                                                        <div class="activity-time">Il y a 2 heures</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="activity-item">
+                                                                    <div class="activity-icon bg-success">
+                                                                        <i class="ri-user-line"></i>
+                                                                    </div>
+                                                                    <div class="activity-content">
+                                                                        <div class="activity-title">Nouveau client contacté</div>
+                                                                        <div class="activity-time">Il y a 5 heures</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="activity-item">
+                                                                    <div class="activity-icon bg-info">
+                                                                        <i class="ri-mail-line"></i>
+                                                                    </div>
+                                                                    <div class="activity-content">
+                                                                        <div class="activity-title">Email envoyé à un prospect</div>
+                                                                        <div class="activity-time">Hier</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Info Panel -->
+                                        <div class="col-lg-4">
+                                            <div class="card border-0 bg-light h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title mb-4">
+                                                        <i class="ri-information-line me-2 text-info"></i>Informations
+                                                    </h6>
+                                                    
+                                                    <div class="info-item mb-3">
+                                                        <div class="info-label">Date d'inscription</div>
+                                                        <div class="info-value"><?php echo date('d/m/Y', strtotime($agent->registration_date)); ?></div>
+                                                    </div>
+                                                    
+                                                    <?php if (!empty($agent->phone)) : ?>
+                                                    <div class="info-item mb-3">
+                                                        <div class="info-label">Téléphone</div>
+                                                        <div class="info-value">
+                                                            <a href="tel:<?php echo $agent->phone; ?>" class="text-decoration-none">
+                                                                <?php echo htmlspecialchars($agent->phone); ?>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if (!empty($agent->address)) : ?>
+                                                    <div class="info-item mb-3">
+                                                        <div class="info-label">Adresse</div>
+                                                        <div class="info-value"><?php echo htmlspecialchars($agent->address); ?></div>
+                                                    </div>
+                                                    <?php endif; ?>
+                                                    
+                                                    <!-- Social Links -->
+                                                    <div class="social-links mt-4">
+                                                        <div class="info-label mb-2">Réseaux sociaux</div>
+                                                        <div class="d-flex gap-2">
+                                                            <?php if (!empty($agent->facebook)) : ?>
+                                                            <a href="<?php echo $agent->facebook; ?>" class="btn btn-sm btn-outline-primary rounded-circle" target="_blank">
+                                                                <i class="ri-facebook-line"></i>
+                                                            </a>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($agent->twitter)) : ?>
+                                                            <a href="<?php echo $agent->twitter; ?>" class="btn btn-sm btn-outline-info rounded-circle" target="_blank">
+                                                                <i class="ri-twitter-line"></i>
+                                                            </a>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($agent->linkedin)) : ?>
+                                                            <a href="<?php echo $agent->linkedin; ?>" class="btn btn-sm btn-outline-primary rounded-circle" target="_blank">
+                                                                <i class="ri-linkedin-line"></i>
+                                                            </a>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($agent->instagram)) : ?>
+                                                            <a href="<?php echo $agent->instagram; ?>" class="btn btn-sm btn-outline-danger rounded-circle" target="_blank">
+                                                                <i class="ri-instagram-line"></i>
+                                                            </a>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Properties Tab -->
+                                <div class="tab-pane fade" id="properties" role="tabpanel">
+                                    <div id="properties-content">
+                                        <div class="text-center py-5">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">Chargement des propriétés...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Activity Tab -->
+                                <div class="tab-pane fade" id="activity" role="tabpanel">
+                                    <div class="timeline-modern">
+                                        <!-- Activity content will be loaded here -->
+                                        <div class="text-center py-5">
+                                            <i class="ri-time-line fs-1 text-muted"></i>
+                                            <p class="text-muted mt-2">Aucune activité récente</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contact Tab -->
+                                <div class="tab-pane fade" id="contact" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="card-title mb-3">Informations de contact</h6>
+                                                    
+                                                    <div class="contact-info">
+                                                        <div class="contact-item">
+                                                            <i class="ri-mail-line text-primary"></i>
+                                                            <div>
+                                                                <div class="contact-label">Email</div>
+                                                                <div class="contact-value">
+                                                                    <a href="mailto:<?php echo $agent->agent_email; ?>">
+                                                                        <?php echo htmlspecialchars($agent->agent_email); ?>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <?php if (!empty($agent->phone)) : ?>
+                                                        <div class="contact-item">
+                                                            <i class="ri-phone-line text-success"></i>
+                                                            <div>
+                                                                <div class="contact-label">Téléphone</div>
+                                                                <div class="contact-value">
+                                                                    <a href="tel:<?php echo $agent->phone; ?>">
+                                                                        <?php echo htmlspecialchars($agent->phone); ?>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                        
+                                                        <?php if (!empty($agent->mobile)) : ?>
+                                                        <div class="contact-item">
+                                                            <i class="ri-smartphone-line text-info"></i>
+                                                            <div>
+                                                                <div class="contact-label">Mobile</div>
+                                                                <div class="contact-value">
+                                                                    <a href="tel:<?php echo $agent->mobile; ?>">
+                                                                        <?php echo htmlspecialchars($agent->mobile); ?>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                        
+                                                        <?php if (!empty($agent->whatsapp)) : ?>
+                                                        <div class="contact-item">
+                                                            <i class="ri-whatsapp-line text-success"></i>
+                                                            <div>
+                                                                <div class="contact-label">WhatsApp</div>
+                                                                <div class="contact-value">
+                                                                    <a href="https://wa.me/<?php echo $agent->whatsapp; ?>" target="_blank">
+                                                                        <?php echo htmlspecialchars($agent->whatsapp); ?>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-6">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="card-title mb-3">Actions rapides</h6>
+                                                    
+                                                    <div class="d-grid gap-2">
+                                                        <button class="btn btn-primary btn-modern">
+                                                            <i class="ri-mail-send-line me-2"></i>Envoyer un email
+                                                        </button>
+                                                        <button class="btn btn-success btn-modern">
+                                                            <i class="ri-phone-line me-2"></i>Programmer un appel
+                                                        </button>
+                                                        <button class="btn btn-info btn-modern">
+                                                            <i class="ri-calendar-line me-2"></i>Planifier une réunion
+                                                        </button>
+                                                        <button class="btn btn-warning btn-modern">
+                                                            <i class="ri-file-text-line me-2"></i>Créer une note
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row g-3">
                 <div class="col-lg-4 col-md-6">
                     <div class="card border-0 shadow-sm h-100 hover-card">
@@ -946,3 +1362,424 @@ function resetContactsCount(userId) {
     }
 }
 </script>
+
+<style>
+/* Modern Profile Styles */
+.modern-profile-card {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.profile-cover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 200px;
+    position: relative;
+}
+
+.profile-gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+}
+
+.profile-avatar-container {
+    position: relative;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-status-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 3px solid white;
+}
+
+.profile-status-indicator.active {
+    background-color: #10b981;
+}
+
+.profile-status-indicator.inactive {
+    background-color: #ef4444;
+}
+
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.btn-modern {
+    border-radius: 12px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Modern Stats Cards */
+.modern-stat-card {
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: none !important;
+}
+
+.modern-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.stat-primary .stat-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-success .stat-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.stat-info .stat-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.stat-warning .stat-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.stat-action {
+    width: 36px;
+    height: 36px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.stat-action:hover {
+    transform: scale(1.1);
+}
+
+/* Modern Tabs */
+.nav-modern {
+    border: none;
+    gap: 8px;
+}
+
+.nav-modern .nav-link {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #6b7280;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.nav-modern .nav-link:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.nav-modern .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Performance Metrics */
+.performance-metric {
+    padding: 16px;
+    border-radius: 12px;
+    background: white;
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    position: relative;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex-grow: 1;
+}
+
+.activity-title {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 2px;
+}
+
+.activity-time {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Info Items */
+.info-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Contact Info */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contact-item i {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.contact-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.contact-value {
+    color: #374151;
+    font-weight: 500;
+}
+
+.contact-value a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.contact-value a:hover {
+    color: #667eea;
+}
+
+/* Loading States */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+    }
+    
+    .profile-actions {
+        margin-top: 20px;
+    }
+    
+    .profile-actions .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+/* Card hover effects */
+.card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<script>
+// Enhanced JavaScript for modern interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching with smooth animations
+    const tabButtons = document.querySelectorAll('#agentTabs button[data-bs-toggle="pill"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function(e) {
+            const targetTab = e.target.getAttribute('data-bs-target');
+            
+            // Load content dynamically for properties tab
+            if (targetTab === '#properties') {
+                loadPropertiesContent();
+            }
+        });
+    });
+    
+    // Animate stats on page load
+    animateStats();
+});
+
+function animateStats() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const targetValue = parseInt(stat.textContent);
+        let currentValue = 0;
+        const increment = targetValue / 30;
+        
+        const timer = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= targetValue) {
+                stat.textContent = targetValue;
+                clearInterval(timer);
+            } else {
+                stat.textContent = Math.floor(currentValue);
+            }
+        }, 50);
+    });
+}
+
+function loadPropertiesContent() {
+    const propertiesContent = document.getElementById('properties-content');
+    if (propertiesContent.innerHTML.includes('Chargement')) {
+        fetch('<?php echo base_url("agent/get_properties_details/"); ?><?php echo $agent->user_id; ?>')
+            .then(response => response.text())
+            .then(data => {
+                propertiesContent.innerHTML = data;
+            })
+            .catch(error => {
+                propertiesContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="ri-error-warning-line fs-1 text-danger"></i>
+                        <p class="text-muted mt-2">Erreur lors du chargement des propriétés</p>
+                    </div>
+                `;
+            });
+    }
+}
+
+// Enhanced modal functions with better UX
+function showPropertiesDetails(userId) {
+    const modal = new bootstrap.Modal(document.getElementById('propertiesModal'));
+    modal.show();
+    
+    document.getElementById('propertiesContent').innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Chargement des propriétés...</p>
+        </div>
+    `;
+    
+    fetch('<?php echo base_url("agent/get_properties_details/"); ?>' + userId)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('propertiesContent').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('propertiesContent').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="ri-error-warning-line me-2"></i>
+                    Erreur lors du chargement des propriétés
+                </div>
+            `;
+        });
+}
