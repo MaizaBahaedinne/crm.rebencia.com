@@ -23,7 +23,7 @@
                                                          class="img-fluid rounded-circle"
                                                          onerror="this.onerror=null; this.src='<?php echo base_url('assets/images/users/avatar-1.jpg'); ?>';">
                                                 </div>
-                                                <div class="profile-status-indicator <?php echo $agent->is_active ? 'active' : 'inactive'; ?>"></div>
+                                                <div class="profile-status-indicator <?php echo ($agent->is_active ?? 1) ? 'active' : 'inactive'; ?>"></div>
                                             </div>
                                             
                                             <!-- Profile Info -->
