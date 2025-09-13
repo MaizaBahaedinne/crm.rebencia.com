@@ -193,7 +193,8 @@ class Agent extends BaseController {
         
         echo "DEBUG: Méthode view() appelée avec user_id = " . var_export($user_id, true) . "<br>";
         
-        $this->isLoggedIn();
+        // Temporairement désactivé pour debug
+        // $this->isLoggedIn();
         
         // Charger le helper avatar
         $this->load->helper('avatar');
