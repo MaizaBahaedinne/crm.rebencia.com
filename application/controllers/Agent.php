@@ -44,7 +44,7 @@ class Agent extends BaseController {
         $this->load->helper('avatar');
         
         try {
-            echo "DEBUG: Tentative de récupération de l'agent $user_id<br>";
+            echo "<h2>1. Test de récupération de l'agent $user_id</h2>";
             
             // Récupérer les données de l'agent
             $agent = $this->agent_model->get_agent($user_id);
@@ -58,7 +58,29 @@ class Agent extends BaseController {
                 echo "✅ " . count($properties) . " propriétés trouvées<br>";
                 
             } else {
-                echo "❌ Agent non trouvé<br>";
+                echo "❌ Agent $user_id non trouvé<br>";
+                
+                // Récupérer tous les agents pour voir lesquels existent
+                echo "<h2>2. Liste de tous les agents disponibles</h2>";
+                $all_agents = $this->agent_model->get_all_agents([]);
+                
+                if ($all_agents && count($all_agents) > 0) {
+                    echo "✅ " . count($all_agents) . " agents trouvés :<br>";
+                    echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                    echo "<tr><th>ID</th><th>Nom</th><th>Email</th><th>Action</th></tr>";
+                    
+                    foreach ($all_agents as $ag) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($ag->agent_id ?? 'N/A') . "</td>";
+                        echo "<td>" . htmlspecialchars($ag->agent_name ?? 'N/A') . "</td>";
+                        echo "<td>" . htmlspecialchars($ag->agent_email ?? 'N/A') . "</td>";
+                        echo "<td><a href='" . base_url('agents/view/' . ($ag->agent_id ?? 0)) . "'>Voir</a></td>";
+                        echo "</tr>";
+                    }
+                    echo "</table>";
+                } else {
+                    echo "❌ Aucun agent trouvé dans la base<br>";
+                }
             }
             
         } catch (Exception $e) {
