@@ -294,7 +294,7 @@
                                                     
                                                     <div class="info-item mb-3">
                                                         <div class="info-label">Date d'inscription</div>
-                                                        <div class="info-value"><?php echo date('d/m/Y', strtotime($agent->registration_date)); ?></div>
+                                                        <div class="info-value"><?php echo date('d/m/Y', strtotime($agent->registration_date ?? $agent->created_date ?? date('Y-m-d'))); ?></div>
                                                     </div>
                                                     
                                                     <?php if (!empty($agent->phone)) : ?>

@@ -623,6 +623,7 @@ class Agent_model extends CI_Model {
             p.post_content as agent_description,
             p.post_status as post_status,
             p.post_date as created_date,
+            p.post_date as registration_date,
             a.ID as agency_id,
             a.post_title as agency_name,
             MAX(CASE WHEN pm.meta_key = 'fave_agent_email' THEN pm.meta_value END) as agent_email,
