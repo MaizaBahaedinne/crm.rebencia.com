@@ -62,7 +62,7 @@ class Dashboard extends BaseController {
         
         // Statistiques de base
         try {
-            $agencies = $this->agency_model->get_all_agencies_from_posts();
+            $agencies = $this->agency_model->get_all_agencies();
             $agents = $this->agent_model->get_all_agents_from_posts();
             
             $data['stats'] = [
@@ -145,7 +145,7 @@ class Dashboard extends BaseController {
      */
     private function get_admin_statistics() {
         // Utiliser les modèles existants pour éviter les erreurs de base de données
-        $agencies = $this->agency_model->get_all_agencies_from_posts();
+        $agencies = $this->agency_model->get_all_agencies();
         $agents = $this->agent_model->get_all_agents_from_posts();
         
         return [
