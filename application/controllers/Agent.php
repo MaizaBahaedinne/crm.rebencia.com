@@ -224,49 +224,30 @@ class Agent extends BaseController {
 
     // Détails d'un agent
     public function view($user_id = null) {
-        // Debug temporaire
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
-        
-        echo "DEBUG: Méthode view() appelée avec user_id = " . var_export($user_id, true) . "<br>";
-        
-        // Temporairement désactivé pour debug
-        // $this->isLoggedIn();
+        $this->isLoggedIn();
         
         // Charger le helper avatar
         $this->load->helper('avatar');
         
         if (!$user_id) {
-            echo "DEBUG: user_id est vide, affichage 404<br>";
             show_404();
             return;
         }
-        
-        echo "DEBUG: user_id valide = $user_id<br>";
 
         $data = $this->global;
         $data['pageTitle'] = 'Profil Agent';
 
         try {
-            echo "DEBUG: Tentative de récupération de l'agent $user_id<br>";
-            
             // Récupérer les données de l'agent
             $agent = $this->agent_model->get_agent($user_id);
             
-            echo "DEBUG: Agent récupéré = " . var_export($agent, true) . "<br>";
-            
             if (!$agent) {
-                echo "DEBUG: Agent non trouvé, affichage 404<br>";
                 show_404();
                 return;
             }
 
-            echo "DEBUG: Agent trouvé, récupération des propriétés<br>";
-            
             // Récupérer les propriétés de l'agent
             $properties = $this->agent_model->get_agent_properties_enhanced($agent->agent_id, $agent->agent_email);
-            
-            echo "DEBUG: " . count($properties) . " propriétés récupérées<br>";
             
             // Données temporaires pour éviter les erreurs
             $estimations = [];
@@ -278,15 +259,13 @@ class Agent extends BaseController {
             $data['transactions'] = $transactions;
 
         } catch (Exception $e) {
-            echo "DEBUG: Erreur - " . $e->getMessage() . "<br>";
-            echo "DEBUG: Trace - " . $e->getTraceAsString() . "<br>";
             log_message('error', 'Error in Agent view: ' . $e->getMessage());
             show_404();
             return;
         }
 
-        echo "DEBUG: Chargement de la vue dashboard/agents/view<br>";
         $this->loadViews("dashboard/agents/view", $this->global, $data, NULL);
+    }
     }
 
     // AJAX pour récupérer tous les agents avec filtres
