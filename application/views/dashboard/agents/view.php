@@ -163,52 +163,8 @@
                     </div>
                 </div>
             </div>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="dropdown mb-3">
-                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    <i class="ri-more-line me-1"></i>Actions
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="mailto:<?php echo $agent->agent_email; ?>"><i class="ri-mail-line me-2"></i>Envoyer email</a></li>
-                                                    <li><a class="dropdown-item" href="<?php echo base_url('properties?agent=' . $agent->user_id); ?>"><i class="ri-home-line me-2"></i>Voir ses propriétés</a></li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Modifier</a></li>
-                                                </ul>
-                                            </div>
-                                            <div class="d-flex flex-wrap gap-2 justify-content-end">
-                                                <?php if (!empty($agent->phone)) : ?>
-                                                <a href="tel:<?php echo $agent->phone; ?>" class="btn btn-primary btn-sm">
-                                                    <i class="ri-phone-line me-1"></i><?php echo $agent->phone; ?>
-                                                </a>
-                                                <?php endif; ?>
-                                                <?php if (!empty($agent->mobile)) : ?>
-                                                <a href="tel:<?php echo $agent->mobile; ?>" class="btn btn-success btn-sm">
-                                                    <i class="ri-smartphone-line me-1"></i><?php echo $agent->mobile; ?>
-                                                </a>
-                                                <?php endif; ?>
-                                                <?php if (!empty($agent->whatsapp)) : ?>
-                                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $agent->whatsapp); ?>" class="btn btn-success btn-sm" target="_blank">
-                                                    <i class="ri-whatsapp-line me-1"></i>WhatsApp
-                                                </a>
-                                                <?php endif; ?>
-                                                <?php if (!empty($agent->website)) : ?>
-                                                <a href="<?php echo $agent->website; ?>" class="btn btn-info btn-sm" target="_blank">
-                                                    <i class="ri-global-line me-1"></i>Site Web
-                                                </a>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
+            <!-- Modern Content Tabs -->
             <!-- Modern Content Tabs -->
             <div class="row mt-4">
                 <div class="col-12">
