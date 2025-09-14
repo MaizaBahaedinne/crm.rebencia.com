@@ -482,4 +482,193 @@ class Property_model extends CI_Model {
             ->where('p.post_status', 'publish')
             ->count_all_results();
     }
+
+    /**
+     * Récupère toutes les propriétés avec leurs agents et agences liés
+     * Utilise une requête complexe pour optimiser les jointures
+     * 
+     * @return array Liste des propriétés avec agent et agence
+     */
+    public function get_properties_with_agents_agencies() {
+        $sql = "
+        SELECT 
+            p.ID AS property_id,
+            p.post_title AS property_title,
+            p.post_status AS property_status,
+            p.post_date AS property_date,
+            
+            -- Agent lié
+            a.ID AS agent_id,
+            a.post_title AS agent_name,
+            agent_email.meta_value AS agent_email,
+            agent_phone.meta_value AS agent_phone,
+            img.guid AS agent_photo,
+            
+            -- Agence finale (priorité : agence de l'agent, sinon agence affectée directement à la propriété)
+            COALESCE(ag_agent.ID, ag_prop.ID) AS agency_id,
+            COALESCE(ag_agent.post_title, ag_prop.post_title) AS agency_name,
+            COALESCE(agency_agent_phone.meta_value, agency_prop_phone.meta_value) AS agency_phone,
+            COALESCE(agency_agent_email.meta_value, agency_prop_email.meta_value) AS agency_email
+            
+        FROM " . $this->wp_db->dbprefix('posts') . " p
+
+        -- Lien propriété -> agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " pm_agent 
+               ON pm_agent.post_id = p.ID AND pm_agent.meta_key = 'fave_agents'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " a 
+               ON a.ID = pm_agent.meta_value AND a.post_type = 'houzez_agent'
+
+        -- Infos agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agent_email 
+               ON agent_email.post_id = a.ID AND agent_email.meta_key = 'fave_agent_email'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agent_phone 
+               ON agent_phone.post_id = a.ID AND agent_phone.meta_key = 'fave_agent_mobile'
+
+        -- Photo agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agent_thumb 
+               ON agent_thumb.post_id = a.ID AND agent_thumb.meta_key = '_thumbnail_id'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " img 
+               ON img.ID = agent_thumb.meta_value
+
+        -- Agence depuis l'agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " pm_agency_agent 
+               ON pm_agency_agent.post_id = a.ID AND pm_agency_agent.meta_key = 'fave_agent_agencies'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " ag_agent 
+               ON ag_agent.ID = pm_agency_agent.meta_value AND ag_agent.post_type = 'houzez_agency'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_agent_phone 
+               ON agency_agent_phone.post_id = ag_agent.ID AND agency_agent_phone.meta_key = 'fave_agency_phone'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_agent_email 
+               ON agency_agent_email.post_id = ag_agent.ID AND agency_agent_email.meta_key = 'fave_agency_email'
+
+        -- Agence directement liée à la propriété
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " pm_agency_prop 
+               ON pm_agency_prop.post_id = p.ID AND pm_agency_prop.meta_key = 'fave_property_agency'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " ag_prop 
+               ON ag_prop.ID = pm_agency_prop.meta_value AND ag_prop.post_type = 'houzez_agency'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_prop_phone 
+               ON agency_prop_phone.post_id = ag_prop.ID AND agency_prop_phone.meta_key = 'fave_agency_phone'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_prop_email 
+               ON agency_prop_email.post_id = ag_prop.ID AND agency_prop_email.meta_key = 'fave_agency_email'
+
+        WHERE p.post_type = 'property' 
+        AND p.post_status = 'publish'
+        ORDER BY p.post_date DESC
+        ";
+
+        return $this->wp_db->query($sql)->result();
+    }
+
+    /**
+     * Crée la vue wp_Hrg8P_prop_agen pour optimiser les requêtes futures
+     * 
+     * @return bool Succès de la création
+     */
+    public function create_property_agent_view() {
+        $view_name = $this->wp_db->dbprefix('prop_agen');
+        
+        $sql = "
+        CREATE OR REPLACE VIEW {$view_name} AS
+        SELECT 
+            p.ID AS property_id,
+            p.post_title AS property_title,
+            p.post_status AS property_status,
+            p.post_date AS property_date,
+            
+            -- Agent lié
+            a.ID AS agent_id,
+            a.post_title AS agent_name,
+            agent_email.meta_value AS agent_email,
+            agent_phone.meta_value AS agent_phone,
+            img.guid AS agent_photo,
+            
+            -- Agence finale (priorité : agence de l'agent, sinon agence affectée directement à la propriété)
+            COALESCE(ag_agent.ID, ag_prop.ID) AS agency_id,
+            COALESCE(ag_agent.post_title, ag_prop.post_title) AS agency_name,
+            COALESCE(agency_agent_phone.meta_value, agency_prop_phone.meta_value) AS agency_phone,
+            COALESCE(agency_agent_email.meta_value, agency_prop_email.meta_value) AS agency_email
+            
+        FROM " . $this->wp_db->dbprefix('posts') . " p
+
+        -- Lien propriété -> agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " pm_agent 
+               ON pm_agent.post_id = p.ID AND pm_agent.meta_key = 'fave_agents'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " a 
+               ON a.ID = pm_agent.meta_value AND a.post_type = 'houzez_agent'
+
+        -- Infos agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agent_email 
+               ON agent_email.post_id = a.ID AND agent_email.meta_key = 'fave_agent_email'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agent_phone 
+               ON agent_phone.post_id = a.ID AND agent_phone.meta_key = 'fave_agent_mobile'
+
+        -- Photo agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agent_thumb 
+               ON agent_thumb.post_id = a.ID AND agent_thumb.meta_key = '_thumbnail_id'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " img 
+               ON img.ID = agent_thumb.meta_value
+
+        -- Agence depuis l'agent
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " pm_agency_agent 
+               ON pm_agency_agent.post_id = a.ID AND pm_agency_agent.meta_key = 'fave_agent_agencies'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " ag_agent 
+               ON ag_agent.ID = pm_agency_agent.meta_value AND ag_agent.post_type = 'houzez_agency'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_agent_phone 
+               ON agency_agent_phone.post_id = ag_agent.ID AND agency_agent_phone.meta_key = 'fave_agency_phone'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_agent_email 
+               ON agency_agent_email.post_id = ag_agent.ID AND agency_agent_email.meta_key = 'fave_agency_email'
+
+        -- Agence directement liée à la propriété
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " pm_agency_prop 
+               ON pm_agency_prop.post_id = p.ID AND pm_agency_prop.meta_key = 'fave_property_agency'
+        LEFT JOIN " . $this->wp_db->dbprefix('posts') . " ag_prop 
+               ON ag_prop.ID = pm_agency_prop.meta_value AND ag_prop.post_type = 'houzez_agency'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_prop_phone 
+               ON agency_prop_phone.post_id = ag_prop.ID AND agency_prop_phone.meta_key = 'fave_agency_phone'
+        LEFT JOIN " . $this->wp_db->dbprefix('postmeta') . " agency_prop_email 
+               ON agency_prop_email.post_id = ag_prop.ID AND agency_prop_email.meta_key = 'fave_agency_email'
+
+        WHERE p.post_type = 'property'
+        ";
+
+        try {
+            $this->wp_db->query($sql);
+            return true;
+        } catch (Exception $e) {
+            log_message('error', 'Erreur création vue prop_agen: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Utilise la vue pour récupérer les données optimisées
+     * 
+     * @param array $filters Filtres optionnels
+     * @return array Résultats de la vue
+     */
+    public function get_from_property_agent_view($filters = []) {
+        $view_name = $this->wp_db->dbprefix('prop_agen');
+        
+        $this->wp_db->from($view_name);
+        
+        // Appliquer les filtres si fournis
+        if (!empty($filters['agent_id'])) {
+            $this->wp_db->where('agent_id', $filters['agent_id']);
+        }
+        
+        if (!empty($filters['agency_id'])) {
+            $this->wp_db->where('agency_id', $filters['agency_id']);
+        }
+        
+        if (!empty($filters['property_status'])) {
+            $this->wp_db->where('property_status', $filters['property_status']);
+        }
+        
+        if (isset($filters['limit'])) {
+            $this->wp_db->limit($filters['limit']);
+        }
+        
+        $this->wp_db->order_by('property_date', 'DESC');
+        
+        return $this->wp_db->get()->result();
+    }
 }
