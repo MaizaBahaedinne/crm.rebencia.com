@@ -395,24 +395,6 @@
                         </div>
                     </div>
                 </div>
-                                                <td>
-                                                    <span class="badge bg-<?php echo ($agent->is_active ?? 1) ? 'success' : 'danger'; ?>">
-                                                        <?php echo ($agent->is_active ?? 1) ? 'Actif' : 'Inactif'; ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="4" class="text-center text-muted">Aucun agent trouvé</td>
-                                            </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Top Agences Détaillées -->
                 <div class="col-xl-6">
