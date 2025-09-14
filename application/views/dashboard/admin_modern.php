@@ -38,16 +38,133 @@
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <div class="stats-number" data-target="<?php echo $stats['agencies']; ?>">0</div>
-                                    <p class="stats-label">Agences</p>
+                                    <p class="stats-label">Agences Total</p>
+                                    <small class="text-muted"><?php echo $stats['active_agencies']; ?> actives</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-info-subtle text-info">
+                                    <i class="ri-building-2-line"></i> <?php echo $stats['properties_with_agencies']; ?>
+                                </span>
+                                <span class="text-muted ms-2">propriétés gérées</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agents -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stats-icon bg-success-subtle text-success">
+                                    <i class="ri-user-line"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="stats-number" data-target="<?php echo $stats['agents']; ?>">0</div>
+                                    <p class="stats-label">Agents Total</p>
+                                    <small class="text-muted"><?php echo $stats['active_agents']; ?> actifs</small>
                                 </div>
                             </div>
                             <div class="mt-3">
                                 <span class="badge bg-success-subtle text-success">
-                                    <i class="ri-arrow-up-line"></i> +12%
+                                    <i class="ri-home-smile-line"></i> <?php echo $stats['properties_with_agents']; ?>
+                                </span>
+                                <span class="text-muted ms-2">propriétés assignées</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propriétés -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stats-icon bg-warning-subtle text-warning">
+                                    <i class="ri-home-4-line"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="stats-number" data-target="<?php echo $stats['properties']; ?>">0</div>
+                                    <p class="stats-label">Propriétés</p>
+                                    <small class="text-muted">Total dans la base</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-<?php echo $stats['growth'] >= 0 ? 'success' : 'danger'; ?>-subtle text-<?php echo $stats['growth'] >= 0 ? 'success' : 'danger'; ?>">
+                                    <i class="ri-arrow-<?php echo $stats['growth'] >= 0 ? 'up' : 'down'; ?>-line"></i> <?php echo abs($stats['growth']); ?>%
                                 </span>
                                 <span class="text-muted ms-2">vs mois dernier</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Revenus Estimés -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="stats-icon bg-danger-subtle text-danger">
+                                    <i class="ri-money-dollar-circle-line"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="stats-number" data-target="<?php echo number_format($stats['revenue'], 0, '', ''); ?>">0</div>
+                                    <p class="stats-label">Revenus Estimés</p>
+                                    <small class="text-muted">DT (estimation)</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-primary-subtle text-primary">
+                                    <i class="ri-calendar-line"></i> <?php echo $stats['current_month_properties']; ?>
+                                </span>
+                                <span class="text-muted ms-2">ce mois</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques Détaillées -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">📊 Répartition Détaillée</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <div class="border-end">
+                                        <h4 class="text-primary"><?php echo $stats['properties_with_agents']; ?></h4>
+                                        <p class="text-muted mb-0">Propriétés avec Agent</p>
+                                        <small><?php echo round(($stats['properties_with_agents'] / max($stats['properties'], 1)) * 100, 1); ?>%</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="border-end">
+                                        <h4 class="text-success"><?php echo $stats['properties_with_agencies']; ?></h4>
+                                        <p class="text-muted mb-0">Propriétés avec Agence</p>
+                                        <small><?php echo round(($stats['properties_with_agencies'] / max($stats['properties'], 1)) * 100, 1); ?>%</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="border-end">
+                                        <h4 class="text-warning"><?php echo $stats['active_agents']; ?></h4>
+                                        <p class="text-muted mb-0">Agents Actifs</p>
+                                        <small><?php echo round(($stats['active_agents'] / max($stats['agents'], 1)) * 100, 1); ?>%</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-info"><?php echo $stats['active_agencies']; ?></h4>
+                                    <p class="text-muted mb-0">Agences Actives</p>
+                                    <small><?php echo round(($stats['active_agencies'] / max($stats['agencies'], 1)) * 100, 1); ?>%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
                     </div>
                 </div>
 
@@ -149,7 +266,7 @@
                 <div class="col-xl-4">
                     <div class="card">
                         <div class="card-header border-0">
-                            <h4 class="card-title mb-0">Types de Propriétés</h4>
+                            <h4 class="card-title mb-0">Statuts Propriétés</h4>
                         </div>
                         <div class="card-body">
                             <canvas id="propertyTypeChart" height="300"></canvas>
@@ -158,13 +275,42 @@
                 </div>
             </div>
 
+            <!-- Nouveaux Graphiques Performance -->
+            <div class="row">
+                <!-- Top Agents Performance -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h4 class="card-title mb-0">Top 10 Agents</h4>
+                            <p class="text-muted mb-0">Par nombre de propriétés</p>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="topAgentsChart" height="350"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Agences Performance -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h4 class="card-title mb-0">Top 10 Agences</h4>
+                            <p class="text-muted mb-0">Par nombre de propriétés</p>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="topAgenciesChart" height="350"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Performance & Activities Row -->
             <div class="row">
-                <!-- Top Agents -->
+                <!-- Top Agents Détaillés -->
                 <div class="col-xl-6">
                     <div class="card">
                         <div class="card-header border-0 align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Top Agents</h4>
+                            <h4 class="card-title mb-0 flex-grow-1">🏆 Top Agents Performance</h4>
                             <a href="<?php echo base_url('agents'); ?>" class="btn btn-sm btn-soft-primary">
                                 Voir tous <i class="ri-arrow-right-line ms-1"></i>
                             </a>
@@ -176,32 +322,79 @@
                                         <tr>
                                             <th>Agent</th>
                                             <th>Propriétés</th>
-                                            <th>Performance</th>
-                                            <th>Status</th>
+                                            <th>Agences</th>
+                                            <th>Contact</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php if (!empty($top_agents)): ?>
-                                            <?php foreach ($top_agents as $agent): ?>
+                                            <?php foreach ($top_agents as $index => $agent): ?>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        <div class="avatar-sm me-3">
-                                                            <img src="<?php echo $agent->agent_avatar ?: base_url('assets/images/users/avatar-1.jpg'); ?>" 
-                                                                 class="img-fluid rounded-circle" alt="Avatar">
+                                                        <div class="position-relative me-3">
+                                                            <span class="badge bg-<?php 
+                                                                echo $index === 0 ? 'warning' : ($index === 1 ? 'secondary' : ($index === 2 ? 'dark' : 'primary')); 
+                                                            ?> position-absolute top-0 start-100 translate-middle rounded-pill">
+                                                                <?php echo $index + 1; ?>
+                                                            </span>
+                                                            <div class="avatar-sm">
+                                                                <div class="avatar-title rounded-circle bg-<?php 
+                                                                    echo $index === 0 ? 'warning' : ($index === 1 ? 'secondary' : ($index === 2 ? 'dark' : 'primary')); 
+                                                                ?>-subtle text-<?php 
+                                                                    echo $index === 0 ? 'warning' : ($index === 1 ? 'secondary' : ($index === 2 ? 'dark' : 'primary')); 
+                                                                ?>">
+                                                                    <i class="ri-user-line"></i>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <div>
-                                                            <h6 class="mb-1"><?php echo htmlspecialchars($agent->agent_name); ?></h6>
-                                                            <p class="text-muted mb-0 fs-12"><?php echo htmlspecialchars($agent->agent_email ?? ''); ?></p>
+                                                            <h6 class="mb-1"><?php echo htmlspecialchars($agent['agent_name']); ?></h6>
+                                                            <p class="text-muted mb-0 fs-12">ID: <?php echo $agent['agent_id']; ?></p>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td><span class="badge bg-primary-subtle text-primary"><?php echo $agent->properties_count ?? 0; ?></span></td>
                                                 <td>
-                                                    <div class="progress progress-sm">
-                                                        <div class="progress-bar bg-success" style="width: <?php echo min(100, ($agent->properties_count ?? 0) * 10); ?>%"></div>
-                                                    </div>
+                                                    <span class="badge bg-success-subtle text-success fs-6">
+                                                        <i class="ri-home-4-line me-1"></i><?php echo $agent['properties_count']; ?>
+                                                    </span>
                                                 </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        <?php echo count($agent['agencies']); ?> agence(s)
+                                                        <?php if (!empty($agent['agencies'][0])): ?>
+                                                            <br><span class="text-primary"><?php echo htmlspecialchars($agent['agencies'][0]); ?></span>
+                                                        <?php endif; ?>
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <?php if ($agent['agent_email']): ?>
+                                                        <small class="text-muted">
+                                                            <i class="ri-mail-line me-1"></i><?php echo htmlspecialchars($agent['agent_email']); ?>
+                                                        </small>
+                                                    <?php endif; ?>
+                                                    <?php if ($agent['agent_phone']): ?>
+                                                        <br><small class="text-muted">
+                                                            <i class="ri-phone-line me-1"></i><?php echo htmlspecialchars($agent['agent_phone']); ?>
+                                                        </small>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">
+                                                    <i class="ri-user-line fs-1 mb-2 d-block"></i>
+                                                    Aucun agent trouvé
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                                                 <td>
                                                     <span class="badge bg-<?php echo ($agent->is_active ?? 1) ? 'success' : 'danger'; ?>">
                                                         <?php echo ($agent->is_active ?? 1) ? 'Actif' : 'Inactif'; ?>
@@ -221,6 +414,99 @@
                     </div>
                 </div>
 
+                <!-- Top Agences Détaillées -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header border-0 align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">🏢 Top Agences Performance</h4>
+                            <a href="<?php echo base_url('agencies'); ?>" class="btn btn-sm btn-soft-primary">
+                                Voir toutes <i class="ri-arrow-right-line ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Agence</th>
+                                            <th>Propriétés</th>
+                                            <th>Agents</th>
+                                            <th>Contact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (!empty($top_agencies)): ?>
+                                            <?php foreach ($top_agencies as $index => $agency): ?>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="position-relative me-3">
+                                                            <span class="badge bg-<?php 
+                                                                echo $index === 0 ? 'warning' : ($index === 1 ? 'secondary' : ($index === 2 ? 'dark' : 'info')); 
+                                                            ?> position-absolute top-0 start-100 translate-middle rounded-pill">
+                                                                <?php echo $index + 1; ?>
+                                                            </span>
+                                                            <div class="avatar-sm">
+                                                                <div class="avatar-title rounded-circle bg-<?php 
+                                                                    echo $index === 0 ? 'warning' : ($index === 1 ? 'secondary' : ($index === 2 ? 'dark' : 'info')); 
+                                                                ?>-subtle text-<?php 
+                                                                    echo $index === 0 ? 'warning' : ($index === 1 ? 'secondary' : ($index === 2 ? 'dark' : 'info')); 
+                                                                ?>">
+                                                                    <i class="ri-building-line"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-1"><?php echo htmlspecialchars($agency['agency_name']); ?></h6>
+                                                            <p class="text-muted mb-0 fs-12">ID: <?php echo $agency['agency_id']; ?></p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary-subtle text-primary fs-6">
+                                                        <i class="ri-home-4-line me-1"></i><?php echo $agency['properties_count']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        <?php echo count($agency['agents']); ?> agent(s)
+                                                        <?php if (!empty($agency['agents'][0])): ?>
+                                                            <br><span class="text-success"><?php echo htmlspecialchars($agency['agents'][0]); ?></span>
+                                                        <?php endif; ?>
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <?php if ($agency['agency_email']): ?>
+                                                        <small class="text-muted">
+                                                            <i class="ri-mail-line me-1"></i><?php echo htmlspecialchars($agency['agency_email']); ?>
+                                                        </small>
+                                                    <?php endif; ?>
+                                                    <?php if ($agency['agency_phone']): ?>
+                                                        <br><small class="text-muted">
+                                                            <i class="ri-phone-line me-1"></i><?php echo htmlspecialchars($agency['agency_phone']); ?>
+                                                        </small>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">
+                                                    <i class="ri-building-line fs-1 mb-2 d-block"></i>
+                                                    Aucune agence trouvée
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activités & Rapides Actions -->
+            <div class="row">
                 <!-- Activités Récentes -->
                 <div class="col-xl-6">
                     <div class="card">
@@ -474,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 20);
     });
 
-    // Graphique des ventes mensuelles
+    // Graphique évolution mensuelle des propriétés
     const salesData = <?php echo json_encode($chart_data['monthly_sales']); ?>;
     const salesCtx = document.getElementById('salesChart').getContext('2d');
     new Chart(salesCtx, {
@@ -482,8 +768,8 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: salesData.map(item => item.month),
             datasets: [{
-                label: 'Ventes',
-                data: salesData.map(item => item.sales),
+                label: 'Propriétés ajoutées',
+                data: salesData.map(item => item.count),
                 borderColor: '#3577F1',
                 backgroundColor: 'rgba(53, 119, 241, 0.1)',
                 borderWidth: 3,
@@ -515,21 +801,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Graphique des types de propriétés
-    const propertyData = <?php echo json_encode($chart_data['properties_by_type']); ?>;
+    // Graphique des statuts de propriétés
+    const propertyStatusData = <?php echo json_encode($chart_data['properties_by_status']); ?>;
     const propertyCtx = document.getElementById('propertyTypeChart').getContext('2d');
     new Chart(propertyCtx, {
         type: 'doughnut',
         data: {
-            labels: propertyData.map(item => item.property_type || 'Non défini'),
+            labels: propertyStatusData.map(item => item.status === 'publish' ? 'Publiées' : 
+                                                 item.status === 'draft' ? 'Brouillons' : 
+                                                 item.status === 'private' ? 'Privées' : 
+                                                 item.status),
             datasets: [{
-                data: propertyData.map(item => item.count),
+                data: propertyStatusData.map(item => item.count),
                 backgroundColor: [
-                    '#3577F1',
-                    '#0AB39C',
-                    '#F7B500',
-                    '#F06548',
-                    '#8A92B2'
+                    '#0AB39C', // Vert pour publiées
+                    '#F7B500', // Orange pour brouillons
+                    '#8A92B2', // Gris pour privées
+                    '#F06548', // Rouge pour autres
+                    '#3577F1'  // Bleu par défaut
                 ],
                 borderWidth: 0
             }]
@@ -548,6 +837,100 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Graphique Top Agents
+    const topAgentsData = <?php echo json_encode($chart_data['top_agents']); ?>;
+    if (topAgentsData.length > 0) {
+        const topAgentsCtx = document.getElementById('topAgentsChart').getContext('2d');
+        new Chart(topAgentsCtx, {
+            type: 'horizontalBar',
+            data: {
+                labels: topAgentsData.map(item => item.agent_name),
+                datasets: [{
+                    label: 'Propriétés',
+                    data: topAgentsData.map(item => item.count),
+                    backgroundColor: [
+                        '#FFD700', // Or pour le 1er
+                        '#C0C0C0', // Argent pour le 2ème
+                        '#CD7F32', // Bronze pour le 3ème
+                        '#3577F1', '#0AB39C', '#F7B500', '#F06548', '#8A92B2', '#6F42C1', '#D63384'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            borderDash: [5, 5]
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Graphique Top Agences
+    const topAgenciesData = <?php echo json_encode($chart_data['top_agencies']); ?>;
+    if (topAgenciesData.length > 0) {
+        const topAgenciesCtx = document.getElementById('topAgenciesChart').getContext('2d');
+        new Chart(topAgenciesCtx, {
+            type: 'horizontalBar',
+            data: {
+                labels: topAgenciesData.map(item => item.agency_name),
+                datasets: [{
+                    label: 'Propriétés',
+                    data: topAgenciesData.map(item => item.count),
+                    backgroundColor: [
+                        '#FFD700', // Or pour la 1ère
+                        '#C0C0C0', // Argent pour la 2ème
+                        '#CD7F32', // Bronze pour la 3ème
+                        '#17A2B8', '#28A745', '#FFC107', '#DC3545', '#6C757D', '#6F42C1', '#E83E8C'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            borderDash: [5, 5]
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
 });
 
 function updatePeriod(period) {

@@ -23,6 +23,7 @@ class Dashboard extends BaseController {
         parent::__construct();
         $this->load->model('Agent_model','agent_model');
         $this->load->model('Agency_model','agency_model');
+        $this->load->model('Property_model','property_model');
         $this->load->model('Activity_model','activity_model');
         $this->load->model('Transaction_model','transaction_model');
         $this->load->model('Task_model','task_model');
@@ -60,64 +61,308 @@ class Dashboard extends BaseController {
         $data = $this->global;
         $data['pageTitle'] = 'Dashboard Admin';
         
-        // Statistiques de base
+        // Statistiques réelles avec la nouvelle vue
         try {
+            // Données de base
             $agencies = $this->agency_model->get_all_agencies();
             $agents = $this->agent_model->get_all_agents_from_posts();
+            $properties = $this->property_model->get_from_property_agent_view();
+            
+            // Statistiques avancées
+            $properties_with_agents = 0;
+            $properties_with_agencies = 0;
+            $active_agents = [];
+            $active_agencies = [];
+            
+            foreach ($properties as $property) {
+                if ($property->agent_id) {
+                    $properties_with_agents++;
+                    $active_agents[$property->agent_id] = true;
+                }
+                if ($property->agency_id) {
+                    $properties_with_agencies++;
+                    $active_agencies[$property->agency_id] = true;
+                }
+            }
+            
+            // Calcul du revenu estimé (basé sur les propriétés)
+            $estimated_revenue = count($properties) * 15000; // Estimation moyenne par propriété
+            
+            // Calcul de la croissance (comparaison avec le mois dernier)
+            $current_month_properties = 0;
+            $last_month_properties = 0;
+            $current_month = date('Y-m');
+            $last_month = date('Y-m', strtotime('-1 month'));
+            
+            foreach ($properties as $property) {
+                $property_month = date('Y-m', strtotime($property->property_date));
+                if ($property_month === $current_month) {
+                    $current_month_properties++;
+                } elseif ($property_month === $last_month) {
+                    $last_month_properties++;
+                }
+            }
+            
+            $growth = $last_month_properties > 0 ? 
+                round((($current_month_properties - $last_month_properties) / $last_month_properties) * 100, 1) : 
+                0;
             
             $data['stats'] = [
                 'agencies' => count($agencies),
                 'agents' => count($agents),
-                'properties' => 150, // Valeur par défaut pour le moment
-                'transactions' => 25,
-                'leads' => 40,
-                'clients' => 85,
-                'revenue' => 750000,
-                'growth' => 12.5
+                'properties' => count($properties),
+                'active_agents' => count($active_agents),
+                'active_agencies' => count($active_agencies),
+                'properties_with_agents' => $properties_with_agents,
+                'properties_with_agencies' => $properties_with_agencies,
+                'revenue' => $estimated_revenue,
+                'growth' => $growth,
+                'current_month_properties' => $current_month_properties,
+                'last_month_properties' => $last_month_properties
             ];
             
-            // Données pour les graphiques (données de test)
-            $data['chart_data'] = [
-                'monthly_sales' => [
-                    ['month' => 'Jan 2025', 'sales' => 5],
-                    ['month' => 'Feb 2025', 'sales' => 8],
-                    ['month' => 'Mar 2025', 'sales' => 12],
-                    ['month' => 'Apr 2025', 'sales' => 7],
-                    ['month' => 'May 2025', 'sales' => 15],
-                    ['month' => 'Jun 2025', 'sales' => 18],
-                    ['month' => 'Jul 2025', 'sales' => 22],
-                    ['month' => 'Aug 2025', 'sales' => 16],
-                    ['month' => 'Sep 2025', 'sales' => 25],
-                    ['month' => 'Oct 2025', 'sales' => 20],
-                    ['month' => 'Nov 2025', 'sales' => 28],
-                    ['month' => 'Dec 2025', 'sales' => 30]
-                ],
-                'properties_by_type' => [
-                    ['property_type' => 'Appartement', 'count' => 45],
-                    ['property_type' => 'Maison', 'count' => 35],
-                    ['property_type' => 'Villa', 'count' => 25],
-                    ['property_type' => 'Studio', 'count' => 20],
-                    ['property_type' => 'Bureau', 'count' => 15]
-                ]
-            ];
+            // Données pour les graphiques réelles
+            $data['chart_data'] = $this->get_real_chart_data($properties);
             
-            // Activités récentes (données de test)
-            $data['recent_activities'] = [
-                ['post_title' => 'Villa moderne à Tunis', 'post_type' => 'property', 'post_date' => date('Y-m-d H:i:s')],
-                ['post_title' => 'Ahmed Ben Ali', 'post_type' => 'houzez_agent', 'post_date' => date('Y-m-d H:i:s', strtotime('-1 hour'))],
-                ['post_title' => 'Appartement centre-ville', 'post_type' => 'property', 'post_date' => date('Y-m-d H:i:s', strtotime('-2 hours'))],
-                ['post_title' => 'Agence Immobilière Nord', 'post_type' => 'houzez_agency', 'post_date' => date('Y-m-d H:i:s', strtotime('-3 hours'))],
-                ['post_title' => 'Maison avec jardin', 'post_type' => 'property', 'post_date' => date('Y-m-d H:i:s', strtotime('-4 hours'))]
-            ];
+            // Activités récentes (basées sur les propriétés réelles)
+            $data['recent_activities'] = $this->get_recent_activities($properties);
             
-            // Top agents et agences
-            $data['top_agents'] = array_slice($agents, 0, 5);
-            $data['top_agencies'] = array_slice($agencies, 0, 5);
+            // Top performers
+            $data['top_agents'] = $this->get_top_agents_performance($properties);
+            $data['top_agencies'] = $this->get_top_agencies_performance($properties);
             
         } catch (Exception $e) {
-            // En cas d'erreur, utiliser des données par défaut
+            // Données de fallback en cas d'erreur
             $data['stats'] = [
                 'agencies' => 0,
+                'agents' => 0,
+                'properties' => 0,
+                'transactions' => 0,
+                'leads' => 0,
+                'clients' => 0,
+                'revenue' => 0,
+                'growth' => 0
+            ];
+            
+            $data['chart_data'] = [
+                'monthly_sales' => [],
+                'properties_by_type' => []
+            ];
+            
+            $data['recent_activities'] = [];
+            $data['top_agents'] = [];
+            $data['top_agencies'] = [];
+            
+            log_message('error', 'Erreur dashboard admin: ' . $e->getMessage());
+        }
+        
+        $this->load->view('dashboard/admin_modern', $data);
+    }
+
+    /**
+     * Génère les données réelles pour les graphiques
+     */
+    private function get_real_chart_data($properties) {
+        // 1. Évolution mensuelle des propriétés ajoutées
+        $monthly_data = [];
+        $months = [];
+        
+        // Préparer les 12 derniers mois
+        for ($i = 11; $i >= 0; $i--) {
+            $month = date('Y-m', strtotime("-$i months"));
+            $months[$month] = [
+                'month' => date('M Y', strtotime($month)),
+                'count' => 0
+            ];
+        }
+        
+        // Compter les propriétés par mois
+        foreach ($properties as $property) {
+            $property_month = date('Y-m', strtotime($property->property_date));
+            if (isset($months[$property_month])) {
+                $months[$property_month]['count']++;
+            }
+        }
+        
+        $monthly_sales = array_values($months);
+        
+        // 2. Répartition des propriétés par agent (top 10)
+        $agent_counts = [];
+        foreach ($properties as $property) {
+            if ($property->agent_id && $property->agent_name) {
+                $agent_name = $property->agent_name;
+                if (!isset($agent_counts[$agent_name])) {
+                    $agent_counts[$agent_name] = 0;
+                }
+                $agent_counts[$agent_name]++;
+            }
+        }
+        
+        arsort($agent_counts);
+        $top_agents_data = [];
+        $count = 0;
+        foreach ($agent_counts as $agent_name => $properties_count) {
+            if ($count < 10) {
+                $top_agents_data[] = [
+                    'agent_name' => $agent_name,
+                    'count' => $properties_count
+                ];
+                $count++;
+            }
+        }
+        
+        // 3. Répartition par agence (top 10)
+        $agency_counts = [];
+        foreach ($properties as $property) {
+            if ($property->agency_id && $property->agency_name) {
+                $agency_name = $property->agency_name;
+                if (!isset($agency_counts[$agency_name])) {
+                    $agency_counts[$agency_name] = 0;
+                }
+                $agency_counts[$agency_name]++;
+            }
+        }
+        
+        arsort($agency_counts);
+        $top_agencies_data = [];
+        $count = 0;
+        foreach ($agency_counts as $agency_name => $properties_count) {
+            if ($count < 10) {
+                $top_agencies_data[] = [
+                    'agency_name' => $agency_name,
+                    'count' => $properties_count
+                ];
+                $count++;
+            }
+        }
+        
+        // 4. Statut des propriétés
+        $status_counts = [];
+        foreach ($properties as $property) {
+            $status = $property->property_status ?? 'unknown';
+            if (!isset($status_counts[$status])) {
+                $status_counts[$status] = 0;
+            }
+            $status_counts[$status]++;
+        }
+        
+        $properties_by_status = [];
+        foreach ($status_counts as $status => $count) {
+            $properties_by_status[] = [
+                'status' => $status,
+                'count' => $count
+            ];
+        }
+        
+        return [
+            'monthly_sales' => $monthly_sales,
+            'top_agents' => $top_agents_data,
+            'top_agencies' => $top_agencies_data,
+            'properties_by_status' => $properties_by_status
+        ];
+    }
+
+    /**
+     * Récupère les activités récentes basées sur les propriétés
+     */
+    private function get_recent_activities($properties) {
+        // Trier par date décroissante et prendre les 10 plus récentes
+        usort($properties, function($a, $b) {
+            return strtotime($b->property_date) - strtotime($a->property_date);
+        });
+        
+        $activities = [];
+        $count = 0;
+        
+        foreach ($properties as $property) {
+            if ($count >= 10) break;
+            
+            $activities[] = [
+                'post_title' => $property->property_title,
+                'post_type' => 'property',
+                'post_date' => $property->property_date,
+                'agent_name' => $property->agent_name ?? 'Agent non assigné',
+                'agency_name' => $property->agency_name ?? 'Agence non assignée'
+            ];
+            $count++;
+        }
+        
+        return $activities;
+    }
+
+    /**
+     * Calcule les top agents par nombre de propriétés
+     */
+    private function get_top_agents_performance($properties) {
+        $agent_performance = [];
+        
+        foreach ($properties as $property) {
+            if ($property->agent_id && $property->agent_name) {
+                $agent_id = $property->agent_id;
+                
+                if (!isset($agent_performance[$agent_id])) {
+                    $agent_performance[$agent_id] = [
+                        'agent_id' => $agent_id,
+                        'agent_name' => $property->agent_name,
+                        'agent_email' => $property->agent_email,
+                        'agent_phone' => $property->agent_phone,
+                        'properties_count' => 0,
+                        'agencies' => []
+                    ];
+                }
+                
+                $agent_performance[$agent_id]['properties_count']++;
+                
+                if ($property->agency_name && !in_array($property->agency_name, $agent_performance[$agent_id]['agencies'])) {
+                    $agent_performance[$agent_id]['agencies'][] = $property->agency_name;
+                }
+            }
+        }
+        
+        // Trier par nombre de propriétés
+        uasort($agent_performance, function($a, $b) {
+            return $b['properties_count'] - $a['properties_count'];
+        });
+        
+        return array_slice(array_values($agent_performance), 0, 10);
+    }
+
+    /**
+     * Calcule les top agences par nombre de propriétés
+     */
+    private function get_top_agencies_performance($properties) {
+        $agency_performance = [];
+        
+        foreach ($properties as $property) {
+            if ($property->agency_id && $property->agency_name) {
+                $agency_id = $property->agency_id;
+                
+                if (!isset($agency_performance[$agency_id])) {
+                    $agency_performance[$agency_id] = [
+                        'agency_id' => $agency_id,
+                        'agency_name' => $property->agency_name,
+                        'agency_email' => $property->agency_email,
+                        'agency_phone' => $property->agency_phone,
+                        'properties_count' => 0,
+                        'agents' => []
+                    ];
+                }
+                
+                $agency_performance[$agency_id]['properties_count']++;
+                
+                if ($property->agent_name && !in_array($property->agent_name, $agency_performance[$agency_id]['agents'])) {
+                    $agency_performance[$agency_id]['agents'][] = $property->agent_name;
+                }
+            }
+        }
+        
+        // Trier par nombre de propriétés
+        uasort($agency_performance, function($a, $b) {
+            return $b['properties_count'] - $a['properties_count'];
+        });
+        
+        return array_slice(array_values($agency_performance), 0, 10);
+    }
                 'agents' => 0,
                 'properties' => 0,
                 'transactions' => 0,
