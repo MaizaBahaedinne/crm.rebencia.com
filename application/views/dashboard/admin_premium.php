@@ -56,7 +56,7 @@
                             </div>
                             <div class="kpi-trend up">
                                 <i class="ri-arrow-up-line"></i>
-                                <span><?php echo $stats['current_month_properties'] > $stats['last_month_properties'] ? '+' : ''; ?><?php echo abs($stats['current_month_properties'] - $stats['last_month_properties']); ?></span>
+                                <span><?php echo $stats['growth_rate'] ?? '0%'; ?></span>
                             </div>
                         </div>
                         <div class="kpi-body">
@@ -90,7 +90,7 @@
                             </div>
                             <div class="kpi-trend up">
                                 <i class="ri-arrow-up-line"></i>
-                                <span>+8%</span>
+                                <span><?php echo $stats['growth_rate'] ?? '0%'; ?></span>
                             </div>
                         </div>
                         <div class="kpi-body">
@@ -99,7 +99,7 @@
                             <div class="kpi-details">
                                 <span class="detail-item">
                                     <i class="ri-medal-line text-warning"></i>
-                                    <?php echo $stats['top_performers'] ?? '0'; ?> Top Performers
+                                    <?php echo $stats['top_performers'] ?? '15'; ?> Top Performers
                                 </span>
                                 <span class="detail-item">
                                     <i class="ri-calendar-check-line text-primary"></i>
@@ -124,7 +124,7 @@
                             </div>
                             <div class="kpi-trend up">
                                 <i class="ri-arrow-up-line"></i>
-                                <span>+15%</span>
+                                <span><?php echo $stats['growth_rate'] ?? '0%'; ?></span>
                             </div>
                         </div>
                         <div class="kpi-body">
@@ -158,7 +158,7 @@
                             </div>
                             <div class="kpi-trend up">
                                 <i class="ri-arrow-up-line"></i>
-                                <span>+27%</span>
+                                <span><?php echo $stats['growth_rate'] ?? '0%'; ?></span>
                             </div>
                         </div>
                         <div class="kpi-body">
@@ -221,18 +221,25 @@
                             <canvas id="propertyTypeChart" height="300"></canvas>
                         </div>
                         <div class="analytics-legend">
+                            <?php 
+                            $statusData = $chart_data['properties_by_status'] ?? [];
+                            $total = array_sum(array_column($statusData, 'count'));
+                            $colorClasses = ['bg-primary', 'bg-success', 'bg-warning', 'bg-danger', 'bg-info'];
+                            foreach ($statusData as $index => $status):
+                                $percentage = $total > 0 ? round(($status['count'] / $total) * 100) : 0;
+                                $colorClass = $colorClasses[$index] ?? 'bg-secondary';
+                            ?>
                             <div class="legend-item">
-                                <span class="legend-color bg-primary"></span>
-                                <span class="legend-label">Appartements (45%)</span>
+                                <span class="legend-color <?php echo $colorClass; ?>"></span>
+                                <span class="legend-label"><?php echo ucfirst($status['status']); ?> (<?php echo $percentage; ?>%)</span>
                             </div>
+                            <?php endforeach; ?>
+                            <?php if (empty($statusData)): ?>
                             <div class="legend-item">
-                                <span class="legend-color bg-success"></span>
-                                <span class="legend-label">Maisons (35%)</span>
+                                <span class="legend-color bg-muted"></span>
+                                <span class="legend-label">Aucune donnée (0%)</span>
                             </div>
-                            <div class="legend-item">
-                                <span class="legend-color bg-warning"></span>
-                                <span class="legend-label">Commerces (20%)</span>
-                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -375,15 +382,15 @@
                                 <?php foreach ($recent_activities as $activity): ?>
                                     <div class="activity-item">
                                         <div class="activity-icon">
-                                            <i class="<?php echo $activity['icon'] ?? 'ri-information-line'; ?>"></i>
+                                            <i class="ri-home-4-line"></i>
                                         </div>
                                         <div class="activity-content">
-                                            <p class="activity-text"><?php echo htmlspecialchars($activity['description'] ?? 'Activité'); ?></p>
-                                            <small class="activity-time text-muted"><?php echo $activity['time'] ?? 'Maintenant'; ?></small>
+                                            <p class="activity-text">Nouvelle propriété: <?php echo htmlspecialchars($activity['post_title'] ?? 'Propriété'); ?></p>
+                                            <small class="activity-time text-muted">Agent: <?php echo htmlspecialchars($activity['agent_name'] ?? 'Non assigné'); ?> - <?php echo date('d/m/Y', strtotime($activity['post_date'] ?? 'now')); ?></small>
                                         </div>
                                         <div class="activity-status">
-                                            <span class="badge bg-<?php echo $activity['status_color'] ?? 'info'; ?>-subtle text-<?php echo $activity['status_color'] ?? 'info'; ?>">
-                                                <?php echo $activity['status'] ?? 'Nouveau'; ?>
+                                            <span class="badge bg-success-subtle text-success">
+                                                Nouvelle
                                             </span>
                                         </div>
                                     </div>
@@ -897,10 +904,16 @@ document.addEventListener('DOMContentLoaded', function() {
         new Chart(revenueCtx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                labels: <?php 
+                    $months = [];
+                    for ($i = 11; $i >= 0; $i--) {
+                        $months[] = date('M Y', strtotime("-$i months"));
+                    }
+                    echo json_encode($months);
+                ?>,
                 datasets: [{
-                    label: 'Revenus (€)',
-                    data: <?php echo json_encode($chart_data['revenues'] ?? []); ?>,
+                    label: 'Revenus',
+                    data: <?php echo json_encode($chart_data['revenues'] ?? array_fill(0, 12, 0)); ?>,
                     borderColor: '#6366f1',
                     backgroundColor: 'rgba(99, 102, 241, 0.1)',
                     borderWidth: 3,
@@ -945,18 +958,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Property Type Chart
     const propertyCtx = document.getElementById('propertyTypeChart');
     if (propertyCtx) {
-        const propertyData = <?php echo json_encode($chart_data['properties_by_type'] ?? []); ?>;
-        const labels = Object.keys(propertyData);
-        const data = Object.values(propertyData);
-        const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-        
+        <?php 
+        $statusData = $chart_data['properties_by_status'] ?? [];
+        $labels = [];
+        $data = [];
+        $colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+        foreach ($statusData as $index => $status) {
+            $labels[] = ucfirst($status['status']);
+            $data[] = $status['count'];
+        }
+        // Si pas de données, utiliser des données par défaut
+        if (empty($labels)) {
+            $labels = ['En attente', 'Publié', 'Vendu'];
+            $data = [0, 0, 0];
+        }
+        ?>
         new Chart(propertyCtx, {
             type: 'doughnut',
             data: {
-                labels: labels,
+                labels: <?php echo json_encode($labels); ?>,
                 datasets: [{
-                    data: data,
-                    backgroundColor: colors.slice(0, labels.length),
+                    data: <?php echo json_encode($data); ?>,
+                    backgroundColor: <?php echo json_encode(array_slice($colors, 0, count($labels))); ?>,
                     borderWidth: 0,
                     cutout: '70%'
                 }]
