@@ -131,6 +131,15 @@ class Dashboard extends BaseController {
             $data['top_agents'] = $this->get_top_agents_performance($properties);
             $data['top_agencies'] = $this->get_top_agencies_performance($properties);
             
+            // Ajout des données premium pour le nouveau design
+            $data['stats']['total_revenue'] = $estimated_revenue;
+            $data['stats']['monthly_revenue'] = round($estimated_revenue / 12);
+            $data['stats']['yearly_revenue'] = $estimated_revenue;
+            $data['stats']['top_performers'] = min(15, count($data['top_agents']));
+            $data['stats']['properties_for_sale'] = $this->get_properties_by_type('for-sale', $properties);
+            $data['stats']['properties_for_rent'] = $this->get_properties_by_type('for-rent', $properties);
+            $data['stats']['growth_rate'] = ($growth >= 0 ? '+' : '') . $growth . '%';
+            
         } catch (Exception $e) {
             // Données de fallback en cas d'erreur
             $data['stats'] = [
@@ -156,7 +165,7 @@ class Dashboard extends BaseController {
             log_message('error', 'Erreur dashboard admin: ' . $e->getMessage());
         }
         
-        $this->loadViews('dashboard/admin_modern', $this->global, $data, NULL);
+        $this->loadViews('dashboard/admin_premium', $this->global, $data, NULL);
     }
 
     /**
@@ -399,5 +408,19 @@ class Dashboard extends BaseController {
         $data['agent'] = $this->agent_model->get_agent($agent_id);
         $data['stats'] = $this->activity_model->get_agent_stats($agent_id);
         $this->loadViews('dashboard/agent', $this->global, $data, NULL);
+    }
+
+    /**
+     * Récupère le nombre de propriétés par type
+     */
+    private function get_properties_by_type($type, $properties) {
+        $count = 0;
+        foreach ($properties as $property) {
+            $property_type = $property->property_status ?? '';
+            if ($property_type === $type) {
+                $count++;
+            }
+        }
+        return $count;
     }
 }
