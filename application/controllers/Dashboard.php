@@ -363,27 +363,6 @@ class Dashboard extends BaseController {
         
         return array_slice(array_values($agency_performance), 0, 10);
     }
-                'agents' => 0,
-                'properties' => 0,
-                'transactions' => 0,
-                'leads' => 0,
-                'clients' => 0,
-                'revenue' => 0,
-                'growth' => 0
-            ];
-            
-            $data['chart_data'] = [
-                'monthly_sales' => [],
-                'properties_by_type' => []
-            ];
-            
-            $data['recent_activities'] = [];
-            $data['top_agents'] = [];
-            $data['top_agencies'] = [];
-        }
-        
-        $this->loadViews('dashboard/admin_modern', $this->global, $data, NULL);
-    }
     
     /**
      * Récupère les statistiques générales pour le dashboard
