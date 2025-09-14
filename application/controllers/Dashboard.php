@@ -68,6 +68,37 @@ class Dashboard extends BaseController {
             $agents = $this->agent_model->get_all_agents_from_posts();
             $properties = $this->property_model->get_from_property_agent_view();
             
+            // Calcul du chiffre d'affaires réel basé sur les prix des propriétés
+            $total_revenue = 0;
+            $monthly_revenue = 0;
+            $properties_for_sale = 0;
+            $properties_for_rent = 0;
+            $current_month = date('Y-m');
+            
+            foreach ($properties as $property) {
+                // Calcul du revenu basé sur les prix réels
+                $price = floatval($property->property_price ?? 0);
+                if ($price > 0) {
+                    // Commission estimée à 3% pour les ventes
+                    $commission = $price * 0.03;
+                    $total_revenue += $commission;
+                    
+                    // Revenu du mois actuel
+                    $property_month = date('Y-m', strtotime($property->property_date ?? 'now'));
+                    if ($property_month === $current_month) {
+                        $monthly_revenue += $commission;
+                    }
+                }
+                
+                // Comptage par type
+                $status = $property->property_status ?? '';
+                if (strpos($status, 'sale') !== false || strpos($status, 'vente') !== false) {
+                    $properties_for_sale++;
+                } elseif (strpos($status, 'rent') !== false || strpos($status, 'location') !== false) {
+                    $properties_for_rent++;
+                }
+            }
+            
             // Statistiques avancées
             $properties_with_agents = 0;
             $properties_with_agencies = 0;
@@ -85,17 +116,13 @@ class Dashboard extends BaseController {
                 }
             }
             
-            // Calcul du revenu estimé (basé sur les propriétés)
-            $estimated_revenue = count($properties) * 15000; // Estimation moyenne par propriété
-            
             // Calcul de la croissance (comparaison avec le mois dernier)
             $current_month_properties = 0;
             $last_month_properties = 0;
-            $current_month = date('Y-m');
             $last_month = date('Y-m', strtotime('-1 month'));
             
             foreach ($properties as $property) {
-                $property_month = date('Y-m', strtotime($property->property_date));
+                $property_month = date('Y-m', strtotime($property->property_date ?? 'now'));
                 if ($property_month === $current_month) {
                     $current_month_properties++;
                 } elseif ($property_month === $last_month) {
@@ -105,7 +132,22 @@ class Dashboard extends BaseController {
             
             $growth = $last_month_properties > 0 ? 
                 round((($current_month_properties - $last_month_properties) / $last_month_properties) * 100, 1) : 
-                0;
+                ($current_month_properties > 0 ? 100 : 0);
+            
+            // Calcul des top performers réels
+            $top_performers_count = 0;
+            $agent_performance = [];
+            foreach ($properties as $property) {
+                $agent_id = $property->agent_id;
+                if ($agent_id) {
+                    if (!isset($agent_performance[$agent_id])) {
+                        $agent_performance[$agent_id] = 0;
+                    }
+                    $agent_performance[$agent_id]++;
+                }
+            }
+            arsort($agent_performance);
+            $top_performers_count = min(15, count(array_filter($agent_performance, function($count) { return $count >= 3; })));
             
             $data['stats'] = [
                 'agencies' => count($agencies),
@@ -115,10 +157,13 @@ class Dashboard extends BaseController {
                 'active_agencies' => count($active_agencies),
                 'properties_with_agents' => $properties_with_agents,
                 'properties_with_agencies' => $properties_with_agencies,
-                'revenue' => $estimated_revenue,
+                'revenue' => $total_revenue, // Utilisation du revenu réel calculé
                 'growth' => $growth,
                 'current_month_properties' => $current_month_properties,
-                'last_month_properties' => $last_month_properties
+                'last_month_properties' => $last_month_properties,
+                'properties_for_sale' => $properties_for_sale,
+                'properties_for_rent' => $properties_for_rent,
+                'top_performers' => $top_performers_count
             ];
             
             // Données pour les graphiques réelles
@@ -132,12 +177,9 @@ class Dashboard extends BaseController {
             $data['top_agencies'] = $this->get_top_agencies_performance($properties);
             
             // Ajout des données premium pour le nouveau design
-            $data['stats']['total_revenue'] = $estimated_revenue;
-            $data['stats']['monthly_revenue'] = round($estimated_revenue / 12);
-            $data['stats']['yearly_revenue'] = $estimated_revenue;
-            $data['stats']['top_performers'] = min(15, count($data['top_agents']));
-            $data['stats']['properties_for_sale'] = $this->get_properties_by_type('for-sale', $properties);
-            $data['stats']['properties_for_rent'] = $this->get_properties_by_type('for-rent', $properties);
+            $data['stats']['total_revenue'] = $total_revenue;
+            $data['stats']['monthly_revenue'] = $monthly_revenue;
+            $data['stats']['yearly_revenue'] = $total_revenue; // Pour simplifier, on garde le total
             $data['stats']['growth_rate'] = ($growth >= 0 ? '+' : '') . $growth . '%';
             
         } catch (Exception $e) {
@@ -172,8 +214,7 @@ class Dashboard extends BaseController {
      * Génère les données réelles pour les graphiques
      */
     private function get_real_chart_data($properties) {
-        // 1. Évolution mensuelle des propriétés ajoutées
-        $monthly_data = [];
+        // 1. Revenus mensuels basés sur les prix réels des propriétés
         $months = [];
         
         // Préparer les 12 derniers mois
@@ -181,21 +222,57 @@ class Dashboard extends BaseController {
             $month = date('Y-m', strtotime("-$i months"));
             $months[$month] = [
                 'month' => date('M Y', strtotime($month)),
+                'revenue' => 0,
                 'count' => 0
             ];
         }
         
-        // Compter les propriétés par mois
+        // Calculer les revenus réels par mois
         foreach ($properties as $property) {
-            $property_month = date('Y-m', strtotime($property->property_date));
+            $property_month = date('Y-m', strtotime($property->property_date ?? 'now'));
             if (isset($months[$property_month])) {
                 $months[$property_month]['count']++;
+                
+                // Calcul du revenu basé sur le prix réel (commission 3%)
+                $price = floatval($property->property_price ?? 0);
+                if ($price > 0) {
+                    $commission = $price * 0.03;
+                    $months[$property_month]['revenue'] += $commission;
+                }
             }
         }
         
-        $monthly_sales = array_values($months);
+        $monthly_revenues = array_column(array_values($months), 'revenue');
         
-        // 2. Répartition des propriétés par agent (top 10)
+        // 2. Répartition des propriétés par type réel
+        $property_types = [
+            'Appartements' => 0,
+            'Maisons' => 0,
+            'Commerces' => 0,
+            'Terrains' => 0,
+            'Autres' => 0
+        ];
+        
+        foreach ($properties as $property) {
+            $type = strtolower($property->property_type ?? '');
+            
+            if (strpos($type, 'apartment') !== false || strpos($type, 'appartement') !== false) {
+                $property_types['Appartements']++;
+            } elseif (strpos($type, 'house') !== false || strpos($type, 'maison') !== false || strpos($type, 'villa') !== false) {
+                $property_types['Maisons']++;
+            } elseif (strpos($type, 'commercial') !== false || strpos($type, 'office') !== false || strpos($type, 'shop') !== false) {
+                $property_types['Commerces']++;
+            } elseif (strpos($type, 'land') !== false || strpos($type, 'terrain') !== false) {
+                $property_types['Terrains']++;
+            } else {
+                $property_types['Autres']++;
+            }
+        }
+        
+        // Filtrer les types avec 0 propriétés
+        $property_types = array_filter($property_types, function($count) { return $count > 0; });
+        
+        // 3. Répartition des propriétés par agent (top 10)
         $agent_counts = [];
         foreach ($properties as $property) {
             if ($property->agent_id && $property->agent_name) {
@@ -214,25 +291,18 @@ class Dashboard extends BaseController {
             if ($count < 10) {
                 $top_agents_data[] = [
                     'agent_name' => $agent_name,
-                    'count' => $properties_count
+                    'properties_count' => $properties_count
                 ];
                 $count++;
             }
         }
         
-        // 3. Répartition par agence (top 10)
-        $agency_counts = [];
-        foreach ($properties as $property) {
-            if ($property->agency_id && $property->agency_name) {
-                $agency_name = $property->agency_name;
-                if (!isset($agency_counts[$agency_name])) {
-                    $agency_counts[$agency_name] = 0;
-                }
-                $agency_counts[$agency_name]++;
-            }
-        }
-        
-        arsort($agency_counts);
+        return [
+            'revenues' => $monthly_revenues,
+            'monthly_sales' => array_column(array_values($months), 'count'),
+            'properties_by_type' => $property_types,
+            'top_agents' => $top_agents_data
+        ];
         $top_agencies_data = [];
         $count = 0;
         foreach ($agency_counts as $agency_name => $properties_count) {

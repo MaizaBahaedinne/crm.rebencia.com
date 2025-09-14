@@ -15,11 +15,11 @@
                                         <p class="hero-subtitle">Pilotez votre empire immobilier avec des données en temps réel</p>
                                         <div class="hero-stats">
                                             <div class="hero-stat-item">
-                                                <span class="hero-stat-number"><?php echo $stats['total_revenue'] ?? '€2.4M'; ?></span>
+                                                <span class="hero-stat-number">€<?php echo number_format($stats['total_revenue'] ?? 0, 0, ',', ' '); ?></span>
                                                 <span class="hero-stat-label">Chiffre d'affaires</span>
                                             </div>
                                             <div class="hero-stat-item">
-                                                <span class="hero-stat-number"><?php echo $stats['growth_rate'] ?? '+23%'; ?></span>
+                                                <span class="hero-stat-number"><?php echo $stats['growth_rate'] ?? '0%'; ?></span>
                                                 <span class="hero-stat-label">Croissance</span>
                                             </div>
                                             <div class="hero-stat-item">
@@ -56,7 +56,7 @@
                             </div>
                             <div class="kpi-trend up">
                                 <i class="ri-arrow-up-line"></i>
-                                <span>+12%</span>
+                                <span><?php echo $stats['current_month_properties'] > $stats['last_month_properties'] ? '+' : ''; ?><?php echo abs($stats['current_month_properties'] - $stats['last_month_properties']); ?></span>
                             </div>
                         </div>
                         <div class="kpi-body">
@@ -99,7 +99,7 @@
                             <div class="kpi-details">
                                 <span class="detail-item">
                                     <i class="ri-medal-line text-warning"></i>
-                                    <?php echo $stats['top_performers'] ?? '15'; ?> Top Performers
+                                    <?php echo $stats['top_performers'] ?? '0'; ?> Top Performers
                                 </span>
                                 <span class="detail-item">
                                     <i class="ri-calendar-check-line text-primary"></i>
@@ -162,16 +162,16 @@
                             </div>
                         </div>
                         <div class="kpi-body">
-                            <h2 class="kpi-number">€<?php echo number_format($stats['total_revenue'] ?? 2400000, 0, ',', ' '); ?></h2>
+                            <h2 class="kpi-number">€<?php echo number_format($stats['total_revenue'] ?? 0, 0, ',', ' '); ?></h2>
                             <p class="kpi-label">Revenus Totaux</p>
                             <div class="kpi-details">
                                 <span class="detail-item">
                                     <i class="ri-line-chart-line text-success"></i>
-                                    Ce mois: €<?php echo number_format($stats['monthly_revenue'] ?? 180000, 0, ',', ' '); ?>
+                                    Ce mois: €<?php echo number_format($stats['monthly_revenue'] ?? 0, 0, ',', ' '); ?>
                                 </span>
                                 <span class="detail-item">
                                     <i class="ri-calendar-line text-info"></i>
-                                    Cette année: €<?php echo number_format($stats['yearly_revenue'] ?? 2400000, 0, ',', ' '); ?>
+                                    Cette année: €<?php echo number_format($stats['yearly_revenue'] ?? 0, 0, ',', ' '); ?>
                                 </span>
                             </div>
                         </div>
@@ -899,8 +899,8 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
                 datasets: [{
-                    label: 'Revenus',
-                    data: <?php echo json_encode($chart_data['revenues'] ?? [120000, 150000, 180000, 160000, 200000, 220000, 250000, 240000, 280000, 300000, 320000, 350000]); ?>,
+                    label: 'Revenus (€)',
+                    data: <?php echo json_encode($chart_data['revenues'] ?? []); ?>,
                     borderColor: '#6366f1',
                     backgroundColor: 'rgba(99, 102, 241, 0.1)',
                     borderWidth: 3,
@@ -945,13 +945,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Property Type Chart
     const propertyCtx = document.getElementById('propertyTypeChart');
     if (propertyCtx) {
+        const propertyData = <?php echo json_encode($chart_data['properties_by_type'] ?? []); ?>;
+        const labels = Object.keys(propertyData);
+        const data = Object.values(propertyData);
+        const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+        
         new Chart(propertyCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Appartements', 'Maisons', 'Commerces'],
+                labels: labels,
                 datasets: [{
-                    data: [45, 35, 20],
-                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b'],
+                    data: data,
+                    backgroundColor: colors.slice(0, labels.length),
                     borderWidth: 0,
                     cutout: '70%'
                 }]
