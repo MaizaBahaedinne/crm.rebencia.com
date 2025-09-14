@@ -156,7 +156,7 @@ class Dashboard extends BaseController {
             log_message('error', 'Erreur dashboard admin: ' . $e->getMessage());
         }
         
-        $this->load->view('dashboard/admin_modern', $data);
+        $this->loadViews('dashboard/admin_modern', $this->global, $data, NULL);
     }
 
     /**
