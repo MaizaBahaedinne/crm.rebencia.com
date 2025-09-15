@@ -109,6 +109,64 @@ class Migration_Create_users_table extends CI_Migration {
             $this->db->insert_batch('wp_users', $test_agents);
         }
 
+        // Créer la table wp_usermeta si elle n'existe pas
+        if (!$this->db->table_exists('wp_usermeta')) {
+            $this->dbforge->add_field(array(
+                'umeta_id' => array(
+                    'type' => 'BIGINT',
+                    'constraint' => 20,
+                    'unsigned' => TRUE,
+                    'auto_increment' => TRUE
+                ),
+                'user_id' => array(
+                    'type' => 'BIGINT',
+                    'constraint' => 20,
+                    'unsigned' => TRUE,
+                    'null' => FALSE,
+                    'default' => 0
+                ),
+                'meta_key' => array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 255,
+                    'null' => TRUE
+                ),
+                'meta_value' => array(
+                    'type' => 'LONGTEXT',
+                    'null' => TRUE
+                )
+            ));
+            $this->dbforge->add_key('umeta_id', TRUE);
+            $this->dbforge->add_key('user_id');
+            $this->dbforge->add_key('meta_key');
+            $this->dbforge->create_table('wp_usermeta');
+
+            // Insérer les capabilities pour nos agents de test
+            $agents_result = $this->db->get('wp_users');
+            $agent_capabilities = array();
+            
+            foreach ($agents_result->result() as $agent) {
+                $agent_capabilities[] = array(
+                    'user_id' => $agent->ID,
+                    'meta_key' => 'wp_capabilities',
+                    'meta_value' => 'a:1:{s:12:"houzez_agent";b:1;}'
+                );
+                $agent_capabilities[] = array(
+                    'user_id' => $agent->ID,
+                    'meta_key' => 'wp_user_level',
+                    'meta_value' => '0'
+                );
+                $agent_capabilities[] = array(
+                    'user_id' => $agent->ID,
+                    'meta_key' => 'fave_agent_agency',
+                    'meta_value' => '1'
+                );
+            }
+            
+            if (!empty($agent_capabilities)) {
+                $this->db->insert_batch('wp_usermeta', $agent_capabilities);
+            }
+        }
+
         // Créer la vue pour le dashboard des objectifs
         $view_sql = "CREATE OR REPLACE VIEW v_objectives_dashboard AS
         SELECT 
@@ -151,6 +209,10 @@ class Migration_Create_users_table extends CI_Migration {
     public function down()
     {
         $this->db->query("DROP VIEW IF EXISTS v_objectives_dashboard");
+        
+        if ($this->db->table_exists('wp_usermeta')) {
+            $this->dbforge->drop_table('wp_usermeta');
+        }
         
         if ($this->db->table_exists('wp_users')) {
             $this->dbforge->drop_table('wp_users');
