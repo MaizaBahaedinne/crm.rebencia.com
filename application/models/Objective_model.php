@@ -17,6 +17,11 @@ class Objective_model extends CI_Model
      * Créer ou mettre à jour les objectifs d'un agent pour un mois
      */
     public function set_monthly_objectives($agent_id, $month, $objectives, $created_by) {
+        // Validation des paramètres obligatoires
+        if (empty($created_by)) {
+            throw new Exception('created_by ne peut pas être vide');
+        }
+        
         $data = [
             'agent_id' => $agent_id,
             'month' => $month . '-01', // Premier jour du mois
@@ -24,7 +29,7 @@ class Objective_model extends CI_Model
             'contacts_target' => $objectives['contacts_target'] ?? 0,
             'transactions_target' => $objectives['transactions_target'] ?? 0,
             'revenue_target' => $objectives['revenue_target'] ?? 0,
-            'created_by' => $created_by,
+            'created_by' => (int)$created_by, // S'assurer que c'est un entier
             'updated_at' => date('Y-m-d H:i:s')
         ];
 

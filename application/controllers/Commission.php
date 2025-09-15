@@ -15,11 +15,13 @@ class Commission extends BaseController {
         $this->load->helper('form');
         $this->load->database(); // Base CRM par défaut
         $this->wp_db = $this->load->database('wordpress', TRUE); // Base WordPress
+    }
         
-        // Vérifier si l'utilisateur est connecté
-        if (!$this->session->userdata('logged_in')) {
-            redirect('login');
-        }
+    /**
+     * Vérification d'authentification pour toutes les méthodes
+     */
+    private function checkAuth() {
+        $this->isLoggedIn();
     }
 
     /**

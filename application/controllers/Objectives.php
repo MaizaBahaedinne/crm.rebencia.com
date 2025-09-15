@@ -9,6 +9,7 @@ class Objectives extends BaseController {
         parent::__construct();
         $this->load->model('Objective_model');
         $this->load->library('form_validation');
+        $this->load->library('session');
         $this->load->helper('form');
         
         // Configuration de la base de données WordPress
@@ -80,7 +81,14 @@ class Objectives extends BaseController {
 
         $agent_id = $this->input->post('agent_id');
         $month = $this->input->post('month');
-        $created_by = $this->session->userdata('user_id');
+        $created_by = $this->vendorId; // ID WordPress de l'utilisateur connecté
+        
+        // Validation de l'utilisateur connecté
+        if (empty($created_by)) {
+            $this->session->set_flashdata('error', 'Erreur de session : utilisateur non identifié.');
+            redirect('objectives/set_monthly');
+            return;
+        }
 
         $objectives = [
             'estimations_target' => $this->input->post('estimations_target'),
@@ -259,7 +267,14 @@ class Objectives extends BaseController {
     private function _process_bulk_objectives() {
         $month = $this->input->post('month');
         $agents_data = $this->input->post('agents');
-        $created_by = $this->session->userdata('user_id');
+        $created_by = $this->vendorId; // ID WordPress de l'utilisateur connecté
+        
+        // Validation de l'utilisateur connecté
+        if (empty($created_by)) {
+            $this->session->set_flashdata('error', 'Erreur de session : utilisateur non identifié.');
+            redirect('objectives/bulk_set');
+            return;
+        }
 
         if (!$month || !$agents_data) {
             $this->session->set_flashdata('error', 'Mois et données agents requis.');
