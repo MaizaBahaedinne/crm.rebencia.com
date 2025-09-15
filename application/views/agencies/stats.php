@@ -15,16 +15,20 @@
                                         <p class="hero-subtitle">Tableau de bord avancé pour analyser les performances de votre réseau d'agences immobilières</p>
                                         <div class="hero-metrics">
                                             <div class="metric-item">
-                                                <span class="metric-value"><?php echo $stats['total_agents'] ?? 0; ?></span>
+                                                <span class="metric-value"><?php echo $stats['total_agencies'] ?? 0; ?></span>
+                                                <span class="metric-label">Agences</span>
+                                            </div>
+                                            <div class="metric-item">
+                                                <span class="metric-value"><?php echo $stats['active_agents'] ?? 0; ?>/<?php echo $stats['total_agents'] ?? 0; ?></span>
                                                 <span class="metric-label">Agents Actifs</span>
                                             </div>
                                             <div class="metric-item">
-                                                <span class="metric-value"><?php echo $stats['total_properties'] ?? 0; ?></span>
-                                                <span class="metric-label">Biens Gérés</span>
+                                                <span class="metric-value"><?php echo $stats['published_properties'] ?? 0; ?></span>
+                                                <span class="metric-label">Biens Publiés</span>
                                             </div>
                                             <div class="metric-item">
-                                                <span class="metric-value">€<?php echo number_format($stats['monthly_revenue'] ?? 0, 0, ',', ' '); ?></span>
-                                                <span class="metric-label">CA Mensuel</span>
+                                                <span class="metric-value">€<?php echo number_format($stats['avg_property_price'] ?? 0, 0, ',', ' '); ?></span>
+                                                <span class="metric-label">Prix Moyen</span>
                                             </div>
                                         </div>
                                     </div>
@@ -67,7 +71,7 @@
                                 <div class="kpi-details">
                                     <span class="detail-badge active">
                                         <i class="ri-user-star-line"></i>
-                                        <?php echo round(($stats['total_agents'] ?? 0) * 0.85); ?> Actifs
+                                        <?php echo $stats['active_agents'] ?? 0; ?> Actifs / <?php echo $stats['total_agents'] ?? 0; ?> Total
                                     </span>
                                 </div>
                             </div>
@@ -98,7 +102,11 @@
                                 <div class="kpi-details">
                                     <span class="detail-badge success">
                                         <i class="ri-checkbox-circle-line"></i>
-                                        <?php echo $stats['active_properties'] ?? 0; ?> Disponibles
+                                        <?php echo $stats['published_properties'] ?? 0; ?> Publiées
+                                    </span>
+                                    <span class="detail-badge warning">
+                                        <i class="ri-draft-line"></i>
+                                        <?php echo $stats['draft_properties'] ?? 0; ?> Brouillons
                                     </span>
                                 </div>
                             </div>
@@ -166,7 +174,11 @@
                                 <div class="kpi-details">
                                     <span class="detail-badge revenue">
                                         <i class="ri-trending-up-line"></i>
-                                        €<?php echo number_format(($stats['monthly_revenue'] ?? 180000) * 12, 0, ',', ' '); ?> Annuel
+                                        €<?php echo number_format($stats['yearly_revenue'] ?? 0, 0, ',', ' '); ?> Annuel
+                                    </span>
+                                    <span class="detail-badge active">
+                                        <i class="ri-calendar-line"></i>
+                                        <?php echo $stats['current_month_properties'] ?? 0; ?> ce mois
                                     </span>
                                 </div>
                             </div>
@@ -234,7 +246,7 @@
                     <div class="card border-0 shadow-sm">
                         <div class="card-header">
                             <div class="d-flex align-items-center">
-                                <h5 class="card-title mb-0">Top Agences Performers</h5>
+                                <h5 class="card-title mb-0">Top Agents Performers</h5>
                                 <div class="ms-auto">
                                     <a href="<?php echo base_url('agencies'); ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="ri-external-link-line me-1"></i>Voir Toutes
@@ -248,141 +260,80 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th>Rang</th>
-                                            <th>Agence</th>
-                                            <th>Agents</th>
+                                            <th>Agent</th>
                                             <th>Propriétés</th>
-                                            <th>Revenus</th>
+                                            <th>Prix Moyen</th>
+                                            <th>Commission</th>
                                             <th>Performance</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <span class="badge bg-warning fs-12">🥇</span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm rounded-circle bg-primary-subtle me-2">
-                                                        <span class="avatar-title rounded-circle bg-primary-subtle text-primary">
-                                                            <i class="ri-building-line"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="mb-0">Agence Premium Paris</h6>
-                                                        <small class="text-muted">Secteur Centre</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="fw-semibold">12</span></td>
-                                            <td><span class="fw-semibold">45</span></td>
-                                            <td><span class="fw-semibold text-success">€85K</span></td>
-                                            <td>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar bg-success" style="width: 92%"></div>
-                                                </div>
-                                                <small class="text-muted">92%</small>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        Actions
-                                                    </button>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="ri-eye-line me-2"></i>Voir Détails
-                                                        </a>
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="ri-file-download-line me-2"></i>Rapport
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <span class="badge bg-secondary fs-12">🥈</span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm rounded-circle bg-success-subtle me-2">
-                                                        <span class="avatar-title rounded-circle bg-success-subtle text-success">
-                                                            <i class="ri-building-line"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="mb-0">Rebencia Immobilier</h6>
-                                                        <small class="text-muted">Multi-secteurs</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="fw-semibold">8</span></td>
-                                            <td><span class="fw-semibold">38</span></td>
-                                            <td><span class="fw-semibold text-success">€72K</span></td>
-                                            <td>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar bg-success" style="width: 88%"></div>
-                                                </div>
-                                                <small class="text-muted">88%</small>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        Actions
-                                                    </button>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="ri-eye-line me-2"></i>Voir Détails
-                                                        </a>
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="ri-file-download-line me-2"></i>Rapport
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <span class="badge bg-warning fs-12" style="color: #cd7f32 !important;">🥉</span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm rounded-circle bg-info-subtle me-2">
-                                                        <span class="avatar-title rounded-circle bg-info-subtle text-info">
-                                                            <i class="ri-building-line"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="mb-0">Agence du Marché</h6>
-                                                        <small class="text-muted">Résidentiel</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="fw-semibold">6</span></td>
-                                            <td><span class="fw-semibold">28</span></td>
-                                            <td><span class="fw-semibold text-success">€58K</span></td>
-                                            <td>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar bg-warning" style="width: 75%"></div>
-                                                </div>
-                                                <small class="text-muted">75%</small>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        Actions
-                                                    </button>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="ri-eye-line me-2"></i>Voir Détails
-                                                        </a>
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="ri-file-download-line me-2"></i>Rapport
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <?php if (!empty($top_agents)): ?>
+                                            <?php foreach ($top_agents as $index => $agent): ?>
+                                                <tr>
+                                                    <td>
+                                                        <?php if ($index === 0): ?>
+                                                            <span class="badge bg-warning fs-12">🥇</span>
+                                                        <?php elseif ($index === 1): ?>
+                                                            <span class="badge bg-secondary fs-12">🥈</span>
+                                                        <?php elseif ($index === 2): ?>
+                                                            <span class="badge bg-warning fs-12" style="color: #cd7f32 !important;">🥉</span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-light text-dark"><?php echo $index + 1; ?></span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar-sm rounded-circle bg-primary-subtle me-2">
+                                                                <span class="avatar-title rounded-circle bg-primary-subtle text-primary">
+                                                                    <i class="ri-user-3-line"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-0"><?php echo htmlspecialchars($agent->display_name ?? 'Agent'); ?></h6>
+                                                                <small class="text-muted">Agent ID: <?php echo $agent->ID ?? 'N/A'; ?></small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td><span class="fw-semibold"><?php echo $agent->property_count ?? 0; ?></span></td>
+                                                    <td><span class="fw-semibold">€<?php echo number_format($agent->avg_property_price ?? 0, 0, ',', ' '); ?></span></td>
+                                                    <td><span class="fw-semibold text-success">€<?php echo number_format(($agent->property_count ?? 0) * ($agent->avg_property_price ?? 0) * 0.03, 0, ',', ' '); ?></span></td>
+                                                    <td>
+                                                        <div class="progress progress-sm">
+                                                            <?php 
+                                                            $performance = min(100, ($agent->property_count ?? 0) * 10); 
+                                                            $color = $performance >= 80 ? 'success' : ($performance >= 60 ? 'warning' : 'danger');
+                                                            ?>
+                                                            <div class="progress-bar bg-<?php echo $color; ?>" style="width: <?php echo $performance; ?>%"></div>
+                                                        </div>
+                                                        <small class="text-muted"><?php echo $performance; ?>%</small>
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                                Actions
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item" href="<?php echo base_url('agents/view/' . ($agent->ID ?? '')); ?>">
+                                                                    <i class="ri-eye-line me-2"></i>Voir Profil
+                                                                </a>
+                                                                <a class="dropdown-item" href="<?php echo base_url('properties?agent=' . ($agent->ID ?? '')); ?>">
+                                                                    <i class="ri-home-4-line me-2"></i>Ses Propriétés
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="7" class="text-center py-4">
+                                                    <i class="ri-user-search-line text-muted" style="font-size: 3rem;"></i>
+                                                    <p class="text-muted mt-2">Aucun agent avec propriétés trouvé</p>
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>

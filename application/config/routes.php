@@ -48,6 +48,27 @@ $route['agency/view/(:num)'] = 'Agency/view/$1';
 
 /*********** AGENTS (HOUZEZ - Consultation) *******************/
 $route['agents'] = 'Agent/index';
+
+/*********** COMMISSION MODULE *******************/
+$route['commission'] = 'Commission/settings';
+$route['commission/settings'] = 'Commission/settings';
+$route['commission/update_settings'] = 'Commission/update_settings';
+$route['commission/calculator'] = 'Commission/calculator';
+$route['commission/api_calculate'] = 'Commission/api_calculate';
+$route['commission/save'] = 'Commission/save';
+$route['commission/history'] = 'Commission/history';
+$route['commission/history/(:num)'] = 'Commission/history/$1';
+$route['commission/stats'] = 'Commission/stats';
+
+/*********** OBJECTIVES MODULE *******************/
+$route['objectives'] = 'Objectives/index';
+$route['objectives/set_monthly'] = 'Objectives/set_monthly';
+$route['objectives/agent/(:num)'] = 'Objectives/agent/$1';
+$route['objectives/update_performance'] = 'Objectives/update_performance';
+$route['objectives/calculate_performance/(:num)/(:any)'] = 'Objectives/calculate_performance/$1/$2';
+$route['objectives/team'] = 'Objectives/team';
+$route['objectives/bulk_set'] = 'Objectives/bulk_set';
+$route['objectives/api_get_data'] = 'Objectives/api_get_data';
 $route['agents/test'] = 'Agent/test';
 $route['agents/view/(:num)'] = 'Agent/view/$1';
 $route['agents/(:num)'] = 'Agent/view/$1';
