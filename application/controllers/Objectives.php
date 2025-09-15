@@ -42,7 +42,7 @@ class Objectives extends BaseController {
         $data['agents'] = $this->Objective_model->get_agents();
         
         // Récupérer les objectifs existants si il y en a
-        $existing_objectives = $this->Objective_model->get_monthly_objectives_by_month($data['selected_month']);
+        $existing_objectives = $this->Objective_model->get_monthly_objectives($data['selected_month']);
         $data['existing_objectives'] = array();
         
         if ($existing_objectives) {
