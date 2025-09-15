@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Commission extends CI_Controller {
+require APPPATH . '/libraries/BaseController.php';
+
+class Commission extends BaseController {
 
     protected $wp_db;
 
