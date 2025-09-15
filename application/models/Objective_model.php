@@ -173,39 +173,73 @@ class Objective_model extends CI_Model
             $month = date('Y-m');
         }
 
-        $sql = "
-            SELECT 
-                mo.*,
-                u.display_name as agent_name,
-                ap.estimations_count,
-                ap.contacts_count,
-                ap.transactions_count,
-                ap.revenue_amount,
-                ap.commission_earned,
-                CASE 
-                    WHEN mo.estimations_target > 0 THEN ROUND((ap.estimations_count / mo.estimations_target) * 100, 2)
-                    ELSE 0 
-                END as estimations_progress,
-                CASE 
-                    WHEN mo.contacts_target > 0 THEN ROUND((ap.contacts_count / mo.contacts_target) * 100, 2)
-                    ELSE 0 
-                END as contacts_progress,
-                CASE 
-                    WHEN mo.transactions_target > 0 THEN ROUND((ap.transactions_count / mo.transactions_target) * 100, 2)
-                    ELSE 0 
-                END as transactions_progress,
-                CASE 
-                    WHEN mo.revenue_target > 0 THEN ROUND((ap.revenue_amount / mo.revenue_target) * 100, 2)
-                    ELSE 0 
-                END as revenue_progress
-            FROM monthly_objectives mo
-            LEFT JOIN wp_users u ON u.ID = mo.agent_id
-            LEFT JOIN agent_performance ap ON ap.agent_id = mo.agent_id AND ap.month = mo.month
-            WHERE mo.month = ?
-            ORDER BY u.display_name ASC
-        ";
+        // Version simplifiée utilisant Active Record
+        $objectives = $this->db->select('*')
+                              ->from('monthly_objectives')
+                              ->where('month', $month . '-01')
+                              ->get()
+                              ->result();
 
-        return $this->db->query($sql, [$month . '-01'])->result();
+        $result = array();
+        
+        foreach ($objectives as $objective) {
+            // Récupérer les infos de l'agent depuis WordPress
+            $agent = $this->wp_db->select('ID, display_name')
+                                 ->from('users')
+                                 ->where('ID', $objective->agent_id)
+                                 ->get()
+                                 ->row();
+
+            // Récupérer les performances depuis la base CRM
+            $performance = $this->db->select('*')
+                                   ->from('agent_performance')
+                                   ->where('agent_id', $objective->agent_id)
+                                   ->where('month', $month . '-01')
+                                   ->get()
+                                   ->row();
+
+            // Calculer les progressions
+            $estimations_progress = ($objective->estimations_target > 0) ? 
+                round((($performance->estimations_count ?? 0) / $objective->estimations_target) * 100, 2) : 0;
+                
+            $contacts_progress = ($objective->contacts_target > 0) ? 
+                round((($performance->contacts_count ?? 0) / $objective->contacts_target) * 100, 2) : 0;
+                
+            $transactions_progress = ($objective->transactions_target > 0) ? 
+                round((($performance->transactions_count ?? 0) / $objective->transactions_target) * 100, 2) : 0;
+                
+            $revenue_progress = ($objective->revenue_target > 0) ? 
+                round((($performance->revenue_amount ?? 0) / $objective->revenue_target) * 100, 2) : 0;
+
+            // Créer l'objet résultat
+            $obj = new stdClass();
+            $obj->id = $objective->id;
+            $obj->agent_id = $objective->agent_id;
+            $obj->month = $objective->month;
+            $obj->estimations_target = $objective->estimations_target;
+            $obj->contacts_target = $objective->contacts_target;
+            $obj->transactions_target = $objective->transactions_target;
+            $obj->revenue_target = $objective->revenue_target;
+            $obj->agent_name = $agent ? $agent->display_name : 'Agent inconnu';
+            $obj->estimations_count = $performance->estimations_count ?? 0;
+            $obj->contacts_count = $performance->contacts_count ?? 0;
+            $obj->transactions_count = $performance->transactions_count ?? 0;
+            $obj->revenue_amount = $performance->revenue_amount ?? 0;
+            $obj->commission_earned = $performance->commission_earned ?? 0;
+            $obj->estimations_progress = $estimations_progress;
+            $obj->contacts_progress = $contacts_progress;
+            $obj->transactions_progress = $transactions_progress;
+            $obj->revenue_progress = $revenue_progress;
+
+            $result[] = $obj;
+        }
+
+        // Trier par nom d'agent
+        usort($result, function($a, $b) {
+            return strcmp($a->agent_name, $b->agent_name);
+        });
+
+        return $result;
     }
 
     /**
@@ -249,5 +283,19 @@ class Objective_model extends CI_Model
         ";
 
         return $this->db->query($sql, [$month . '-01'])->row();
+    }
+
+    /**
+     * Récupérer la liste des agents depuis WordPress
+     */
+    public function get_agents() {
+        return $this->wp_db->select('u.ID, u.display_name, u.user_email')
+                           ->from('users u')
+                           ->join('usermeta um', 'um.user_id = u.ID')
+                           ->where('um.meta_key', 'wp_Hrg8P_capabilities')
+                           ->like('um.meta_value', 'houzez_agent')
+                           ->order_by('u.display_name', 'ASC')
+                           ->get()
+                           ->result();
     }
 }

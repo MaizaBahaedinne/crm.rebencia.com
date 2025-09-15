@@ -3,10 +3,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Commission extends CI_Controller {
 
+    protected $wp_db;
+
     public function __construct() {
         parent::__construct();
         $this->load->model('Commission_model');
         $this->load->library('session');
+        $this->load->library('form_validation');
+        $this->load->helper('form');
+        $this->load->database(); // Base CRM par défaut
+        $this->wp_db = $this->load->database('wordpress', TRUE); // Base WordPress
         
         // Vérifier si l'utilisateur est connecté
         if (!$this->session->userdata('logged_in')) {
@@ -94,15 +100,14 @@ class Commission extends CI_Controller {
         }
 
         // Récupérer la liste des agents pour le select
-        $this->load->database('wordpress');
-        $data['agents'] = $this->db->select('u.ID, u.display_name')
-                                  ->from('wp_users u')
-                                  ->join('wp_usermeta um', 'um.user_id = u.ID')
-                                  ->where('um.meta_key', 'wp_capabilities')
-                                  ->like('um.meta_value', 'houzez_agent')
-                                  ->order_by('u.display_name', 'ASC')
-                                  ->get()
-                                  ->result();
+        $data['agents'] = $this->wp_db->select('u.ID, u.display_name')
+                                      ->from('users u')
+                                      ->join('usermeta um', 'um.user_id = u.ID')
+                                      ->where('um.meta_key', 'wp_Hrg8P_capabilities')
+                                      ->like('um.meta_value', 'houzez_agent')
+                                      ->order_by('u.display_name', 'ASC')
+                                      ->get()
+                                      ->result();
 
         $this->load->view('includes/header', $data);
         $this->load->view('commission/calculator', $data);
@@ -127,14 +132,14 @@ class Commission extends CI_Controller {
 
         // Récupérer la liste des agents
         $this->load->database('wordpress');
-        $data['agents'] = $this->db->select('u.ID, u.display_name')
-                                  ->from('wp_users u')
-                                  ->join('wp_usermeta um', 'um.user_id = u.ID')
-                                  ->where('um.meta_key', 'wp_capabilities')
-                                  ->like('um.meta_value', 'houzez_agent')
-                                  ->order_by('u.display_name', 'ASC')
-                                  ->get()
-                                  ->result();
+        $data['agents'] = $this->wp_db->select('u.ID, u.display_name')
+                                       ->from('users u')
+                                       ->join('usermeta um', 'um.user_id = u.ID')
+                                       ->where('um.meta_key', 'wp_Hrg8P_capabilities')
+                                       ->like('um.meta_value', 'houzez_agent')
+                                       ->order_by('u.display_name', 'ASC')
+                                       ->get()
+                                       ->result();
 
         $this->load->view('includes/header', $data);
         $this->load->view('commission/history', $data);

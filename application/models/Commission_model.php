@@ -3,9 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Commission_model extends CI_Model {
 
+    protected $wp_db;
+
     public function __construct() {
         parent::__construct();
-        $this->load->database();
+        $this->load->database(); // Base CRM par défaut
+        $this->wp_db = $this->load->database('wordpress', TRUE); // Base WordPress
     }
 
     /**
