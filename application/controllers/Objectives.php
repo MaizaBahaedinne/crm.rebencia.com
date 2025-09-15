@@ -27,9 +27,7 @@ class Objectives extends BaseController {
         $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month);
         $data['stats'] = $this->Objective_model->get_objectives_stats($month);
         
-        $this->load->view('includes/header', $data);
-        $data['objectives_data'] = $this->load->view('objectives/index', $data);
-        $this->load->view('includes/footer');
+        $this->loadViews('objectives/index', $this->global, $data, NULL);
     }
 
     /**
@@ -59,9 +57,7 @@ class Objectives extends BaseController {
             return;
         }
 
-        $this->load->view('header', $data);
-        $this->load->view('objectives/set_monthly', $data);
-        $this->load->view('footer');
+        $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);
     }
 
     /**
@@ -128,9 +124,7 @@ class Objectives extends BaseController {
             show_404();
         }
 
-        $this->load->view('header', $data);
-        $this->load->view('objectives/agent_detail', $data);
-        $this->load->view('footer');
+        $this->loadViews('objectives/agent_detail', $this->global, $data, NULL);
     }
 
     /**
@@ -212,9 +206,7 @@ class Objectives extends BaseController {
         $data['team_objectives'] = $this->Objective_model->get_monthly_objectives($month);
         $data['team_stats'] = $this->Objective_model->get_objectives_stats($month);
 
-        $this->load->view('header', $data);
-        $this->load->view('objectives/team', $data);
-        $this->load->view('footer');
+        $this->loadViews('objectives/team', $this->global, $data, NULL);
     }
 
     /**
@@ -258,9 +250,7 @@ class Objectives extends BaseController {
             $this->_process_bulk_objectives();
         }
 
-        $this->load->view('header', $data);
-        $this->load->view('objectives/bulk_set', $data);
-        $this->load->view('footer');
+        $this->loadViews('objectives/bulk_set', $this->global, $data, NULL);
     }
 
     /**

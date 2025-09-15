@@ -30,9 +30,7 @@ class Commission extends BaseController {
         $data['title'] = 'Paramètres des Commissions';
         $data['settings'] = $this->Commission_model->get_commission_settings();
         
-        $this->load->view('includes/header', $data);
-        $this->load->view('commission/settings', $data);
-        $this->load->view('includes/footer');
+        $this->loadViews('commission/settings', $this->global, $data, NULL);
     }
 
     /**
@@ -114,9 +112,10 @@ class Commission extends BaseController {
                                       ->get()
                                       ->result();
 
-        $this->load->view('includes/header', $data);
-        $this->load->view('commission/calculator', $data);
-        $this->load->view('includes/footer');
+        }
+        
+        $this->loadViews('commission/calculator', $this->global, $data, NULL);
+    }
     }
 
     /**
@@ -147,9 +146,7 @@ class Commission extends BaseController {
                                        ->get()
                                        ->result();
 
-        $this->load->view('includes/header', $data);
-        $this->load->view('commission/history', $data);
-        $this->load->view('includes/footer');
+        $this->loadViews('commission/history', $this->global, $data, NULL);
     }
 
     /**
@@ -163,9 +160,7 @@ class Commission extends BaseController {
         $data['last_month_stats'] = $this->Commission_model->get_commission_stats('last_month');
         $data['current_year_stats'] = $this->Commission_model->get_commission_stats('current_year');
 
-        $this->load->view('includes/header', $data);
-        $this->load->view('commission/stats', $data);
-        $this->load->view('includes/footer');
+        $this->loadViews('commission/stats', $this->global, $data, NULL);
     }
 
     /**
