@@ -360,7 +360,7 @@ class Objective_model extends CI_Model
             SELECT COUNT(*) as count
             FROM crm_clients 
             WHERE agent_id = ? 
-            AND DATE(created_at) BETWEEN ? AND ?
+            AND DATE(date_creation) BETWEEN ? AND ?
         ";
         $contacts_result = $this->db->query($contacts_query, [$agent_id, $month_start, $month_end]);
         if ($contacts_result && $contacts_result->num_rows() > 0) {
