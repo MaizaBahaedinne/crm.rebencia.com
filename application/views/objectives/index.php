@@ -427,23 +427,6 @@
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header">
-                            <div class="d-flex align-items-center">
-                                <h5 class="card-title mb-0">
-                                    <i class="ri-dashboard-3-line me-2"></i>
-                                    Dashboard des Objectifs - <?php echo date('F Y', strtotime($current_month . '-01')); ?>
-                                </h5>
-                                <div class="ms-auto">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="exportToExcel()">
-                                        <i class="ri-file-excel-2-line me-1"></i>Exporter Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <?php if (!empty($objectives_data)): ?>
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0" id="objectives-table">
-                                        <thead class="table-light">
                         
                         <?php if (!empty($objectives_data)): ?>
                             <div class="table-responsive">
@@ -622,33 +605,7 @@
                         <?php endif; ?>
                     </div>
                 </div>
-                                                                <div class="progress progress-sm">
-                                                                    <?php 
-                                                                    $progress = min(100, $objective->contacts_progress ?? 0);
-                                                                    $color = $progress >= 80 ? 'success' : ($progress >= 60 ? 'warning' : 'danger');
-                                                                    ?>
-                                                                    <div class="progress-bar bg-<?php echo $color; ?>" 
-                                                                         style="width: <?php echo $progress; ?>%"></div>
-                                                                </div>
-                                                                <small class="text-muted"><?php echo number_format($progress, 1); ?>%</small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-2">
-                                                                <span class="badge bg-light text-dark">
-                                                                    <?php echo $objective->transactions_count ?? 0; ?> / <?php echo $objective->transactions_target; ?>
-                                                                </span>
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <div class="progress progress-sm">
-                                                                    <?php 
-                                                                    $progress = min(100, $objective->transactions_progress ?? 0);
-                                                                    $color = $progress >= 80 ? 'success' : ($progress >= 60 ? 'warning' : 'danger');
-                                                                    ?>
 
-                
                 <!-- Floating Action Button -->
                 <div class="floating-action">
                     <button class="fab-premium" onclick="quickActions()" title="Actions rapides">
