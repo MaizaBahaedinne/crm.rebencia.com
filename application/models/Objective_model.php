@@ -48,30 +48,87 @@ class Objective_model extends CI_Model
      * Récupérer les objectifs d'un agent
      */
     public function get_agent_objectives($agent_id, $month = null) {
-        $this->db->select('mo.*, u.display_name as agent_name, cb.display_name as created_by_name')
-                 ->from('monthly_objectives mo')
-                 ->join('wp_users u', 'u.ID = mo.agent_id', 'left')
-                 ->join('wp_users cb', 'cb.ID = mo.created_by', 'left')
-                 ->where('mo.agent_id', $agent_id);
+        // Récupérer les objectifs depuis la base CRM
+        $this->db->select('*')
+                 ->from('monthly_objectives')
+                 ->where('agent_id', $agent_id);
 
         if ($month) {
-            $this->db->where('mo.month', $month . '-01');
+            $this->db->where('month', $month . '-01');
         }
 
-        return $this->db->order_by('mo.month', 'DESC')->get()->result();
+        $objectives = $this->db->order_by('month', 'DESC')->get()->result();
+        
+        // Enrichir avec les noms depuis WordPress si nécessaire
+        if (!empty($objectives)) {
+            $user_ids = array_unique(array_merge(
+                array_column($objectives, 'agent_id'),
+                array_column($objectives, 'created_by')
+            ));
+            
+            if (!empty($user_ids)) {
+                $users = $this->wp_db->select('ID, display_name')
+                                    ->from('users')
+                                    ->where_in('ID', $user_ids)
+                                    ->get()
+                                    ->result();
+                
+                $user_names = [];
+                foreach ($users as $user) {
+                    $user_names[$user->ID] = $user->display_name;
+                }
+                
+                foreach ($objectives as $objective) {
+                    $objective->agent_name = $user_names[$objective->agent_id] ?? 'Agent #' . $objective->agent_id;
+                    $objective->created_by_name = $user_names[$objective->created_by] ?? 'Utilisateur #' . $objective->created_by;
+                }
+            }
+        }
+        
+        return $objectives;
     }
 
     /**
      * Récupérer tous les objectifs pour un mois donné
      */
     public function get_monthly_objectives($month) {
-        return $this->db->select('mo.*, u.display_name as agent_name')
-                       ->from('monthly_objectives mo')
-                       ->join('wp_users u', 'u.ID = mo.agent_id', 'left')
-                       ->where('mo.month', $month . '-01')
-                       ->order_by('u.display_name', 'ASC')
-                       ->get()
-                       ->result();
+        // D'abord récupérer les objectifs depuis la base CRM
+        $objectives = $this->db->select('*')
+                              ->from('monthly_objectives')
+                              ->where('month', $month . '-01')
+                              ->get()
+                              ->result();
+        
+        // Ensuite enrichir avec les noms des agents depuis WordPress
+        if (!empty($objectives)) {
+            $agent_ids = array_column($objectives, 'agent_id');
+            
+            if (!empty($agent_ids)) {
+                $agents = $this->wp_db->select('ID, display_name')
+                                     ->from('users')
+                                     ->where_in('ID', $agent_ids)
+                                     ->get()
+                                     ->result();
+                
+                // Créer un mapping agent_id => display_name
+                $agent_names = [];
+                foreach ($agents as $agent) {
+                    $agent_names[$agent->ID] = $agent->display_name;
+                }
+                
+                // Enrichir les objectifs avec les noms
+                foreach ($objectives as $objective) {
+                    $objective->agent_name = $agent_names[$objective->agent_id] ?? 'Agent #' . $objective->agent_id;
+                }
+                
+                // Trier par nom d'agent
+                usort($objectives, function($a, $b) {
+                    return strcmp($a->agent_name, $b->agent_name);
+                });
+            }
+        }
+        
+        return $objectives;
     }
 
     /**

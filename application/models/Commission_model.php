@@ -105,21 +105,60 @@ class Commission_model extends CI_Model {
      * Récupérer les commissions d'un agent
      */
     public function get_agent_commissions($agent_id, $month = null, $status = null) {
-        $this->db->select('ac.*, p.post_title as property_title, u.display_name as agent_name')
-                 ->from('agent_commissions ac')
-                 ->join('wp_posts p', 'p.ID = ac.property_id', 'left')
-                 ->join('wp_users u', 'u.ID = ac.agent_id', 'left')
-                 ->where('ac.agent_id', $agent_id);
+        // Récupérer les commissions depuis la base CRM
+        $this->db->select('*')
+                 ->from('agent_commissions')
+                 ->where('agent_id', $agent_id);
 
         if ($month) {
-            $this->db->where('DATE_FORMAT(ac.created_at, "%Y-%m")', $month);
+            $this->db->where('DATE_FORMAT(created_at, "%Y-%m")', $month);
         }
 
         if ($status) {
-            $this->db->where('ac.status', $status);
+            $this->db->where('status', $status);
         }
 
-        return $this->db->order_by('ac.created_at', 'DESC')->get()->result();
+        $commissions = $this->db->order_by('created_at', 'DESC')->get()->result();
+        
+        // Enrichir avec les données WordPress si nécessaire
+        if (!empty($commissions)) {
+            $property_ids = array_filter(array_column($commissions, 'property_id'));
+            $agent_ids = array_unique(array_column($commissions, 'agent_id'));
+            
+            // Récupérer les propriétés depuis WordPress
+            $properties = [];
+            if (!empty($property_ids)) {
+                $props = $this->wp_db->select('ID, post_title')
+                                    ->from('posts')
+                                    ->where_in('ID', $property_ids)
+                                    ->get()
+                                    ->result();
+                foreach ($props as $prop) {
+                    $properties[$prop->ID] = $prop->post_title;
+                }
+            }
+            
+            // Récupérer les agents depuis WordPress
+            $agents = [];
+            if (!empty($agent_ids)) {
+                $users = $this->wp_db->select('ID, display_name')
+                                    ->from('users')
+                                    ->where_in('ID', $agent_ids)
+                                    ->get()
+                                    ->result();
+                foreach ($users as $user) {
+                    $agents[$user->ID] = $user->display_name;
+                }
+            }
+            
+            // Enrichir les commissions
+            foreach ($commissions as $commission) {
+                $commission->property_title = $properties[$commission->property_id] ?? 'Propriété #' . $commission->property_id;
+                $commission->agent_name = $agents[$commission->agent_id] ?? 'Agent #' . $commission->agent_id;
+            }
+        }
+
+        return $commissions;
     }
 
     /**
