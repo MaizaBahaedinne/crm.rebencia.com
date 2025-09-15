@@ -371,12 +371,12 @@ class Objective_model extends CI_Model
         $transactions_query = "
             SELECT 
                 COUNT(*) as count,
-                SUM(transaction_amount) as total_revenue,
-                SUM(agent_commission + agency_commission) as total_commission
+                SUM(montant) as total_revenue,
+                SUM(montant) as total_commission
             FROM agent_commissions 
             WHERE agent_id = ? 
             AND DATE(created_at) BETWEEN ? AND ?
-            AND status != 'cancelled'
+            AND statut != 'cancelled'
         ";
         $transactions_result = $this->db->query($transactions_query, [$agent_id, $month_start, $month_end]);
         if ($transactions_result && $transactions_result->num_rows() > 0) {
