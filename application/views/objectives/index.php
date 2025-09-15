@@ -38,6 +38,9 @@
                                 </div>
                                 <div class="col-md-6 text-end">
                                     <div class="btn-group">
+                                        <button type="button" id="refresh_data" class="btn btn-success">
+                                            <i class="ri-refresh-line me-2"></i>Actualiser Données
+                                        </button>
                                         <a href="<?php echo base_url('objectives/set_monthly'); ?>" class="btn btn-primary">
                                             <i class="ri-target-line me-2"></i>Définir Objectifs
                                         </a>
@@ -454,5 +457,86 @@ document.addEventListener('DOMContentLoaded', function() {
     progressBars.forEach(bar => {
         bar.setAttribute('title', 'Progression: ' + bar.style.width);
     });
+
+    // Événement pour le bouton d'actualisation
+    const refreshButton = document.getElementById('refresh_data');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', function() {
+            refreshButton.innerHTML = '<i class="ri-loader-2-line me-2 spin"></i>Actualisation...';
+            refreshButton.disabled = true;
+            
+            const month = document.getElementById('month_selector').value;
+            
+            fetch('<?php echo base_url("objectives/update_performance"); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    month: month
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Afficher un message de succès
+                    showToast('success', data.message);
+                    // Recharger la page après 1 seconde
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    showToast('error', 'Erreur: ' + data.message);
+                    refreshButton.innerHTML = '<i class="ri-refresh-line me-2"></i>Actualiser Données';
+                    refreshButton.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showToast('error', 'Erreur lors de la mise à jour des performances');
+                refreshButton.innerHTML = '<i class="ri-refresh-line me-2"></i>Actualiser Données';
+                refreshButton.disabled = false;
+            });
+        });
+    }
 });
+
+// Fonction pour afficher des notifications toast
+function showToast(type, message) {
+    // Créer un élément toast
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <i class="ri-${type === 'success' ? 'check-circle' : 'error-warning'}-line me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Supprimer le toast après 5 secondes
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 5000);
+}
 </script>
+
+<style>
+/* Animation de rotation pour l'icône de chargement */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>

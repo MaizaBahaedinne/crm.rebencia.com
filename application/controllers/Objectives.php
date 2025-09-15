@@ -251,9 +251,9 @@ class Objectives extends BaseController {
     }
 
     /**
-     * Mettre à jour les performances d'un agent
+     * Mettre à jour les performances d'un agent manuellement
      */
-    public function update_performance() {
+    public function update_agent_performance() {
         $this->isLoggedIn();
         if ($this->input->method() !== 'post') {
             show_404();
@@ -315,6 +315,65 @@ class Objectives extends BaseController {
         }
 
         redirect('objectives/agent/' . $agent_id . '?month=' . $month);
+    }
+
+    /**
+     * Mettre à jour les performances en temps réel (AJAX)
+     */
+    public function update_performance() {
+        $this->isLoggedIn();
+        
+        if ($this->input->method() !== 'post') {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['success' => false, 'message' => 'Méthode non autorisée']));
+            return;
+        }
+
+        $month = $this->input->post('month') ?: date('Y-m');
+        $agent_id = $this->input->post('agent_id');
+        
+        try {
+            if ($agent_id) {
+                // Recalculer les performances pour un agent spécifique
+                $performance = $this->Objective_model->calculate_real_performance($agent_id, $month);
+                
+                if ($performance) {
+                    $this->output
+                        ->set_content_type('application/json')
+                        ->set_output(json_encode([
+                            'success' => true, 
+                            'message' => 'Performances mises à jour avec succès',
+                            'data' => $performance
+                        ]));
+                } else {
+                    $this->output
+                        ->set_content_type('application/json')
+                        ->set_output(json_encode([
+                            'success' => false, 
+                            'message' => 'Aucune donnée trouvée pour cet agent'
+                        ]));
+                }
+            } else {
+                // Recalculer les performances pour tous les agents
+                $updated_count = $this->Objective_model->update_all_agents_performance($month);
+                
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode([
+                        'success' => true, 
+                        'message' => "{$updated_count} agent(s) mis à jour avec succès",
+                        'updated_count' => $updated_count
+                    ]));
+            }
+        } catch (Exception $e) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => false, 
+                    'message' => 'Erreur lors de la mise à jour: ' . $e->getMessage()
+                ]));
+        }
     }
 
     /**

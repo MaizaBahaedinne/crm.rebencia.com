@@ -143,8 +143,14 @@ class Objective_model extends CI_Model
 
     /**
      * Mettre à jour les performances réelles d'un agent
+     * Version améliorée qui calcule automatiquement les vraies données
      */
-    public function update_agent_performance($agent_id, $month, $performance_data) {
+    public function update_agent_performance($agent_id, $month, $performance_data = null) {
+        // Si aucune donnée fournie, calculer les vraies performances
+        if ($performance_data === null) {
+            $performance_data = $this->calculate_real_performance($agent_id, $month);
+        }
+        
         $data = [
             'agent_id' => $agent_id,
             'month' => $month . '-01',
@@ -259,7 +265,10 @@ class Objective_model extends CI_Model
             ";
             $agent = $this->wp_db->query($query)->row();
 
-            // Récupérer les performances depuis la base CRM
+            // Calculer les vraies performances depuis les données réelles
+            $real_performance = $this->calculate_real_performance($objective->agent_id, $month);
+
+            // Récupérer les performances depuis la base CRM (fallback)
             $performance = $this->db->select('*')
                                    ->from('agent_performance')
                                    ->where('agent_id', $objective->agent_id)
@@ -267,18 +276,25 @@ class Objective_model extends CI_Model
                                    ->get()
                                    ->row();
 
+            // Utiliser les vraies performances si disponibles, sinon utiliser les données de la table agent_performance
+            $estimations_count = $real_performance['estimations_count'] ?? ($performance->estimations_count ?? 0);
+            $contacts_count = $real_performance['contacts_count'] ?? ($performance->contacts_count ?? 0);
+            $transactions_count = $real_performance['transactions_count'] ?? ($performance->transactions_count ?? 0);
+            $revenue_amount = $real_performance['revenue_amount'] ?? ($performance->revenue_amount ?? 0);
+            $commission_earned = $real_performance['commission_earned'] ?? ($performance->commission_earned ?? 0);
+
             // Calculer les progressions
             $estimations_progress = ($objective->estimations_target > 0) ? 
-                round((($performance->estimations_count ?? 0) / $objective->estimations_target) * 100, 2) : 0;
+                round(($estimations_count / $objective->estimations_target) * 100, 2) : 0;
                 
             $contacts_progress = ($objective->contacts_target > 0) ? 
-                round((($performance->contacts_count ?? 0) / $objective->contacts_target) * 100, 2) : 0;
+                round(($contacts_count / $objective->contacts_target) * 100, 2) : 0;
                 
             $transactions_progress = ($objective->transactions_target > 0) ? 
-                round((($performance->transactions_count ?? 0) / $objective->transactions_target) * 100, 2) : 0;
+                round(($transactions_count / $objective->transactions_target) * 100, 2) : 0;
                 
             $revenue_progress = ($objective->revenue_target > 0) ? 
-                round((($performance->revenue_amount ?? 0) / $objective->revenue_target) * 100, 2) : 0;
+                round(($revenue_amount / $objective->revenue_target) * 100, 2) : 0;
 
             // Créer l'objet résultat
             $obj = new stdClass();
@@ -290,11 +306,11 @@ class Objective_model extends CI_Model
             $obj->transactions_target = $objective->transactions_target;
             $obj->revenue_target = $objective->revenue_target;
             $obj->agent_name = $agent ? $agent->display_name : 'Agent inconnu';
-            $obj->estimations_count = $performance->estimations_count ?? 0;
-            $obj->contacts_count = $performance->contacts_count ?? 0;
-            $obj->transactions_count = $performance->transactions_count ?? 0;
-            $obj->revenue_amount = $performance->revenue_amount ?? 0;
-            $obj->commission_earned = $performance->commission_earned ?? 0;
+            $obj->estimations_count = $estimations_count;
+            $obj->contacts_count = $contacts_count;
+            $obj->transactions_count = $transactions_count;
+            $obj->revenue_amount = $revenue_amount;
+            $obj->commission_earned = $commission_earned;
             $obj->estimations_progress = $estimations_progress;
             $obj->contacts_progress = $contacts_progress;
             $obj->transactions_progress = $transactions_progress;
@@ -309,6 +325,92 @@ class Objective_model extends CI_Model
         });
 
         return $result;
+    }
+
+    /**
+     * Calculer les vraies performances d'un agent pour un mois donné
+     * En récupérant les données réelles depuis les différentes tables
+     */
+    private function calculate_real_performance($agent_id, $month) {
+        $month_start = $month . '-01';
+        $month_end = date('Y-m-t', strtotime($month_start));
+        
+        $performance = [
+            'estimations_count' => 0,
+            'contacts_count' => 0,
+            'transactions_count' => 0,
+            'revenue_amount' => 0,
+            'commission_earned' => 0
+        ];
+
+        // 1. Compter les estimations (depuis crm_properties)
+        $estimations_query = "
+            SELECT COUNT(*) as count
+            FROM crm_properties 
+            WHERE agent_id = ? 
+            AND DATE(created_at) BETWEEN ? AND ?
+        ";
+        $estimations_result = $this->db->query($estimations_query, [$agent_id, $month_start, $month_end]);
+        if ($estimations_result && $estimations_result->num_rows() > 0) {
+            $performance['estimations_count'] = $estimations_result->row()->count;
+        }
+
+        // 2. Compter les contacts (depuis crm_clients)
+        $contacts_query = "
+            SELECT COUNT(*) as count
+            FROM crm_clients 
+            WHERE agent_id = ? 
+            AND DATE(created_at) BETWEEN ? AND ?
+        ";
+        $contacts_result = $this->db->query($contacts_query, [$agent_id, $month_start, $month_end]);
+        if ($contacts_result && $contacts_result->num_rows() > 0) {
+            $performance['contacts_count'] = $contacts_result->row()->count;
+        }
+
+        // 3. Compter les transactions et calculer le CA (depuis agent_commissions)
+        $transactions_query = "
+            SELECT 
+                COUNT(*) as count,
+                SUM(transaction_amount) as total_revenue,
+                SUM(agent_commission + agency_commission) as total_commission
+            FROM agent_commissions 
+            WHERE agent_id = ? 
+            AND DATE(created_at) BETWEEN ? AND ?
+            AND status != 'cancelled'
+        ";
+        $transactions_result = $this->db->query($transactions_query, [$agent_id, $month_start, $month_end]);
+        if ($transactions_result && $transactions_result->num_rows() > 0) {
+            $row = $transactions_result->row();
+            $performance['transactions_count'] = $row->count ?? 0;
+            $performance['revenue_amount'] = $row->total_revenue ?? 0;
+            $performance['commission_earned'] = $row->total_commission ?? 0;
+        }
+
+        // 4. Si pas de données dans agent_commissions, essayer depuis tbl_booking
+        if ($performance['transactions_count'] == 0) {
+            $booking_query = "
+                SELECT 
+                    COUNT(*) as count,
+                    SUM(CASE 
+                        WHEN bookingStatus = 'confirmed' THEN bookingAmount 
+                        ELSE 0 
+                    END) as total_revenue
+                FROM tbl_booking 
+                WHERE userId = ? 
+                AND DATE(createdDtm) BETWEEN ? AND ?
+                AND bookingStatus IN ('confirmed', 'completed')
+            ";
+            $booking_result = $this->db->query($booking_query, [$agent_id, $month_start, $month_end]);
+            if ($booking_result && $booking_result->num_rows() > 0) {
+                $row = $booking_result->row();
+                $performance['transactions_count'] = $row->count ?? 0;
+                $performance['revenue_amount'] = $row->total_revenue ?? 0;
+                // Calculer une commission estimée (5% du CA)
+                $performance['commission_earned'] = ($row->total_revenue ?? 0) * 0.05;
+            }
+        }
+
+        return $performance;
     }
 
     /**
@@ -369,5 +471,50 @@ class Objective_model extends CI_Model
         ";
         
         return $this->wp_db->query($query)->result();
+    }
+
+    /**
+     * Mettre à jour les performances de tous les agents pour un mois donné
+     */
+    public function update_all_agents_performance($month) {
+        $agents = $this->get_agents();
+        $updated_count = 0;
+
+        foreach ($agents as $agent) {
+            $real_performance = $this->calculate_real_performance($agent->ID, $month);
+            
+            if ($real_performance) {
+                // Mettre à jour ou insérer les performances dans la table agent_performance
+                $existing = $this->db->select('id')
+                                   ->from('agent_performance')
+                                   ->where('agent_id', $agent->ID)
+                                   ->where('month', $month . '-01')
+                                   ->get()
+                                   ->row();
+
+                $performance_data = [
+                    'agent_id' => $agent->ID,
+                    'month' => $month . '-01',
+                    'estimations_count' => $real_performance['estimations_count'],
+                    'contacts_count' => $real_performance['contacts_count'],
+                    'transactions_count' => $real_performance['transactions_count'],
+                    'revenue_amount' => $real_performance['revenue_amount'],
+                    'commission_earned' => $real_performance['commission_earned'],
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+
+                if ($existing) {
+                    $this->db->where('id', $existing->id);
+                    $this->db->update('agent_performance', $performance_data);
+                } else {
+                    $performance_data['created_at'] = date('Y-m-d H:i:s');
+                    $this->db->insert('agent_performance', $performance_data);
+                }
+                
+                $updated_count++;
+            }
+        }
+
+        return $updated_count;
     }
 }
