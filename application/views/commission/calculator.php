@@ -2,7 +2,11 @@
     <div class="page-content">
         <div class="container-fluid">
             
-            <!-- Titre de la page -->
+                                      <p class="mb-2"><strong>Pour une vente de 300 000 TND :</strong></p>
+                                <ul class="list-unstyled mb-0">
+                                    <li>Commission totale = <strong>300 000 TND × 5% = 15 000 TND</strong></li>
+                                    <li>Commission Agent = <strong>15 000 TND × 10% = 1 500 TND</strong></li>
+                                    <li>Commission Agence = <strong>15 000 TND × 90% = 13 500 TND</strong></li> <!-- Titre de la page -->
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -69,7 +73,7 @@
                                                min="0" 
                                                placeholder="Ex: 300000 pour vente, 1500 pour location"
                                                required>
-                                        <span class="input-group-text">€</span>
+                                        <span class="input-group-text">TND</span>
                                     </div>
                                     <div class="form-text" id="amount_help">
                                         Pour vente: prix de vente | Pour location: loyer mensuel
@@ -171,7 +175,9 @@
                                         <div class="text-center">
                                             <h6 class="text-muted">Montant de Base</h6>
                                             <h4 class="text-primary">
-                                                <?php echo number_format($calculation['base_amount'], 2, ',', ' '); ?>€
+                                                                                            <span class="fw-bold text-primary fs-4">
+                                                <?php echo number_format($calculation['base_amount'], 2, ',', ' '); ?> TND
+                                            </span>
                                             </h4>
                                         </div>
                                     </div>
@@ -181,7 +187,7 @@
                                             <div class="text-center">
                                                 <h6 class="text-muted">Base Commission</h6>
                                                 <h4 class="text-info">
-                                                    <?php echo number_format($calculation['commission_base'], 2, ',', ' '); ?>€
+                                                    <?php echo number_format($calculation['commission_base'], 2, ',', ' '); ?> TND
                                                 </h4>
                                                 <small class="text-muted">(<?php echo $calculation['rental_months']; ?> mois)</small>
                                             </div>
@@ -206,7 +212,7 @@
                                         <div class="border rounded p-3 text-center bg-primary-subtle">
                                             <h6 class="text-muted mb-2">Commission Agent</h6>
                                             <h4 class="text-primary mb-1">
-                                                <?php echo number_format($calculation['agent_commission'], 2, ',', ' '); ?>€
+                                                <?php echo number_format($calculation['agent_commission'], 2, ',', ' '); ?> TND
                                             </h4>
                                             <small class="text-muted">(10% de la commission totale)</small>
                                         </div>
@@ -216,7 +222,7 @@
                                         <div class="border rounded p-3 text-center bg-secondary-subtle">
                                             <h6 class="text-muted mb-2">Commission Agence</h6>
                                             <h4 class="text-secondary mb-1">
-                                                <?php echo number_format($calculation['agency_commission'], 2, ',', ' '); ?>€
+                                                <?php echo number_format($calculation['agency_commission'], 2, ',', ' '); ?> TND
                                             </h4>
                                             <small class="text-muted">(90% de la commission totale)</small>
                                         </div>
@@ -227,7 +233,7 @@
                                     <div class="border rounded p-4 text-center bg-success-subtle">
                                         <h5 class="text-muted mb-2">COMMISSION TOTALE</h5>
                                         <h2 class="text-success mb-0">
-                                            <?php echo number_format($calculation['total_commission'], 2, ',', ' '); ?>€
+                                            <?php echo number_format($calculation['total_commission'], 2, ',', ' '); ?> TND
                                         </h2>
                                     </div>
                                 </div>

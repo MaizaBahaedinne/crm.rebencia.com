@@ -174,22 +174,22 @@
                                                     </td>
                                                     <td>
                                                         <span class="fw-bold text-primary">
-                                                            <?php echo number_format($commission->transaction_amount, 2, ',', ' '); ?> €
+                                                            <?php echo number_format($commission->transaction_amount, 2, ',', ' '); ?> TND
                                                         </span>
                                                     </td>
                                                     <td>
                                                         <span class="text-success fw-medium">
-                                                            <?php echo number_format($commission->agent_commission, 2, ',', ' '); ?> €
+                                                            <?php echo number_format($commission->agent_commission, 2, ',', ' '); ?> TND
                                                         </span>
                                                     </td>
                                                     <td>
                                                         <span class="text-warning fw-medium">
-                                                            <?php echo number_format($commission->agency_commission, 2, ',', ' '); ?> €
+                                                            <?php echo number_format($commission->agency_commission, 2, ',', ' '); ?> TND
                                                         </span>
                                                     </td>
                                                     <td>
                                                         <span class="fw-bold">
-                                                            <?php echo number_format($commission->agent_commission + $commission->agency_commission, 2, ',', ' '); ?> €
+                                                            <?php echo number_format($commission->agent_commission + $commission->agency_commission, 2, ',', ' '); ?> TND
                                                         </span>
                                                     </td>
                                                     <td>
@@ -257,13 +257,13 @@
                                             <tr>
                                                 <th colspan="5" class="text-end">Totaux:</th>
                                                 <th class="text-success">
-                                                    <?php echo number_format($total_agent_commission, 2, ',', ' '); ?> €
+                                                    <?php echo number_format($total_agent_commission, 2, ',', ' '); ?> TND
                                                 </th>
                                                 <th class="text-warning">
-                                                    <?php echo number_format($total_agency_commission, 2, ',', ' '); ?> €
+                                                    <?php echo number_format($total_agency_commission, 2, ',', ' '); ?> TND
                                                 </th>
                                                 <th class="fw-bold">
-                                                    <?php echo number_format($total_commission, 2, ',', ' '); ?> €
+                                                    <?php echo number_format($total_commission, 2, ',', ' '); ?> TND
                                                 </th>
                                                 <th colspan="2"></th>
                                             </tr>

@@ -102,7 +102,7 @@
                                                 <div class="flex-grow-1 ms-3">
                                                     <p class="text-uppercase fw-semibold fs-12 text-muted mb-1">Commission Totale</p>
                                                     <h4 class="mb-0">
-                                                        <span class="counter-value" data-target="<?php echo number_format($current_month_data['total_commission'], 0, '', ''); ?>">0</span> €
+                                                        <span class="counter-value" data-target="<?php echo number_format($current_month_data['total_commission'], 0, '', ''); ?>">0</span> TND
                                                     </h4>
                                                 </div>
                                             </div>
@@ -122,7 +122,7 @@
                                                 <div class="flex-grow-1 ms-3">
                                                     <p class="text-uppercase fw-semibold fs-12 text-muted mb-1">Commission Agents</p>
                                                     <h4 class="mb-0">
-                                                        <span class="counter-value" data-target="<?php echo number_format($current_month_data['total_agent_commission'], 0, '', ''); ?>">0</span> €
+                                                        <span class="counter-value" data-target="<?php echo number_format($current_month_data['total_agent_commission'], 0, '', ''); ?>">0</span> TND
                                                     </h4>
                                                 </div>
                                             </div>
@@ -142,7 +142,7 @@
                                                 <div class="flex-grow-1 ms-3">
                                                     <p class="text-uppercase fw-semibold fs-12 text-muted mb-1">Commission Agence</p>
                                                     <h4 class="mb-0">
-                                                        <span class="counter-value" data-target="<?php echo number_format($current_month_data['total_agency_commission'], 0, '', ''); ?>">0</span> €
+                                                        <span class="counter-value" data-target="<?php echo number_format($current_month_data['total_agency_commission'], 0, '', ''); ?>">0</span> TND
                                                     </h4>
                                                 </div>
                                             </div>
@@ -239,8 +239,8 @@
                                                     Commissions
                                                 </div>
                                             </td>
-                                            <td><span class="fw-semibold"><?php echo number_format($current_month_data['total_commission'], 2, ',', ' '); ?> €</span></td>
-                                            <td><span class="text-muted"><?php echo number_format($last_month_data['total_commission'], 2, ',', ' '); ?> €</span></td>
+                                            <td><span class="fw-semibold"><?php echo number_format($current_month_data['total_commission'], 2, ',', ' '); ?> TND</span></td>
+                                            <td><span class="text-muted"><?php echo number_format($last_month_data['total_commission'], 2, ',', ' '); ?> TND</span></td>
                                             <td>
                                                 <?php if ($commission_variation >= 0): ?>
                                                     <span class="badge bg-soft-success text-success">
@@ -360,7 +360,7 @@
                                                     <i class="ri-money-euro-circle-line"></i>
                                                 </div>
                                             </div>
-                                            <h5 class="mb-1"><?php echo number_format($current_year_data['total_commission'], 0, ',', ' '); ?> €</h5>
+                                            <h5 class="mb-1"><?php echo number_format($current_year_data['total_commission'], 0, ',', ' '); ?> TND</h5>
                                             <p class="text-muted mb-0">Commission Totale</p>
                                         </div>
                                     </div>
@@ -374,7 +374,7 @@
                                                     <i class="ri-user-star-line"></i>
                                                 </div>
                                             </div>
-                                            <h5 class="mb-1"><?php echo number_format($current_year_data['total_agent_commission'], 0, ',', ' '); ?> €</h5>
+                                            <h5 class="mb-1"><?php echo number_format($current_year_data['total_agent_commission'], 0, ',', ' '); ?> TND</h5>
                                             <p class="text-muted mb-0">Commission Agents</p>
                                         </div>
                                     </div>
@@ -388,7 +388,7 @@
                                                     <i class="ri-building-line"></i>
                                                 </div>
                                             </div>
-                                            <h5 class="mb-1"><?php echo number_format($current_year_data['total_agency_commission'], 0, ',', ' '); ?> €</h5>
+                                            <h5 class="mb-1"><?php echo number_format($current_year_data['total_agency_commission'], 0, ',', ' '); ?> TND</h5>
                                             <p class="text-muted mb-0">Commission Agence</p>
                                         </div>
                                     </div>
@@ -407,13 +407,13 @@
                                                 <div class="col-md-4">
                                                     <strong>Commission moyenne par transaction :</strong><br>
                                                     <span class="fs-5 text-primary">
-                                                        <?php echo number_format($current_year_data['total_commission'] / $current_year_data['total_transactions'], 2, ',', ' '); ?> €
+                                                        <?php echo number_format($current_year_data['total_commission'] / $current_year_data['total_transactions'], 2, ',', ' '); ?> TND
                                                     </span>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <strong>Commission agent moyenne :</strong><br>
                                                     <span class="fs-5 text-success">
-                                                        <?php echo number_format($current_year_data['avg_agent_commission'], 2, ',', ' '); ?> €
+                                                        <?php echo number_format($current_year_data['avg_agent_commission'], 2, ',', ' '); ?> TND
                                                     </span>
                                                 </div>
                                                 <div class="col-md-4">

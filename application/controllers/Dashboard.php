@@ -265,7 +265,7 @@ class Dashboard extends BaseController {
         
         return [
             'monthly_sales' => $monthly_sales,
-            'revenues' => array_map(function($month) { return $month['count'] * 15000; }, $monthly_sales), // Estimation 15k€ par propriété
+            'revenues' => array_map(function($month) { return $month['count'] * 15000; }, $monthly_sales), // Estimation 15k TND par propriété
             'top_agents' => $top_agents_data,
             'top_agencies' => $top_agencies_data,
             'properties_by_status' => $properties_by_status

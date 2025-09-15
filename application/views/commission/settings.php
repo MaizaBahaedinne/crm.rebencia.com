@@ -97,10 +97,10 @@
                                         <i class="ri-information-line me-2"></i>Exemple de Calcul
                                     </h6>
                                     <p class="mb-0">
-                                        Pour une vente de <strong>300 000€</strong> :<br>
-                                        • Commission Agent : <span id="sale_agent_example">15 000€</span><br>
-                                        • Commission Agence : <span id="sale_agency_example">15 000€</span><br>
-                                        • <strong>Total : <span id="sale_total_example">30 000€</span></strong>
+                                        Pour une vente de <strong>300 000 TND</strong> :<br>
+                                        • Commission Agent : <span id="sale_agent_example">15 000 TND</span><br>
+                                        • Commission Agence : <span id="sale_agency_example">15 000 TND</span><br>
+                                        • <strong>Total : <span id="sale_total_example">30 000 TND</span></strong>
                                     </p>
                                 </div>
                         </div>
@@ -169,10 +169,10 @@
                                     <i class="ri-information-line me-2"></i>Exemple de Calcul
                                 </h6>
                                 <p class="mb-0">
-                                    Pour un loyer de <strong>1 500€/mois</strong> :<br>
-                                    • Base de calcul : <span id="rental_base_example">1 500€</span><br>
-                                    • Commission Agent : <span id="rental_agent_example">150€</span><br>
-                                    • Commission Agence : <strong>0€</strong> (Location)
+                                    Pour un loyer de <strong>1 500 TND/mois</strong> :<br>
+                                    • Base de calcul : <span id="rental_base_example">1 500 TND</span><br>
+                                    • Commission Agent : <span id="rental_agent_example">150 TND</span><br>
+                                    • Commission Agence : <strong>0 TND</strong> (Location)
                                 </p>
                             </div>
                         </div>
@@ -213,7 +213,7 @@ function updateExamples() {
     const rentalAgentRate = parseFloat(document.getElementById('rental_agent_rate').value) || 0;
     const rentalMonths = parseInt(document.getElementById('rental_months').value) || 1;
     
-    // Exemples vente (300 000€)
+    // Exemples vente (300 000 TND)
     const salePrice = 300000;
     const saleAgentCommission = (salePrice * saleAgentRate) / 100;
     const saleAgencyCommission = (salePrice * saleAgencyRate) / 100;
@@ -226,7 +226,7 @@ function updateExamples() {
     document.getElementById('sale_total_example').textContent = 
         new Intl.NumberFormat('fr-FR', {style: 'currency', currency: 'EUR'}).format(saleTotalCommission);
     
-    // Exemples location (1 500€/mois)
+    // Exemples location (1 500 TND/mois)
     const monthlyRent = 1500;
     const rentalBase = monthlyRent * rentalMonths;
     const rentalAgentCommission = (rentalBase * rentalAgentRate) / 100;

@@ -27,7 +27,7 @@ CREATE TABLE `monthly_objectives` (
   `estimations_target` int(11) NOT NULL DEFAULT 0 COMMENT 'Objectif nombre estimations',
   `contacts_target` int(11) NOT NULL DEFAULT 0 COMMENT 'Objectif nombre contacts',
   `transactions_target` int(11) NOT NULL DEFAULT 0 COMMENT 'Objectif nombre transactions',
-  `revenue_target` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Objectif CA en euros',
+  `revenue_target` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Objectif CA en dinars tunisiens',
   `created_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
