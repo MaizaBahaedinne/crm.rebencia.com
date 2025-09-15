@@ -72,11 +72,13 @@ class Objective_model extends CI_Model
             ));
             
             if (!empty($user_ids)) {
-                $users = $this->wp_db->select('ID, display_name')
-                                    ->from('users')
-                                    ->where_in('ID', $user_ids)
-                                    ->get()
-                                    ->result();
+                $user_ids_str = implode(',', $user_ids);
+                $query = "
+                    SELECT ID, display_name
+                    FROM rebencia_RebenciaBD.wp_Hrg8P_users
+                    WHERE ID IN ({$user_ids_str})
+                ";
+                $users = $this->wp_db->query($query)->result();
                 
                 $user_names = [];
                 foreach ($users as $user) {
@@ -109,11 +111,14 @@ class Objective_model extends CI_Model
             $agent_ids = array_column($objectives, 'agent_id');
             
             if (!empty($agent_ids)) {
-                $agents = $this->wp_db->select('ID, display_name')
-                                     ->from('users')
-                                     ->where_in('ID', $agent_ids)
-                                     ->get()
-                                     ->result();
+                // Utiliser une requête SQL directe pour forcer la bonne base
+                $agent_ids_str = implode(',', $agent_ids);
+                $query = "
+                    SELECT ID, display_name
+                    FROM rebencia_RebenciaBD.wp_Hrg8P_users
+                    WHERE ID IN ({$agent_ids_str})
+                ";
+                $agents = $this->wp_db->query($query)->result();
                 
                 // Créer un mapping agent_id => display_name
                 $agent_names = [];
@@ -246,11 +251,13 @@ class Objective_model extends CI_Model
         
         foreach ($objectives as $objective) {
             // Récupérer les infos de l'agent depuis WordPress
-            $agent = $this->wp_db->select('ID, display_name')
-                                 ->from('users')
-                                 ->where('ID', $objective->agent_id)
-                                 ->get()
-                                 ->row();
+            $query = "
+                SELECT ID, display_name
+                FROM rebencia_RebenciaBD.wp_Hrg8P_users
+                WHERE ID = {$objective->agent_id}
+                LIMIT 1
+            ";
+            $agent = $this->wp_db->query($query)->row();
 
             // Récupérer les performances depuis la base CRM
             $performance = $this->db->select('*')
@@ -351,13 +358,16 @@ class Objective_model extends CI_Model
      * Récupérer la liste des agents depuis WordPress
      */
     public function get_agents() {
-        return $this->wp_db->select('u.ID, u.display_name, u.user_email')
-                           ->from('users u')
-                           ->join('usermeta um', 'um.user_id = u.ID')
-                           ->where('um.meta_key', 'wp_Hrg8P_capabilities')
-                           ->like('um.meta_value', 'houzez_agent')
-                           ->order_by('u.display_name', 'ASC')
-                           ->get()
-                           ->result();
+        // Utiliser une requête SQL directe pour s'assurer d'utiliser la bonne base
+        $query = "
+            SELECT u.ID, u.display_name, u.user_email
+            FROM rebencia_RebenciaBD.wp_Hrg8P_users u
+            JOIN rebencia_RebenciaBD.wp_Hrg8P_usermeta um ON um.user_id = u.ID
+            WHERE um.meta_key = 'wp_Hrg8P_capabilities'
+            AND um.meta_value LIKE '%houzez_agent%'
+            ORDER BY u.display_name ASC
+        ";
+        
+        return $this->wp_db->query($query)->result();
     }
 }

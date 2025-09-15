@@ -36,29 +36,36 @@ class Objectives extends BaseController {
      */
     public function set_monthly() {
         $this->isLoggedIn();
-        $data['title'] = 'Définir les Objectifs Mensuels';
-        $data['selected_month'] = $this->input->get('month') ?: date('Y-m');
         
-        // Récupérer la liste des agents depuis le modèle
-        $data['agents'] = $this->Objective_model->get_agents();
-        
-        // Récupérer les objectifs existants si il y en a
-        $existing_objectives = $this->Objective_model->get_monthly_objectives($data['selected_month']);
-        $data['existing_objectives'] = array();
-        
-        if ($existing_objectives) {
-            foreach ($existing_objectives as $obj) {
-                $data['existing_objectives'][$obj->agent_id] = $obj;
+        try {
+            $data['title'] = 'Définir les Objectifs Mensuels';
+            $data['selected_month'] = $this->input->get('month') ?: date('Y-m');
+            
+            // Récupérer la liste des agents depuis le modèle
+            $data['agents'] = $this->Objective_model->get_agents();
+            
+            // Récupérer les objectifs existants si il y en a
+            $existing_objectives = $this->Objective_model->get_monthly_objectives($data['selected_month']);
+            $data['existing_objectives'] = array();
+            
+            if ($existing_objectives) {
+                foreach ($existing_objectives as $obj) {
+                    $data['existing_objectives'][$obj->agent_id] = $obj;
+                }
             }
-        }
 
-        // Si c'est une soumission
-        if ($this->input->method() === 'post') {
-            $this->_process_monthly_objectives();
-            return;
-        }
+            // Si c'est une soumission
+            if ($this->input->method() === 'post') {
+                $this->_process_monthly_objectives();
+                return;
+            }
 
-        $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);
+            $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);
+            
+        } catch (Exception $e) {
+            log_message('error', 'Erreur dans set_monthly: ' . $e->getMessage());
+            show_error('Erreur lors du chargement de la page: ' . $e->getMessage());
+        }
     }
 
     /**
