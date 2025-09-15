@@ -112,10 +112,7 @@ class Commission extends BaseController {
                                       ->get()
                                       ->result();
 
-        }
-        
         $this->loadViews('commission/calculator', $this->global, $data, NULL);
-    }
     }
 
     /**
