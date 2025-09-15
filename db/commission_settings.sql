@@ -13,8 +13,10 @@ CREATE TABLE `commission_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insertion des valeurs par défaut
+-- Pour les ventes : 5% du prix total, réparti 10% agent / 90% agence
+-- Les valeurs agent_rate et agency_rate représentent maintenant la répartition de la commission totale
 INSERT INTO `commission_settings` (`type`, `agent_rate`, `agency_rate`, `rental_months`) VALUES
-('sale', 5.00, 5.00, NULL),
+('sale', 10.00, 90.00, NULL),
 ('rental', 10.00, 0.00, 1);
 
 -- Table pour les objectifs mensuels par agent

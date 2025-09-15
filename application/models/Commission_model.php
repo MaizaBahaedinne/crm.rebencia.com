@@ -58,11 +58,11 @@ class Commission_model extends CI_Model {
         ];
 
         if ($transaction_type === 'sale') {
-            // Pour les ventes : pourcentage du prix de vente
-            $total_commission_rate = $settings->agent_rate + $settings->agency_rate;
-            $result['total_commission'] = ($amount * $total_commission_rate) / 100;
-            $result['agent_commission'] = ($amount * $settings->agent_rate) / 100;
-            $result['agency_commission'] = ($amount * $settings->agency_rate) / 100;
+            // Pour les ventes : 5% du prix de vente, réparti entre agent (10%) et agence (90%)
+            $commission_rate = 5; // 5% du prix de vente
+            $result['total_commission'] = ($amount * $commission_rate) / 100;
+            $result['agent_commission'] = ($result['total_commission'] * 10) / 100; // 10% de la commission totale
+            $result['agency_commission'] = ($result['total_commission'] * 90) / 100; // 90% de la commission totale
             
         } elseif ($transaction_type === 'rental') {
             // Pour les locations : commission sur X mois de loyer

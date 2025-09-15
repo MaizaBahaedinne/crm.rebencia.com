@@ -106,9 +106,21 @@
                     <!-- Paramètres actuels -->
                     <div class="card border-0 shadow-sm mt-3">
                         <div class="card-header">
-                            <h6 class="card-title mb-0">Paramètres Actuels</h6>
+                            <h6 class="card-title mb-0">Exemple de Calcul</h6>
                         </div>
                         <div class="card-body">
+                            <div class="alert alert-info mb-3">
+                                <h6 class="alert-heading">
+                                    <i class="ri-information-line me-2"></i>Comment ça marche ?
+                                </h6>
+                                <p class="mb-2"><strong>Pour une vente de 300 000€ :</strong></p>
+                                <ul class="mb-0">
+                                    <li>Commission totale = <strong>300 000€ × 5% = 15 000€</strong></li>
+                                    <li>Commission Agent = <strong>15 000€ × 10% = 1 500€</strong></li>
+                                    <li>Commission Agence = <strong>15 000€ × 90% = 13 500€</strong></li>
+                                </ul>
+                            </div>
+                            
                             <div class="row">
                                 <?php foreach ($settings as $setting): ?>
                                     <div class="col-6">
@@ -116,16 +128,16 @@
                                             <h6 class="text-uppercase mb-2">
                                                 <?php echo $setting->type === 'sale' ? 'Vente' : 'Location'; ?>
                                             </h6>
-                                            <p class="mb-1">
-                                                <strong>Agent:</strong> <?php echo $setting->agent_rate; ?>%
-                                            </p>
-                                            <p class="mb-1">
-                                                <strong>Agence:</strong> <?php echo $setting->agency_rate; ?>%
-                                            </p>
-                                            <?php if ($setting->type === 'rental'): ?>
-                                                <p class="mb-0">
-                                                    <strong>Mois:</strong> <?php echo $setting->rental_months; ?>
-                                                </p>
+                                            <?php if ($setting->type === 'sale'): ?>
+                                                <p class="mb-1"><strong>Commission:</strong> 5% du prix</p>
+                                                <p class="mb-1"><strong>Agent:</strong> 10% de la commission</p>
+                                                <p class="mb-0"><strong>Agence:</strong> 90% de la commission</p>
+                                            <?php else: ?>
+                                                <p class="mb-1"><strong>Agent:</strong> <?php echo $setting->agent_rate; ?>%</p>
+                                                <p class="mb-1"><strong>Agence:</strong> <?php echo $setting->agency_rate; ?>%</p>
+                                                <?php if ($setting->type === 'rental'): ?>
+                                                    <p class="mb-0"><strong>Mois:</strong> <?php echo $setting->rental_months; ?></p>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -177,10 +189,11 @@
                                     <?php else: ?>
                                         <div class="col-6">
                                             <div class="text-center">
-                                                <h6 class="text-muted">Taux Total</h6>
+                                                <h6 class="text-muted">Commission Totale</h6>
                                                 <h4 class="text-info">
-                                                    <?php echo ($calculation['agent_rate'] + $calculation['agency_rate']); ?>%
+                                                    5%
                                                 </h4>
+                                                <small class="text-muted">du prix de vente</small>
                                             </div>
                                         </div>
                                     <?php endif; ?>
@@ -195,7 +208,7 @@
                                             <h4 class="text-primary mb-1">
                                                 <?php echo number_format($calculation['agent_commission'], 2, ',', ' '); ?>€
                                             </h4>
-                                            <small class="text-muted">(<?php echo $calculation['agent_rate']; ?>%)</small>
+                                            <small class="text-muted">(10% de la commission totale)</small>
                                         </div>
                                     </div>
                                     
@@ -205,7 +218,7 @@
                                             <h4 class="text-secondary mb-1">
                                                 <?php echo number_format($calculation['agency_commission'], 2, ',', ' '); ?>€
                                             </h4>
-                                            <small class="text-muted">(<?php echo $calculation['agency_rate']; ?>%)</small>
+                                            <small class="text-muted">(90% de la commission totale)</small>
                                         </div>
                                     </div>
                                 </div>
