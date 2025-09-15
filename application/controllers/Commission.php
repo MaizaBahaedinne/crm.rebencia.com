@@ -24,6 +24,7 @@ class Commission extends CI_Controller {
      * Page de gestion des paramètres de commission
      */
     public function settings() {
+        $this->isLoggedIn();
         $data['title'] = 'Paramètres des Commissions';
         $data['settings'] = $this->Commission_model->get_commission_settings();
         
@@ -36,6 +37,7 @@ class Commission extends CI_Controller {
      * Mettre à jour les paramètres de commission
      */
     public function update_settings() {
+        $this->isLoggedIn();
         if ($this->input->method() !== 'post') {
             show_404();
         }
@@ -86,6 +88,7 @@ class Commission extends CI_Controller {
      * Calculatrice de commission
      */
     public function calculator() {
+        $this->isLoggedIn();
         $data['title'] = 'Calculatrice de Commission';
         $data['settings'] = $this->Commission_model->get_commission_settings();
         
@@ -118,6 +121,7 @@ class Commission extends CI_Controller {
      * Historique des commissions
      */
     public function history($agent_id = null) {
+        $this->isLoggedIn();
         $data['title'] = 'Historique des Commissions';
         
         $month = $this->input->get('month');
@@ -150,6 +154,7 @@ class Commission extends CI_Controller {
      * Statistiques des commissions
      */
     public function stats() {
+        $this->isLoggedIn();
         $data['title'] = 'Statistiques des Commissions';
         
         $data['current_month_stats'] = $this->Commission_model->get_commission_stats('current_month');
@@ -165,6 +170,7 @@ class Commission extends CI_Controller {
      * API pour calculer une commission (AJAX)
      */
     public function api_calculate() {
+        $this->isLoggedIn();
         if ($this->input->method() !== 'post') {
             $this->output
                 ->set_content_type('application/json')
@@ -200,6 +206,7 @@ class Commission extends CI_Controller {
      * Enregistrer une commission
      */
     public function save() {
+        $this->isLoggedIn();
         if ($this->input->method() !== 'post') {
             show_404();
         }

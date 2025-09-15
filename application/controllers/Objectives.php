@@ -1,23 +1,23 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Objectives extends CI_Controller {
+class Objectives extends BaseController {
 
     public function __construct() {
         parent::__construct();
         $this->load->model('Objective_model');
-        $this->load->library('session');
+        $this->load->library('form_validation');
+        $this->load->helper('form');
         
-        // Vérifier si l'utilisateur est connecté
-        if (!$this->session->userdata('logged_in')) {
-            redirect('login');
-        }
+        // Configuration de la base de données WordPress
+        $this->wp_db = $this->load->database('wordpress', TRUE);
     }
 
     /**
      * Dashboard des objectifs
      */
     public function index() {
+        $this->isLoggedIn();
         $month = $this->input->get('month') ?: date('Y-m');
         
         $data['title'] = 'Tableau de Bord des Objectifs';
@@ -25,31 +25,36 @@ class Objectives extends CI_Controller {
         $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month);
         $data['stats'] = $this->Objective_model->get_objectives_stats($month);
         
-        $this->load->view('header', $data);
-        $this->load->view('objectives/dashboard', $data);
-        $this->load->view('footer');
+        $this->load->view('includes/header', $data);
+        $data['objectives_data'] = $this->load->view('objectives/index', $data);
+        $this->load->view('includes/footer');
     }
 
     /**
      * Définir les objectifs mensuels
      */
     public function set_monthly() {
+        $this->isLoggedIn();
         $data['title'] = 'Définir les Objectifs Mensuels';
+        $data['selected_month'] = $this->input->get('month') ?: date('Y-m');
         
-        // Récupérer la liste des agents
-        $this->load->database('wordpress');
-        $data['agents'] = $this->db->select('u.ID, u.display_name')
-                                  ->from('wp_users u')
-                                  ->join('wp_usermeta um', 'um.user_id = u.ID')
-                                  ->where('um.meta_key', 'wp_capabilities')
-                                  ->like('um.meta_value', 'houzez_agent')
-                                  ->order_by('u.display_name', 'ASC')
-                                  ->get()
-                                  ->result();
+        // Récupérer la liste des agents depuis le modèle
+        $data['agents'] = $this->Objective_model->get_agents();
+        
+        // Récupérer les objectifs existants si il y en a
+        $existing_objectives = $this->Objective_model->get_monthly_objectives_by_month($data['selected_month']);
+        $data['existing_objectives'] = array();
+        
+        if ($existing_objectives) {
+            foreach ($existing_objectives as $obj) {
+                $data['existing_objectives'][$obj->agent_id] = $obj;
+            }
+        }
 
         // Si c'est une soumission
         if ($this->input->method() === 'post') {
             $this->_process_monthly_objectives();
+            return;
         }
 
         $this->load->view('header', $data);
@@ -97,6 +102,7 @@ class Objectives extends CI_Controller {
      * Voir les objectifs d'un agent
      */
     public function agent($agent_id = null) {
+        $this->isLoggedIn();
         if (!$agent_id) {
             show_404();
         }
@@ -129,6 +135,7 @@ class Objectives extends CI_Controller {
      * Mettre à jour les performances d'un agent
      */
     public function update_performance() {
+        $this->isLoggedIn();
         if ($this->input->method() !== 'post') {
             show_404();
         }
@@ -173,6 +180,7 @@ class Objectives extends CI_Controller {
      * Calculer automatiquement les performances
      */
     public function calculate_performance($agent_id = null, $month = null) {
+        $this->isLoggedIn();
         if (!$agent_id || !$month) {
             $this->session->set_flashdata('error', 'Agent et mois requis.');
             redirect('objectives');
@@ -194,6 +202,7 @@ class Objectives extends CI_Controller {
      * Objectifs par équipe/agence
      */
     public function team() {
+        $this->isLoggedIn();
         $month = $this->input->get('month') ?: date('Y-m');
         
         $data['title'] = 'Objectifs par Équipe';
@@ -210,6 +219,7 @@ class Objectives extends CI_Controller {
      * API pour récupérer les données d'objectifs (AJAX)
      */
     public function api_get_data() {
+        $this->isLoggedIn();
         $month = $this->input->get('month') ?: date('Y-m');
         $agent_id = $this->input->get('agent_id');
 
@@ -228,6 +238,7 @@ class Objectives extends CI_Controller {
      * Définition d'objectifs en masse
      */
     public function bulk_set() {
+        $this->isLoggedIn();
         $data['title'] = 'Définir Objectifs en Masse';
         
         // Récupérer tous les agents

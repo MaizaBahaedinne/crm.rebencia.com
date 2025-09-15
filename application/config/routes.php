@@ -62,6 +62,7 @@ $route['commission/stats'] = 'Commission/stats';
 
 /*********** OBJECTIVES MODULE *******************/
 $route['objectives'] = 'Objectives/index';
+$route['objectives/set_objectives'] = 'Objectives/set_monthly';
 $route['objectives/set_monthly'] = 'Objectives/set_monthly';
 $route['objectives/agent/(:num)'] = 'Objectives/agent/$1';
 $route['objectives/update_performance'] = 'Objectives/update_performance';
