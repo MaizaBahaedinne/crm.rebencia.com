@@ -1,11 +1,16 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Objective_model extends CI_Model {
-
-    public function __construct() {
+class Objective_model extends CI_Model 
+{
+    protected $wp_db;
+    
+    public function __construct()
+    {
         parent::__construct();
         $this->load->database();
+        // Charger la base WordPress séparément
+        $this->wp_db = $this->load->database('wordpress', TRUE);
     }
 
     /**
@@ -169,35 +174,9 @@ class Objective_model extends CI_Model {
         }
 
         $sql = "
-            SELECT 
-                mo.*,
-                u.display_name as agent_name,
-                ap.estimations_count,
-                ap.contacts_count,
-                ap.transactions_count,
-                ap.revenue_amount,
-                ap.commission_earned,
-                CASE 
-                    WHEN mo.estimations_target > 0 THEN ROUND((ap.estimations_count / mo.estimations_target) * 100, 2)
-                    ELSE 0 
-                END as estimations_progress,
-                CASE 
-                    WHEN mo.contacts_target > 0 THEN ROUND((ap.contacts_count / mo.contacts_target) * 100, 2)
-                    ELSE 0 
-                END as contacts_progress,
-                CASE 
-                    WHEN mo.transactions_target > 0 THEN ROUND((ap.transactions_count / mo.transactions_target) * 100, 2)
-                    ELSE 0 
-                END as transactions_progress,
-                CASE 
-                    WHEN mo.revenue_target > 0 THEN ROUND((ap.revenue_amount / mo.revenue_target) * 100, 2)
-                    ELSE 0 
-                END as revenue_progress
-            FROM monthly_objectives mo
-            LEFT JOIN wp_users u ON u.ID = mo.agent_id
-            LEFT JOIN agent_performance ap ON ap.agent_id = mo.agent_id AND ap.month = mo.month
-            WHERE mo.month = ?
-            ORDER BY u.display_name ASC
+            SELECT * FROM v_objectives_dashboard
+            WHERE month = ?
+            ORDER BY agent_name ASC
         ";
 
         return $this->db->query($sql, [$month . '-01'])->result();
