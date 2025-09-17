@@ -89,7 +89,7 @@
             </div>
 
             <!-- Formulaire Wizard -->
-            <form id="estimation-wizard" method="post" action="<?= base_url('estimation/calcul'); ?>" enctype="multipart/form-data">
+            <form id="estimation-wizard" method="post" action="<?= base_url('estimation/calculate'); ?>" enctype="multipart/form-data">
                 
                 <!-- Étape 1: Localisation -->
                 <div class="wizard-step active" id="step-1">
