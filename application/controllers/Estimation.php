@@ -26,8 +26,8 @@ class Estimation extends BaseController {
         $this->isLoggedIn();
         $data = $this->global;
         $data['zones'] = $this->estim->get_zones();
-        $data['pageTitle'] = 'Nouvelle estimation';
-        $this->loadViews('estimation/form', $data, $data, NULL);
+        $data['pageTitle'] = 'Nouvelle estimation - Mode Assistant';
+        $this->loadViews('estimation/form_wizard', $data, $data, NULL);
     }
 
     public function calculate() {
