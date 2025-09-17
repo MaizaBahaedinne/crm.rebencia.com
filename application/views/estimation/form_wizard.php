@@ -316,6 +316,35 @@
                                             </select>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Objectif -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Objectif</label>
+                                            <select name="objectif" class="form-select" required>
+                                                <option value="">Sélectionner</option>
+                                                <option value="vente" selected>Vente</option>
+                                                <option value="location">Location</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Classe énergétique -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Classe énergétique</label>
+                                            <select name="energie_classe" class="form-select">
+                                                <option value="">Non renseigné</option>
+                                                <option value="A">A - Très économe</option>
+                                                <option value="B">B - Économe</option>
+                                                <option value="C">C - Assez économe</option>
+                                                <option value="D">D - Moyennement économe</option>
+                                                <option value="E">E - Peu économe</option>
+                                                <option value="F">F - Très consommateur</option>
+                                                <option value="G">G - Extrêmement consommateur</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -436,6 +465,77 @@
                                     </div>
                                 </div>
 
+                                <!-- Détails techniques -->
+                                <div class="col-12">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Type de salle de bain</label>
+                                            <select name="sdb_type" class="form-select">
+                                                <option value="">Non spécifié</option>
+                                                <option value="standard">Standard</option>
+                                                <option value="moderne">Moderne</option>
+                                                <option value="luxe">Luxe</option>
+                                                <option value="ancienne">Ancienne</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Type de sol</label>
+                                            <select name="sol_type" class="form-select">
+                                                <option value="">Non spécifié</option>
+                                                <option value="carrelage">Carrelage</option>
+                                                <option value="parquet">Parquet</option>
+                                                <option value="moquette">Moquette</option>
+                                                <option value="marbre">Marbre</option>
+                                                <option value="beton">Béton</option>
+                                                <option value="stratifie">Stratifié</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Type de chauffe-eau</label>
+                                            <select name="chauffe_eau" class="form-select">
+                                                <option value="">Non spécifié</option>
+                                                <option value="electrique">Électrique</option>
+                                                <option value="gaz">Gaz</option>
+                                                <option value="solaire">Solaire</option>
+                                                <option value="mixte">Mixte</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informations légales -->
+                                <div class="col-12">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Type de gaz</label>
+                                            <select name="gaz_type" class="form-select">
+                                                <option value="">Aucun</option>
+                                                <option value="ville">Gaz de ville</option>
+                                                <option value="bouteille">Bouteille de gaz</option>
+                                                <option value="citerne">Citerne</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Titre foncier</label>
+                                            <select name="titre_foncier" class="form-select">
+                                                <option value="">Non spécifié</option>
+                                                <option value="oui">Oui</option>
+                                                <option value="non">Non</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Type de propriété</label>
+                                            <select name="type_propriete" class="form-select">
+                                                <option value="">Non spécifié</option>
+                                                <option value="pleine_propriete">Pleine propriété</option>
+                                                <option value="nue_propriete">Nue propriété</option>
+                                                <option value="usufruit">Usufruit</option>
+                                                <option value="indivision">Indivision</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Commodités supplémentaires -->
                                 <div class="col-12">
                                     <div class="p-3 bg-light rounded-3">
@@ -525,29 +625,70 @@
                                     </div>
                                 </div>
 
+                                <!-- Scores de proximité -->
                                 <div class="col-12">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Classe énergétique</label>
-                                            <select name="energie_classe" class="form-select">
-                                                <option value="">-- Non définie --</option>
-                                                <option value="A">A - Très économe</option>
-                                                <option value="B">B - Économe</option>
-                                                <option value="C">C - Convenable</option>
-                                                <option value="D">D - Peu économe</option>
-                                                <option value="E">E - Énergivore</option>
-                                                <option value="F">F - Très énergivore</option>
-                                                <option value="G">G - Extrêmement énergivore</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Titre foncier</label>
-                                            <select name="titre_foncier" class="form-select">
-                                                <option value="">-- Non spécifié --</option>
-                                                <option value="oui">Oui</option>
-                                                <option value="non">Non</option>
-                                                <option value="en_cours">En cours</option>
-                                            </select>
+                                    <div class="p-3 bg-info-subtle rounded-3">
+                                        <h6 class="mb-3 text-info">
+                                            <i class="ri-map-pin-2-line me-2"></i>
+                                            Scores de proximité (1 à 5)
+                                        </h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité transports</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_transports_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'transport-score')">
+                                                    <span class="badge bg-primary" id="transport-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Bus, métro, tramway à proximité</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité commodités</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_commodites_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'commodite-score')">
+                                                    <span class="badge bg-success" id="commodite-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Commerces, banques, services</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité écoles</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_ecoles_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'ecoles-score')">
+                                                    <span class="badge bg-warning" id="ecoles-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Écoles, universités à proximité</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité santé</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_sante_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'sante-score')">
+                                                    <span class="badge bg-danger" id="sante-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Hôpitaux, cliniques, pharmacies</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité commerces</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_commerces_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'commerces-score')">
+                                                    <span class="badge bg-info" id="commerces-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Centres commerciaux, marchés</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité espaces verts</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_espaces_verts_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'espaces-score')">
+                                                    <span class="badge bg-success" id="espaces-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Parcs, jardins publics</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Proximité plage</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="proximite_plage_score" class="form-range flex-grow-1" min="1" max="5" step="1" value="3" oninput="updateScoreDisplay(this, 'plage-score')">
+                                                    <span class="badge bg-info" id="plage-score">3/5</span>
+                                                </div>
+                                                <div class="form-text">Distance à la plage/mer</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
