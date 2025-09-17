@@ -106,10 +106,6 @@ class Estimation extends BaseController {
         $data['pageTitle'] = 'Résultat Estimation Premium';
         $data['property'] = $this->estim->get_property($id);
         if(!$data['property']) { redirect('estimation'); }
-        
-        // Debug temporaire
-        echo "<!-- DEBUG: Chargement de result_premium pour ID: $id -->";
-        
         $this->loadViews('estimation/result_premium', $data, $data, NULL);
     }
 
