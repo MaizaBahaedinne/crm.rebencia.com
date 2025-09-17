@@ -112,14 +112,28 @@ class Estimation extends BaseController {
     public function liste() {
         $this->isLoggedIn();
         $data = $this->global;
-        $data['pageTitle'] = 'Estimations';
+        $data['pageTitle'] = 'Estimations - Vue Premium';
         $filters = [];
         if($this->input->get('statut')) $filters['statut'] = $this->input->get('statut');
         if($this->input->get('zone_id')) $filters['zone_id'] = $this->input->get('zone_id');
-    // $data['allowed_status'] supprimé car la méthode n'existe plus
         $data['zones'] = $this->estim->get_zones();
         $data['estimations'] = $this->estim->list_estimations(200,0,$filters);
-        $this->loadViews('estimation/list', $data, $data, NULL);
+        
+        // Récupération des informations des agents
+        $agents = [];
+        if(!empty($data['estimations'])) {
+            foreach($data['estimations'] as &$estimation) {
+                if(!empty($estimation['agent_id']) && !isset($agents[$estimation['agent_id']])) {
+                    $agents[$estimation['agent_id']] = [
+                        'display_name' => 'Agent #' . $estimation['agent_id'],
+                        'user_login' => 'agent_' . $estimation['agent_id']
+                    ];
+                }
+            }
+        }
+        $data['agents'] = $agents;
+        
+        $this->loadViews('estimation/list_premium', $data, $data, NULL);
     }
 
     public function statut($id, $new) {

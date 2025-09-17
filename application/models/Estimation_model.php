@@ -119,10 +119,10 @@ class Estimation_model extends CI_Model {
      * Liste paginée des estimations
      */
     public function list_estimations($limit = 100, $offset = 0, $filters = []) {
-    $this->db->select("p.id, p.zone_id, z.nom as zone_nom, p.surface_habitable, p.valeur_min_estimee, p.valeur_estimee, p.valeur_max_estimee, p.loyer_potentiel, p.rentabilite, p.objectif, p.created_at");
+        $this->db->select("p.id, p.zone_id, p.agent_id, p.statut_dossier, z.nom as zone_nom, p.surface_habitable, p.valeur_min_estimee, p.valeur_estimee, p.valeur_max_estimee, p.loyer_potentiel, p.rentabilite, p.objectif, p.created_at");
         $this->db->from($this->propertiesTable.' p');
         $this->db->join($this->zonesTable.' z','z.id = p.zone_id','left');
-    // Suppression du filtre statut
+        if(!empty($filters['statut'])) { $this->db->where('p.statut_dossier', $filters['statut']); }
         if(!empty($filters['zone_id'])) { $this->db->where('p.zone_id', $filters['zone_id']); }
         $this->db->order_by('p.id','DESC');
         $this->db->limit($limit,$offset);
