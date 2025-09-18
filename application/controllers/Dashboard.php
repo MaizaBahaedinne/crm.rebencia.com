@@ -513,10 +513,13 @@ class Dashboard extends BaseController {
         
         // Propriétés WordPress - statistiques
         $data['wp_properties_active'] = count(array_filter($wp_properties, function($p) {
-            return $p['post_status'] === 'publish';
+            return isset($p['property_status']) ? $p['property_status'] === 'publish' : 
+                   (isset($p['post_status']) ? $p['post_status'] === 'publish' : false);
         }));
         $data['wp_properties_recent'] = count(array_filter($wp_properties, function($p) {
-            return strtotime($p['post_date']) > strtotime('-7 days');
+            $date_field = isset($p['property_date']) ? $p['property_date'] : 
+                         (isset($p['post_date']) ? $p['post_date'] : null);
+            return $date_field ? strtotime($date_field) > strtotime('-7 days') : false;
         }));
         
         // Estimations - statistiques  
