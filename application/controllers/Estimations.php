@@ -18,8 +18,6 @@ class Estimations extends BaseController
         $this->load->database();
         $this->load->model('Estimation_model');
         $this->load->model('User_model');
-        $this->load->library('input');
-        $this->load->library('output');
     }
 
     /**
