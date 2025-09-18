@@ -16,7 +16,12 @@ class Profile extends BaseController {
         $this->load->model('agency_model');
         $this->load->model('user_model');
         $this->load->library('session');
+        $this->load->library('form_validation');
+        $this->load->library('input');
+        $this->load->library('security');
         $this->load->helper('url');
+        $this->load->helper('form');
+        $this->load->helper('security');
     }
 
     public function index() {
