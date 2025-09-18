@@ -50,7 +50,7 @@ class Dashboard extends BaseController {
             $agency_id = $this->session->userdata('agency_id');
             redirect('dashboard/agency/' . $agency_id);
         } elseif ($role === 'agent') {
-            $agent_id = $this->session->userdata('agent_id');
+            $agent_id = $this->session->userdata('user_post_id');
             redirect('dashboard/agent/' . $agent_id);
         } else {
             redirect('login');
