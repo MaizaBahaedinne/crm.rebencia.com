@@ -285,7 +285,7 @@ class Estimations extends BaseController
             'id' => $this->vendorId,
             'role' => $this->role,
             'name' => $this->name,
-            'email' => $this->email
+            'email' => ''
         ];
     }
 

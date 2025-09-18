@@ -318,7 +318,7 @@ class Estimation_model extends CI_Model {
                 c.nom as client_nom,
                 c.prenom as client_prenom,
                 c.email as client_email,
-                c.phone as client_phone
+                c.contact_principal as client_phone
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
             LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
@@ -369,7 +369,7 @@ class Estimation_model extends CI_Model {
                 c.nom as client_nom,
                 c.prenom as client_prenom,
                 c.email as client_email,
-                c.phone as client_phone
+                c.contact_principal as client_phone
             FROM {$this->propertiesTable} e
             LEFT JOIN crm_clients c ON e.client_id = c.id
             WHERE e.agent_id = ?
@@ -394,7 +394,7 @@ class Estimation_model extends CI_Model {
                 c.nom as client_nom,
                 c.prenom as client_prenom,
                 c.email as client_email,
-                c.phone as client_phone,
+                c.contact_principal as client_phone,
                 c.adresse as client_adresse
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
