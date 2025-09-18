@@ -87,4 +87,16 @@ class Transaction_model extends CI_Model {
         }
         return ['rows'=>$rows,'total'=>$total,'aggregats'=>$agg,'page'=>$page,'per_page'=>$perPage];
     }
+    
+    /**
+     * Récupérer les transactions d'un agent
+     */
+    public function get_transactions_by_agent($agent_id) {
+        if(!$this->db->table_exists($this->table)) return [];
+        return $this->db->where('commercial', $agent_id)
+                       ->or_where('agent_id', $agent_id) // Si vous avez ce champ
+                       ->order_by('created_at', 'DESC')
+                       ->get($this->table)
+                       ->result_array();
+    }
 }

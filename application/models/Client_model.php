@@ -69,6 +69,12 @@ class Client_model extends CI_Model {
         if(!empty($filters['statut'])) $this->db->where('statut',$filters['statut']);
         return (int)$this->db->count_all_results($this->table);
     }
+    
+    public function get_clients_by_agent($agent_id) {
+        if(!$this->db->table_exists($this->table)) return [];
+        return $this->db->where('agent_id', $agent_id)->order_by('date_creation','DESC')->get($this->table)->result_array();
+    }
+    
     public function get($id){ if(!$this->db->table_exists($this->table)) return null; return $this->db->where('id',(int)$id)->get($this->table)->row_array(); }
     public function create($data){ $data['date_creation']=date('Y-m-d H:i:s'); $data['date_modification']=date('Y-m-d H:i:s'); $this->db->insert($this->table,$data); return (int)$this->db->insert_id(); }
     public function update($id,$data){ $data['date_modification']=date('Y-m-d H:i:s'); return $this->db->where('id',(int)$id)->update($this->table,$data); }

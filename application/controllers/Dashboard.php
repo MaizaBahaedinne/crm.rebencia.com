@@ -403,12 +403,72 @@ class Dashboard extends BaseController {
         $this->loadViews('dashboard/agency', $this->global, $data, NULL);
     }
 
-    // Vue Agent : données d'un agent
+    // Vue Agent : tableau de bord moderne et premium
     public function agent($agent_id) {
         $this->isLoggedIn();
+        
+        $data = $this->global;
+        $data['pageTitle'] = 'Tableau de bord Agent - Vue Premium';
+        
+        // Informations de l'agent
         $data['agent'] = $this->agent_model->get_agent($agent_id);
-        $data['stats'] = $this->activity_model->get_agent_stats($agent_id);
-        $this->loadViews('dashboard/agent', $this->global, $data, NULL);
+        
+        // === PROPRIÉTÉS ===
+        $properties = $this->property_model->get_properties_by_agent($agent_id);
+        $data['properties_total'] = count($properties);
+        $data['properties_active'] = $this->count_by_status($properties, 'publish');
+        $data['properties_sold'] = $this->count_by_status($properties, 'sold');
+        $data['properties_recent'] = $this->count_recent($properties, 7); // 7 derniers jours
+        
+        // === CONTACTS/CLIENTS ===
+        $this->load->model('Client_model');
+        $clients = $this->Client_model->get_clients_by_agent($agent_id);
+        $data['contacts_total'] = count($clients);
+        $data['contacts_recent'] = $this->count_recent($clients, 30); // 30 derniers jours
+        $data['contacts_active'] = count(array_filter($clients, function($c) {
+            return !empty($c['phone']) || !empty($c['email']);
+        }));
+        
+        // === TRANSACTIONS ===
+        $transactions = $this->transaction_model->get_transactions_by_agent($agent_id);
+        $data['transactions_total'] = count($transactions);
+        $data['transactions_month'] = $this->count_current_month($transactions);
+        $data['transactions_value'] = $this->sum_transactions_value($transactions);
+        
+        // === COMMISSIONS ===
+        $this->load->model('Commission_model');
+        $commissions = $this->Commission_model->get_commissions_by_agent($agent_id);
+        $data['commissions_total'] = $this->sum_commissions($commissions);
+        $data['commissions_pending'] = $this->sum_commissions_pending($commissions);
+        $data['commissions_month'] = $this->sum_commissions_current_month($commissions);
+        
+        // === TÂCHES ET RDV ===
+        $tasks = $this->task_model->get_tasks_by_agent($agent_id);
+        $data['tasks_total'] = count($tasks);
+        $data['tasks_pending'] = count(array_filter($tasks, function($t) {
+            return $t['status'] === 'pending';
+        }));
+        $data['tasks_today'] = $this->count_tasks_today($tasks);
+        $data['tasks_overdue'] = $this->count_tasks_overdue($tasks);
+        
+        // === CALENDRIER (RDV et Réunions) ===
+        $data['calendar_events'] = $this->get_calendar_events($agent_id);
+        $data['meetings_today'] = $this->count_meetings_today($data['calendar_events']);
+        $data['meetings_week'] = $this->count_meetings_week($data['calendar_events']);
+        
+        // === ACTIVITÉ RÉCENTE ===
+        $data['recent_activities'] = $this->activity_model->get_recent_activities($agent_id, 10);
+        
+        // === OBJECTIFS ===
+        $this->load->model('Objective_model');
+        $data['objectives'] = $this->Objective_model->get_agent_objectives($agent_id);
+        
+        // === DONNÉES POUR GRAPHIQUES ===
+        $data['properties_chart_data'] = $this->get_properties_chart_data($agent_id);
+        $data['commissions_chart_data'] = $this->get_commissions_chart_data($agent_id);
+        $data['activities_chart_data'] = $this->get_activities_chart_data($agent_id);
+        
+        $this->loadViews('dashboard/agent_premium', $data, $data, NULL);
     }
 
     /**
@@ -423,5 +483,152 @@ class Dashboard extends BaseController {
             }
         }
         return $count;
+    }
+    
+    /**
+     * Méthodes helper pour le dashboard agent
+     */
+    private function count_by_status($items, $status) {
+        return count(array_filter($items, function($item) use ($status) {
+            return (isset($item['status']) && $item['status'] === $status) || 
+                   (isset($item->status) && $item->status === $status) ||
+                   (isset($item['property_status']) && $item['property_status'] === $status) ||
+                   (isset($item->property_status) && $item->property_status === $status);
+        }));
+    }
+    
+    private function count_recent($items, $days) {
+        $date_limit = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        return count(array_filter($items, function($item) use ($date_limit) {
+            $created_date = $item['created_at'] ?? $item->created_at ?? $item['date_creation'] ?? null;
+            return $created_date && strtotime($created_date) >= strtotime($date_limit);
+        }));
+    }
+    
+    private function count_current_month($items) {
+        $current_month = date('Y-m');
+        return count(array_filter($items, function($item) use ($current_month) {
+            $created_date = $item['created_at'] ?? $item->created_at ?? $item['date_creation'] ?? null;
+            return $created_date && date('Y-m', strtotime($created_date)) === $current_month;
+        }));
+    }
+    
+    private function sum_transactions_value($transactions) {
+        $total = 0;
+        foreach($transactions as $transaction) {
+            $total += floatval($transaction['montant'] ?? $transaction->montant ?? 0);
+        }
+        return $total;
+    }
+    
+    private function sum_commissions($commissions) {
+        $total = 0;
+        foreach($commissions as $commission) {
+            $total += floatval($commission['total_commission'] ?? $commission->total_commission ?? 0);
+        }
+        return $total;
+    }
+    
+    private function sum_commissions_pending($commissions) {
+        $total = 0;
+        foreach($commissions as $commission) {
+            if(($commission['status'] ?? $commission->status ?? '') === 'pending') {
+                $total += floatval($commission['total_commission'] ?? $commission->total_commission ?? 0);
+            }
+        }
+        return $total;
+    }
+    
+    private function sum_commissions_current_month($commissions) {
+        $current_month = date('Y-m');
+        $total = 0;
+        foreach($commissions as $commission) {
+            $created_date = $commission['created_at'] ?? $commission->created_at ?? null;
+            if($created_date && date('Y-m', strtotime($created_date)) === $current_month) {
+                $total += floatval($commission['total_commission'] ?? $commission->total_commission ?? 0);
+            }
+        }
+        return $total;
+    }
+    
+    private function count_tasks_today($tasks) {
+        $today = date('Y-m-d');
+        return count(array_filter($tasks, function($task) use ($today) {
+            $due_date = $task['due_date'] ?? $task->due_date ?? null;
+            return $due_date && date('Y-m-d', strtotime($due_date)) === $today;
+        }));
+    }
+    
+    private function count_tasks_overdue($tasks) {
+        $today = date('Y-m-d');
+        return count(array_filter($tasks, function($task) use ($today) {
+            $due_date = $task['due_date'] ?? $task->due_date ?? null;
+            $status = $task['status'] ?? $task->status ?? 'pending';
+            return $due_date && $status !== 'completed' && strtotime($due_date) < strtotime($today);
+        }));
+    }
+    
+    private function get_calendar_events($agent_id) {
+        // Simuler des événements de calendrier - à adapter selon votre système
+        return [
+            [
+                'title' => 'Visite propriété',
+                'date' => date('Y-m-d H:i:s'),
+                'type' => 'visite'
+            ],
+            [
+                'title' => 'Réunion équipe',
+                'date' => date('Y-m-d H:i:s', strtotime('+1 day')),
+                'type' => 'reunion'
+            ]
+        ];
+    }
+    
+    private function count_meetings_today($events) {
+        $today = date('Y-m-d');
+        return count(array_filter($events, function($event) use ($today) {
+            return date('Y-m-d', strtotime($event['date'])) === $today;
+        }));
+    }
+    
+    private function count_meetings_week($events) {
+        $week_start = date('Y-m-d', strtotime('monday this week'));
+        $week_end = date('Y-m-d', strtotime('sunday this week'));
+        return count(array_filter($events, function($event) use ($week_start, $week_end) {
+            $event_date = date('Y-m-d', strtotime($event['date']));
+            return $event_date >= $week_start && $event_date <= $week_end;
+        }));
+    }
+    
+    private function get_properties_chart_data($agent_id) {
+        // Données pour graphique des propriétés par mois
+        $data = [];
+        for($i = 5; $i >= 0; $i--) {
+            $month = date('M', strtotime("-{$i} months"));
+            $data['labels'][] = $month;
+            $data['values'][] = rand(2, 15); // À remplacer par vraies données
+        }
+        return $data;
+    }
+    
+    private function get_commissions_chart_data($agent_id) {
+        // Données pour graphique des commissions
+        $data = [];
+        for($i = 11; $i >= 0; $i--) {
+            $month = date('M', strtotime("-{$i} months"));
+            $data['labels'][] = $month;
+            $data['values'][] = rand(1000, 8000); // À remplacer par vraies données
+        }
+        return $data;
+    }
+    
+    private function get_activities_chart_data($agent_id) {
+        // Données pour graphique des activités
+        return [
+            'visites' => rand(15, 40),
+            'appels' => rand(25, 60),
+            'emails' => rand(30, 80),
+            'reunions' => rand(5, 15)
+        ];
     }
 }

@@ -197,4 +197,14 @@ class Commission_model extends CI_Model {
 
         return $query->result();
     }
+    
+    /**
+     * Récupérer les commissions d'un agent
+     */
+    public function get_commissions_by_agent($agent_id) {
+        return $this->db->where('agent_id', $agent_id)
+                       ->order_by('created_at', 'DESC')
+                       ->get('agent_commissions')
+                       ->result_array();
+    }
 }
