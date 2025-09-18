@@ -465,14 +465,10 @@ class Dashboard extends BaseController {
         // === PROPRIÉTÉS (via WordPress + crm_properties) ===
         $this->load->database();
         
-        // 1. Propriétés WordPress (houzez_property)
+        // 1. Propriétés WordPress via la vue wp_Hrg8P_prop_agen
         $wp_properties_query = $this->wp_db->query("
-            SELECT p.*, pm_agent.meta_value as agent_id
-            FROM {$this->posts_table} p
-            LEFT JOIN {$this->postmeta_table} pm_agent ON p.ID = pm_agent.post_id AND pm_agent.meta_key = 'fave_property_agent'
-            WHERE p.post_type = 'houzez_property' 
-            AND p.post_status = 'publish'
-            AND pm_agent.meta_value = ?
+            SELECT * FROM wp_Hrg8P_prop_agen 
+            WHERE agent_id = ?
         ", [$user_post_id]);
         $wp_properties = $wp_properties_query->result_array();
         
@@ -484,7 +480,7 @@ class Dashboard extends BaseController {
         $all_properties = array_merge($wp_properties, $estimations);
         
         // DEBUG: Vérifier aussi sans filtre pour les deux sources
-        $all_wp_properties_query = $this->wp_db->query("SELECT COUNT(*) as total FROM {$this->posts_table} WHERE post_type = 'houzez_property' AND post_status = 'publish'");
+        $all_wp_properties_query = $this->wp_db->query("SELECT COUNT(*) as total FROM wp_Hrg8P_prop_agen");
         $all_wp_properties_count = $all_wp_properties_query->row()->total;
         
         $all_estimations_query = $this->db->query("SELECT COUNT(*) as total FROM crm_properties");
@@ -492,10 +488,9 @@ class Dashboard extends BaseController {
         
         // DEBUG: Voir quels agent_id existent dans les deux tables
         $wp_agent_ids_query = $this->wp_db->query("
-            SELECT DISTINCT pm.meta_value as agent_id 
-            FROM {$this->postmeta_table} pm 
-            WHERE pm.meta_key = 'fave_property_agent' 
-            AND pm.meta_value IS NOT NULL
+            SELECT DISTINCT agent_id 
+            FROM wp_Hrg8P_prop_agen 
+            WHERE agent_id IS NOT NULL
         ");
         $wp_agent_ids_in_db = $wp_agent_ids_query->result_array();
         
@@ -741,19 +736,25 @@ class Dashboard extends BaseController {
         
         // Rendez-vous basés sur les nouvelles propriétés
         $recent_properties = array_filter($properties, function($p) {
-            // Gérer les deux types de dates (WordPress et CRM)
-            $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+            // Gérer les trois types de dates (vue WordPress, WordPress direct, CRM)
+            $date_field = isset($p['property_date']) ? $p['property_date'] : 
+                         (isset($p['post_date']) ? $p['post_date'] : 
+                         (isset($p['created_at']) ? $p['created_at'] : null));
             if (!$date_field) return false;
             return strtotime($date_field) > strtotime('-7 days');
         });
         
         foreach(array_slice($recent_properties, 0, 5) as $property) {
             // Utiliser l'ID et le titre appropriés selon la source
-            $prop_id = isset($property['ID']) ? $property['ID'] : (isset($property['id']) ? $property['id'] : 'unknown');
-            $prop_title = isset($property['post_title']) ? $property['post_title'] : 
-                         (isset($property['nom']) ? $property['nom'] : 'Propriété');
-            $prop_date = isset($property['post_date']) ? $property['post_date'] : 
-                        (isset($property['created_at']) ? $property['created_at'] : date('Y-m-d H:i:s'));
+            $prop_id = isset($property['property_id']) ? $property['property_id'] : 
+                      (isset($property['ID']) ? $property['ID'] : 
+                      (isset($property['id']) ? $property['id'] : 'unknown'));
+            $prop_title = isset($property['property_title']) ? $property['property_title'] : 
+                         (isset($property['post_title']) ? $property['post_title'] : 
+                         (isset($property['nom']) ? $property['nom'] : 'Propriété'));
+            $prop_date = isset($property['property_date']) ? $property['property_date'] : 
+                        (isset($property['post_date']) ? $property['post_date'] : 
+                        (isset($property['created_at']) ? $property['created_at'] : date('Y-m-d H:i:s')));
             
             $events[] = [
                 'id' => 'prop_' . $prop_id,
@@ -799,19 +800,25 @@ class Dashboard extends BaseController {
         
         // Activités basées sur les propriétés récentes
         $recent_properties = array_filter($properties, function($p) {
-            // Vérifier d'abord si c'est une propriété WordPress ou CRM
-            $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+            // Vérifier d'abord si c'est une propriété WordPress (vue) ou CRM
+            $date_field = isset($p['property_date']) ? $p['property_date'] : 
+                         (isset($p['post_date']) ? $p['post_date'] : 
+                         (isset($p['created_at']) ? $p['created_at'] : null));
             if (!$date_field) return false;
             return strtotime($date_field) > strtotime('-30 days');
         });
         
         foreach(array_slice($recent_properties, 0, 5) as $property) {
             // Utiliser l'ID approprié selon la source
-            $prop_id = isset($property['ID']) ? $property['ID'] : (isset($property['id']) ? $property['id'] : 'unknown');
-            $prop_title = isset($property['post_title']) ? $property['post_title'] : 
-                         (isset($property['nom']) ? $property['nom'] : 'Propriété');
-            $prop_date = isset($property['post_date']) ? $property['post_date'] : 
-                        (isset($property['created_at']) ? $property['created_at'] : date('Y-m-d H:i:s'));
+            $prop_id = isset($property['property_id']) ? $property['property_id'] : 
+                      (isset($property['ID']) ? $property['ID'] : 
+                      (isset($property['id']) ? $property['id'] : 'unknown'));
+            $prop_title = isset($property['property_title']) ? $property['property_title'] : 
+                         (isset($property['post_title']) ? $property['post_title'] : 
+                         (isset($property['nom']) ? $property['nom'] : 'Propriété'));
+            $prop_date = isset($property['property_date']) ? $property['property_date'] : 
+                        (isset($property['post_date']) ? $property['post_date'] : 
+                        (isset($property['created_at']) ? $property['created_at'] : date('Y-m-d H:i:s')));
             
             $activities[] = [
                 'id' => 'prop_' . $prop_id,
@@ -891,8 +898,10 @@ class Dashboard extends BaseController {
             $months[] = date('M Y', strtotime("-$i months"));
             
             $count = count(array_filter($properties, function($p) use ($month) {
-                // Gérer les deux types de dates (WordPress et CRM)
-                $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+                // Gérer les trois types de dates (vue WordPress, WordPress direct, CRM)
+                $date_field = isset($p['property_date']) ? $p['property_date'] : 
+                             (isset($p['post_date']) ? $p['post_date'] : 
+                             (isset($p['created_at']) ? $p['created_at'] : null));
                 if (!$date_field) return false;
                 return date('Y-m', strtotime($date_field)) === $month;
             }));
@@ -948,8 +957,10 @@ class Dashboard extends BaseController {
             
             // Propriétés ajoutées ce jour
             $prop_count = count(array_filter($properties, function($p) use ($date) {
-                // Gérer les deux types de dates (WordPress et CRM)
-                $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+                // Gérer les trois types de dates (vue WordPress, WordPress direct, CRM)
+                $date_field = isset($p['property_date']) ? $p['property_date'] : 
+                             (isset($p['post_date']) ? $p['post_date'] : 
+                             (isset($p['created_at']) ? $p['created_at'] : null));
                 if (!$date_field) return false;
                 return date('Y-m-d', strtotime($date_field)) === $date;
             }));
