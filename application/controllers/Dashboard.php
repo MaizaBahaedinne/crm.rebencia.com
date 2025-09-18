@@ -594,7 +594,7 @@ class Dashboard extends BaseController {
         $data['tasks_overdue'] = rand(0, 2);
         
         // === CALENDRIER ===
-        $data['calendar_events'] = $this->get_real_calendar_events_simple($agent_id, $properties, $clients);
+        $data['calendar_events'] = $this->get_real_calendar_events_simple($agent_id, $all_properties, $clients);
         $data['meetings_today'] = count(array_filter($data['calendar_events'], function($e) {
             return date('Y-m-d', strtotime($e['date'])) === date('Y-m-d');
         }));
@@ -606,17 +606,27 @@ class Dashboard extends BaseController {
         }));
         
         // === ACTIVITÉ RÉCENTE ===
-        $data['recent_activities'] = $this->get_real_recent_activities_simple($agent_id, $properties, $commissions, $clients);
+        $all_properties = array_merge($wp_properties, $estimations); // Combiner les deux sources
+        $data['recent_activities'] = $this->get_real_recent_activities_simple($agent_id, $all_properties, $commissions, $clients);
         
         // === OBJECTIFS ===
         $this->load->model('Objective_model');
         $data['objectives'] = $this->Objective_model->get_agent_objectives($agent_id);
         
         // === DONNÉES POUR GRAPHIQUES ===
-        $data['properties_chart_data'] = $this->get_real_properties_chart_data_simple($agent_id, $properties);
+        $data['properties_chart_data'] = $this->get_real_properties_chart_data_simple($agent_id, $all_properties);
         $data['commissions_chart_data'] = $this->get_real_commissions_chart_data_simple($agent_id, $commissions);
-        $data['activities_chart_data'] = $this->get_real_activities_chart_data_simple($agent_id, $properties, $clients);
+        $data['activities_chart_data'] = $this->get_real_activities_chart_data_simple($agent_id, $all_properties, $clients);
         
+        // Préparer les statistiques pour la vue
+        $stats = [
+            'wp_properties' => count($wp_properties),
+            'crm_estimations' => count($estimations)
+        ];
+        
+        // Ajouter les statistiques aux données
+        $data['stats'] = $stats;
+
         $this->loadViews('dashboard/agent_premium', $data, $data, NULL);
     }
 
@@ -722,25 +732,45 @@ class Dashboard extends BaseController {
     private function get_real_calendar_events_simple($agent_id, $properties, $clients) {
         $events = [];
         
+        // Vérifier que $properties est un tableau
+        if (!is_array($properties)) {
+            $properties = [];
+        }
+        
         // Rendez-vous basés sur les nouvelles propriétés
         $recent_properties = array_filter($properties, function($p) {
-            return strtotime($p['created_at']) > strtotime('-7 days');
+            // Gérer les deux types de dates (WordPress et CRM)
+            $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+            if (!$date_field) return false;
+            return strtotime($date_field) > strtotime('-7 days');
         });
         
         foreach(array_slice($recent_properties, 0, 5) as $property) {
+            // Utiliser l'ID et le titre appropriés selon la source
+            $prop_id = isset($property['ID']) ? $property['ID'] : (isset($property['id']) ? $property['id'] : 'unknown');
+            $prop_title = isset($property['post_title']) ? $property['post_title'] : 
+                         (isset($property['nom']) ? $property['nom'] : 'Propriété');
+            $prop_date = isset($property['post_date']) ? $property['post_date'] : 
+                        (isset($property['created_at']) ? $property['created_at'] : date('Y-m-d H:i:s'));
+            
             $events[] = [
-                'id' => 'prop_' . $property['id'],
-                'title' => 'RDV - ' . ($property['nom'] ?? 'Propriété'),
-                'date' => date('Y-m-d H:i:s', strtotime($property['created_at']) + rand(3600, 7200)),
+                'id' => 'prop_' . $prop_id,
+                'title' => 'RDV - ' . $prop_title,
+                'date' => date('Y-m-d H:i:s', strtotime($prop_date) + rand(3600, 7200)),
                 'type' => 'meeting',
                 'color' => '#3b82f6'
             ];
         }
         
+        // Vérifier que $clients est un tableau
+        if (!is_array($clients)) {
+            $clients = [];
+        }
+        
         // Suivi basé sur les clients récents
         if(!empty($clients)) {
             $recent_clients = array_filter($clients, function($c) {
-                return strtotime($c['date_creation']) > strtotime('-14 days');
+                return isset($c['date_creation']) && strtotime($c['date_creation']) > strtotime('-14 days');
             });
             
             foreach(array_slice($recent_clients, 0, 3) as $client) {
@@ -760,22 +790,42 @@ class Dashboard extends BaseController {
     private function get_real_recent_activities_simple($agent_id, $properties, $commissions, $clients) {
         $activities = [];
         
+        // Vérifier que $properties est un tableau
+        if (!is_array($properties)) {
+            $properties = [];
+        }
+        
         // Activités basées sur les propriétés récentes
         $recent_properties = array_filter($properties, function($p) {
-            return strtotime($p['created_at']) > strtotime('-30 days');
+            // Vérifier d'abord si c'est une propriété WordPress ou CRM
+            $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+            if (!$date_field) return false;
+            return strtotime($date_field) > strtotime('-30 days');
         });
         
         foreach(array_slice($recent_properties, 0, 5) as $property) {
+            // Utiliser l'ID approprié selon la source
+            $prop_id = isset($property['ID']) ? $property['ID'] : (isset($property['id']) ? $property['id'] : 'unknown');
+            $prop_title = isset($property['post_title']) ? $property['post_title'] : 
+                         (isset($property['nom']) ? $property['nom'] : 'Propriété');
+            $prop_date = isset($property['post_date']) ? $property['post_date'] : 
+                        (isset($property['created_at']) ? $property['created_at'] : date('Y-m-d H:i:s'));
+            
             $activities[] = [
-                'id' => 'prop_' . $property['id'],
+                'id' => 'prop_' . $prop_id,
                 'type' => 'property_added',
                 'title' => 'Nouvelle propriété ajoutée',
-                'description' => $property['nom'] ?? 'Propriété',
+                'description' => $prop_title,
                 'metadata' => ['price' => $property['prix'] ?? 0],
-                'created_at' => $property['created_at'],
+                'created_at' => $prop_date,
                 'icon' => 'home-4-line',
                 'color' => 'primary'
             ];
+        }
+        
+        // Vérifier que $commissions est un tableau
+        if (!is_array($commissions)) {
+            $commissions = [];
         }
         
         // Activités basées sur les commissions récentes
@@ -797,9 +847,9 @@ class Dashboard extends BaseController {
         }
         
         // Activités basées sur les nouveaux clients
-        if(!empty($clients)) {
+        if(!empty($clients) && is_array($clients)) {
             $recent_clients = array_filter($clients, function($c) {
-                return strtotime($c['date_creation']) > strtotime('-30 days');
+                return isset($c['date_creation']) && strtotime($c['date_creation']) > strtotime('-30 days');
             });
             
             foreach(array_slice($recent_clients, 0, 3) as $client) {
@@ -828,13 +878,21 @@ class Dashboard extends BaseController {
         $months = [];
         $data = [];
         
+        // Vérifier que $properties est un tableau
+        if (!is_array($properties)) {
+            $properties = [];
+        }
+        
         // Derniers 6 mois
         for($i = 5; $i >= 0; $i--) {
             $month = date('Y-m', strtotime("-$i months"));
             $months[] = date('M Y', strtotime("-$i months"));
             
             $count = count(array_filter($properties, function($p) use ($month) {
-                return date('Y-m', strtotime($p['created_at'])) === $month;
+                // Gérer les deux types de dates (WordPress et CRM)
+                $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+                if (!$date_field) return false;
+                return date('Y-m', strtotime($date_field)) === $month;
             }));
             
             $data[] = $count;
@@ -873,6 +931,14 @@ class Dashboard extends BaseController {
         $properties_data = [];
         $clients_data = [];
         
+        // Vérifier que les paramètres sont des tableaux
+        if (!is_array($properties)) {
+            $properties = [];
+        }
+        if (!is_array($clients)) {
+            $clients = [];
+        }
+        
         // Derniers 7 jours
         for($i = 6; $i >= 0; $i--) {
             $date = date('Y-m-d', strtotime("-$i days"));
@@ -880,7 +946,10 @@ class Dashboard extends BaseController {
             
             // Propriétés ajoutées ce jour
             $prop_count = count(array_filter($properties, function($p) use ($date) {
-                return date('Y-m-d', strtotime($p['created_at'])) === $date;
+                // Gérer les deux types de dates (WordPress et CRM)
+                $date_field = isset($p['post_date']) ? $p['post_date'] : (isset($p['created_at']) ? $p['created_at'] : null);
+                if (!$date_field) return false;
+                return date('Y-m-d', strtotime($date_field)) === $date;
             }));
             $properties_data[] = $prop_count;
             
@@ -888,7 +957,7 @@ class Dashboard extends BaseController {
             $client_count = 0;
             if(!empty($clients)) {
                 $client_count = count(array_filter($clients, function($c) use ($date) {
-                    return date('Y-m-d', strtotime($c['date_creation'])) === $date;
+                    return isset($c['date_creation']) && date('Y-m-d', strtotime($c['date_creation'])) === $date;
                 }));
             }
             $clients_data[] = $client_count;

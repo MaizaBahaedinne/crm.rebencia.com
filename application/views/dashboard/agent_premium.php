@@ -99,18 +99,48 @@
                                     </span>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <p class="text-uppercase fw-medium text-muted text-truncate fs-13 mb-1">Propriétés</p>
+                                    <p class="text-uppercase fw-medium text-muted text-truncate fs-13 mb-1">Propriétés WordPress</p>
                                     <div class="d-flex align-items-center">
-                                        <h4 class="fs-24 fw-semibold ff-secondary mb-0 text-primary counter" data-target="<?= $properties_total; ?>">0</h4>
+                                        <h4 class="fs-24 fw-semibold ff-secondary mb-0 text-primary counter" data-target="<?= isset($stats['wp_properties']) ? $stats['wp_properties'] : 0; ?>">0</h4>
                                         <small class="text-success ms-2">
-                                            <i class="ri-arrow-up-line me-1"></i>+<?= $properties_recent; ?> cette semaine
+                                            <i class="ri-wordpress-line me-1"></i>WP Properties
                                         </small>
                                     </div>
                                     <div class="mt-2">
                                         <div class="progress" style="height: 4px;">
-                                            <div class="progress-bar bg-primary" style="width: <?= $properties_total > 0 ? ($properties_active / $properties_total * 100) : 0; ?>%"></div>
+                                            <div class="progress-bar bg-primary" style="width: <?= isset($stats['wp_properties']) && $stats['wp_properties'] > 0 ? 75 : 0; ?>%"></div>
                                         </div>
-                                        <small class="text-muted"><?= $properties_active; ?> actives • <?= $properties_sold; ?> vendues</small>
+                                        <small class="text-muted">Propriétés depuis WordPress</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estimations CRM -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100 stats-card" data-color="info">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-lg flex-shrink-0 me-3">
+                                    <span class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
+                                        <i class="ri-file-list-3-line"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="text-uppercase fw-medium text-muted text-truncate fs-13 mb-1">Estimations CRM</p>
+                                    <div class="d-flex align-items-center">
+                                        <h4 class="fs-24 fw-semibold ff-secondary mb-0 text-info counter" data-target="<?= isset($stats['crm_estimations']) ? $stats['crm_estimations'] : 0; ?>">0</h4>
+                                        <small class="text-warning ms-2">
+                                            <i class="ri-calculator-line me-1"></i>CRM Data
+                                        </small>
+                                    </div>
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 4px;">
+                                            <div class="progress-bar bg-info" style="width: <?= isset($stats['crm_estimations']) && $stats['crm_estimations'] > 0 ? 60 : 0; ?>%"></div>
+                                        </div>
+                                        <small class="text-muted">Estimations en base CRM</small>
                                     </div>
                                 </div>
                             </div>
