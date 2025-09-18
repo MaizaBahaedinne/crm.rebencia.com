@@ -147,7 +147,8 @@ class Login extends CI_Controller {
                     'raw_role'    => $role,
                     'wp_avatar'   => $avatar_url,
                     'isLoggedIn'  => TRUE,
-                    'wp_url'      => null
+                    'wp_url'      => null,
+                    'user_post_id' => $user->ID  // Ajout du user_post_id
                 ];
                 if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; }
                 if ($mappedRole === 'agency') { $sessionData['agency_id'] = $agency_id; }
