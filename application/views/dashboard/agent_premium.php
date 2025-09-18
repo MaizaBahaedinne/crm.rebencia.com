@@ -1,4 +1,18 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php 
+// Debug temporaire - à supprimer après correction
+if(isset($_GET['debug'])) {
+    echo "<div style='background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;'>";
+    echo "<h3>Debug Info:</h3>";
+    echo "<p><strong>Type de \$agent:</strong> " . (isset($agent) ? gettype($agent) : 'non défini') . "</p>";
+    if(isset($agent)) {
+        echo "<p><strong>Contenu de \$agent:</strong></p>";
+        echo "<pre>" . print_r($agent, true) . "</pre>";
+    }
+    echo "<p><strong>user_post_id:</strong> " . (isset($user_post_id) ? $user_post_id : 'non défini') . "</p>";
+    echo "</div>";
+}
+?>
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
@@ -10,7 +24,19 @@
                         <div>
                             <h4 class="mb-2 text-dark fw-bold">
                                 <i class="ri-dashboard-3-line me-2 text-primary"></i>
-                                Bienvenue, <?= $agent['display_name'] ?? 'Agent'; ?>
+                                Bienvenue, <?php 
+                                    if(isset($agent) && is_object($agent) && isset($agent->agent_name)) {
+                                        echo $agent->agent_name;
+                                    } elseif(isset($agent) && is_array($agent) && isset($agent['agent_name'])) {
+                                        echo $agent['agent_name'];
+                                    } elseif(isset($agent) && is_object($agent) && isset($agent->display_name)) {
+                                        echo $agent->display_name;
+                                    } elseif(isset($agent) && is_array($agent) && isset($agent['display_name'])) {
+                                        echo $agent['display_name'];
+                                    } else {
+                                        echo 'Agent';
+                                    }
+                                ?>
                             </h4>
                             <p class="text-muted mb-0">
                                 <i class="ri-calendar-line me-1"></i>
