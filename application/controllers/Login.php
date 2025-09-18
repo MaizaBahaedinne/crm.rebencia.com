@@ -147,12 +147,23 @@ class Login extends CI_Controller {
                     'raw_role'    => $role,
                     'wp_avatar'   => $avatar_url,
                     'isLoggedIn'  => TRUE,
-                    'wp_url'      => null,
-                    // Récupérer agent_post_id depuis wp_Hrg8P_crm_agents si agent
-                    'user_post_id' => ($mappedRole === 'agent')
-                        ? ($wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row('agent_post_id'))
-                        : $user->ID
+                    'wp_url'      => null
                 ];
+                
+                // Récupérer agent_post_id depuis wp_Hrg8P_crm_agents si agent
+                if ($mappedRole === 'agent') {
+                    $agent_post_id = null;
+                    if ($wp_db->table_exists('wp_Hrg8P_crm_agents')) {
+                        $agent_record = $wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row();
+                        if ($agent_record && isset($agent_record->agent_post_id)) {
+                            $agent_post_id = $agent_record->agent_post_id;
+                        }
+                    }
+                    // Fallback vers user->ID si pas d'agent_post_id trouvé
+                    $sessionData['user_post_id'] = $agent_post_id ?: $user->ID;
+                } else {
+                    $sessionData['user_post_id'] = $user->ID;
+                }
                 if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; }
                 if ($mappedRole === 'agency') { $sessionData['agency_id'] = $agency_id; }
                 // Assurer disponibilité session
