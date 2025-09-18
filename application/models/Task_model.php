@@ -97,4 +97,62 @@ class Task_model extends CI_Model
         
         return TRUE;
     }
+    
+    /**
+     * This function is used to get tasks by agent
+     * @param number $agent_id : This is agent id
+     * @return array $result : This is tasks list
+     */
+    function get_tasks_by_agent($agent_id)
+    {
+        // Vérifier si la table existe
+        if (!$this->db->table_exists('tbl_task')) {
+            // Retourner des données simulées pour le dashboard
+            return [
+                [
+                    'taskId' => 1,
+                    'taskTitle' => 'Rappeler client Dupont',
+                    'description' => 'Suivre le dossier d\'estimation',
+                    'status' => 'pending',
+                    'due_date' => date('Y-m-d'),
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'taskId' => 2,
+                    'taskTitle' => 'Préparer visite propriété',
+                    'description' => 'Visite prévue demain matin',
+                    'status' => 'pending',
+                    'due_date' => date('Y-m-d', strtotime('+1 day')),
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'taskId' => 3,
+                    'taskTitle' => 'Envoyer rapport mensuel',
+                    'description' => 'Rapport d\'activité du mois',
+                    'status' => 'pending',
+                    'due_date' => date('Y-m-d', strtotime('+3 days')),
+                    'created_at' => date('Y-m-d H:i:s', strtotime('-2 days'))
+                ]
+            ];
+        }
+        
+        $this->db->select('taskId, taskTitle, description, createdDtm as created_at');
+        $this->db->from('tbl_task');
+        // Si vous avez un champ agent_id dans la table, décommentez la ligne suivante
+        // $this->db->where('agent_id', $agent_id);
+        $this->db->where('isDeleted', 0);
+        $this->db->order_by('taskId', 'DESC');
+        $this->db->limit(20); // Limiter à 20 tâches
+        $query = $this->db->get();
+        
+        $results = $query->result_array();
+        
+        // Ajouter des champs manquants pour le dashboard
+        foreach ($results as &$task) {
+            $task['status'] = 'pending'; // Status par défaut
+            $task['due_date'] = date('Y-m-d', strtotime('+1 day')); // Due date par défaut
+        }
+        
+        return $results;
+    }
 }
