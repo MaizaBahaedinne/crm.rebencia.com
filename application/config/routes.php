@@ -37,8 +37,9 @@ $route['editOld'] = "User/editOld";
 $route['editOld/(:num)'] = "User/editOld/$1";
 $route['editUser'] = "User/editUser";
 $route['deleteUser'] = "User/deleteUser";
-$route['profile'] = "User/profile";
-$route['profile/(:any)'] = "User/profile/$1";
+// Routes déplacées vers Profile controller
+// $route['profile'] = "User/profile";
+// $route['profile/(:any)'] = "User/profile/$1";
 $route['profileUpdate'] = "User/profileUpdate";
 $route['profileUpdate/(:any)'] = "User/profileUpdate/$1";
 $route['roleListing/(:num)/(:num)'] = "Roles/roleListing/$1/$2";

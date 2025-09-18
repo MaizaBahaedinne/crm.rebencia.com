@@ -36,21 +36,32 @@ class Profile extends BaseController {
         $user = $this->user_model->get_wp_user($userId);
 
         if (empty($user)) {
-            // Préparer structure minimale pour la vue (évite notices)
-            $data['user'] = [
-                'name' => $this->global['name'] ?? 'Utilisateur',
-                'user_email' => '',
-                'email' => '',
-                'mobile' => '',
-                'phone' => '',
-                'location' => '',
-                'bio' => '',
-            ];
+            // Préparer structure minimale pour la vue users/profile
+            $userInfo = new stdClass();
+            $userInfo->userId = $userId;
+            $userInfo->name = $this->global['name'] ?? 'Utilisateur';
+            $userInfo->email = '';
+            $userInfo->mobile = '';
+            $userInfo->roleId = 1;
+            $userInfo->role = 'Utilisateur';
+            
+            $data['userInfo'] = $userInfo;
+            $data['active'] = 'details';
             $this->global['flash_error'] = "Profil introuvable.";
         } else {
-            $data['user'] = $user; // objet accepté (la vue normalise en tableau)
+            // Transformer l'objet user en format compatible avec la vue users/profile
+            $userInfo = new stdClass();
+            $userInfo->userId = $user->ID ?? $userId;
+            $userInfo->name = $user->display_name ?? $user->user_login ?? 'Utilisateur';
+            $userInfo->email = $user->user_email ?? '';
+            $userInfo->mobile = $user->phone ?? '';
+            $userInfo->roleId = 1; // Par défaut
+            $userInfo->role = 'Utilisateur';
+            
+            $data['userInfo'] = $userInfo;
+            $data['active'] = 'details'; // Tab actif par défaut
         }
 
-        $this->loadViews('profile/index', $this->global, $data, NULL);
+        $this->loadViews('users/profile', $this->global, $data, NULL);
     }
 }
