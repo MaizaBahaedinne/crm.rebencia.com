@@ -3,31 +3,44 @@
 if (!isset($user)) { $user = []; }
 if (is_object($user)) { $user = (array)$user; }
 if (!is_array($user)) { $user = []; }
-// Construire nom si absent
+
+// Construire nom si absent - utiliser les bons champs de la table wp_Hrg8P_crm_agents
 if (empty($user['name'])) {
-    $dn = isset($user['display_name']) ? trim($user['display_name']) : '';
-    $fn = isset($user['first_name']) ? trim($user['first_name']) : '';
-    $ln = isset($user['last_name']) ? trim($user['last_name']) : '';
-    $combo = trim($fn.' '.$ln);
-    $user['name'] = $dn ?: ($combo ?: (isset($user['user_login']) ? $user['user_login'] : '')); 
+    $agent_name = isset($user['agent_name']) ? trim($user['agent_name']) : '';
+    $user_login = isset($user['user_login']) ? trim($user['user_login']) : '';
+    $user['name'] = $agent_name ?: $user_login ?: 'Utilisateur'; 
 }
-// Valeurs par défaut sûres
+
+// Valeurs par défaut sûres basées sur la structure de wp_Hrg8P_crm_agents
 $defaults = [
+    'user_login' => isset($user['user_login']) ? $user['user_login'] : '',
+    'user_email' => isset($user['user_email']) ? $user['user_email'] : '',
+    'agent_email' => isset($user['agent_email']) ? $user['agent_email'] : '',
+    'phone' => isset($user['phone']) ? $user['phone'] : '',
+    'mobile' => isset($user['mobile']) ? $user['mobile'] : '',
+    'whatsapp' => isset($user['whatsapp']) ? $user['whatsapp'] : '',
+    'skype' => isset($user['skype']) ? $user['skype'] : '',
+    'user_status' => isset($user['user_status']) ? $user['user_status'] : 'active',
+    'user_registered' => isset($user['registration_date']) ? $user['registration_date'] : (isset($user['user_registered']) ? $user['user_registered'] : ''),
+    'agent_name' => isset($user['agent_name']) ? $user['agent_name'] : '',
+    'agency_name' => isset($user['agency_name']) ? $user['agency_name'] : '',
+    'agency_id' => isset($user['agency_id']) ? $user['agency_id'] : '',
+    'agent_post_id' => isset($user['agent_post_id']) ? $user['agent_post_id'] : '',
+    'position' => isset($user['position']) ? $user['position'] : '',
+    'website' => isset($user['website']) ? $user['website'] : '',
+    'agent_avatar' => isset($user['agent_avatar']) ? $user['agent_avatar'] : '',
     'location' => '',
-    'mobile' => '',
-    'phone' => '',
-    'email' => isset($user['user_email']) ? $user['user_email'] : '',
-    'bio' => isset($user['description']) ? $user['description'] : '',
+    'bio' => '',
 ];
+
 foreach ($defaults as $k=>$v) { if (!isset($user[$k])) $user[$k] = $v; }
-// Alias biographie
-if (!isset($user['biography']) && isset($user['description'])) { $user['biography'] = $user['description']; }
-// Rôles en chaîne
-if (isset($user['roles']) && is_array($user['roles'])) {
-    $user['roles_string'] = implode(', ', $user['roles']);
-} elseif (!isset($user['roles_string'])) {
-    $user['roles_string'] = '';
-}
+
+// Email principal (priorité à agent_email puis user_email)
+$primary_email = $user['agent_email'] ?: $user['user_email'];
+$user['email'] = $primary_email;
+
+// Rôles par défaut
+$user['roles_string'] = $user['position'] ?: 'Agent Immobilier';
 ?>
 
 <div class="main-content">
@@ -65,7 +78,7 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                     <div class="col">
                         <div class="p-2">
                             <h3 class="text-white mb-1"><?php echo $user['name']; ?></h3>
-                            <p class="text-white text-opacity-75"><?php echo $user['roles_string'] ?: 'Utilisateur'; ?></p>
+                            <p class="text-white text-opacity-75"><?php echo $user['roles_string'] ?: 'Agent Immobilier'; ?></p>
                             <div class="hstack text-white-50 gap-1">
                                 <div class="me-2">
                                     <i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
@@ -73,7 +86,7 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                 </div>
                                 <div>
                                     <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>
-                                    Rebencia CRM
+                                    <?php echo $user['agency_name'] ?: 'Rebencia CRM'; ?>
                                 </div>
                             </div>
                         </div>
@@ -81,20 +94,25 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                     
                     <div class="col-12 col-lg-auto order-last order-lg-0">
                         <div class="row text-white-50 text-center">
-                            <div class="col-lg-6 col-4">
-                                <div class="p-2">
-                                    <h4 class="text-white mb-1">
-                                        <?php echo date('Y') - (isset($user['user_registered']) ? date('Y', strtotime($user['user_registered'])) : date('Y')); ?>
-                                    </h4>
-                                    <p class="fs-14 mb-0">Années</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-4">
-                                <div class="p-2">
-                                    <h4 class="text-white mb-1">Actif</h4>
-                                    <p class="fs-14 mb-0">Statut</p>
-                                </div>
-                            </div>
+                                    <div class="col-lg-6 col-4">
+                                        <div class="p-2">
+                                            <h4 class="text-white mb-1">
+                                                <?php 
+                                                $reg_date = $user['user_registered'] ?: date('Y-m-d');
+                                                echo date('Y') - date('Y', strtotime($reg_date)); 
+                                                ?>
+                                            </h4>
+                                            <p class="fs-14 mb-0">Années</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-4">
+                                        <div class="p-2">
+                                            <h4 class="text-white mb-1">
+                                                <?php echo ucfirst($user['user_status'] ?: 'Actif'); ?>
+                                            </h4>
+                                            <p class="fs-14 mb-0">Statut</p>
+                                        </div>
+                                    </div>
                         </div>
                     </div>
                 </div>
@@ -148,41 +166,52 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                                 <td class="text-muted"><?php echo $user['user_login'] ?: 'Non défini'; ?></td>
                                                             </tr>
                                                             <tr>
-                                                                <th class="ps-0" scope="row">Nom affiché :</th>
-                                                                <td class="text-muted"><?php echo $user['display_name'] ?: $user['name']; ?></td>
+                                                                <th class="ps-0" scope="row">Nom d'agent :</th>
+                                                                <td class="text-muted"><?php echo $user['agent_name'] ?: $user['name']; ?></td>
                                                             </tr>
                                                             <tr>
-                                                                <th class="ps-0" scope="row">Prénom :</th>
-                                                                <td class="text-muted"><?php echo $user['first_name'] ?: 'Non spécifié'; ?></td>
+                                                                <th class="ps-0" scope="row">ID Agent :</th>
+                                                                <td class="text-muted"><?php echo $user['agent_post_id'] ?: 'Non assigné'; ?></td>
                                                             </tr>
                                                             <tr>
-                                                                <th class="ps-0" scope="row">Nom :</th>
-                                                                <td class="text-muted"><?php echo $user['last_name'] ?: 'Non spécifié'; ?></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="ps-0" scope="row">Surnom :</th>
-                                                                <td class="text-muted"><?php echo $user['nickname'] ?: 'Non spécifié'; ?></td>
+                                                                <th class="ps-0" scope="row">Position :</th>
+                                                                <td class="text-muted"><?php echo $user['position'] ?: 'Agent Immobilier'; ?></td>
                                                             </tr>
                                                             <tr>
                                                                 <th class="ps-0" scope="row">Date d'inscription :</th>
                                                                 <td class="text-muted">
-                                                                    <?php echo isset($user['user_registered']) ? date('d/m/Y', strtotime($user['user_registered'])) : 'Non disponible'; ?>
+                                                                    <?php 
+                                                                    $reg_date = $user['user_registered'];
+                                                                    echo $reg_date ? date('d/m/Y', strtotime($reg_date)) : 'Non disponible'; 
+                                                                    ?>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th class="ps-0" scope="row">Statut :</th>
                                                                 <td class="text-muted">
                                                                     <span class="badge bg-success">
-                                                                        <?php echo $user['user_status'] ?: 'Actif'; ?>
+                                                                        <?php echo ucfirst($user['user_status'] ?: 'Actif'); ?>
                                                                     </span>
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <th class="ps-0" scope="row">Rôles :</th>
+                                                                <th class="ps-0" scope="row">Rôle :</th>
                                                                 <td class="text-muted">
                                                                     <span class="badge bg-primary">
-                                                                        <?php echo $user['roles_string'] ?: 'Utilisateur'; ?>
+                                                                        <?php echo $user['roles_string'] ?: 'Agent'; ?>
                                                                     </span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="ps-0" scope="row">Site web :</th>
+                                                                <td class="text-muted">
+                                                                    <?php if($user['website']): ?>
+                                                                        <a href="<?php echo $user['website']; ?>" target="_blank" class="text-decoration-none">
+                                                                            <?php echo $user['website']; ?>
+                                                                        </a>
+                                                                    <?php else: ?>
+                                                                        Non spécifié
+                                                                    <?php endif; ?>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -195,10 +224,16 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                             <div class="card-body">
                                                 <h5 class="card-title mb-3">
                                                     <i class="ri-file-text-line me-2 text-primary"></i>
-                                                    Biographie
+                                                    À propos
                                                 </h5>
                                                 <p class="text-muted">
-                                                    <?php echo $user['biography'] ?: $user['bio'] ?: 'Aucune biographie disponible.'; ?>
+                                                    Agent immobilier professionnel chez <?php echo $user['agency_name'] ?: 'Rebencia'; ?>.
+                                                    <?php if($user['position']): ?>
+                                                        <br>Position : <?php echo $user['position']; ?>
+                                                    <?php endif; ?>
+                                                    <?php if($user['website']): ?>
+                                                        <br>Site web : <a href="<?php echo $user['website']; ?>" target="_blank"><?php echo $user['website']; ?></a>
+                                                    <?php endif; ?>
                                                 </p>
                                             </div>
                                         </div>
@@ -223,8 +258,12 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                                 <td class="text-muted"><?php echo $user['agency_name'] ?: 'Non assigné'; ?></td>
                                                             </tr>
                                                             <tr>
-                                                                <th class="ps-0" scope="row">ID Utilisateur Agence :</th>
-                                                                <td class="text-muted"><?php echo $user['agency_user_id'] ?: 'Non assigné'; ?></td>
+                                                                <th class="ps-0" scope="row">ID Post Agent :</th>
+                                                                <td class="text-muted"><?php echo $user['agent_post_id'] ?: 'Non assigné'; ?></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="ps-0" scope="row">Position :</th>
+                                                                <td class="text-muted"><?php echo $user['position'] ?: 'Agent Immobilier'; ?></td>
                                                             </tr>
                                                             <tr>
                                                                 <th class="ps-0" scope="row">Localisation :</th>
@@ -287,7 +326,7 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                             <tr>
                                                                 <th class="ps-0" scope="row">E-mail :</th>
                                                                 <td class="text-muted">
-                                                                    <?php $email = $user['user_email'] ?: $user['email']; ?>
+                                                                    <?php $email = $user['email']; ?>
                                                                     <?php if($email): ?>
                                                                         <a href="mailto:<?php echo $email; ?>" class="text-decoration-none">
                                                                             <?php echo $email; ?>
@@ -324,8 +363,8 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                             <tr>
                                                                 <th class="ps-0" scope="row">WhatsApp :</th>
                                                                 <td class="text-muted">
-                                                                    <?php if(isset($user['whatsapp']) && $user['whatsapp']): ?>
-                                                                        <a href="https://wa.me/<?php echo $user['whatsapp']; ?>" class="text-decoration-none">
+                                                                    <?php if($user['whatsapp']): ?>
+                                                                        <a href="https://wa.me/<?php echo $user['whatsapp']; ?>" class="text-decoration-none" target="_blank">
                                                                             <?php echo $user['whatsapp']; ?>
                                                                         </a>
                                                                     <?php else: ?>
@@ -336,7 +375,7 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                             <tr>
                                                                 <th class="ps-0" scope="row">Skype :</th>
                                                                 <td class="text-muted">
-                                                                    <?php if(isset($user['skype']) && $user['skype']): ?>
+                                                                    <?php if($user['skype']): ?>
                                                                         <a href="skype:<?php echo $user['skype']; ?>?chat" class="text-decoration-none">
                                                                             <?php echo $user['skype']; ?>
                                                                         </a>
@@ -360,7 +399,7 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                     Actions rapides
                                                 </h5>
                                                 <div class="d-grid gap-2">
-                                                    <?php $email = $user['user_email'] ?: $user['email']; ?>
+                                                    <?php $email = $user['email']; ?>
                                                     <?php if($email): ?>
                                                     <a href="mailto:<?php echo $email; ?>" class="btn btn-outline-primary">
                                                         <i class="ri-mail-line me-1"></i> Envoyer un e-mail
@@ -373,9 +412,15 @@ if (isset($user['roles']) && is_array($user['roles'])) {
                                                     </a>
                                                     <?php endif; ?>
                                                     
-                                                    <?php if(isset($user['whatsapp']) && $user['whatsapp']): ?>
+                                                    <?php if($user['whatsapp']): ?>
                                                     <a href="https://wa.me/<?php echo $user['whatsapp']; ?>" class="btn btn-outline-success" target="_blank">
                                                         <i class="ri-whatsapp-line me-1"></i> WhatsApp
+                                                    </a>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if($user['website']): ?>
+                                                    <a href="<?php echo $user['website']; ?>" class="btn btn-outline-info" target="_blank">
+                                                        <i class="ri-global-line me-1"></i> Site web
                                                     </a>
                                                     <?php endif; ?>
                                                 </div>
