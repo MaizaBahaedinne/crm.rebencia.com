@@ -160,6 +160,83 @@ class User_model extends CI_Model
 		return $user;
 	}
 
+	// === MÉTHODES POUR LES FILTRES D'ESTIMATIONS ===
+
+	/**
+	 * Récupérer tous les agents
+	 */
+	public function get_all_agents()
+	{
+		$query = $this->wp_db->query("
+			SELECT DISTINCT u.ID, u.display_name, u.user_email
+			FROM wp_Hrg8P_users u
+			INNER JOIN wp_Hrg8P_crm_agents ca ON u.ID = ca.user_post_id
+			WHERE ca.role = 'agent'
+			ORDER BY u.display_name
+		");
+		
+		return $query->result_array();
+	}
+
+	/**
+	 * Récupérer toutes les agences
+	 */
+	public function get_all_agencies()
+	{
+		$query = $this->wp_db->query("
+			SELECT ID, post_title as agency_name
+			FROM wp_Hrg8P_posts
+			WHERE post_type = 'houzez_agency'
+			AND post_status = 'publish'
+			ORDER BY post_title
+		");
+		
+		return $query->result_array();
+	}
+
+	/**
+	 * Récupérer les agents d'une agence
+	 */
+	public function get_agents_by_agency($agency_id)
+	{
+		if (!$agency_id) {
+			return [];
+		}
+
+		$query = $this->wp_db->query("
+			SELECT DISTINCT u.ID, u.display_name, u.user_email
+			FROM wp_Hrg8P_users u
+			INNER JOIN wp_Hrg8P_crm_agents ca ON u.ID = ca.user_post_id
+			WHERE ca.agency_id = ?
+			AND ca.role = 'agent'
+			ORDER BY u.display_name
+		", [$agency_id]);
+		
+		return $query->result_array();
+	}
+
+	/**
+	 * Récupérer les informations d'un agent
+	 */
+	public function get_agent_info($agent_id)
+	{
+		$query = $this->wp_db->query("
+			SELECT 
+				u.ID,
+				u.display_name,
+				u.user_email,
+				u.user_login,
+				ca.role,
+				ca.agency_id,
+				ag.post_title as agency_name
+			FROM wp_Hrg8P_users u
+			LEFT JOIN wp_Hrg8P_crm_agents ca ON u.ID = ca.user_post_id
+			LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
+			WHERE u.ID = ?
+		", [$agent_id]);
+		
+		return $query->row_array();
+	}
 
 	
 }

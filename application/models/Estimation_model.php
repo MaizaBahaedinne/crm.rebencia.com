@@ -300,4 +300,248 @@ class Estimation_model extends CI_Model {
         $this->db->where('id',$id)->update($this->propertiesTable,$row);
         return $this->db->affected_rows()>0;
     }
+
+    // === NOUVELLES MÉTHODES POUR CONTRÔLE D'ACCÈS PAR RÔLE ===
+
+    /**
+     * Récupérer toutes les estimations avec détails (pour admin)
+     */
+    public function get_all_estimations_with_details()
+    {
+        $query = $this->db->query("
+            SELECT 
+                e.*,
+                a.display_name as agent_name,
+                a.user_email as agent_email,
+                a.user_login as agent_username,
+                ag.post_title as agency_name,
+                c.nom as client_nom,
+                c.prenom as client_prenom,
+                c.email as client_email,
+                c.phone as client_phone
+            FROM {$this->propertiesTable} e
+            LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
+            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
+            LEFT JOIN crm_clients c ON e.client_id = c.id
+            ORDER BY e.created_at DESC
+        ");
+        
+        return $query->result_array();
+    }
+
+    /**
+     * Récupérer les estimations par agence (pour manager)
+     */
+    public function get_estimations_by_agency($agency_id)
+    {
+        if (!$agency_id) {
+            return [];
+        }
+
+        $query = $this->db->query("
+            SELECT 
+                e.*,
+                a.display_name as agent_name,
+                a.user_email as agent_email,
+                c.nom as client_nom,
+                c.prenom as client_prenom,
+                c.email as client_email
+            FROM {$this->propertiesTable} e
+            LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
+            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN crm_clients c ON e.client_id = c.id
+            WHERE ca.agency_id = ?
+            ORDER BY e.created_at DESC
+        ", [$agency_id]);
+        
+        return $query->result_array();
+    }
+
+    /**
+     * Récupérer les estimations par agent (pour agent)
+     */
+    public function get_estimations_by_agent($agent_id)
+    {
+        $query = $this->db->query("
+            SELECT 
+                e.*,
+                c.nom as client_nom,
+                c.prenom as client_prenom,
+                c.email as client_email,
+                c.phone as client_phone
+            FROM {$this->propertiesTable} e
+            LEFT JOIN crm_clients c ON e.client_id = c.id
+            WHERE e.agent_id = ?
+            ORDER BY e.created_at DESC
+        ", [$agent_id]);
+        
+        return $query->result_array();
+    }
+
+    /**
+     * Récupérer les détails d'une estimation
+     */
+    public function get_estimation_details($estimation_id)
+    {
+        $query = $this->db->query("
+            SELECT 
+                e.*,
+                a.display_name as agent_name,
+                a.user_email as agent_email,
+                a.user_login as agent_username,
+                ag.post_title as agency_name,
+                c.nom as client_nom,
+                c.prenom as client_prenom,
+                c.email as client_email,
+                c.phone as client_phone,
+                c.adresse as client_adresse
+            FROM {$this->propertiesTable} e
+            LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
+            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
+            LEFT JOIN crm_clients c ON e.client_id = c.id
+            WHERE e.id = ?
+        ", [$estimation_id]);
+        
+        return $query->row_array();
+    }
+
+    /**
+     * Filtrer les estimations selon critères et rôle
+     */
+    public function get_filtered_estimations($filters, $role, $user_post_id)
+    {
+        $where_clauses = [];
+        $params = [];
+
+        // Filtre par rôle
+        switch ($role) {
+            case 'manager':
+                $agency_id = $this->get_user_agency_id($user_post_id);
+                if ($agency_id) {
+                    $where_clauses[] = "ca.agency_id = ?";
+                    $params[] = $agency_id;
+                }
+                break;
+            case 'agent':
+                $where_clauses[] = "e.agent_id = ?";
+                $params[] = $user_post_id;
+                break;
+        }
+
+        // Filtre par statut
+        if (!empty($filters['statut'])) {
+            $where_clauses[] = "e.statut_dossier = ?";
+            $params[] = $filters['statut'];
+        }
+
+        // Filtre par agent (pour admin/manager)
+        if (!empty($filters['agent_id']) && in_array($role, ['admin', 'manager'])) {
+            $where_clauses[] = "e.agent_id = ?";
+            $params[] = $filters['agent_id'];
+        }
+
+        // Filtre par période
+        if (!empty($filters['periode'])) {
+            $date_filter = $this->get_date_filter($filters['periode']);
+            if ($date_filter) {
+                $where_clauses[] = "e.created_at >= ?";
+                $params[] = $date_filter;
+            }
+        }
+
+        // Construire la requête
+        $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses) : "";
+
+        $query = $this->db->query("
+            SELECT 
+                e.*,
+                a.display_name as agent_name,
+                c.nom as client_nom,
+                c.prenom as client_prenom
+            FROM {$this->propertiesTable} e
+            LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
+            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN crm_clients c ON e.client_id = c.id
+            {$where_sql}
+            ORDER BY e.created_at DESC
+        ", $params);
+        
+        return $query->result_array();
+    }
+
+    /**
+     * Convertir la période en date de début
+     */
+    private function get_date_filter($periode)
+    {
+        switch ($periode) {
+            case 'today':
+                return date('Y-m-d 00:00:00');
+            case 'week':
+                return date('Y-m-d 00:00:00', strtotime('monday this week'));
+            case 'month':
+                return date('Y-m-01 00:00:00');
+            case 'quarter':
+                $quarter_start = ceil(date('n') / 3) * 3 - 2;
+                return date('Y-' . sprintf('%02d', $quarter_start) . '-01 00:00:00');
+            case 'year':
+                return date('Y-01-01 00:00:00');
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Obtenir l'agence d'un utilisateur
+     */
+    private function get_user_agency_id($user_post_id)
+    {
+        $query = $this->db->query(
+            "SELECT agency_id FROM wp_Hrg8P_crm_agents WHERE user_post_id = ?", 
+            [$user_post_id]
+        );
+        
+        $result = $query->row();
+        return $result ? $result->agency_id : null;
+    }
+
+    /**
+     * Statistiques des estimations par rôle
+     */
+    public function get_stats_by_role($role, $user_post_id)
+    {
+        $where_sql = "";
+        $params = [];
+
+        switch ($role) {
+            case 'manager':
+                $agency_id = $this->get_user_agency_id($user_post_id);
+                if ($agency_id) {
+                    $where_sql = "WHERE ca.agency_id = ?";
+                    $params[] = $agency_id;
+                }
+                break;
+            case 'agent':
+                $where_sql = "WHERE e.agent_id = ?";
+                $params[] = $user_post_id;
+                break;
+        }
+
+        $query = $this->db->query("
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN statut_dossier = 'en_cours' THEN 1 ELSE 0 END) as en_cours,
+                SUM(CASE WHEN statut_dossier = 'valide' THEN 1 ELSE 0 END) as validees,
+                SUM(CASE WHEN statut_dossier = 'rejete' THEN 1 ELSE 0 END) as rejetees,
+                SUM(prix_estimation) as montant_total,
+                AVG(prix_estimation) as montant_moyen
+            FROM {$this->propertiesTable} e
+            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            {$where_sql}
+        ", $params);
+        
+        return $query->row_array();
+    }
 }
