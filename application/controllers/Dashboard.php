@@ -480,6 +480,9 @@ class Dashboard extends BaseController {
         $estimations_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
         $estimations = $estimations_query->result_array();
         
+        // Combiner les deux sources de données
+        $all_properties = array_merge($wp_properties, $estimations);
+        
         // DEBUG: Vérifier aussi sans filtre pour les deux sources
         $all_wp_properties_query = $this->wp_db->query("SELECT COUNT(*) as total FROM {$this->posts_table} WHERE post_type = 'houzez_property' AND post_status = 'publish'");
         $all_wp_properties_count = $all_wp_properties_query->row()->total;
@@ -606,7 +609,6 @@ class Dashboard extends BaseController {
         }));
         
         // === ACTIVITÉ RÉCENTE ===
-        $all_properties = array_merge($wp_properties, $estimations); // Combiner les deux sources
         $data['recent_activities'] = $this->get_real_recent_activities_simple($agent_id, $all_properties, $commissions, $clients);
         
         // === OBJECTIFS ===
