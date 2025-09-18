@@ -15,8 +15,11 @@ class Estimations extends BaseController
     {
         parent::__construct();
         $this->isLoggedIn();
+        $this->load->database();
         $this->load->model('Estimation_model');
         $this->load->model('User_model');
+        $this->load->library('input');
+        $this->load->library('output');
     }
 
     /**
@@ -101,11 +104,12 @@ class Estimations extends BaseController
                     break;
             }
             
-            // Montants
-            $montant_total += (float)$estimation['prix_estimation'];
+            // Montants - utiliser valeur_estimee au lieu de prix_estimation
+            $valeur_estimation = (float)($estimation['valeur_estimee'] ?: 0);
+            $montant_total += $valeur_estimation;
             
             if (date('Y-m', strtotime($estimation['created_at'])) === $current_month) {
-                $montant_mois += (float)$estimation['prix_estimation'];
+                $montant_mois += $valeur_estimation;
             }
         }
         
