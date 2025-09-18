@@ -314,16 +314,11 @@ class Estimation_model extends CI_Model {
                 a.display_name as agent_name,
                 a.user_email as agent_email,
                 a.user_login as agent_username,
-                ag.post_title as agency_name,
-                c.nom as client_nom,
-                c.prenom as client_prenom,
-                c.email as client_email,
-                c.contact_principal as client_phone
+                ag.post_title as agency_name
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
             LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
             LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
-            LEFT JOIN crm_clients c ON e.client_id = c.id
             ORDER BY e.created_at DESC
         ");
         
@@ -343,14 +338,10 @@ class Estimation_model extends CI_Model {
             SELECT 
                 e.*,
                 a.display_name as agent_name,
-                a.user_email as agent_email,
-                c.nom as client_nom,
-                c.prenom as client_prenom,
-                c.email as client_email
+                a.user_email as agent_email
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
             LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
-            LEFT JOIN crm_clients c ON e.client_id = c.id
             WHERE ca.agency_id = ?
             ORDER BY e.created_at DESC
         ", [$agency_id]);
@@ -364,14 +355,8 @@ class Estimation_model extends CI_Model {
     public function get_estimations_by_agent($agent_id)
     {
         $query = $this->db->query("
-            SELECT 
-                e.*,
-                c.nom as client_nom,
-                c.prenom as client_prenom,
-                c.email as client_email,
-                c.contact_principal as client_phone
+            SELECT e.*
             FROM {$this->propertiesTable} e
-            LEFT JOIN crm_clients c ON e.client_id = c.id
             WHERE e.agent_id = ?
             ORDER BY e.created_at DESC
         ", [$agent_id]);
@@ -400,7 +385,6 @@ class Estimation_model extends CI_Model {
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
             LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
             LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
-            LEFT JOIN crm_clients c ON e.client_id = c.id
             WHERE e.id = ?
         ", [$estimation_id]);
         
@@ -457,13 +441,10 @@ class Estimation_model extends CI_Model {
         $query = $this->db->query("
             SELECT 
                 e.*,
-                a.display_name as agent_name,
-                c.nom as client_nom,
-                c.prenom as client_prenom
+                a.display_name as agent_name
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
             LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
-            LEFT JOIN crm_clients c ON e.client_id = c.id
             {$where_sql}
             ORDER BY e.created_at DESC
         ", $params);
