@@ -408,18 +408,25 @@ class Dashboard extends BaseController {
     }
 
     // Vue Agent : tableau de bord moderne et premium
-    public function agent($agent_id) {
+    public function agent($agent_id = null) {
         $this->isLoggedIn();
+        
+        // Utiliser user_post_id de la session au lieu du paramètre
+        $user_post_id = $this->userPostId;
+        if(empty($user_post_id)) {
+            // Fallback vers le paramètre si user_post_id n'est pas disponible
+            $user_post_id = $agent_id;
+        }
         
         $data = $this->global;
         $data['pageTitle'] = 'Tableau de bord Agent - Vue Premium';
         
         // Informations de l'agent
-        $data['agent'] = $this->agent_model->get_agent($agent_id);
+        $data['agent'] = $this->agent_model->get_agent($user_post_id);
         
         // === PROPRIÉTÉS (via crm_properties) ===
         $this->load->database();
-        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$agent_id]);
+        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
         $properties = $properties_query->result_array();
         
         $data['properties_total'] = count($properties);
@@ -436,7 +443,7 @@ class Dashboard extends BaseController {
         // === CONTACTS/CLIENTS (via crm_clients) ===
         $clients = [];
         if($this->db->table_exists('crm_clients')) {
-            $clients_query = $this->db->query("SELECT * FROM crm_clients WHERE agent_id = ?", [$agent_id]);
+            $clients_query = $this->db->query("SELECT * FROM crm_clients WHERE agent_id = ?", [$user_post_id]);
             $clients = $clients_query->result_array();
             
             $data['contacts_total'] = count($clients);
@@ -455,7 +462,7 @@ class Dashboard extends BaseController {
         // === TRANSACTIONS (via crm_transactions) ===
         $transactions = [];
         if($this->db->table_exists('crm_transactions')) {
-            $transactions_query = $this->db->query("SELECT * FROM crm_transactions WHERE commercial = ?", [$agent_id]);
+            $transactions_query = $this->db->query("SELECT * FROM crm_transactions WHERE commercial = ?", [$user_post_id]);
             $transactions = $transactions_query->result_array();
             
             $data['transactions_total'] = count($transactions);
@@ -470,7 +477,7 @@ class Dashboard extends BaseController {
         }
         
         // === COMMISSIONS (via agent_commissions) ===
-        $commissions_query = $this->db->query("SELECT * FROM agent_commissions WHERE agent_id = ?", [$agent_id]);
+        $commissions_query = $this->db->query("SELECT * FROM agent_commissions WHERE agent_id = ?", [$user_post_id]);
         $commissions = $commissions_query->result_array();
         
         $data['commissions_total'] = array_sum(array_column($commissions, 'total_commission'));
@@ -488,7 +495,7 @@ class Dashboard extends BaseController {
         $data['tasks_overdue'] = rand(0, 2);
         
         // === CALENDRIER ===
-        $data['calendar_events'] = $this->get_real_calendar_events_simple($agent_id, $properties, $clients);
+        $data['calendar_events'] = $this->get_real_calendar_events_simple($user_post_id, $properties, $clients);
         $data['meetings_today'] = count(array_filter($data['calendar_events'], function($e) {
             return date('Y-m-d', strtotime($e['date'])) === date('Y-m-d');
         }));
@@ -500,16 +507,16 @@ class Dashboard extends BaseController {
         }));
         
         // === ACTIVITÉ RÉCENTE ===
-        $data['recent_activities'] = $this->get_real_recent_activities_simple($agent_id, $properties, $commissions, $clients);
+        $data['recent_activities'] = $this->get_real_recent_activities_simple($user_post_id, $properties, $commissions, $clients);
         
         // === OBJECTIFS ===
         $this->load->model('Objective_model');
-        $data['objectives'] = $this->Objective_model->get_agent_objectives($agent_id);
+        $data['objectives'] = $this->Objective_model->get_agent_objectives($user_post_id);
         
         // === DONNÉES POUR GRAPHIQUES ===
-        $data['properties_chart_data'] = $this->get_real_properties_chart_data_simple($agent_id, $properties);
-        $data['commissions_chart_data'] = $this->get_real_commissions_chart_data_simple($agent_id, $commissions);
-        $data['activities_chart_data'] = $this->get_real_activities_chart_data_simple($agent_id, $properties, $clients);
+        $data['properties_chart_data'] = $this->get_real_properties_chart_data_simple($user_post_id, $properties);
+        $data['commissions_chart_data'] = $this->get_real_commissions_chart_data_simple($user_post_id, $commissions);
+        $data['activities_chart_data'] = $this->get_real_activities_chart_data_simple($user_post_id, $properties, $clients);
         
         $this->loadViews('dashboard/agent_premium', $data, $data, NULL);
     }
@@ -813,30 +820,36 @@ class Dashboard extends BaseController {
     
     private function get_properties_chart_data($agent_id) {
         // Méthode maintenue pour compatibilité - utilise les vraies données maintenant
-        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$agent_id]);
+        // Utiliser user_post_id de la session si disponible
+        $user_post_id = $this->userPostId ?: $agent_id;
+        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
         $properties = $properties_query->result_array();
-        return $this->get_real_properties_chart_data_simple($agent_id, $properties);
+        return $this->get_real_properties_chart_data_simple($user_post_id, $properties);
     }
     
     private function get_commissions_chart_data($agent_id) {
         // Méthode maintenue pour compatibilité - utilise les vraies données maintenant
-        $commissions_query = $this->db->query("SELECT * FROM agent_commissions WHERE agent_id = ?", [$agent_id]);
+        // Utiliser user_post_id de la session si disponible
+        $user_post_id = $this->userPostId ?: $agent_id;
+        $commissions_query = $this->db->query("SELECT * FROM agent_commissions WHERE agent_id = ?", [$user_post_id]);
         $commissions = $commissions_query->result_array();
-        return $this->get_real_commissions_chart_data_simple($agent_id, $commissions);
+        return $this->get_real_commissions_chart_data_simple($user_post_id, $commissions);
     }
     
     private function get_activities_chart_data($agent_id) {
         // Méthode maintenue pour compatibilité - utilise les vraies données maintenant
-        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$agent_id]);
+        // Utiliser user_post_id de la session si disponible
+        $user_post_id = $this->userPostId ?: $agent_id;
+        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
         $properties = $properties_query->result_array();
         
         $clients = [];
         if($this->db->table_exists('crm_clients')) {
-            $clients_query = $this->db->query("SELECT * FROM crm_clients WHERE agent_id = ?", [$agent_id]);
+            $clients_query = $this->db->query("SELECT * FROM crm_clients WHERE agent_id = ?", [$user_post_id]);
             $clients = $clients_query->result_array();
         }
         
-        return $this->get_real_activities_chart_data_simple($agent_id, $properties, $clients);
+        return $this->get_real_activities_chart_data_simple($user_post_id, $properties, $clients);
     }
     
 

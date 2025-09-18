@@ -23,6 +23,10 @@ $route['createPasswordUser'] = "Login/createPasswordUser";
 
 /*********** DASHBOARD *******************/
 $route['dashboard'] = 'Dashboard/index';
+$route['dashboard/agent'] = 'Dashboard/agent';  // Route sans paramètre utilisant user_post_id de session
+$route['dashboard/agent/(:num)'] = 'Dashboard/agent/$1';  // Route avec paramètre pour compatibilité
+$route['dashboard/agency/(:num)'] = 'Dashboard/agency/$1';
+$route['dashboard/admin'] = 'Dashboard/admin';
 
 /*********** USER MANAGEMENT *******************/
 $route['userListing'] = 'User/userListing';
