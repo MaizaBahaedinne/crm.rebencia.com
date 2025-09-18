@@ -68,8 +68,15 @@
                             </div>
                             <div class="col-md-6">
                                 <strong>Données trouvées :</strong><br>
-                                - Propriétés pour cet agent: <?= isset($debug_info['properties_found_for_agent']) ? $debug_info['properties_found_for_agent'] : 'Non défini' ?><br>
-                                - Total propriétés en DB: <?= isset($debug_info['total_properties_in_db']) ? $debug_info['total_properties_in_db'] : 'Non défini' ?><br>
+                                <u>Propriétés WordPress :</u><br>
+                                - Propriétés WP pour cet agent: <?= isset($debug_info['wp_properties_found_for_agent']) ? $debug_info['wp_properties_found_for_agent'] : 'Non défini' ?><br>
+                                - Total propriétés WP en DB: <?= isset($debug_info['total_wp_properties_in_db']) ? $debug_info['total_wp_properties_in_db'] : 'Non défini' ?><br>
+                                - Agent IDs dans WP properties: <?= isset($debug_info['wp_agent_ids_in_properties']) ? implode(', ', array_slice($debug_info['wp_agent_ids_in_properties'], 0, 5)) : 'Non défini' ?><br>
+                                <u>Estimations (crm_properties) :</u><br>
+                                - Estimations pour cet agent: <?= isset($debug_info['estimations_found_for_agent']) ? $debug_info['estimations_found_for_agent'] : 'Non défini' ?><br>
+                                - Total estimations en DB: <?= isset($debug_info['total_estimations_in_db']) ? $debug_info['total_estimations_in_db'] : 'Non défini' ?><br>
+                                - Agent IDs dans estimations: <?= isset($debug_info['estimations_agent_ids_in_properties']) ? implode(', ', $debug_info['estimations_agent_ids_in_properties']) : 'Non défini' ?><br>
+                                <u>Commissions :</u><br>
                                 - Commissions pour cet agent: <?= isset($debug_info['commissions_found_for_agent']) ? $debug_info['commissions_found_for_agent'] : 'Non défini' ?><br>
                                 - Total commissions en DB: <?= isset($debug_info['total_commissions_in_db']) ? $debug_info['total_commissions_in_db'] : 'Non défini' ?>
                             </div>

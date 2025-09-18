@@ -462,26 +462,73 @@ class Dashboard extends BaseController {
             ];
         }
         
-        // === PROPRIÉTÉS (via crm_properties) ===
+        // === PROPRIÉTÉS (via WordPress + crm_properties) ===
         $this->load->database();
-        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
-        $properties = $properties_query->result_array();
         
-        // DEBUG: Vérifier aussi sans filtre
-        $all_properties_query = $this->db->query("SELECT COUNT(*) as total FROM crm_properties");
-        $all_properties_count = $all_properties_query->row()->total;
+        // 1. Propriétés WordPress (houzez_property)
+        $wp_properties_query = $this->wp_db->query("
+            SELECT p.*, pm_agent.meta_value as agent_id
+            FROM {$this->posts_table} p
+            LEFT JOIN {$this->postmeta_table} pm_agent ON p.ID = pm_agent.post_id AND pm_agent.meta_key = 'fave_property_agent'
+            WHERE p.post_type = 'houzez_property' 
+            AND p.post_status = 'publish'
+            AND pm_agent.meta_value = ?
+        ", [$user_post_id]);
+        $wp_properties = $wp_properties_query->result_array();
         
-        $data['debug_info']['properties_found_for_agent'] = count($properties);
-        $data['debug_info']['total_properties_in_db'] = $all_properties_count;
+        // 2. Estimations (crm_properties)
+        $estimations_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
+        $estimations = $estimations_query->result_array();
         
-        $data['properties_total'] = count($properties);
-        $data['properties_active'] = count(array_filter($properties, function($p) {
+        // DEBUG: Vérifier aussi sans filtre pour les deux sources
+        $all_wp_properties_query = $this->wp_db->query("SELECT COUNT(*) as total FROM {$this->posts_table} WHERE post_type = 'houzez_property' AND post_status = 'publish'");
+        $all_wp_properties_count = $all_wp_properties_query->row()->total;
+        
+        $all_estimations_query = $this->db->query("SELECT COUNT(*) as total FROM crm_properties");
+        $all_estimations_count = $all_estimations_query->row()->total;
+        
+        // DEBUG: Voir quels agent_id existent dans les deux tables
+        $wp_agent_ids_query = $this->wp_db->query("
+            SELECT DISTINCT pm.meta_value as agent_id 
+            FROM {$this->postmeta_table} pm 
+            WHERE pm.meta_key = 'fave_property_agent' 
+            AND pm.meta_value IS NOT NULL
+        ");
+        $wp_agent_ids_in_db = $wp_agent_ids_query->result_array();
+        
+        $estimations_agent_ids_query = $this->db->query("SELECT DISTINCT agent_id FROM crm_properties WHERE agent_id IS NOT NULL");
+        $estimations_agent_ids_in_db = $estimations_agent_ids_query->result_array();
+        
+        $data['debug_info']['wp_properties_found_for_agent'] = count($wp_properties);
+        $data['debug_info']['total_wp_properties_in_db'] = $all_wp_properties_count;
+        $data['debug_info']['wp_agent_ids_in_properties'] = array_column($wp_agent_ids_in_db, 'agent_id');
+        
+        $data['debug_info']['estimations_found_for_agent'] = count($estimations);
+        $data['debug_info']['total_estimations_in_db'] = $all_estimations_count;
+        $data['debug_info']['estimations_agent_ids_in_properties'] = array_column($estimations_agent_ids_in_db, 'agent_id');
+        
+        // Statistiques combinées
+        $total_properties = count($wp_properties) + count($estimations);
+        $data['properties_total'] = $total_properties;
+        $data['wp_properties_count'] = count($wp_properties);
+        $data['estimations_count'] = count($estimations);
+        
+        // Propriétés WordPress - statistiques
+        $data['wp_properties_active'] = count(array_filter($wp_properties, function($p) {
+            return $p['post_status'] === 'publish';
+        }));
+        $data['wp_properties_recent'] = count(array_filter($wp_properties, function($p) {
+            return strtotime($p['post_date']) > strtotime('-7 days');
+        }));
+        
+        // Estimations - statistiques  
+        $data['estimations_active'] = count(array_filter($estimations, function($p) {
             return empty($p['statut_dossier']) || $p['statut_dossier'] === 'en_cours';
         }));
-        $data['properties_sold'] = count(array_filter($properties, function($p) {
+        $data['estimations_validated'] = count(array_filter($estimations, function($p) {
             return $p['statut_dossier'] === 'valide';
         }));
-        $data['properties_recent'] = count(array_filter($properties, function($p) {
+        $data['estimations_recent'] = count(array_filter($estimations, function($p) {
             return strtotime($p['created_at']) > strtotime('-7 days');
         }));
         
