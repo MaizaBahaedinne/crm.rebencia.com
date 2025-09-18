@@ -424,15 +424,21 @@ class Dashboard extends BaseController {
         // Informations de l'agent
         $data['agent'] = $this->agent_model->get_agent($user_post_id);
         
-        // Debug temporaire pour diagnostiquer le problème
+        // Si aucun agent trouvé avec user_post_id, essayer avec wp_id
         if(empty($data['agent'])) {
-            log_message('error', "Aucun agent trouvé pour user_post_id: " . $user_post_id);
-            // Essayer avec l'ID utilisateur WordPress comme fallback
             $wp_user_id = $this->session->userdata('wp_id');
             $data['agent'] = $this->agent_model->get_agent($wp_user_id);
-            if($data['agent']) {
-                log_message('info', "Agent trouvé avec wp_id: " . $wp_user_id);
-            }
+        }
+        
+        // Si toujours aucun agent, créer un objet par défaut
+        if(empty($data['agent'])) {
+            $data['agent'] = (object)[
+                'agent_id' => $user_post_id,
+                'agent_name' => $this->session->userdata('name') ?: 'Agent',
+                'agent_email' => '',
+                'phone' => '',
+                'agent_avatar' => ''
+            ];
         }
         
         // === PROPRIÉTÉS (via crm_properties) ===
