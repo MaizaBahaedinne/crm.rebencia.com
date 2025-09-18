@@ -411,18 +411,44 @@ class Dashboard extends BaseController {
     public function agent($agent_id = null) {
         $this->isLoggedIn();
         
-       
+        // Récupération fiable de l'identifiant agent (triple fallback)
+        $user_post_id = $this->userPostId ?: $this->session->userdata('user_post_id') ?: $agent_id;
+        
+        // Si toujours pas d'ID, utiliser userId avec recherche dans wp_Hrg8P_crm_agents
+        if (empty($user_post_id)) {
+            $userId = $this->global['userId'] ?? $this->session->userdata('userId');
+            if ($userId) {
+                $agent_data = $this->agent_model->get_agent_by_wp_user_id($userId);
+                if ($agent_data && isset($agent_data->agent_post_id)) {
+                    $user_post_id = $agent_data->agent_post_id;
+                }
+            }
+        }
+        
+        // Fallback ultime
+        if (empty($user_post_id)) {
+            $user_post_id = 1; // ID par défaut pour éviter les erreurs
+        }
+        
+        // DEBUG: Ajouter les informations de debug
+        $data['debug_info'] = [
+            'user_post_id_used' => $user_post_id,
+            'session_user_post_id' => $this->session->userdata('user_post_id'),
+            'userPostId_property' => $this->userPostId,
+            'agent_id_param' => $agent_id,
+            'session_userId' => $this->session->userdata('userId')
+        ];
         
         $data = $this->global;
         $data['pageTitle'] = 'Tableau de bord Agent - Vue Premium';
         
         // Informations de l'agent
-        $data['agent'] = $this->agent_model->get_agent($agent_id);
+        $data['agent'] = $this->agent_model->get_agent($user_post_id);
         
         // Si aucun agent trouvé avec user_post_id, essayer avec wp_id
         if(empty($data['agent'])) {
             $wp_user_id = $this->session->userdata('wp_id');
-            $data['agent'] = $this->agent_model->get_agent($agent_id);
+            $data['agent'] = $this->agent_model->get_agent($wp_user_id);
         }
         
         // Si toujours aucun agent, créer un objet par défaut
@@ -438,8 +464,15 @@ class Dashboard extends BaseController {
         
         // === PROPRIÉTÉS (via crm_properties) ===
         $this->load->database();
-        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$agent_id]);
+        $properties_query = $this->db->query("SELECT * FROM crm_properties WHERE agent_id = ?", [$user_post_id]);
         $properties = $properties_query->result_array();
+        
+        // DEBUG: Vérifier aussi sans filtre
+        $all_properties_query = $this->db->query("SELECT COUNT(*) as total FROM crm_properties");
+        $all_properties_count = $all_properties_query->row()->total;
+        
+        $data['debug_info']['properties_found_for_agent'] = count($properties);
+        $data['debug_info']['total_properties_in_db'] = $all_properties_count;
         
         $data['properties_total'] = count($properties);
         $data['properties_active'] = count(array_filter($properties, function($p) {
@@ -455,7 +488,7 @@ class Dashboard extends BaseController {
         // === CONTACTS/CLIENTS (via crm_clients) ===
         $clients = [];
         if($this->db->table_exists('crm_clients')) {
-            $clients_query = $this->db->query("SELECT * FROM crm_clients WHERE agent_id = ?", [$agent_id]);
+            $clients_query = $this->db->query("SELECT * FROM crm_clients WHERE agent_id = ?", [$user_post_id]);
             $clients = $clients_query->result_array();
             
             $data['contacts_total'] = count($clients);
@@ -474,7 +507,7 @@ class Dashboard extends BaseController {
         // === TRANSACTIONS (via crm_transactions) ===
         $transactions = [];
         if($this->db->table_exists('crm_transactions')) {
-            $transactions_query = $this->db->query("SELECT * FROM crm_transactions WHERE commercial = ?", [$agent_id]);
+            $transactions_query = $this->db->query("SELECT * FROM crm_transactions WHERE commercial = ?", [$user_post_id]);
             $transactions = $transactions_query->result_array();
             
             $data['transactions_total'] = count($transactions);
@@ -489,8 +522,15 @@ class Dashboard extends BaseController {
         }
         
         // === COMMISSIONS (via agent_commissions) ===
-        $commissions_query = $this->db->query("SELECT * FROM agent_commissions WHERE agent_id = ?", [$agent_id]);
+        $commissions_query = $this->db->query("SELECT * FROM agent_commissions WHERE agent_id = ?", [$user_post_id]);
         $commissions = $commissions_query->result_array();
+        
+        // DEBUG: Vérifier aussi sans filtre
+        $all_commissions_query = $this->db->query("SELECT COUNT(*) as total FROM agent_commissions");
+        $all_commissions_count = $all_commissions_query->row()->total;
+        
+        $data['debug_info']['commissions_found_for_agent'] = count($commissions);
+        $data['debug_info']['total_commissions_in_db'] = $all_commissions_count;
         
         $data['commissions_total'] = array_sum(array_column($commissions, 'total_commission'));
         $data['commissions_pending'] = array_sum(array_map(function($c) {

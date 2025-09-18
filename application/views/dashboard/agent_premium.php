@@ -50,6 +50,34 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- DEBUG BLOCK TEMPORAIRE -->
+            <?php if(isset($debug_info)): ?>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h6><i class="ri-bug-line me-2"></i>Informations de Debug (temporaire)</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>IDs utilisés :</strong><br>
+                                - user_post_id utilisé: <?= $debug_info['user_post_id_used'] ?><br>
+                                - Session user_post_id: <?= $debug_info['session_user_post_id'] ?><br>
+                                - UserPostId property: <?= $debug_info['userPostId_property'] ?><br>
+                                - Agent ID param: <?= $debug_info['agent_id_param'] ?><br>
+                                - Session userId: <?= $debug_info['session_userId'] ?>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Données trouvées :</strong><br>
+                                - Propriétés pour cet agent: <?= $debug_info['properties_found_for_agent'] ?><br>
+                                - Total propriétés en DB: <?= $debug_info['total_properties_in_db'] ?><br>
+                                - Commissions pour cet agent: <?= $debug_info['commissions_found_for_agent'] ?><br>
+                                - Total commissions en DB: <?= $debug_info['total_commissions_in_db'] ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Cartes de Statistiques Principales -->
             <div class="row mb-4">
