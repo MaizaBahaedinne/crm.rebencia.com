@@ -60,18 +60,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <strong>IDs utilisés :</strong><br>
-                                - user_post_id utilisé: <?= $debug_info['user_post_id_used'] ?><br>
-                                - Session user_post_id: <?= $debug_info['session_user_post_id'] ?><br>
-                                - UserPostId property: <?= $debug_info['userPostId_property'] ?><br>
-                                - Agent ID param: <?= $debug_info['agent_id_param'] ?><br>
-                                - Session userId: <?= $debug_info['session_userId'] ?>
+                                - user_post_id utilisé: <?= isset($debug_info['user_post_id_used']) ? $debug_info['user_post_id_used'] : 'Non défini' ?><br>
+                                - Session user_post_id: <?= isset($debug_info['session_user_post_id']) ? $debug_info['session_user_post_id'] : 'Non défini' ?><br>
+                                - UserPostId property: <?= isset($debug_info['userPostId_property']) ? $debug_info['userPostId_property'] : 'Non défini' ?><br>
+                                - Agent ID param: <?= isset($debug_info['agent_id_param']) ? $debug_info['agent_id_param'] : 'Non défini' ?><br>
+                                - Session userId: <?= isset($debug_info['session_userId']) ? $debug_info['session_userId'] : 'Non défini' ?>
                             </div>
                             <div class="col-md-6">
                                 <strong>Données trouvées :</strong><br>
-                                - Propriétés pour cet agent: <?= $debug_info['properties_found_for_agent'] ?><br>
-                                - Total propriétés en DB: <?= $debug_info['total_properties_in_db'] ?><br>
-                                - Commissions pour cet agent: <?= $debug_info['commissions_found_for_agent'] ?><br>
-                                - Total commissions en DB: <?= $debug_info['total_commissions_in_db'] ?>
+                                - Propriétés pour cet agent: <?= isset($debug_info['properties_found_for_agent']) ? $debug_info['properties_found_for_agent'] : 'Non défini' ?><br>
+                                - Total propriétés en DB: <?= isset($debug_info['total_properties_in_db']) ? $debug_info['total_properties_in_db'] : 'Non défini' ?><br>
+                                - Commissions pour cet agent: <?= isset($debug_info['commissions_found_for_agent']) ? $debug_info['commissions_found_for_agent'] : 'Non défini' ?><br>
+                                - Total commissions en DB: <?= isset($debug_info['total_commissions_in_db']) ? $debug_info['total_commissions_in_db'] : 'Non défini' ?>
                             </div>
                         </div>
                     </div>

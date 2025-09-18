@@ -430,6 +430,9 @@ class Dashboard extends BaseController {
             $user_post_id = 1; // ID par défaut pour éviter les erreurs
         }
         
+        $data = $this->global;
+        $data['pageTitle'] = 'Tableau de bord Agent - Vue Premium';
+        
         // DEBUG: Ajouter les informations de debug
         $data['debug_info'] = [
             'user_post_id_used' => $user_post_id,
@@ -438,9 +441,6 @@ class Dashboard extends BaseController {
             'agent_id_param' => $agent_id,
             'session_userId' => $this->session->userdata('userId')
         ];
-        
-        $data = $this->global;
-        $data['pageTitle'] = 'Tableau de bord Agent - Vue Premium';
         
         // Informations de l'agent
         $data['agent'] = $this->agent_model->get_agent($user_post_id);
