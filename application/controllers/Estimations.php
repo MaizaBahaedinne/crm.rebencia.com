@@ -97,15 +97,19 @@ class Estimations extends BaseController
 
     private function get_user_info()
     {
-        // Récupérer depuis la session
-        $session_data = $this->session->userdata();
+        // Récupérer les infos comme dans Dashboard
+        $role = $this->session->userdata('role');
+        $user_post_id = $this->session->userdata('user_post_id');
+        $agency_id = $this->session->userdata('agency_id');
+        $userId = $this->session->userdata('userId');
+        $name = $this->session->userdata('name');
         
         return [
-            'user_id' => $session_data['userId'] ?? 0,
-            'user_post_id' => $session_data['user_post_id'] ?? 0,
-            'role' => $session_data['role'] ?? 'agent',
-            'agency_id' => $session_data['agency_id'] ?? 1,
-            'name' => $session_data['name'] ?? 'Utilisateur'
+            'user_id' => $userId ?? 0,
+            'user_post_id' => $user_post_id ?? 0,
+            'role' => $role ?? 'agent',
+            'agency_id' => $agency_id ?? 1,
+            'name' => $name ?? 'Utilisateur'
         ];
     }
 }
