@@ -54,27 +54,30 @@ try {
         echo "Erreur requête wp_Hrg8P_users: " . $mysqli->error . "<br>";
     }
     
-    // 4. Test jointure complète comme dans le modèle
-    echo "<h2>4. Test jointure complète</h2>";
+    // 4. Test jointure complète comme dans le modèle (avec la vue wp_Hrg8P_crm_agents)
+    echo "<h2>4. Test jointure complète (avec vue wp_Hrg8P_crm_agents)</h2>";
     $query4 = "
         SELECT 
             p.id,
             p.type_propriete,
+            CONCAT(p.adresse_numero, ' ', p.adresse_rue, ', ', p.adresse_ville) as adresse,
             p.adresse_ville,
             p.valeur_estimee,
-            u.display_name as agent_nom
+            a.agent_name,
+            a.agency_name,
+            p.latitude,
+            p.longitude
         FROM crm_properties p
-        LEFT JOIN rebencia_RebenciaBD.wp_Hrg8P_prop_agen a ON p.agent_id = a.agent_post_id
-        LEFT JOIN rebencia_RebenciaBD.wp_Hrg8P_users u ON a.user_id = u.ID
+        LEFT JOIN rebencia_RebenciaBD.wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
         WHERE p.valeur_estimee IS NOT NULL
         LIMIT 5
     ";
     
     $result4 = $mysqli->query($query4);
     if ($result4) {
-        echo "Résultats de la jointure:<br>";
+        echo "Résultats de la jointure avec vue wp_Hrg8P_crm_agents:<br>";
         while ($row4 = $result4->fetch_assoc()) {
-            echo "ID: {$row4['id']}, Type: {$row4['type_propriete']}, Ville: {$row4['adresse_ville']}, Valeur: {$row4['valeur_estimee']}, Agent: {$row4['agent_nom']}<br>";
+            echo "ID: {$row4['id']}, Type: {$row4['type_propriete']}, Adresse: {$row4['adresse']}, Valeur: {$row4['valeur_estimee']}, Agent: {$row4['agent_name']}, Agence: {$row4['agency_name']}<br>";
         }
     } else {
         echo "Erreur jointure: " . $mysqli->error . "<br>";
