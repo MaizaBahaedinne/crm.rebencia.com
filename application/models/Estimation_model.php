@@ -310,16 +310,25 @@ class Estimation_model extends CI_Model {
     {
         $query = $this->db->query("
             SELECT 
-                e.*,
-                a.display_name as agent_name,
-                a.user_email as agent_email,
-                a.user_login as agent_username,
-                ag.post_title as agency_name
-            FROM {$this->propertiesTable} e
-            LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
-            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
-            LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
-            ORDER BY e.created_at DESC
+                p.id,
+                p.type_propriete as titre,
+                CONCAT(p.adresse_numero, ' ', p.adresse_rue, ', ', p.adresse_ville) as adresse,
+                p.type_bien as type_propriete,
+                p.surface_habitable as surface,
+                p.adresse_ville as ville,
+                p.adresse_ville as gouvernorat,
+                p.valeur_estimee,
+                p.latitude,
+                p.longitude,
+                p.created_at as date_creation,
+                'en_attente' as statut,
+                u.display_name as agent_nom,
+                'Rebencia Immobilier' as agence_nom
+            FROM {$this->propertiesTable} p
+            LEFT JOIN wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
+            LEFT JOIN wp_Hrg8P_users u ON a.user_id = u.ID
+            WHERE p.valeur_estimee IS NOT NULL
+            ORDER BY p.created_at DESC
         ");
         
         return $query->result_array();
@@ -336,14 +345,25 @@ class Estimation_model extends CI_Model {
 
         $query = $this->db->query("
             SELECT 
-                e.*,
-                a.display_name as agent_name,
-                a.user_email as agent_email
-            FROM {$this->propertiesTable} e
-            LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
-            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
-            WHERE ca.agency_id = ?
-            ORDER BY e.created_at DESC
+                p.id,
+                p.type_propriete as titre,
+                CONCAT(p.adresse_numero, ' ', p.adresse_rue, ', ', p.adresse_ville) as adresse,
+                p.type_bien as type_propriete,
+                p.surface_habitable as surface,
+                p.adresse_ville as ville,
+                p.adresse_ville as gouvernorat,
+                p.valeur_estimee,
+                p.latitude,
+                p.longitude,
+                p.created_at as date_creation,
+                'en_attente' as statut,
+                u.display_name as agent_nom,
+                'Rebencia Immobilier' as agence_nom
+            FROM {$this->propertiesTable} p
+            LEFT JOIN wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
+            LEFT JOIN wp_Hrg8P_users u ON a.user_id = u.ID
+            WHERE a.agency_id = ? AND p.valeur_estimee IS NOT NULL
+            ORDER BY p.created_at DESC
         ", [$agency_id]);
         
         return $query->result_array();
@@ -355,10 +375,26 @@ class Estimation_model extends CI_Model {
     public function get_estimations_by_agent($agent_id)
     {
         $query = $this->db->query("
-            SELECT e.*
-            FROM {$this->propertiesTable} e
-            WHERE e.agent_id = ?
-            ORDER BY e.created_at DESC
+            SELECT 
+                p.id,
+                p.type_propriete as titre,
+                CONCAT(p.adresse_numero, ' ', p.adresse_rue, ', ', p.adresse_ville) as adresse,
+                p.type_bien as type_propriete,
+                p.surface_habitable as surface,
+                p.adresse_ville as ville,
+                p.adresse_ville as gouvernorat,
+                p.valeur_estimee,
+                p.latitude,
+                p.longitude,
+                p.created_at as date_creation,
+                'en_attente' as statut,
+                u.display_name as agent_nom,
+                'Rebencia Immobilier' as agence_nom
+            FROM {$this->propertiesTable} p
+            LEFT JOIN wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
+            LEFT JOIN wp_Hrg8P_users u ON a.user_id = u.ID
+            WHERE p.agent_id = ? AND p.valeur_estimee IS NOT NULL
+            ORDER BY p.created_at DESC
         ", [$agent_id]);
         
         return $query->result_array();
