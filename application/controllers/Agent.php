@@ -178,7 +178,7 @@ class Agent extends BaseController {
                 if ($agency_id) {
                     // Récupérer uniquement les agents de son agence
                     $agents = $this->agent_model->get_agents_by_agency($agency_id);
-                    $data['pageTitle'] = 'Mon équipe';
+                    $data['pageTitle'] = 'Mon agence';
                 } else {
                     $agents = [];
                     $data['error'] = 'Manager non associé à une agence.';

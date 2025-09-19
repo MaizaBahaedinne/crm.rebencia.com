@@ -164,6 +164,19 @@ class Login extends CI_Controller {
                 } else {
                     $sessionData['user_post_id'] = $user->ID;
                 }
+                
+                // Récupérer l'agency_id depuis wp_Hrg8P_crm_agents pour agent et manager
+                if ($mappedRole === 'agent' || $mappedRole === 'manager') {
+                    $user_agency_id = null;
+                    if ($wp_db->table_exists('wp_Hrg8P_crm_agents')) {
+                        $agent_record = $wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row();
+                        if ($agent_record && isset($agent_record->agency_id)) {
+                            $user_agency_id = $agent_record->agency_id;
+                        }
+                    }
+                    $sessionData['agency_id'] = $user_agency_id ?: $agency_id;
+                }
+                
                 if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; }
                 if ($mappedRole === 'agency') { $sessionData['agency_id'] = $agency_id; }
                 // Assurer disponibilité session

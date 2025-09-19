@@ -64,7 +64,7 @@
                                     </span>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <p class="text-uppercase fw-medium text-muted text-truncate fs-13 mb-1">Agents de l'équipe</p>
+                                    <p class="text-uppercase fw-medium text-muted text-truncate fs-13 mb-1">Agents de l'agence</p>
                                     <div class="d-flex align-items-center">
                                         <h4 class="fs-24 fw-semibold ff-secondary mb-0 text-primary counter" data-target="<?= isset($stats['total_agents']) ? $stats['total_agents'] : count($agents ?? []) ?>">0</h4>
                                         <small class="text-success ms-2">
@@ -150,14 +150,14 @@
                 </div>
             </div>
 
-            <!-- Section Agents de l'équipe -->
+            <!-- Section Agents de l'agence -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">
                                 <i class="ri-team-line me-2 text-primary"></i>
-                                Équipe d'agents
+                                Agence d'agents
                                 <span class="badge bg-primary ms-2"><?= count($agents ?? []) ?> agents</span>
                             </h5>
                             <a href="<?= base_url('agents'); ?>" class="btn btn-outline-primary btn-sm">
@@ -222,7 +222,7 @@
                                         </div>
                                     </div>
                                     <h5 class="mb-2">Aucun agent trouvé</h5>
-                                    <p class="text-muted mb-3">Votre équipe d'agents apparaîtra ici</p>
+                                    <p class="text-muted mb-3">Votre agence d'agents apparaîtra ici</p>
                                     <a href="<?= base_url('agents/add'); ?>" class="btn btn-primary">
                                         <i class="ri-user-add-line me-2"></i>Ajouter un agent
                                     </a>
@@ -244,7 +244,7 @@
                                 </div>
                             </div>
                             <h5 class="mb-2">Estimations</h5>
-                            <p class="text-muted mb-3">Gérer les estimations de votre équipe</p>
+                            <p class="text-muted mb-3">Gérer les estimations de votre agence</p>
                             <a href="<?= base_url('estimations'); ?>" class="btn btn-primary">
                                 <i class="ri-eye-line me-2"></i>Voir les estimations
                             </a>
@@ -260,7 +260,7 @@
                                 </div>
                             </div>
                             <h5 class="mb-2">Objectifs</h5>
-                            <p class="text-muted mb-3">Définir et suivre les objectifs de l'équipe</p>
+                            <p class="text-muted mb-3">Définir et suivre les objectifs de l'agence</p>
                             <a href="<?= base_url('objectives'); ?>" class="btn btn-success">
                                 <i class="ri-settings-4-line me-2"></i>Gérer les objectifs
                             </a>
