@@ -26,7 +26,8 @@ class Profile extends BaseController {
         $this->isLoggedIn();
 
         // Récupération fiable de l'identifiant utilisateur
-        $userId = $this->global['userId'] ?? $this->vendorId ?? $this->session->userdata('userId');
+        // BaseController définit vendorId = session->userdata('wp_id') et global['userId'] = vendorId
+        $userId = $this->global['userId'] ?? $this->vendorId ?? $this->session->userdata('wp_id');
         if (empty($userId)) {
             // Pas d'ID -> retour login
             redirect('login');
