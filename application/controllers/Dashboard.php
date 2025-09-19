@@ -49,6 +49,8 @@ class Dashboard extends BaseController {
         } elseif ($role === 'agency') {
             $agency_id = $this->session->userdata('agency_id');
             redirect('dashboard/agency/' . $agency_id);
+        } elseif ($role === 'manager') {
+            redirect('dashboard/manager');
         } elseif ($role === 'agent') {
             $agent_id = $this->session->userdata('user_post_id');
             redirect('dashboard/agent/' . $agent_id);
@@ -405,6 +407,56 @@ class Dashboard extends BaseController {
         $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
         $data['stats'] = $this->activity_model->get_agency_stats($agency_id);
         $this->loadViews('dashboard/agency', $this->global, $data, NULL);
+    }
+
+    // Vue Manager : tableau de bord manager avec gestion d'agence
+    public function manager() {
+        $this->isLoggedIn();
+        
+        $data = $this->global;
+        $data['pageTitle'] = 'Tableau de bord Manager';
+        
+        // Récupérer l'agency_id depuis la session ou les métadonnées
+        $agency_id = $this->session->userdata('agency_id');
+        $user_id = $this->session->userdata('wp_id');
+        
+        // Si pas d'agency_id en session, le récupérer depuis les métadonnées
+        if (!$agency_id && $user_id) {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            $meta_query = $wp_db->where('user_id', $user_id)
+                                ->where('meta_key', 'houzez_agency_id')
+                                ->get('wp_Hrg8P_usermeta');
+            if ($meta_query->num_rows() > 0) {
+                $agency_id = $meta_query->row()->meta_value;
+                // Sauvegarder en session pour les prochaines fois
+                $this->session->set_userdata('agency_id', $agency_id);
+            }
+        }
+        
+        // Fallback agency_id par défaut si toujours pas trouvé
+        if (!$agency_id) {
+            $agency_id = 1; // ID par défaut
+        }
+        
+        // Récupérer les données de l'agence et ses agents
+        $data['agency'] = $this->agency_model->get_agency($agency_id);
+        $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
+        
+        // Statistiques spécifiques au manager
+        try {
+            $data['stats'] = $this->activity_model->get_agency_stats($agency_id);
+        } catch (Exception $e) {
+            // Fallback si la méthode n'existe pas
+            $data['stats'] = [
+                'total_agents' => count($data['agents']),
+                'total_properties' => 0,
+                'total_transactions' => 0,
+                'total_revenue' => 0
+            ];
+        }
+        
+        // Charger la vue manager
+        $this->loadViews('dashboard/manager', $this->global, $data, NULL);
     }
 
     // Vue Agent : tableau de bord moderne et premium

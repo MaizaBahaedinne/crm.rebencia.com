@@ -174,6 +174,8 @@ class Login extends CI_Controller {
                     redirect('dashboard/admin');
                 } elseif ($mappedRole === 'agency') {
                     redirect('dashboard/agency/'.$agency_id);
+                } elseif ($mappedRole === 'manager') {
+                    redirect('dashboard/manager');
                 } elseif ($mappedRole === 'agent') {
                     // Utiliser une route simplifiée puisque user_post_id est en session
                     redirect('dashboard/agent');
