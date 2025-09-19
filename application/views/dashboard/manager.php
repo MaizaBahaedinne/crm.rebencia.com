@@ -20,7 +20,7 @@
                             <div class="mt-2">
                                 <span class="badge bg-warning-subtle text-warning fs-13">
                                     <i class="ri-building-line me-1"></i>
-                                    <?= is_object($agency) ? $agency->post_title : (is_array($agency) ? $agency['name'] : 'Agence') ?>
+                                    <?= is_object($agency) ? $agency->agency_name : (is_array($agency) ? $agency['name'] : 'Agence') ?>
                                 </span>
                             </div>
                             <?php endif; ?>
