@@ -47,7 +47,7 @@ class Estimations extends BaseController
     {
         try {
             switch ($role) {
-                case 'admin':
+                case 'administrator':
                     return $this->Estimation_model->get_all_estimations_with_details();
                 case 'manager':
                     $agency_id = $user_info['agency_id'] ?? 1;

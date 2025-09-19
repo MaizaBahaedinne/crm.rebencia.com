@@ -878,7 +878,7 @@
                                     <i class="ri-bar-chart-grouped-line"></i> <span>Rapports agence</span>
                                 </a>
                             </li>
-                        <?php elseif ($role === 'agent') : ?>
+                        <?php elseif ($role === 'houzez_agent') : ?>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
                                     <i class="ri-dashboard-2-line"></i> <span>Mon tableau de bord</span>
