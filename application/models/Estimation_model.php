@@ -325,7 +325,7 @@ class Estimation_model extends CI_Model {
                 u.display_name as agent_nom,
                 'Rebencia Immobilier' as agence_nom
             FROM {$this->propertiesTable} p
-            LEFT JOIN wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
+            LEFT JOIN wp_Hrg8P_prop_agen a ON p.agent_id = a.agent_post_id
             LEFT JOIN wp_Hrg8P_users u ON a.user_id = u.ID
             WHERE p.valeur_estimee IS NOT NULL
             ORDER BY p.created_at DESC
@@ -360,7 +360,7 @@ class Estimation_model extends CI_Model {
                 u.display_name as agent_nom,
                 'Rebencia Immobilier' as agence_nom
             FROM {$this->propertiesTable} p
-            LEFT JOIN wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
+            LEFT JOIN wp_Hrg8P_prop_agen a ON p.agent_id = a.agent_post_id
             LEFT JOIN wp_Hrg8P_users u ON a.user_id = u.ID
             WHERE a.agency_id = ? AND p.valeur_estimee IS NOT NULL
             ORDER BY p.created_at DESC
@@ -391,7 +391,7 @@ class Estimation_model extends CI_Model {
                 u.display_name as agent_nom,
                 'Rebencia Immobilier' as agence_nom
             FROM {$this->propertiesTable} p
-            LEFT JOIN wp_Hrg8P_crm_agents a ON p.agent_id = a.agent_post_id
+            LEFT JOIN wp_Hrg8P_prop_agen a ON p.agent_id = a.agent_post_id
             LEFT JOIN wp_Hrg8P_users u ON a.user_id = u.ID
             WHERE p.agent_id = ? AND p.valeur_estimee IS NOT NULL
             ORDER BY p.created_at DESC
@@ -419,7 +419,7 @@ class Estimation_model extends CI_Model {
                 c.adresse as client_adresse
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
-            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN wp_Hrg8P_prop_agen ca ON e.agent_id = ca.user_post_id
             LEFT JOIN wp_Hrg8P_posts ag ON ca.agency_id = ag.ID
             WHERE e.id = ?
         ", [$estimation_id]);
@@ -480,7 +480,7 @@ class Estimation_model extends CI_Model {
                 a.display_name as agent_name
             FROM {$this->propertiesTable} e
             LEFT JOIN wp_Hrg8P_users a ON e.agent_id = a.ID
-            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN wp_Hrg8P_prop_agen ca ON e.agent_id = ca.user_post_id
             {$where_sql}
             ORDER BY e.created_at DESC
         ", $params);
@@ -516,7 +516,7 @@ class Estimation_model extends CI_Model {
     private function get_user_agency_id($user_post_id)
     {
         $query = $this->db->query(
-            "SELECT agency_id FROM wp_Hrg8P_crm_agents WHERE user_post_id = ?", 
+            "SELECT agency_id FROM wp_Hrg8P_prop_agen WHERE user_post_id = ?", 
             [$user_post_id]
         );
         
@@ -555,7 +555,7 @@ class Estimation_model extends CI_Model {
                 SUM(prix_estimation) as montant_total,
                 AVG(prix_estimation) as montant_moyen
             FROM {$this->propertiesTable} e
-            LEFT JOIN wp_Hrg8P_crm_agents ca ON e.agent_id = ca.user_post_id
+            LEFT JOIN wp_Hrg8P_prop_agen ca ON e.agent_id = ca.user_post_id
             {$where_sql}
         ", $params);
         
