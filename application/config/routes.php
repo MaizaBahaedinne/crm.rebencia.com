@@ -118,6 +118,7 @@ $route['transactions/properties/by-type'] = 'Transaction/properties_by_type';
 $route['reports/sales'] = 'Report/sales';
 $route['reports/agency-performance'] = 'Report/agency_performance';
 $route['reports/agency'] = 'Report/agency';
+$route['reports/manager'] = 'Report/manager';
 
 /*********** SETTINGS *******************/
 $route['settings/roles'] = 'Settings/roles';

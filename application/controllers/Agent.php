@@ -16,6 +16,7 @@ class Agent extends BaseController {
         $this->load->model('Agent_model', 'agent_model');
         $this->load->model('Agency_model', 'agency_model');
         $this->load->model('Property_model', 'property_model');
+        $this->load->model('User_model');
     }
 
     // Debug avatar comparison
@@ -157,14 +158,35 @@ class Agent extends BaseController {
         // Charger le helper avatar
         $this->load->helper('avatar');
         
+        // Récupérer le rôle et les infos de l'utilisateur connecté
+        $role = $this->session->userdata('role');
+        $user_id = $this->session->userdata('user_id');
+        
         // Préparer les données pour la vue
         $data = $this->global;
         $data['pageTitle'] = 'Liste des agents';
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
         try {
-            // Récupérer tous les agents depuis wp_posts uniquement (sans wp_users)
-            $agents = $this->agent_model->get_all_agents_from_posts($data['filters']);
+            // Pour le manager, filtrer par son agence
+            if ($role === 'manager') {
+                // Récupérer l'ID de l'agence du manager
+                $this->load->model('User_model');
+                $user_info = $this->User_model->get_user_info($user_id);
+                $agency_id = $user_info->agency_id ?? null;
+                
+                if ($agency_id) {
+                    // Récupérer uniquement les agents de son agence
+                    $agents = $this->agent_model->get_agents_by_agency($agency_id);
+                    $data['pageTitle'] = 'Mon équipe';
+                } else {
+                    $agents = [];
+                    $data['error'] = 'Manager non associé à une agence.';
+                }
+            } else {
+                // Pour les autres rôles (admin, agency_admin), récupérer tous les agents
+                $agents = $this->agent_model->get_all_agents_from_posts($data['filters']);
+            }
             
             $data['agents'] = $agents;
             
