@@ -39,7 +39,7 @@ class Report extends BaseController {
         
         // Récupérer l'ID de l'agence du manager
         $this->load->model('User_model');
-        $user_info = $this->User_model->get_user_info($user_id);
+        $user_info = $this->User_model->get_wp_user($user_id);
         $agency_id = $user_info->agency_id ?? null;
         
         if (!$agency_id) {

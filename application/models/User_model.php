@@ -179,7 +179,8 @@ class User_model extends CI_Model
 				a.phone as agent_phone,
 				a.mobile as agent_mobile,
 				a.position,
-				a.agent_avatar
+				a.agent_avatar,
+				a.agency_id
 			FROM wp_Hrg8P_users u
 			LEFT JOIN wp_Hrg8P_usermeta um ON u.ID = um.user_id
 			LEFT JOIN wp_Hrg8P_crm_agents a ON u.ID = a.user_id
@@ -187,7 +188,7 @@ class User_model extends CI_Model
 			GROUP BY u.ID, u.user_login, u.user_email, u.user_nicename, u.display_name, 
 					 u.user_registered, u.user_status, u.user_url,
 					 a.agent_name, a.agency_name, a.agent_email, a.phone, a.mobile, 
-					 a.position, a.agent_avatar
+					 a.position, a.agent_avatar, a.agency_id
 		", [$user_id]);
 		
 		$user = $query->row();
