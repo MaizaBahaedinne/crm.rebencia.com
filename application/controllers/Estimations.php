@@ -53,7 +53,7 @@ class Estimations extends BaseController
                     $agency_id = $user_info['agency_id'] ?? 1;
                     return $this->Estimation_model->get_estimations_by_agency($agency_id);
                 default:
-                    $user_post_id = $user_info['user_post_id'] ?? 0;
+                    $user_post_id = $user_info['user_post_id'] ?? 1;
                     return $this->Estimation_model->get_estimations_by_agent($user_post_id);
             }
         } catch (Exception $e) {
