@@ -14,6 +14,9 @@ class Estimations extends BaseController
 
     public function index()
     {
+        // Vérifier si l'utilisateur est connecté
+        $this->isLoggedIn();
+        
         // Récupérer les informations utilisateur depuis la session
         $user_info = $this->get_user_info();
         $user_role = $user_info['role'];
