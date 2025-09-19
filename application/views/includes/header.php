@@ -878,6 +878,48 @@
                                     <i class="ri-bar-chart-grouped-line"></i> <span>Rapports agence</span>
                                 </a>
                             </li>
+                        <?php elseif ($role === 'manager') : ?>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('dashboard/manager'); ?>">
+                                    <i class="ri-dashboard-3-line"></i> <span>Dashboard Manager</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Gestion d'équipe</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('agents'); ?>">
+                                    <i class="ri-team-line"></i> <span>Mon équipe</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Propriétés</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
+                                    <i class="ri-home-4-line"></i> <span>Propriétés équipe</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Estimations</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('estimations'); ?>">
+                                    <i class="ri-file-list-3-line"></i> <span>Estimations équipe</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Clients</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('clients'); ?>">
+                                    <i class="ri-group-line"></i> <span>Clients équipe</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Transactions</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('transactions'); ?>">
+                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes & Locations</span>
+                                </a>
+                            </li>
+                            <li class="menu-title"><span>Rapports</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('reports/manager'); ?>">
+                                    <i class="ri-bar-chart-grouped-line"></i> <span>Rapports équipe</span>
+                                </a>
+                            </li>
                         <?php elseif ($role === 'agent') : ?>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
