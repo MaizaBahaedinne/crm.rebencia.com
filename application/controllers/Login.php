@@ -137,7 +137,7 @@ class Login extends CI_Controller {
                 $mappedRole = $role;
                 if ($role === 'houzez_agency') { $mappedRole = 'agency'; }
                 if ($role === 'houzez_agent') { $mappedRole = 'agent'; }
-
+                if ($role === 'houzez_manager') { $mappedRole = 'manager'; }
                 $sessionData = [
                     'logged_in'   => true,
                     'wp_id'       => $user->ID,
