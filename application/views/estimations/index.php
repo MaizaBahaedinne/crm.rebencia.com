@@ -145,73 +145,49 @@
                 </div>
             </div>
 
-            <!-- Filtres et recherche -->
+            <!-- Barre de contrôles -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-gradient-primary text-white">
+                        <div class="card-body py-3">
                             <div class="row align-items-center">
-                                <div class="col">
-                                    <h5 class="card-title mb-0">
-                                        <i class="ri-filter-line me-2"></i>Filtres et Recherche
-                                    </h5>
-                                </div>
-                                <div class="col-auto">
-                                    <button class="btn btn-light btn-sm" id="resetFilters">
-                                        <i class="ri-refresh-line me-1"></i>Réinitialiser
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <label class="form-label fw-semibold">Recherche</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="searchInput" placeholder="Rechercher...">
-                                        <span class="input-group-text">
-                                            <i class="ri-search-line"></i>
-                                        </span>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-primary" id="gridViewBtn">
+                                                <i class="ri-grid-line me-1"></i>Grille
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary" id="listViewBtn">
+                                                <i class="ri-list-unordered me-1"></i>Liste
+                                            </button>
+                                        </div>
+                                        <div class="input-group" style="width: 300px;">
+                                            <input type="text" class="form-control" id="searchInput" placeholder="Rechercher une estimation...">
+                                            <span class="input-group-text">
+                                                <i class="ri-search-line"></i>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label fw-semibold">Statut</label>
-                                    <select class="form-select" id="statusFilter">
-                                        <option value="">Tous les statuts</option>
-                                        <option value="en_attente">En attente</option>
-                                        <option value="validee">Validée</option>
-                                        <option value="refusee">Refusée</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label fw-semibold">Type</label>
-                                    <select class="form-select" id="typeFilter">
-                                        <option value="">Tous les types</option>
-                                        <option value="appartement">Appartement</option>
-                                        <option value="villa">Villa</option>
-                                        <option value="terrain">Terrain</option>
-                                        <option value="bureau">Bureau</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label fw-semibold">Gouvernorat</label>
-                                    <select class="form-select" id="regionFilter">
-                                        <option value="">Toutes les régions</option>
-                                        <option value="tunis">Tunis</option>
-                                        <option value="ariana">Ariana</option>
-                                        <option value="ben_arous">Ben Arous</option>
-                                        <option value="manouba">Manouba</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-semibold">Période</label>
-                                    <select class="form-select" id="periodFilter">
-                                        <option value="">Toutes les périodes</option>
-                                        <option value="today">Aujourd'hui</option>
-                                        <option value="week">Cette semaine</option>
-                                        <option value="month">Ce mois</option>
-                                        <option value="quarter">Ce trimestre</option>
-                                    </select>
+                                <div class="col-md-6 text-end">
+                                    <div class="d-flex align-items-center justify-content-end gap-2">
+                                        <select class="form-select form-select-sm" id="statusFilter" style="width: auto;">
+                                            <option value="">Tous les statuts</option>
+                                            <option value="en_attente">En attente</option>
+                                            <option value="validee">Validée</option>
+                                            <option value="refusee">Refusée</option>
+                                        </select>
+                                        <select class="form-select form-select-sm" id="typeFilter" style="width: auto;">
+                                            <option value="">Tous les types</option>
+                                            <option value="appartement">Appartement</option>
+                                            <option value="villa">Villa</option>
+                                            <option value="terrain">Terrain</option>
+                                            <option value="bureau">Bureau</option>
+                                        </select>
+                                        <button class="btn btn-outline-secondary btn-sm" id="toggleMapBtn">
+                                            <i class="ri-map-2-line me-1"></i>Carte
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -219,64 +195,51 @@
                 </div>
             </div>
 
-            <!-- Table des estimations -->
+            <!-- Vue principale avec carte et grille -->
             <div class="row">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
+                <!-- Carte interactive (masquée par défaut) -->
+                <div class="col-lg-6 mb-4" id="mapContainer" style="display: none;">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">
-                                <i class="ri-list-check-2 me-2"></i>
-                                Liste des Estimations 
-                                <span class="badge bg-primary ms-2"><?= count($estimations) ?> résultats</span>
+                                <i class="ri-map-2-line me-2 text-primary"></i>
+                                Localisation des Estimations
                             </h5>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-outline-primary btn-sm">
-                                    <i class="ri-grid-line me-1"></i>Grille
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" id="centerMapBtn">
+                                    <i class="ri-focus-3-line"></i>
                                 </button>
-                                <button type="button" class="btn btn-primary btn-sm">
-                                    <i class="ri-list-unordered me-1"></i>Liste
+                                <button class="btn btn-outline-primary" id="fullscreenMapBtn">
+                                    <i class="ri-fullscreen-line"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0" id="estimationsTable">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th class="text-start fw-semibold">
-                                                <div class="d-flex align-items-center">
-                                                    <input type="checkbox" id="selectAll" class="form-check-input me-2">
-                                                    Propriété
-                                                </div>
-                                            </th>
-                                            <th class="text-center fw-semibold">Type</th>
-                                            <th class="text-center fw-semibold">Valeur</th>
-                                            <th class="text-center fw-semibold">Localisation</th>
-                                            <th class="text-center fw-semibold">Agent</th>
-                                            <th class="text-center fw-semibold">Date</th>
-                                            <th class="text-center fw-semibold">Statut</th>
-                                            <th class="text-center fw-semibold">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if (!empty($estimations)): ?>
-                                            <?php foreach ($estimations as $estimation): ?>
-                                                <tr class="estimation-row">
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <input type="checkbox" class="form-check-input me-3" value="<?= $estimation['id'] ?>">
-                                                            <div class="flex-grow-1">
-                                                                <h6 class="mb-1 fw-semibold text-truncate">
-                                                                    <?= character_limiter(($estimation['titre'] ?? 'Propriété sans titre'), 40) ?>
-                                                                </h6>
-                                                                <small class="text-muted">
-                                                                    <i class="ri-map-pin-line me-1"></i>
-                                                                    <?= $estimation['adresse'] ?? 'Adresse non renseignée' ?>
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
+                            <div id="estimationsMap" style="height: 600px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grille des estimations -->
+                <div class="col-lg-12" id="gridContainer">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-list-check-2 me-2"></i>
+                                Estimations 
+                                <span class="badge bg-primary ms-2" id="resultsCount"><?= count($estimations) ?> résultats</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-3">
+                            <!-- Vue Grille -->
+                            <div id="gridView" class="row g-3">
+                                <?php if (!empty($estimations)): ?>
+                                    <?php foreach ($estimations as $estimation): ?>
+                                        <div class="col-xl-4 col-lg-6 col-md-6 estimation-card" data-estimation='<?= json_encode($estimation) ?>'>
+                                            <div class="card border h-100 estimation-item">
+                                                <div class="card-body">
+                                                    <!-- Header avec type et statut -->
+                                                    <div class="d-flex justify-content-between align-items-start mb-3">
                                                         <?php 
                                                         $type_badges = [
                                                             'appartement' => 'bg-primary',
@@ -289,47 +252,7 @@
                                                         <span class="badge <?= $badge_class ?> text-uppercase fs-12">
                                                             <?= ucfirst($estimation['type_propriete'] ?? 'N/A') ?>
                                                         </span>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div>
-                                                            <span class="fw-bold text-success fs-14">
-                                                                <?= number_format($estimation['valeur_estimee'] ?? 0, 0, ',', ' ') ?> TND
-                                                            </span>
-                                                            <br>
-                                                            <small class="text-muted">
-                                                                <?= $estimation['surface'] ?? 0 ?> m²
-                                                            </small>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div>
-                                                            <span class="fw-medium"><?= $estimation['gouvernorat'] ?? 'N/A' ?></span>
-                                                            <br>
-                                                            <small class="text-muted"><?= $estimation['ville'] ?? '' ?></small>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <div class="avatar-xs me-2">
-                                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                                    <?= substr($estimation['agent_nom'] ?? 'A', 0, 1) ?>
-                                                                </div>
-                                                            </div>
-                                                            <div class="text-start">
-                                                                <span class="fw-medium fs-13"><?= $estimation['agent_nom'] ?? 'N/A' ?></span>
-                                                                <br>
-                                                                <small class="text-muted"><?= $estimation['agence_nom'] ?? '' ?></small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div>
-                                                            <span class="fw-medium"><?= date('d/m/Y', strtotime($estimation['date_creation'] ?? date('Y-m-d'))) ?></span>
-                                                            <br>
-                                                            <small class="text-muted"><?= date('H:i', strtotime($estimation['date_creation'] ?? date('Y-m-d H:i:s'))) ?></small>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
+                                                        
                                                         <?php 
                                                         $status_classes = [
                                                             'en_attente' => 'bg-warning',
@@ -347,94 +270,285 @@
                                                             <i class="<?= $status_icons[$status] ?? 'ri-question-line' ?> me-1"></i>
                                                             <?= ucfirst(str_replace('_', ' ', $status)) ?>
                                                         </span>
-                                                    </td>
-                                                    <td class="text-center">
+                                                    </div>
+
+                                                    <!-- Titre et adresse -->
+                                                    <h6 class="card-title mb-2 fw-semibold text-truncate">
+                                                        <?= character_limiter(($estimation['titre'] ?? 'Propriété sans titre'), 35) ?>
+                                                    </h6>
+                                                    <p class="text-muted mb-3 fs-13">
+                                                        <i class="ri-map-pin-line me-1"></i>
+                                                        <?= character_limiter(($estimation['adresse'] ?? 'Adresse non renseignée'), 40) ?>
+                                                    </p>
+
+                                                    <!-- Prix et surface -->
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <div class="text-center">
+                                                                <h5 class="text-success mb-1 fw-bold">
+                                                                    <?= number_format($estimation['valeur_estimee'] ?? 0, 0, ',', ' ') ?>
+                                                                </h5>
+                                                                <small class="text-muted">TND</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="text-center">
+                                                                <h5 class="text-primary mb-1 fw-bold">
+                                                                    <?= $estimation['surface'] ?? 0 ?>
+                                                                </h5>
+                                                                <small class="text-muted">m²</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Localisation -->
+                                                    <div class="mb-3">
+                                                        <small class="text-muted">
+                                                            <i class="ri-map-line me-1"></i>
+                                                            <?= $estimation['gouvernorat'] ?? 'N/A' ?>
+                                                            <?php if (!empty($estimation['ville'])): ?>
+                                                                - <?= $estimation['ville'] ?>
+                                                            <?php endif; ?>
+                                                        </small>
+                                                    </div>
+
+                                                    <!-- Agent info -->
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <div class="avatar-xs me-2">
+                                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-12">
+                                                                <?= substr($estimation['agent_nom'] ?? 'A', 0, 1) ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <small class="fw-medium text-dark d-block"><?= $estimation['agent_nom'] ?? 'N/A' ?></small>
+                                                            <small class="text-muted"><?= date('d/m/Y', strtotime($estimation['date_creation'] ?? date('Y-m-d'))) ?></small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Actions -->
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-primary btn-sm flex-fill" onclick="viewEstimation(<?= $estimation['id'] ?>)">
+                                                            <i class="ri-eye-line me-1"></i>Voir
+                                                        </button>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="showOnMap(<?= $estimation['id'] ?>)">
+                                                            <i class="ri-map-pin-line"></i>
+                                                        </button>
                                                         <div class="dropdown">
-                                                            <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
                                                                 <i class="ri-more-2-fill"></i>
                                                             </button>
                                                             <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="<?= base_url('estimation/view/' . $estimation['id']) ?>">
-                                                                        <i class="ri-eye-line me-2"></i>Voir détails
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="<?= base_url('estimation/edit/' . $estimation['id']) ?>">
-                                                                        <i class="ri-edit-line me-2"></i>Modifier
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item text-primary" href="<?= base_url('estimation/print/' . $estimation['id']) ?>">
-                                                                        <i class="ri-printer-line me-2"></i>Imprimer rapport
-                                                                    </a>
-                                                                </li>
+                                                                <li><a class="dropdown-item" href="<?= base_url('estimation/edit/' . $estimation['id']) ?>">
+                                                                    <i class="ri-edit-line me-2"></i>Modifier</a></li>
+                                                                <li><a class="dropdown-item text-primary" href="<?= base_url('estimation/print/' . $estimation['id']) ?>">
+                                                                    <i class="ri-printer-line me-2"></i>Imprimer</a></li>
                                                                 <li><hr class="dropdown-divider"></li>
-                                                                <li>
-                                                                    <a class="dropdown-item text-danger" href="#" onclick="deleteEstimation(<?= $estimation['id'] ?>)">
-                                                                        <i class="ri-delete-bin-line me-2"></i>Supprimer
-                                                                    </a>
-                                                                </li>
+                                                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteEstimation(<?= $estimation['id'] ?>)">
+                                                                    <i class="ri-delete-bin-line me-2"></i>Supprimer</a></li>
                                                             </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="col-12">
+                                        <div class="text-center py-5">
+                                            <div class="mb-3">
+                                                <i class="ri-file-list-line text-muted" style="font-size: 3rem;"></i>
+                                            </div>
+                                            <h5 class="text-muted">Aucune estimation trouvée</h5>
+                                            <p class="text-muted mb-3">
+                                                <?php if ($user_role === 'admin'): ?>
+                                                    Aucune estimation n'a été créée dans le système.
+                                                <?php elseif ($user_role === 'manager'): ?>
+                                                    Aucune estimation n'a été créée pour votre agence.
+                                                <?php else: ?>
+                                                    Vous n'avez créé aucune estimation pour le moment.
+                                                <?php endif; ?>
+                                            </p>
+                                            <a href="<?= base_url('estimation/add') ?>" class="btn btn-primary">
+                                                <i class="ri-add-line me-2"></i>Créer une estimation
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            </div>
+
+                            <!-- Vue Liste (masquée par défaut) -->
+                            <div id="listView" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="text-start fw-semibold">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="checkbox" id="selectAll" class="form-check-input me-2">
+                                                        Propriété
+                                                    </div>
+                                                </th>
+                                                <th class="text-center fw-semibold">Type</th>
+                                                <th class="text-center fw-semibold">Valeur</th>
+                                                <th class="text-center fw-semibold">Localisation</th>
+                                                <th class="text-center fw-semibold">Agent</th>
+                                                <th class="text-center fw-semibold">Date</th>
+                                                <th class="text-center fw-semibold">Statut</th>
+                                                <th class="text-center fw-semibold">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php if (!empty($estimations)): ?>
+                                                <?php foreach ($estimations as $estimation): ?>
+                                                    <tr class="estimation-row">
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <input type="checkbox" class="form-check-input me-3" value="<?= $estimation['id'] ?>">
+                                                                <div class="flex-grow-1">
+                                                                    <h6 class="mb-1 fw-semibold text-truncate">
+                                                                        <?= character_limiter(($estimation['titre'] ?? 'Propriété sans titre'), 40) ?>
+                                                                    </h6>
+                                                                    <small class="text-muted">
+                                                                        <i class="ri-map-pin-line me-1"></i>
+                                                                        <?= $estimation['adresse'] ?? 'Adresse non renseignée' ?>
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <?php 
+                                                            $type_badges = [
+                                                                'appartement' => 'bg-primary',
+                                                                'villa' => 'bg-success',
+                                                                'terrain' => 'bg-warning',
+                                                                'bureau' => 'bg-info'
+                                                            ];
+                                                            $badge_class = $type_badges[$estimation['type_propriete']] ?? 'bg-secondary';
+                                                            ?>
+                                                            <span class="badge <?= $badge_class ?> text-uppercase fs-12">
+                                                                <?= ucfirst($estimation['type_propriete'] ?? 'N/A') ?>
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div>
+                                                                <span class="fw-bold text-success fs-14">
+                                                                    <?= number_format($estimation['valeur_estimee'] ?? 0, 0, ',', ' ') ?> TND
+                                                                </span>
+                                                                <br>
+                                                                <small class="text-muted">
+                                                                    <?= $estimation['surface'] ?? 0 ?> m²
+                                                                </small>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div>
+                                                                <span class="fw-medium"><?= $estimation['gouvernorat'] ?? 'N/A' ?></span>
+                                                                <br>
+                                                                <small class="text-muted"><?= $estimation['ville'] ?? '' ?></small>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="d-flex align-items-center justify-content-center">
+                                                                <div class="avatar-xs me-2">
+                                                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                                        <?= substr($estimation['agent_nom'] ?? 'A', 0, 1) ?>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-start">
+                                                                    <span class="fw-medium fs-13"><?= $estimation['agent_nom'] ?? 'N/A' ?></span>
+                                                                    <br>
+                                                                    <small class="text-muted"><?= $estimation['agence_nom'] ?? '' ?></small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div>
+                                                                <span class="fw-medium"><?= date('d/m/Y', strtotime($estimation['date_creation'] ?? date('Y-m-d'))) ?></span>
+                                                                <br>
+                                                                <small class="text-muted"><?= date('H:i', strtotime($estimation['date_creation'] ?? date('Y-m-d H:i:s'))) ?></small>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <?php 
+                                                            $status_classes = [
+                                                                'en_attente' => 'bg-warning',
+                                                                'validee' => 'bg-success',
+                                                                'refusee' => 'bg-danger'
+                                                            ];
+                                                            $status_icons = [
+                                                                'en_attente' => 'ri-time-line',
+                                                                'validee' => 'ri-check-line',
+                                                                'refusee' => 'ri-close-line'
+                                                            ];
+                                                            $status = $estimation['statut'] ?? 'en_attente';
+                                                            ?>
+                                                            <span class="badge <?= $status_classes[$status] ?? 'bg-secondary' ?> d-inline-flex align-items-center">
+                                                                <i class="<?= $status_icons[$status] ?? 'ri-question-line' ?> me-1"></i>
+                                                                <?= ucfirst(str_replace('_', ' ', $status)) ?>
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                                                    <i class="ri-more-2-fill"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="<?= base_url('estimation/view/' . $estimation['id']) ?>">
+                                                                            <i class="ri-eye-line me-2"></i>Voir détails
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="<?= base_url('estimation/edit/' . $estimation['id']) ?>">
+                                                                            <i class="ri-edit-line me-2"></i>Modifier
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item text-primary" href="<?= base_url('estimation/print/' . $estimation['id']) ?>">
+                                                                            <i class="ri-printer-line me-2"></i>Imprimer rapport
+                                                                        </a>
+                                                                    </li>
+                                                                    <li><hr class="dropdown-divider"></li>
+                                                                    <li>
+                                                                        <a class="dropdown-item text-danger" href="#" onclick="deleteEstimation(<?= $estimation['id'] ?>)">
+                                                                            <i class="ri-delete-bin-line me-2"></i>Supprimer
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <tr>
+                                                    <td colspan="8" class="text-center py-5">
+                                                        <div class="py-4">
+                                                            <div class="mb-3">
+                                                                <i class="ri-file-list-line text-muted" style="font-size: 3rem;"></i>
+                                                            </div>
+                                                            <h5 class="text-muted">Aucune estimation trouvée</h5>
+                                                            <p class="text-muted mb-3">
+                                                                <?php if ($user_role === 'admin'): ?>
+                                                                    Aucune estimation n'a été créée dans le système.
+                                                                <?php elseif ($user_role === 'manager'): ?>
+                                                                    Aucune estimation n'a été créée pour votre agence.
+                                                                <?php else: ?>
+                                                                    Vous n'avez créé aucune estimation pour le moment.
+                                                                <?php endif; ?>
+                                                            </p>
+                                                            <a href="<?= base_url('estimation/add') ?>" class="btn btn-primary">
+                                                                <i class="ri-add-line me-2"></i>Créer une estimation
+                                                            </a>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="8" class="text-center py-5">
-                                                    <div class="py-4">
-                                                        <div class="mb-3">
-                                                            <i class="ri-file-list-line text-muted" style="font-size: 3rem;"></i>
-                                                        </div>
-                                                        <h5 class="text-muted">Aucune estimation trouvée</h5>
-                                                        <p class="text-muted mb-3">
-                                                            <?php if ($user_role === 'admin'): ?>
-                                                                Aucune estimation n'a été créée dans le système.
-                                                            <?php elseif ($user_role === 'manager'): ?>
-                                                                Aucune estimation n'a été créée pour votre agence.
-                                                            <?php else: ?>
-                                                                Vous n'avez créé aucune estimation pour le moment.
-                                                            <?php endif; ?>
-                                                        </p>
-                                                        <a href="<?= base_url('estimation/add') ?>" class="btn btn-primary">
-                                                            <i class="ri-add-line me-2"></i>Créer une estimation
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <?php if (!empty($estimations)): ?>
-                        <!-- Pagination -->
-                        <div class="card-footer border-top-dashed">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="text-muted">
-                                        Affichage de <strong>1</strong> à <strong><?= count($estimations) ?></strong> 
-                                        sur <strong><?= count($estimations) ?></strong> résultats
-                                    </span>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <nav>
-                                    <ul class="pagination mb-0">
-                                        <li class="page-item disabled">
-                                            <span class="page-link">Précédent</span>
-                                        </li>
-                                        <li class="page-item active">
-                                            <span class="page-link">1</span>
-                                        </li>
-                                        <li class="page-item disabled">
-                                            <span class="page-link">Suivant</span>
-                                        </li>
-                                    </ul>
-                                </nav>
                             </div>
                         </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -442,7 +556,7 @@
     </div>
 </div>
 
-<!-- CSS personnalisé pour les animations -->
+<!-- Styles CSS personnalisés -->
 <style>
 .stats-card {
     transition: all 0.3s ease;
@@ -454,12 +568,19 @@
     box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.15) !important;
 }
 
-.estimation-row {
-    transition: all 0.2s ease;
+.estimation-item {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
 }
 
-.estimation-row:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.05);
+.estimation-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    border-color: #5156be;
+}
+
+.estimation-card {
+    transition: all 0.3s ease;
 }
 
 .counter {
@@ -469,14 +590,6 @@
 @keyframes countUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-.table th {
-    background-color: #f8f9fa;
-    border: none;
-    padding: 1rem 0.75rem;
-    color: #495057;
-    font-weight: 600;
 }
 
 .avatar-xs {
@@ -492,11 +605,64 @@
 .bg-gradient-primary {
     background: linear-gradient(135deg, #5156be 0%, #6366f1 100%);
 }
+
+/* Styles pour la carte */
+#estimationsMap {
+    border-radius: 0.375rem;
+}
+
+.leaflet-popup-content {
+    font-family: inherit;
+}
+
+.leaflet-popup-content h6 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .estimation-card {
+        margin-bottom: 1rem;
+    }
+    
+    #mapContainer {
+        order: 2;
+    }
+    
+    #gridContainer {
+        order: 1;
+    }
+}
 </style>
 
-<!-- JavaScript pour les interactions -->
+<!-- Scripts JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales
+    let map = null;
+    let markers = [];
+    let currentView = 'grid';
+    let mapVisible = false;
+    
+    // Données des estimations pour la carte
+    const estimationsData = <?= json_encode($estimations) ?>;
+    
+    // Elements DOM
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const toggleMapBtn = document.getElementById('toggleMapBtn');
+    const mapContainer = document.getElementById('mapContainer');
+    const gridContainer = document.getElementById('gridContainer');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    
     // Animation des compteurs
     const counters = document.querySelectorAll('.counter');
     counters.forEach(counter => {
@@ -514,34 +680,152 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
         
-        // Démarrer l'animation après un délai
         setTimeout(updateCounter, 500);
     });
     
-    // Filtres en temps réel
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const typeFilter = document.getElementById('typeFilter');
-    const regionFilter = document.getElementById('regionFilter');
-    const periodFilter = document.getElementById('periodFilter');
-    const resetBtn = document.getElementById('resetFilters');
+    // Initialiser la carte
+    function initMap() {
+        if (map) return;
+        
+        map = L.map('estimationsMap').setView([36.8065, 10.1815], 10); // Centré sur Tunis
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Ajouter les marqueurs
+        addMarkersToMap();
+        
+        // Ajuster la vue pour afficher tous les marqueurs
+        if (markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+    }
     
-    function filterTable() {
-        const rows = document.querySelectorAll('.estimation-row');
+    // Ajouter les marqueurs sur la carte
+    function addMarkersToMap() {
+        estimationsData.forEach(estimation => {
+            // Coordonnées par défaut pour la Tunisie (vous pouvez ajouter des coordonnées réelles)
+            const lat = 36.8 + (Math.random() - 0.5) * 0.5;
+            const lng = 10.2 + (Math.random() - 0.5) * 0.5;
+            
+            const marker = L.marker([lat, lng]).addTo(map);
+            
+            const popupContent = `
+                <div class="p-2">
+                    <h6 class="mb-2">${estimation.titre || 'Propriété sans titre'}</h6>
+                    <p class="mb-1"><strong>Type:</strong> ${estimation.type_propriete || 'N/A'}</p>
+                    <p class="mb-1"><strong>Valeur:</strong> ${parseInt(estimation.valeur_estimee || 0).toLocaleString()} TND</p>
+                    <p class="mb-1"><strong>Surface:</strong> ${estimation.surface || 0} m²</p>
+                    <p class="mb-2"><strong>Localisation:</strong> ${estimation.gouvernorat || 'N/A'}</p>
+                    <button class="btn btn-primary btn-sm" onclick="viewEstimation(${estimation.id})">
+                        <i class="ri-eye-line me-1"></i>Voir détails
+                    </button>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            markers.push(marker);
+        });
+    }
+    
+    // Basculer entre vue grille et liste
+    gridViewBtn.addEventListener('click', function() {
+        currentView = 'grid';
+        gridViewBtn.classList.add('btn-primary');
+        gridViewBtn.classList.remove('btn-outline-primary');
+        listViewBtn.classList.add('btn-outline-primary');
+        listViewBtn.classList.remove('btn-primary');
+        
+        gridView.style.display = 'block';
+        listView.style.display = 'none';
+    });
+    
+    listViewBtn.addEventListener('click', function() {
+        currentView = 'list';
+        listViewBtn.classList.add('btn-primary');
+        listViewBtn.classList.remove('btn-outline-primary');
+        gridViewBtn.classList.add('btn-outline-primary');
+        gridViewBtn.classList.remove('btn-primary');
+        
+        gridView.style.display = 'none';
+        listView.style.display = 'block';
+    });
+    
+    // Basculer l'affichage de la carte
+    toggleMapBtn.addEventListener('click', function() {
+        mapVisible = !mapVisible;
+        
+        if (mapVisible) {
+            mapContainer.style.display = 'block';
+            gridContainer.classList.remove('col-lg-12');
+            gridContainer.classList.add('col-lg-6');
+            toggleMapBtn.innerHTML = '<i class="ri-map-2-fill me-1"></i>Masquer carte';
+            toggleMapBtn.classList.remove('btn-outline-secondary');
+            toggleMapBtn.classList.add('btn-secondary');
+            
+            // Initialiser la carte si pas encore fait
+            setTimeout(() => {
+                initMap();
+                if (map) map.invalidateSize();
+            }, 100);
+        } else {
+            mapContainer.style.display = 'none';
+            gridContainer.classList.remove('col-lg-6');
+            gridContainer.classList.add('col-lg-12');
+            toggleMapBtn.innerHTML = '<i class="ri-map-2-line me-1"></i>Carte';
+            toggleMapBtn.classList.remove('btn-secondary');
+            toggleMapBtn.classList.add('btn-outline-secondary');
+        }
+    });
+    
+    // Filtrage en temps réel
+    function filterEstimations() {
         const searchTerm = searchInput.value.toLowerCase();
         const statusValue = statusFilter.value;
         const typeValue = typeFilter.value;
-        const regionValue = regionFilter.value;
         
-        rows.forEach(row => {
+        const cards = document.querySelectorAll('.estimation-card');
+        const rows = document.querySelectorAll('.estimation-row');
+        let visibleCount = 0;
+        
+        // Filtrer les cartes (vue grille)
+        cards.forEach(card => {
+            const estimation = JSON.parse(card.getAttribute('data-estimation'));
             let visible = true;
             
             // Recherche textuelle
-            if (searchTerm && !row.textContent.toLowerCase().includes(searchTerm)) {
-                visible = false;
+            if (searchTerm) {
+                const searchText = (estimation.titre + ' ' + estimation.adresse + ' ' + estimation.gouvernorat).toLowerCase();
+                if (!searchText.includes(searchTerm)) {
+                    visible = false;
+                }
             }
             
             // Filtrer par statut
+            if (statusValue && estimation.statut !== statusValue) {
+                visible = false;
+            }
+            
+            // Filtrer par type
+            if (typeValue && estimation.type_propriete !== typeValue) {
+                visible = false;
+            }
+            
+            card.style.display = visible ? 'block' : 'none';
+            if (visible) visibleCount++;
+        });
+        
+        // Filtrer les lignes (vue liste)
+        rows.forEach(row => {
+            let visible = true;
+            const text = row.textContent.toLowerCase();
+            
+            if (searchTerm && !text.includes(searchTerm)) {
+                visible = false;
+            }
+            
             if (statusValue) {
                 const statusBadge = row.querySelector('td:nth-child(7) .badge');
                 if (!statusBadge || !statusBadge.textContent.toLowerCase().includes(statusValue.replace('_', ' '))) {
@@ -549,7 +833,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Filtrer par type
             if (typeValue) {
                 const typeBadge = row.querySelector('td:nth-child(2) .badge');
                 if (!typeBadge || !typeBadge.textContent.toLowerCase().includes(typeValue)) {
@@ -559,45 +842,35 @@ document.addEventListener('DOMContentLoaded', function() {
             
             row.style.display = visible ? '' : 'none';
         });
+        
+        // Mettre à jour le compteur
+        document.getElementById('resultsCount').textContent = visibleCount + ' résultats';
     }
     
     // Événements de filtrage
-    [searchInput, statusFilter, typeFilter, regionFilter, periodFilter].forEach(element => {
-        element.addEventListener('input', filterTable);
-        element.addEventListener('change', filterTable);
-    });
-    
-    // Réinitialiser les filtres
-    resetBtn.addEventListener('click', function() {
-        [searchInput, statusFilter, typeFilter, regionFilter, periodFilter].forEach(element => {
-            element.value = '';
-        });
-        filterTable();
-    });
-    
-    // Sélection multiple
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-    
-    selectAll.addEventListener('change', function() {
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-    
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const checkedCount = document.querySelectorAll('tbody input[type="checkbox"]:checked').length;
-            selectAll.checked = checkedCount === checkboxes.length;
-            selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
-        });
+    [searchInput, statusFilter, typeFilter].forEach(element => {
+        element.addEventListener('input', filterEstimations);
+        element.addEventListener('change', filterEstimations);
     });
 });
 
-// Fonction pour supprimer une estimation
+// Fonctions globales
+function viewEstimation(id) {
+    window.location.href = '<?= base_url("estimation/view/") ?>' + id;
+}
+
+function showOnMap(id) {
+    // Activer la carte si elle n'est pas visible
+    if (!document.getElementById('mapContainer').style.display || document.getElementById('mapContainer').style.display === 'none') {
+        document.getElementById('toggleMapBtn').click();
+    }
+    
+    // Vous pouvez ajouter une logique pour centrer la carte sur le marqueur correspondant
+    console.log('Afficher sur la carte l\'estimation:', id);
+}
+
 function deleteEstimation(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette estimation ?')) {
-        // AJAX call pour supprimer
         fetch('<?= base_url("estimations/delete/") ?>' + id, {
             method: 'POST',
             headers: {
