@@ -264,14 +264,14 @@
                                                 <tr class="estimation-row">
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            <input type="checkbox" class="form-check-input me-3" value="<?= $estimation->id ?>">
+                                                            <input type="checkbox" class="form-check-input me-3" value="<?= $estimation['id'] ?>">
                                                             <div class="flex-grow-1">
                                                                 <h6 class="mb-1 fw-semibold text-truncate">
-                                                                    <?= character_limiter(($estimation->titre ?? 'Propriété sans titre'), 40) ?>
+                                                                    <?= character_limiter(($estimation['titre'] ?? 'Propriété sans titre'), 40) ?>
                                                                 </h6>
                                                                 <small class="text-muted">
                                                                     <i class="ri-map-pin-line me-1"></i>
-                                                                    <?= $estimation->adresse ?? 'Adresse non renseignée' ?>
+                                                                    <?= $estimation['adresse'] ?? 'Adresse non renseignée' ?>
                                                                 </small>
                                                             </div>
                                                         </div>
@@ -284,49 +284,49 @@
                                                             'terrain' => 'bg-warning',
                                                             'bureau' => 'bg-info'
                                                         ];
-                                                        $badge_class = $type_badges[$estimation->type_propriete] ?? 'bg-secondary';
+                                                        $badge_class = $type_badges[$estimation['type_propriete']] ?? 'bg-secondary';
                                                         ?>
                                                         <span class="badge <?= $badge_class ?> text-uppercase fs-12">
-                                                            <?= ucfirst($estimation->type_propriete ?? 'N/A') ?>
+                                                            <?= ucfirst($estimation['type_propriete'] ?? 'N/A') ?>
                                                         </span>
                                                     </td>
                                                     <td class="text-center">
                                                         <div>
                                                             <span class="fw-bold text-success fs-14">
-                                                                <?= number_format($estimation->valeur_estimee ?? 0, 0, ',', ' ') ?> TND
+                                                                <?= number_format($estimation['valeur_estimee'] ?? 0, 0, ',', ' ') ?> TND
                                                             </span>
                                                             <br>
                                                             <small class="text-muted">
-                                                                <?= $estimation->surface ?? 0 ?> m²
+                                                                <?= $estimation['surface'] ?? 0 ?> m²
                                                             </small>
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
                                                         <div>
-                                                            <span class="fw-medium"><?= $estimation->gouvernorat ?? 'N/A' ?></span>
+                                                            <span class="fw-medium"><?= $estimation['gouvernorat'] ?? 'N/A' ?></span>
                                                             <br>
-                                                            <small class="text-muted"><?= $estimation->ville ?? '' ?></small>
+                                                            <small class="text-muted"><?= $estimation['ville'] ?? '' ?></small>
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
                                                         <div class="d-flex align-items-center justify-content-center">
                                                             <div class="avatar-xs me-2">
                                                                 <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                                    <?= substr($estimation->agent_nom ?? 'A', 0, 1) ?>
+                                                                    <?= substr($estimation['agent_nom'] ?? 'A', 0, 1) ?>
                                                                 </div>
                                                             </div>
                                                             <div class="text-start">
-                                                                <span class="fw-medium fs-13"><?= $estimation->agent_nom ?? 'N/A' ?></span>
+                                                                <span class="fw-medium fs-13"><?= $estimation['agent_nom'] ?? 'N/A' ?></span>
                                                                 <br>
-                                                                <small class="text-muted"><?= $estimation->agence_nom ?? '' ?></small>
+                                                                <small class="text-muted"><?= $estimation['agence_nom'] ?? '' ?></small>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
                                                         <div>
-                                                            <span class="fw-medium"><?= date('d/m/Y', strtotime($estimation->date_creation ?? date('Y-m-d'))) ?></span>
+                                                            <span class="fw-medium"><?= date('d/m/Y', strtotime($estimation['date_creation'] ?? date('Y-m-d'))) ?></span>
                                                             <br>
-                                                            <small class="text-muted"><?= date('H:i', strtotime($estimation->date_creation ?? date('Y-m-d H:i:s'))) ?></small>
+                                                            <small class="text-muted"><?= date('H:i', strtotime($estimation['date_creation'] ?? date('Y-m-d H:i:s'))) ?></small>
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
@@ -341,7 +341,7 @@
                                                             'validee' => 'ri-check-line',
                                                             'refusee' => 'ri-close-line'
                                                         ];
-                                                        $status = $estimation->statut ?? 'en_attente';
+                                                        $status = $estimation['statut'] ?? 'en_attente';
                                                         ?>
                                                         <span class="badge <?= $status_classes[$status] ?? 'bg-secondary' ?> d-inline-flex align-items-center">
                                                             <i class="<?= $status_icons[$status] ?? 'ri-question-line' ?> me-1"></i>
@@ -355,23 +355,23 @@
                                                             </button>
                                                             <ul class="dropdown-menu">
                                                                 <li>
-                                                                    <a class="dropdown-item" href="<?= base_url('estimation/view/' . $estimation->id) ?>">
+                                                                    <a class="dropdown-item" href="<?= base_url('estimation/view/' . $estimation['id']) ?>">
                                                                         <i class="ri-eye-line me-2"></i>Voir détails
                                                                     </a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="<?= base_url('estimation/edit/' . $estimation->id) ?>">
+                                                                    <a class="dropdown-item" href="<?= base_url('estimation/edit/' . $estimation['id']) ?>">
                                                                         <i class="ri-edit-line me-2"></i>Modifier
                                                                     </a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item text-primary" href="<?= base_url('estimation/print/' . $estimation->id) ?>">
+                                                                    <a class="dropdown-item text-primary" href="<?= base_url('estimation/print/' . $estimation['id']) ?>">
                                                                         <i class="ri-printer-line me-2"></i>Imprimer rapport
                                                                     </a>
                                                                 </li>
                                                                 <li><hr class="dropdown-divider"></li>
                                                                 <li>
-                                                                    <a class="dropdown-item text-danger" href="#" onclick="deleteEstimation(<?= $estimation->id ?>)">
+                                                                    <a class="dropdown-item text-danger" href="#" onclick="deleteEstimation(<?= $estimation['id'] ?>)">
                                                                         <i class="ri-delete-bin-line me-2"></i>Supprimer
                                                                     </a>
                                                                 </li>

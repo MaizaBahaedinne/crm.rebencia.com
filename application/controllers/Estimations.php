@@ -75,7 +75,7 @@ class Estimations extends BaseController
 
         foreach ($estimations as $estimation) {
             // Compter par statut
-            $statut = $estimation->statut ?? 'en_attente';
+            $statut = $estimation['statut'] ?? 'en_attente';
             if ($statut === 'en_attente') {
                 $stats['en_attente']++;
             } elseif ($statut === 'validee') {
@@ -83,10 +83,10 @@ class Estimations extends BaseController
             }
             
             // Calculer le montant total
-            $stats['montant_total'] += (float)($estimation->valeur_estimee ?? 0);
+            $stats['montant_total'] += (float)($estimation['valeur_estimee'] ?? 0);
             
             // Compter les récentes (ce mois)
-            $date_creation = $estimation->date_creation ?? date('Y-m-d');
+            $date_creation = $estimation['date_creation'] ?? date('Y-m-d');
             if (date('Y-m', strtotime($date_creation)) === date('Y-m')) {
                 $stats['recent']++;
             }
