@@ -153,9 +153,65 @@ class User_model extends CI_Model
 
 	function get_wp_user($user_id)
 	{   
-		$this->wp_db->select('*')->from('v_users_profile')->where('user_id', (int)$user_id);
-		$query = $this->wp_db->get();
-	    $user = $query->row();
+		// Utilisation directe des tables WordPress + vue crm_agents
+		$query = $this->wp_db->query("
+			SELECT 
+				u.ID as user_id,
+				u.user_login,
+				u.user_email,
+				u.user_nicename,
+				u.display_name,
+				u.user_registered,
+				u.user_status,
+				u.user_url,
+				MAX(CASE WHEN um.meta_key = 'first_name' THEN um.meta_value END) as first_name,
+				MAX(CASE WHEN um.meta_key = 'last_name' THEN um.meta_value END) as last_name,
+				MAX(CASE WHEN um.meta_key = 'nickname' THEN um.meta_value END) as nickname,
+				MAX(CASE WHEN um.meta_key = 'description' THEN um.meta_value END) as description,
+				MAX(CASE WHEN um.meta_key = 'phone' THEN um.meta_value END) as phone,
+				MAX(CASE WHEN um.meta_key = 'mobile' THEN um.meta_value END) as mobile,
+				MAX(CASE WHEN um.meta_key = 'billing_address_1' THEN um.meta_value END) as address,
+				MAX(CASE WHEN um.meta_key = 'billing_city' THEN um.meta_value END) as city,
+				MAX(CASE WHEN um.meta_key = 'billing_country' THEN um.meta_value END) as country,
+				a.agent_name,
+				a.agency_name,
+				a.agent_email,
+				a.phone as agent_phone,
+				a.mobile as agent_mobile,
+				a.position,
+				a.agent_avatar
+			FROM wp_Hrg8P_users u
+			LEFT JOIN wp_Hrg8P_usermeta um ON u.ID = um.user_id
+			LEFT JOIN wp_Hrg8P_crm_agents a ON u.ID = a.user_id
+			WHERE u.ID = ?
+			GROUP BY u.ID, u.user_login, u.user_email, u.user_nicename, u.display_name, 
+					 u.user_registered, u.user_status, u.user_url,
+					 a.agent_name, a.agency_name, a.agent_email, a.phone, a.mobile, 
+					 a.position, a.agent_avatar
+		", [$user_id]);
+		
+		$user = $query->row();
+		
+		// Si pas de données utilisateur de base, retourner null
+		if (!$user || empty($user->user_id)) {
+			return null;
+		}
+		
+		// Normaliser les données pour compatibilité avec la vue
+		$user->name = $user->display_name ?: ($user->first_name . ' ' . $user->last_name) ?: $user->user_login;
+		$user->email = $user->user_email;
+		$user->bio = $user->description ?: '';
+		$user->location = ($user->city ? $user->city : '') . ($user->country ? ', ' . $user->country : '');
+		$user->biography = $user->description ?: '';
+		$user->roles_string = $user->agent_name ? 'Agent Immobilier' : 'Utilisateur';
+		
+		// Utiliser les données agent si disponibles
+		if ($user->agent_name) {
+			$user->phone = $user->agent_phone ?: $user->phone;
+			$user->mobile = $user->agent_mobile ?: $user->mobile;
+			$user->name = $user->agent_name ?: $user->name;
+			$user->email = $user->agent_email ?: $user->email;
+		}
 		
 		return $user;
 	}
