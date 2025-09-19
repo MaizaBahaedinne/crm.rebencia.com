@@ -33,11 +33,10 @@ class Estimations extends BaseController
             'page_title' => 'Estimations Immobilières'
         ];
         
-        // Charger la vue avec la méthode correcte du BaseController
-        $this->global['pageTitle'] = 'Estimations Immobilières';
-        $this->global['page_heading'] = 'Estimations';
-        
-        $this->loadViews("estimations/index", $this->global, $data, NULL);
+        // Charger la vue
+        $this->load->view('layout/header', $data);
+        $this->load->view('estimations/index', $data);
+        $this->load->view('layout/footer');
     }
 
     private function get_estimations_by_role($role, $user_info)
