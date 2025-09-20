@@ -168,7 +168,7 @@ class Agent extends BaseController {
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
         try {
-            // Pour le manager, filtrer par son agence
+            // Pour le manager, utiliser une méthode spécifique qui récupère son équipe
             if ($role === 'manager') {
                 // Récupérer l'ID de l'agence du manager
                 $this->load->model('User_model');
@@ -176,10 +176,8 @@ class Agent extends BaseController {
                 $agency_id = $user_info->agency_id ?? null;
                 
                 if ($agency_id) {
-                    // Ajouter le filtre d'agence
-                    $data['filters']['agency'] = $agency_id;
-                    // Récupérer tous les agents avec rôles et agences, filtré par agence
-                    $agents = $this->agent_model->get_agents_with_roles_and_agencies($data['filters']);
+                    // Utiliser la méthode spécifique pour les managers
+                    $agents = $this->agent_model->get_manager_team_agents($agency_id);
                     $data['pageTitle'] = 'Mon agence';
                 } else {
                     $agents = [];
