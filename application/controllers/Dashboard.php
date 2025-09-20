@@ -860,6 +860,203 @@ class Dashboard extends BaseController {
     }
     
     /**
+     * Remplit les tables avec des données de test pour démonstration
+     */
+    public function populate_test_data() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Générer Données Test - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".result { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo ".success { background: #d4edda; border-color: #c3e6cb; color: #155724; }";
+        echo ".error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }";
+        echo ".info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🎲 Génération de Données Test</h1>";
+        
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        echo "<p><strong>Agency ID utilisé:</strong> $agency_id</p>";
+        
+        // Récupérer les agents de l'agence
+        $agents = $this->get_filtered_agents_from_view($agency_id);
+        $agent_ids = array_column($agents, 'ID');
+        
+        echo "<div class='result info'>";
+        echo "<strong>Agents trouvés:</strong> " . count($agents) . "<br>";
+        echo "<strong>IDs:</strong> " . implode(', ', $agent_ids);
+        echo "</div>";
+        
+        if (empty($agent_ids)) {
+            echo "<div class='result error'>Aucun agent trouvé pour cette agence. Impossible de générer des données.</div>";
+            echo "</div></body></html>";
+            return;
+        }
+        
+        // 1. Générer des transactions de test
+        echo "<h2>💰 Génération de transactions</h2>";
+        
+        try {
+            $transactions_created = 0;
+            
+            // Générer des transactions pour les 6 derniers mois
+            for ($i = 5; $i >= 0; $i--) {
+                $month = date('Y-m', strtotime("-$i months"));
+                $month_start = $month . '-01';
+                $month_end = date('Y-m-t', strtotime($month_start));
+                
+                // Pour chaque agent, créer quelques transactions
+                foreach ($agent_ids as $agent_id) {
+                    // Générer 1-3 ventes par mois
+                    $sales_count = rand(1, 3);
+                    for ($j = 0; $j < $sales_count; $j++) {
+                        $transaction_data = [
+                            'agent_id' => $agent_id,
+                            'type' => 'vente',
+                            'montant' => rand(50000, 200000), // Entre 50k et 200k TND
+                            'statut' => rand(0, 10) > 7 ? 'cloture' : 'actif', // 70% actif, 30% clôturé
+                            'description' => 'Transaction de vente générée automatiquement',
+                            'created_at' => date('Y-m-d H:i:s', strtotime($month_start . ' +' . rand(0, 28) . ' days +' . rand(8, 18) . ' hours')),
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ];
+                        
+                        $this->db->insert('crm_transactions', $transaction_data);
+                        $transactions_created++;
+                    }
+                    
+                    // Générer 1-2 locations par mois
+                    $rentals_count = rand(1, 2);
+                    for ($j = 0; $j < $rentals_count; $j++) {
+                        $transaction_data = [
+                            'agent_id' => $agent_id,
+                            'type' => 'location',
+                            'montant' => rand(1000, 5000), // Entre 1k et 5k TND/mois
+                            'statut' => rand(0, 10) > 6 ? 'cloture' : 'actif', // 60% actif, 40% clôturé
+                            'description' => 'Transaction de location générée automatiquement',
+                            'created_at' => date('Y-m-d H:i:s', strtotime($month_start . ' +' . rand(0, 28) . ' days +' . rand(8, 18) . ' hours')),
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ];
+                        
+                        $this->db->insert('crm_transactions', $transaction_data);
+                        $transactions_created++;
+                    }
+                }
+            }
+            
+            echo "<div class='result success'>";
+            echo "✅ <strong>$transactions_created transactions créées</strong>";
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "❌ Erreur lors de la création des transactions: " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        // 2. Générer des objectifs mensuels
+        echo "<h2>🎯 Génération d'objectifs</h2>";
+        
+        try {
+            $objectives_created = 0;
+            $current_month = date('Y-m-01');
+            
+            foreach ($agent_ids as $agent_id) {
+                // Vérifier si l'objectif existe déjà
+                $existing = $this->db->where('agent_id', $agent_id)
+                                   ->where('month', $current_month)
+                                   ->get('monthly_objectives');
+                
+                if ($existing->num_rows() == 0) {
+                    $objective_data = [
+                        'agent_id' => $agent_id,
+                        'month' => $current_month,
+                        'estimations_target' => rand(10, 25), // 10-25 estimations par mois
+                        'transactions_target' => rand(5, 15), // 5-15 transactions par mois
+                        'revenue_target' => rand(100000, 300000), // 100k-300k TND de CA
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ];
+                    
+                    $this->db->insert('monthly_objectives', $objective_data);
+                    $objectives_created++;
+                }
+            }
+            
+            echo "<div class='result success'>";
+            echo "✅ <strong>$objectives_created objectifs créés pour le mois " . date('M Y') . "</strong>";
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "❌ Erreur lors de la création des objectifs: " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        // 3. Générer des commissions
+        echo "<h2>💼 Génération de commissions</h2>";
+        
+        try {
+            $commissions_created = 0;
+            
+            // Récupérer les transactions clôturées pour générer des commissions
+            $closed_transactions = $this->db->where('statut', 'cloture')
+                                           ->where_in('agent_id', $agent_ids)
+                                           ->get('crm_transactions')
+                                           ->result();
+            
+            foreach ($closed_transactions as $transaction) {
+                // Vérifier si la commission existe déjà
+                $existing = $this->db->where('transaction_id', $transaction->id)
+                                   ->get('agent_commissions');
+                
+                if ($existing->num_rows() == 0) {
+                    $commission_rate = 0.05; // 5% de commission
+                    $commission_data = [
+                        'agent_id' => $transaction->agent_id,
+                        'transaction_id' => $transaction->id,
+                        'transaction_type' => $transaction->type == 'vente' ? 'sale' : 'rental',
+                        'base_amount' => $transaction->montant,
+                        'commission_rate' => $commission_rate,
+                        'commission_amount' => $transaction->montant * $commission_rate,
+                        'status' => 'confirmed',
+                        'created_at' => $transaction->created_at,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ];
+                    
+                    $this->db->insert('agent_commissions', $commission_data);
+                    $commissions_created++;
+                }
+            }
+            
+            echo "<div class='result success'>";
+            echo "✅ <strong>$commissions_created commissions créées</strong>";
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "❌ Erreur lors de la création des commissions: " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        echo "<div class='result info'>";
+        echo "<h3>✅ Génération terminée!</h3>";
+        echo "<p>Vous pouvez maintenant retourner au dashboard manager pour voir les vraies données.</p>";
+        echo "<p><a href='" . base_url('dashboard/manager') . "' style='display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;'>Dashboard Manager</a>";
+        echo "<a href='" . base_url('dashboard/debug_transactions') . "' style='display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Debug Transactions</a></p>";
+        echo "</div>";
+        
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
+    /**
      * Ajoute des avatars par défaut pour les agents sans avatar
      */
     public function set_default_avatars() {
