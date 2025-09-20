@@ -416,9 +416,7 @@ class Dashboard extends BaseController {
         $data = $this->global;
         $data['pageTitle'] = 'Tableau de bord Manager';
         
-        // Récupérer l'agency_id depuis la session ou les métadonnées
-        $agency_id = $this->session->userdata('agency_id');
-        $user_id = $this->session->userdata('wp_id');
+    
         
         // Si pas d'agency_id en session, le récupérer depuis les métadonnées
         if (!$agency_id && $user_id) {
