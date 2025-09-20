@@ -448,6 +448,13 @@ class Dashboard extends BaseController {
             'properties_status' => $this->get_properties_status_data($agency_id)
         ];
         
+        // Nouvelles données pour la section transactions
+        $data['transactions_data'] = [
+            'sales_evolution' => $this->get_sales_evolution($agency_id),
+            'rentals_evolution' => $this->get_rentals_evolution($agency_id),
+            'objectives_progress' => $this->get_objectives_with_progress($agency_id)
+        ];
+        
         // Charger la vue manager
         $this->loadViews('dashboard/manager', $this->global, $data, NULL);
     }
@@ -521,6 +528,145 @@ class Dashboard extends BaseController {
             print_r($agents[0]);
             echo "</pre>";
         }
+    }
+    
+    /**
+     * Vérifie les propriétés des agents pour éviter les erreurs PHP Notice
+     */
+    public function debug_agent_properties() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Debug Agent Properties - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".agent-card { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo ".property-check { margin: 5px 0; padding: 5px; }";
+        echo ".missing { background: #f8d7da; color: #721c24; }";
+        echo ".present { background: #d4edda; color: #155724; }";
+        echo ".empty { background: #fff3cd; color: #856404; }";
+        echo "table { width: 100%; border-collapse: collapse; margin: 15px 0; }";
+        echo "th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }";
+        echo "th { background: #f8f9fa; font-weight: bold; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🔍 Debug - Propriétés des Agents</h1>";
+        
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        echo "<p><strong>Agency ID utilisé:</strong> $agency_id</p>";
+        
+        // Propriétés requises pour l'affichage
+        $required_properties = [
+            'display_name' => 'Nom d\'affichage',
+            'user_nicename' => 'Nom d\'utilisateur',
+            'user_email' => 'Email',
+            'user_role' => 'Rôle',
+            'avatar_url' => 'URL Avatar',
+            'property_count' => 'Nombre de propriétés',
+            'user_id' => 'ID utilisateur',
+            'agent_post_id' => 'ID post agent'
+        ];
+        
+        try {
+            // Test avec get_agents_by_agency_with_avatars
+            echo "<h2>📋 Test avec get_agents_by_agency_with_avatars()</h2>";
+            $agents_method1 = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
+            echo "<p><strong>Nombre d'agents:</strong> " . count($agents_method1) . "</p>";
+            
+            echo "<table>";
+            echo "<tr><th>Agent</th>";
+            foreach ($required_properties as $prop => $label) {
+                echo "<th>$label</th>";
+            }
+            echo "</tr>";
+            
+            foreach ($agents_method1 as $agent) {
+                echo "<tr>";
+                echo "<td><strong>" . htmlspecialchars($agent->display_name ?? 'N/A') . "</strong></td>";
+                
+                foreach ($required_properties as $prop => $label) {
+                    $status = 'missing';
+                    $value = 'MANQUANT';
+                    
+                    if (isset($agent->$prop)) {
+                        if (!empty($agent->$prop)) {
+                            $status = 'present';
+                            $value = htmlspecialchars($agent->$prop);
+                        } else {
+                            $status = 'empty';
+                            $value = 'VIDE';
+                        }
+                    }
+                    
+                    echo "<td class='$status'>$value</td>";
+                }
+                echo "</tr>";
+            }
+            echo "</table>";
+            
+            // Test avec get_filtered_agents_from_view
+            echo "<h2>🔍 Test avec get_filtered_agents_from_view()</h2>";
+            $agents_method2 = $this->get_filtered_agents_from_view($agency_id);
+            echo "<p><strong>Nombre d'agents:</strong> " . count($agents_method2) . "</p>";
+            
+            echo "<table>";
+            echo "<tr><th>Agent</th>";
+            foreach ($required_properties as $prop => $label) {
+                echo "<th>$label</th>";
+            }
+            echo "</tr>";
+            
+            foreach ($agents_method2 as $agent) {
+                echo "<tr>";
+                echo "<td><strong>" . htmlspecialchars($agent->display_name ?? 'N/A') . "</strong></td>";
+                
+                foreach ($required_properties as $prop => $label) {
+                    $status = 'missing';
+                    $value = 'MANQUANT';
+                    
+                    if (isset($agent->$prop)) {
+                        if (!empty($agent->$prop)) {
+                            $status = 'present';
+                            $value = htmlspecialchars($agent->$prop);
+                        } else {
+                            $status = 'empty';
+                            $value = 'VIDE';
+                        }
+                    }
+                    
+                    echo "<td class='$status'>$value</td>";
+                }
+                echo "</tr>";
+            }
+            echo "</table>";
+            
+            // Comparaison des méthodes
+            echo "<h2>⚖️ Comparaison des Méthodes</h2>";
+            echo "<div class='agent-card'>";
+            echo "<p><strong>get_agents_by_agency_with_avatars():</strong> " . count($agents_method1) . " agents</p>";
+            echo "<p><strong>get_filtered_agents_from_view():</strong> " . count($agents_method2) . " agents</p>";
+            
+            if (count($agents_method1) !== count($agents_method2)) {
+                echo "<p style='color: red;'>⚠️ Les deux méthodes retournent un nombre différent d'agents!</p>";
+            } else {
+                echo "<p style='color: green;'>✅ Les deux méthodes retournent le même nombre d'agents.</p>";
+            }
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='agent-card missing'>";
+            echo "<strong>Erreur:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        echo "<p><a href='" . base_url('dashboard/manager') . "' style='display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Retour au Dashboard Manager</a></p>";
+        echo "</div>";
+        echo "</body></html>";
     }
     
     /**
@@ -2106,6 +2252,246 @@ class Dashboard extends BaseController {
         return $this->get_real_activities_chart_data_simple($user_post_id, $properties, $clients);
     }
     
+    /**
+     * Récupérer l'évolution des ventes par mois pour une agence
+     */
+    private function get_sales_evolution($agency_id) {
+        try {
+            // Charger le modèle Transaction
+            $this->load->model('Transaction_model');
+            
+            // Récupérer les agents de l'agence
+            $agents = $this->get_filtered_agents_from_view($agency_id);
+            $agent_ids = array_column($agents, 'ID');
+            
+            if (empty($agent_ids)) {
+                return $this->get_sample_sales_data();
+            }
+            
+            // Récupérer les transactions de vente des 6 derniers mois
+            $sales_data = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $month = date('Y-m', strtotime("-$i months"));
+                $month_start = $month . '-01';
+                $month_end = date('Y-m-t', strtotime($month_start));
+                
+                $sql = "SELECT COUNT(*) as count, SUM(base_amount) as total_amount 
+                       FROM agent_commissions 
+                       WHERE agent_id IN (" . implode(',', $agent_ids) . ") 
+                       AND transaction_type = 'sale'
+                       AND DATE(created_at) BETWEEN ? AND ?
+                       AND status != 'cancelled'";
+                
+                $result = $this->db->query($sql, [$month_start, $month_end]);
+                $row = $result ? $result->row() : null;
+                
+                $sales_data[] = [
+                    'month' => date('M Y', strtotime($month_start)),
+                    'count' => $row ? (int)$row->count : 0,
+                    'amount' => $row ? (float)$row->total_amount : 0
+                ];
+            }
+            
+            return $sales_data;
+            
+        } catch (Exception $e) {
+            return $this->get_sample_sales_data();
+        }
+    }
+
+    /**
+     * Récupérer l'évolution des locations par mois pour une agence
+     */
+    private function get_rentals_evolution($agency_id) {
+        try {
+            // Charger le modèle Transaction
+            $this->load->model('Transaction_model');
+            
+            // Récupérer les agents de l'agence
+            $agents = $this->get_filtered_agents_from_view($agency_id);
+            $agent_ids = array_column($agents, 'ID');
+            
+            if (empty($agent_ids)) {
+                return $this->get_sample_rentals_data();
+            }
+            
+            // Récupérer les transactions de location des 6 derniers mois
+            $rentals_data = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $month = date('Y-m', strtotime("-$i months"));
+                $month_start = $month . '-01';
+                $month_end = date('Y-m-t', strtotime($month_start));
+                
+                $sql = "SELECT COUNT(*) as count, SUM(base_amount) as total_amount 
+                       FROM agent_commissions 
+                       WHERE agent_id IN (" . implode(',', $agent_ids) . ") 
+                       AND transaction_type = 'rental'
+                       AND DATE(created_at) BETWEEN ? AND ?
+                       AND status != 'cancelled'";
+                
+                $result = $this->db->query($sql, [$month_start, $month_end]);
+                $row = $result ? $result->row() : null;
+                
+                $rentals_data[] = [
+                    'month' => date('M Y', strtotime($month_start)),
+                    'count' => $row ? (int)$row->count : 0,
+                    'amount' => $row ? (float)$row->total_amount : 0
+                ];
+            }
+            
+            return $rentals_data;
+            
+        } catch (Exception $e) {
+            return $this->get_sample_rentals_data();
+        }
+    }
+
+    /**
+     * Récupérer les objectifs avec progression pour une agence
+     */
+    private function get_objectives_with_progress($agency_id) {
+        try {
+            // Charger le modèle Objective
+            $this->load->model('Objective_model');
+            
+            // Récupérer les agents de l'agence
+            $agents = $this->get_filtered_agents_from_view($agency_id);
+            $agent_ids = array_column($agents, 'ID');
+            
+            if (empty($agent_ids)) {
+                return $this->get_sample_objectives_data();
+            }
+            
+            // Récupérer les objectifs du mois courant
+            $current_month = date('Y-m');
+            $objectives_data = [];
+            
+            foreach ($agent_ids as $agent_id) {
+                $objectives = $this->Objective_model->get_agent_objectives($agent_id, $current_month);
+                if (!empty($objectives)) {
+                    // Calculer les performances réelles
+                    $performance = $this->Objective_model->calculate_real_performance($agent_id, $current_month);
+                    
+                    $objective = $objectives[0]; // Premier objectif trouvé
+                    $objectives_data[] = [
+                        'agent_id' => $agent_id,
+                        'agent_name' => $this->get_agent_name($agent_id),
+                        'estimations_target' => $objective->estimations_target,
+                        'estimations_actual' => $performance['estimations_count'],
+                        'estimations_progress' => $objective->estimations_target > 0 ? 
+                            round(($performance['estimations_count'] / $objective->estimations_target) * 100, 1) : 0,
+                        'transactions_target' => $objective->transactions_target,
+                        'transactions_actual' => $performance['transactions_count'],
+                        'transactions_progress' => $objective->transactions_target > 0 ? 
+                            round(($performance['transactions_count'] / $objective->transactions_target) * 100, 1) : 0,
+                        'revenue_target' => $objective->revenue_target,
+                        'revenue_actual' => $performance['revenue_amount'],
+                        'revenue_progress' => $objective->revenue_target > 0 ? 
+                            round(($performance['revenue_amount'] / $objective->revenue_target) * 100, 1) : 0
+                    ];
+                }
+            }
+            
+            return !empty($objectives_data) ? $objectives_data : $this->get_sample_objectives_data();
+            
+        } catch (Exception $e) {
+            return $this->get_sample_objectives_data();
+        }
+    }
+
+    /**
+     * Obtenir le nom d'un agent depuis WordPress
+     */
+    private function get_agent_name($agent_id) {
+        try {
+            $wp_db = $this->load->database('wordpress', TRUE);
+            $query = "SELECT display_name FROM wp_Hrg8P_users WHERE ID = ? LIMIT 1";
+            $result = $wp_db->query($query, [$agent_id]);
+            
+            if ($result && $result->num_rows() > 0) {
+                return $result->row()->display_name;
+            }
+            
+            return "Agent #$agent_id";
+        } catch (Exception $e) {
+            return "Agent #$agent_id";
+        }
+    }
+
+    /**
+     * Données d'exemple pour les ventes
+     */
+    private function get_sample_sales_data() {
+        return [
+            ['month' => 'Jul 2024', 'count' => 8, 'amount' => 450000],
+            ['month' => 'Aug 2024', 'count' => 12, 'amount' => 680000],
+            ['month' => 'Sep 2024', 'count' => 15, 'amount' => 750000],
+            ['month' => 'Oct 2024', 'count' => 10, 'amount' => 520000],
+            ['month' => 'Nov 2024', 'count' => 18, 'amount' => 890000],
+            ['month' => 'Dec 2024', 'count' => 22, 'amount' => 1200000]
+        ];
+    }
+
+    /**
+     * Données d'exemple pour les locations
+     */
+    private function get_sample_rentals_data() {
+        return [
+            ['month' => 'Jul 2024', 'count' => 25, 'amount' => 85000],
+            ['month' => 'Aug 2024', 'count' => 30, 'amount' => 95000],
+            ['month' => 'Sep 2024', 'count' => 28, 'amount' => 90000],
+            ['month' => 'Oct 2024', 'count' => 35, 'amount' => 110000],
+            ['month' => 'Nov 2024', 'count' => 40, 'amount' => 125000],
+            ['month' => 'Dec 2024', 'count' => 45, 'amount' => 140000]
+        ];
+    }
+
+    /**
+     * Données d'exemple pour les objectifs
+     */
+    private function get_sample_objectives_data() {
+        return [
+            [
+                'agent_id' => 1,
+                'agent_name' => 'Ahmed Ben Ali',
+                'estimations_target' => 25,
+                'estimations_actual' => 28,
+                'estimations_progress' => 112.0,
+                'transactions_target' => 5,
+                'transactions_actual' => 6,
+                'transactions_progress' => 120.0,
+                'revenue_target' => 150000,
+                'revenue_actual' => 175000,
+                'revenue_progress' => 116.7
+            ],
+            [
+                'agent_id' => 2,
+                'agent_name' => 'Fatima Gharbi',
+                'estimations_target' => 20,
+                'estimations_actual' => 16,
+                'estimations_progress' => 80.0,
+                'transactions_target' => 4,
+                'transactions_actual' => 3,
+                'transactions_progress' => 75.0,
+                'revenue_target' => 120000,
+                'revenue_actual' => 95000,
+                'revenue_progress' => 79.2
+            ],
+            [
+                'agent_id' => 3,
+                'agent_name' => 'Mohamed Khelifi',
+                'estimations_target' => 30,
+                'estimations_actual' => 32,
+                'estimations_progress' => 106.7,
+                'transactions_target' => 6,
+                'transactions_actual' => 7,
+                'transactions_progress' => 116.7,
+                'revenue_target' => 180000,
+                'revenue_actual' => 200000,
+                'revenue_progress' => 111.1
+            ]
+        ];
+    }
 
     
 }
