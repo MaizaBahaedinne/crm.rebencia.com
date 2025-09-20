@@ -173,9 +173,13 @@
                                                 <div class="card-body p-3">
                                                     <div class="d-flex align-items-center">
                                                         <div class="avatar-sm flex-shrink-0 me-3">
-                                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                                <i class="ri-user-line"></i>
-                                                            </div>
+                                                            <?php if (is_object($agent) && !empty($agent->avatar_url)): ?>
+                                                                <img src="<?= $agent->avatar_url ?>" alt="<?= $agent->display_name ?? 'Agent' ?>" class="avatar-sm rounded-circle">
+                                                            <?php else: ?>
+                                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                                    <i class="ri-user-line"></i>
+                                                                </div>
+                                                            <?php endif; ?>
                                                         </div>
                                                         <div class="flex-grow-1">
                                                             <h6 class="mb-1 fw-semibold">

@@ -438,9 +438,9 @@ class Dashboard extends BaseController {
             $agency_id = 1; // ID par défaut
         }
         
-        // Récupérer les données de l'agence et ses agents
+        // Récupérer les données de l'agence et ses agents avec avatars
         $data['agency'] = $this->agency_model->get_agency($agency_id);
-        $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
+        $data['agents'] = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
         
         // Statistiques spécifiques au manager
         try {

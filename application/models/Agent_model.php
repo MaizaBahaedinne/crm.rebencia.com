@@ -1485,4 +1485,58 @@ class Agent_model extends CI_Model {
         return $agents;
     }
 
+    public function get_agents_by_agency_with_avatars($agency_id) {
+        if (!$agency_id) return [];
+        
+        $this->load->database('rebenciaBD');
+        $this->rebenciaBD = $this->load->database('rebenciaBD', TRUE);
+        
+        // Utiliser les vues optimisées pour récupérer les agents avec avatars
+        $this->rebenciaBD->select('
+            a.ID as user_id,
+            a.display_name,
+            a.user_email,
+            a.user_nicename,
+            ava.agent_post_id,
+            ava.avatar_url,
+            ava.avatar_id,
+            prop.property_count,
+            a.user_role,
+            a.agency_name,
+            a.agency_id
+        ');
+        
+        $this->rebenciaBD->from('wp_Hrg8P_crm_agents a');
+        $this->rebenciaBD->join('wp_Hrg8P_crm_avatar_agents ava', 'a.ID = ava.agent_post_id', 'left');
+        $this->rebenciaBD->join('wp_Hrg8P_prop_agen prop', 'a.ID = prop.agent_post_id', 'left');
+        
+        // Filtrer par agence et inclure agents et managers
+        $this->rebenciaBD->where('a.agency_id', $agency_id);
+        $this->rebenciaBD->where_in('a.user_role', ['houzez_agent', 'houzez_manager']);
+        
+        $this->rebenciaBD->order_by('a.display_name', 'ASC');
+        
+        $query = $this->rebenciaBD->get();
+        $agents = $query->result();
+        
+        // Nettoyer et enrichir les données
+        foreach ($agents as &$agent) {
+            // Nettoyer les données
+            $agent = $this->clean_agent_data($agent);
+            
+            // Ajouter des statistiques par défaut si manquantes
+            if (!isset($agent->properties_count)) {
+                $agent->properties_count = 0;
+            }
+            if (!isset($agent->sales_count)) {
+                $agent->sales_count = 0;
+            }
+            if (!isset($agent->contacts_count)) {
+                $agent->contacts_count = 0;
+            }
+        }
+
+        return $agents;
+    }
+
 }
