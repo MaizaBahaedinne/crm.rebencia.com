@@ -1356,7 +1356,7 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) AS phone,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) AS mobile,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) AS whatsapp,
-            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) AS agent_avatar,
+            avatar_view.image_url AS agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position,
             
             (SELECT COUNT(*) 
@@ -1376,7 +1376,7 @@ class Agent_model extends CI_Model {
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
-            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->join('wp_Hrg8P_crm_avatar_agents avatar_view', 'avatar_view.agent_post_id = p.ID', 'left')
             ->join($this->usermeta_table . ' ur', 'ur.user_id = u.ID AND ur.meta_key = "wp_Hrg8P_capabilities"', 'left')
             ->where('p.post_type IN ("houzez_agent", "houzez_manager")', NULL, FALSE)
             ->where('p.post_status', 'publish');
