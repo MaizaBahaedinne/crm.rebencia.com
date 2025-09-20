@@ -599,18 +599,18 @@ class Dashboard extends BaseController {
                     // Essayer avec d'autres colonnes
                     echo "<h3>🔍 Recherche alternative...</h3>";
                     
-                    // Essayer avec ID
+                    // Essayer avec user_id (colonne correcte)
                     $query_id = $wp_db->select('*')
                                       ->from('wp_Hrg8P_crm_agents')
-                                      ->where('ID', $user_post_id)
+                                      ->where('user_id', $user_post_id)
                                       ->get();
                     
                     echo "<div class='result'>";
-                    echo "<strong>Test avec ID = $user_post_id:</strong> " . $query_id->num_rows() . " résultat(s)<br>";
+                    echo "<strong>Test avec user_id = $user_post_id:</strong> " . $query_id->num_rows() . " résultat(s)<br>";
                     if ($query_id->num_rows() > 0) {
                         $agent = $query_id->row();
                         echo "<div class='result success'>";
-                        echo "<strong>✅ Agency ID trouvé via ID:</strong> " . ($agent->agency_id ?: 'NULL') . "<br>";
+                        echo "<strong>✅ Agency ID trouvé via user_id:</strong> " . ($agent->agency_id ?: 'NULL') . "<br>";
                         echo "<pre>" . print_r($agent, true) . "</pre>";
                         echo "</div>";
                     }
@@ -618,7 +618,7 @@ class Dashboard extends BaseController {
                     
                     // Montrer un échantillon des données
                     echo "<h3>📋 Échantillon des données disponibles</h3>";
-                    $sample = $wp_db->select('agent_post_id, ID, agency_id, display_name')
+                    $sample = $wp_db->select('agent_post_id, user_id, agency_id, display_name')
                                     ->from('wp_Hrg8P_crm_agents')
                                     ->limit(10)
                                     ->get();
@@ -627,11 +627,11 @@ class Dashboard extends BaseController {
                         echo "<div class='result info'>";
                         echo "<strong>Premiers agents dans la vue:</strong><br>";
                         echo "<table border='1' cellpadding='5' cellspacing='0'>";
-                        echo "<tr><th>agent_post_id</th><th>ID</th><th>agency_id</th><th>display_name</th></tr>";
+                        echo "<tr><th>agent_post_id</th><th>user_id</th><th>agency_id</th><th>display_name</th></tr>";
                         foreach ($sample->result() as $row) {
                             echo "<tr>";
                             echo "<td>" . ($row->agent_post_id ?: 'NULL') . "</td>";
-                            echo "<td>" . ($row->ID ?: 'NULL') . "</td>";
+                            echo "<td>" . ($row->user_id ?: 'NULL') . "</td>";
                             echo "<td>" . ($row->agency_id ?: 'NULL') . "</td>";
                             echo "<td>" . ($row->display_name ?: 'NULL') . "</td>";
                             echo "</tr>";
@@ -675,55 +675,17 @@ class Dashboard extends BaseController {
     public function debug_session() {
         $this->isLoggedIn();
         
-        echo "<!DOCTYPE html>";
-        echo "<html><head>";
-        echo "<title>Debug Session - CRM Rebencia</title>";
-        echo "<style>";
-        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
-        echo ".container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }";
-        echo "h1, h2 { color: #2c3e50; }";
-        echo "h2 { background: #ecf0f1; padding: 10px; border-left: 4px solid #3498db; }";
-        echo ".info-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
-        echo "pre { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; }";
-        echo ".property { margin: 5px 0; padding: 5px; background: #e8f4fd; border-left: 3px solid #007bff; }";
-        echo ".value { font-weight: bold; color: #007bff; }";
-        echo ".null { color: #dc3545; font-style: italic; }";
-        echo ".empty { color: #ffc107; font-style: italic; }";
-        echo "</style>";
-        echo "</head><body>";
+        $data = $this->global;
+        $data['pageTitle'] = 'Debug Session - CRM Rebencia';
         
-        echo "<div class='container'>";
-        echo "<h1>🔍 Debug - Session Utilisateur Connecté</h1>";
-        echo "<p><strong>Date/Heure:</strong> " . date('Y-m-d H:i:s') . "</p>";
+        // Préparer toutes les données pour la vue
+        $debug_data = [];
         
         // 1. Données de session CodeIgniter
-        echo "<h2>📊 Données de Session CodeIgniter</h2>";
-        echo "<div class='info-box'>";
-        $session_data = $this->session->all_userdata();
-        if (!empty($session_data)) {
-            foreach ($session_data as $key => $value) {
-                echo "<div class='property'>";
-                echo "<strong>$key:</strong> ";
-                if (is_null($value)) {
-                    echo "<span class='null'>NULL</span>";
-                } elseif (is_array($value) || is_object($value)) {
-                    echo "<pre>" . print_r($value, true) . "</pre>";
-                } elseif (empty($value) && $value !== '0') {
-                    echo "<span class='empty'>EMPTY</span>";
-                } else {
-                    echo "<span class='value'>" . htmlspecialchars($value) . "</span>";
-                }
-                echo "</div>";
-            }
-        } else {
-            echo "<p>Aucune donnée de session trouvée</p>";
-        }
-        echo "</div>";
+        $debug_data['session_data'] = $this->session->all_userdata();
         
         // 2. Propriétés du BaseController
-        echo "<h2>🏗️ Propriétés BaseController</h2>";
-        echo "<div class='info-box'>";
-        $properties = [
+        $debug_data['base_controller'] = [
             'role' => $this->role,
             'vendorId' => $this->vendorId,
             'name' => $this->name,
@@ -736,46 +698,11 @@ class Dashboard extends BaseController {
             'agencyId' => $this->agencyId,
         ];
         
-        foreach ($properties as $prop => $value) {
-            echo "<div class='property'>";
-            echo "<strong>$prop:</strong> ";
-            if (is_null($value)) {
-                echo "<span class='null'>NULL</span>";
-            } elseif (empty($value) && $value !== '0') {
-                echo "<span class='empty'>EMPTY</span>";
-            } else {
-                echo "<span class='value'>" . htmlspecialchars($value) . "</span>";
-            }
-            echo "</div>";
-        }
-        echo "</div>";
-        
         // 3. Variable globale $this->global
-        echo "<h2>🌐 Variable Global</h2>";
-        echo "<div class='info-box'>";
-        if (!empty($this->global)) {
-            foreach ($this->global as $key => $value) {
-                echo "<div class='property'>";
-                echo "<strong>$key:</strong> ";
-                if (is_null($value)) {
-                    echo "<span class='null'>NULL</span>";
-                } elseif (is_array($value) || is_object($value)) {
-                    echo "<pre>" . print_r($value, true) . "</pre>";
-                } elseif (empty($value) && $value !== '0') {
-                    echo "<span class='empty'>EMPTY</span>";
-                } else {
-                    echo "<span class='value'>" . htmlspecialchars($value) . "</span>";
-                }
-                echo "</div>";
-            }
-        } else {
-            echo "<p>Variable global vide</p>";
-        }
-        echo "</div>";
+        $debug_data['global_var'] = $this->global;
         
         // 4. Informations sur l'utilisateur WordPress
-        echo "<h2>👤 Informations Utilisateur WordPress</h2>";
-        echo "<div class='info-box'>";
+        $debug_data['wp_user_info'] = [];
         $wp_id = $this->session->userdata('wp_id');
         if ($wp_id) {
             try {
@@ -785,39 +712,26 @@ class Dashboard extends BaseController {
                 // Récupérer les données utilisateur
                 $user_query = $wp_db->where('ID', $wp_id)->get('users');
                 if ($user_query->num_rows() > 0) {
-                    $user = $user_query->row();
-                    echo "<h3>Données utilisateur:</h3>";
-                    echo "<pre>" . print_r($user, true) . "</pre>";
+                    $debug_data['wp_user_info']['user'] = $user_query->row();
                 }
                 
                 // Récupérer les métadonnées utilisateur
                 $meta_query = $wp_db->where('user_id', $wp_id)->get('usermeta');
                 if ($meta_query->num_rows() > 0) {
-                    echo "<h3>Métadonnées utilisateur:</h3>";
-                    foreach ($meta_query->result() as $meta) {
-                        echo "<div class='property'>";
-                        echo "<strong>" . $meta->meta_key . ":</strong> ";
-                        echo "<span class='value'>" . htmlspecialchars($meta->meta_value) . "</span>";
-                        echo "</div>";
-                    }
+                    $debug_data['wp_user_info']['meta'] = $meta_query->result();
                 }
                 
             } catch (Exception $e) {
-                echo "<p style='color: red;'>Erreur: " . $e->getMessage() . "</p>";
+                $debug_data['wp_user_info']['error'] = $e->getMessage();
             }
-        } else {
-            echo "<p>Aucun wp_id en session</p>";
         }
-        echo "</div>";
         
-        // 7. Test de récupération d'agency_id depuis wp_Hrg8P_crm_agents
-        echo "<h2>🔍 Test Récupération Agency ID depuis wp_Hrg8P_crm_agents</h2>";
-        echo "<div class='info-box'>";
-        echo "<div class='property'><strong>agencyId (BaseController):</strong> <span class='value'>" . ($this->agencyId ?: 'EMPTY') . "</span></div>";
-        echo "<div class='property'><strong>agency_id (Session):</strong> <span class='value'>" . ($this->session->userdata('agency_id') ?: 'EMPTY') . "</span></div>";
-        echo "<div class='property'><strong>user_post_id (Session):</strong> <span class='value'>" . ($this->session->userdata('user_post_id') ?: 'EMPTY') . "</span></div>";
+        // 5. Test de récupération d'agency_id depuis wp_Hrg8P_crm_agents
+        $debug_data['agency_test'] = [];
+        $debug_data['agency_test']['current_agency_id'] = $this->agencyId;
+        $debug_data['agency_test']['session_agency_id'] = $this->session->userdata('agency_id');
+        $debug_data['agency_test']['user_post_id'] = $this->session->userdata('user_post_id');
         
-        // Test direct de la vue wp_Hrg8P_crm_agents
         $user_post_id = $this->session->userdata('user_post_id');
         if ($user_post_id) {
             try {
@@ -826,7 +740,7 @@ class Dashboard extends BaseController {
                 
                 // Vérifier l'existence de la vue
                 $check = $wp_db->query("SHOW TABLES LIKE 'wp_Hrg8P_crm_agents'");
-                echo "<div class='property'><strong>Vue wp_Hrg8P_crm_agents existe:</strong> <span class='value'>" . ($check->num_rows() > 0 ? 'OUI' : 'NON') . "</span></div>";
+                $debug_data['agency_test']['view_exists'] = $check->num_rows() > 0;
                 
                 if ($check->num_rows() > 0) {
                     // Rechercher l'agent par agent_post_id
@@ -835,77 +749,51 @@ class Dashboard extends BaseController {
                                          ->where('agent_post_id', $user_post_id)
                                          ->get();
                     
-                    echo "<div class='property'><strong>Agents trouvés pour agent_post_id=$user_post_id:</strong> <span class='value'>" . $agent_query->num_rows() . "</span></div>";
+                    $debug_data['agency_test']['agents_found_by_agent_post_id'] = $agent_query->num_rows();
                     
                     if ($agent_query->num_rows() > 0) {
-                        $agent = $agent_query->row();
-                        echo "<div class='property'><strong>agency_id trouvé:</strong> <span class='value'>" . ($agent->agency_id ?: 'EMPTY') . "</span></div>";
-                        echo "<h3>Données complètes de l'agent:</h3>";
-                        echo "<pre>" . print_r($agent, true) . "</pre>";
+                        $debug_data['agency_test']['agent_data'] = $agent_query->row();
                     } else {
-                        // Essayer avec ID au lieu de agent_post_id
+                        // Essayer avec user_id
                         $agent_query_id = $wp_db->select('*')
                                                 ->from('wp_Hrg8P_crm_agents')
-                                                ->where('ID', $user_post_id)
+                                                ->where('user_id', $user_post_id)
                                                 ->get();
                         
-                        echo "<div class='property'><strong>Agents trouvés pour ID=$user_post_id:</strong> <span class='value'>" . $agent_query_id->num_rows() . "</span></div>";
+                        $debug_data['agency_test']['agents_found_by_user_id'] = $agent_query_id->num_rows();
                         
                         if ($agent_query_id->num_rows() > 0) {
-                            $agent = $agent_query_id->row();
-                            echo "<div class='property'><strong>agency_id trouvé (via ID):</strong> <span class='value'>" . ($agent->agency_id ?: 'EMPTY') . "</span></div>";
-                            echo "<h3>Données complètes de l'agent (via ID):</h3>";
-                            echo "<pre>" . print_r($agent, true) . "</pre>";
+                            $debug_data['agency_test']['agent_data_via_user_id'] = $agent_query_id->row();
                         } else {
-                            // Montrer un échantillon des données pour debug
+                            // Échantillon des données
                             $sample_query = $wp_db->select('*')
                                                   ->from('wp_Hrg8P_crm_agents')
                                                   ->limit(3)
                                                   ->get();
                             
-                            echo "<h3>Échantillon des données dans wp_Hrg8P_crm_agents:</h3>";
-                            if ($sample_query->num_rows() > 0) {
-                                foreach ($sample_query->result() as $sample) {
-                                    echo "<pre>" . print_r($sample, true) . "</pre><hr>";
-                                }
-                            } else {
-                                echo "<p>Aucune donnée dans wp_Hrg8P_crm_agents</p>";
-                            }
+                            $debug_data['agency_test']['sample_data'] = $sample_query->result();
                         }
                     }
                 }
                 
             } catch (Exception $e) {
-                echo "<p style='color: red;'>Erreur: " . $e->getMessage() . "</p>";
+                $debug_data['agency_test']['error'] = $e->getMessage();
             }
-        } else {
-            echo "<p>Aucun user_post_id en session pour tester</p>";
         }
         
-        // Méthode utilisée dans le dashboard manager
-        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id');
-        if (!$agency_id) {
-            $agency_id = 1; // Fallback
-        }
-        echo "<div class='property'><strong>agency_id final utilisé:</strong> <span class='value'>$agency_id</span></div>";
-        echo "</div>";
-        
-        // 6. Variables superglobales utiles
-        echo "<h2>🔧 Variables Serveur</h2>";
-        echo "<div class='info-box'>";
+        // 6. Variables serveur
+        $debug_data['server_vars'] = [];
         $server_vars = ['HTTP_HOST', 'REQUEST_URI', 'HTTP_USER_AGENT', 'REMOTE_ADDR'];
         foreach ($server_vars as $var) {
             if (isset($_SERVER[$var])) {
-                echo "<div class='property'>";
-                echo "<strong>$var:</strong> ";
-                echo "<span class='value'>" . htmlspecialchars($_SERVER[$var]) . "</span>";
-                echo "</div>";
+                $debug_data['server_vars'][$var] = $_SERVER[$var];
             }
         }
-        echo "</div>";
         
-        echo "</div>";
-        echo "</body></html>";
+        $data['debug_data'] = $debug_data;
+        
+        // Charger la vue dédiée
+        $this->loadViews('dashboard/debug_session', $this->global, $data, NULL);
     }
     
     // Méthodes helper pour les statistiques du dashboard manager

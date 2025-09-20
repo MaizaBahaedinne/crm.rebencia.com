@@ -94,7 +94,7 @@ class BaseController extends CI_Controller {
 			$CI->load->database('wordpress');
 			$wp_db = $CI->load->database('wordpress', TRUE);
 			
-			// Requête pour récupérer l'agency_id
+			// Essayer d'abord avec agent_post_id
 			$query = $wp_db->select('agency_id')
 							->from('wp_Hrg8P_crm_agents')
 							->where('agent_post_id', $agent_post_id)
@@ -103,6 +103,17 @@ class BaseController extends CI_Controller {
 			if ($query && $query->num_rows() > 0) {
 				$result = $query->row();
 				return $result->agency_id;
+			}
+			
+			// Si pas trouvé, essayer avec user_id (colonne correcte)
+			$query2 = $wp_db->select('agency_id')
+							 ->from('wp_Hrg8P_crm_agents')
+							 ->where('user_id', $agent_post_id)
+							 ->get();
+			
+			if ($query2 && $query2->num_rows() > 0) {
+				$result2 = $query2->row();
+				return $result2->agency_id;
 			}
 			
 			return null;
