@@ -142,8 +142,8 @@ class Dashboard extends BaseController {
             $data['stats']['monthly_revenue'] = round($estimated_revenue / 12);
             $data['stats']['yearly_revenue'] = $estimated_revenue;
             $data['stats']['top_performers'] = min(15, count($data['top_agents']));
-            $data['stats']['properties_for_sale'] = $this->get_properties_by_type('for-sale', $properties);
-            $data['stats']['properties_for_rent'] = $this->get_properties_by_type('for-rent', $properties);
+            $data['stats']['properties_for_sale'] = $this->get_properties_by_status('for-sale', $properties);
+            $data['stats']['properties_for_rent'] = $this->get_properties_by_status('for-rent', $properties);
             $data['stats']['growth_rate'] = ($growth >= 0 ? '+' : '') . $growth . '%';
             
         } catch (Exception $e) {
@@ -820,9 +820,9 @@ class Dashboard extends BaseController {
     }
 
     /**
-     * Récupère le nombre de propriétés par type
+     * Récupère le nombre de propriétés par type de statut
      */
-    private function get_properties_by_type($type, $properties) {
+    private function get_properties_by_status($type, $properties) {
         $count = 0;
         foreach ($properties as $property) {
             $property_type = $property->property_status ?? '';
