@@ -157,6 +157,9 @@ class Login extends CI_Controller {
                         $agent_record = $wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row();
                         if ($agent_record && isset($agent_record->agent_post_id)) {
                             $agent_post_id = $agent_record->agent_post_id;
+                            if (isset($agent_record->agency_id)) {
+                                $sessionData['agency_id'] = $agent_record->agency_id;
+                            }
                         }
                     }
                     // Fallback vers user->ID si pas d'agent_post_id trouvé
@@ -164,7 +167,18 @@ class Login extends CI_Controller {
                 } else {
                     $sessionData['user_post_id'] = $user->ID;
                 }
-                if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; $sessionData['agency_id'] = $agency_id; }
+                if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID;  
+                    if ($wp_db->table_exists('wp_Hrg8P_crm_agents')) {
+                        $agent_record = $wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row();
+                        if ($agent_record && isset($agent_record->agent_post_id)) {
+                            $agent_post_id = $agent_record->agent_post_id;
+                            if (isset($agent_record->agency_id)) {
+                                $sessionData['agency_id'] = $agent_record->agency_id;
+                            }
+                        }
+                    }
+                    
+                }
                 if ($mappedRole === 'agency') { $sessionData['agency_id'] = $agency_id; }
                 // Assurer disponibilité session
                 $this->session->set_userdata($sessionData);
