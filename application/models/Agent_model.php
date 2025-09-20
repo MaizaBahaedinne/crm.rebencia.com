@@ -1445,11 +1445,11 @@ class Agent_model extends CI_Model {
     }
 
     public function get_manager_team_agents($manager_agency_id) {
-        $this->load->database('rebenciaBD');
-        $this->rebenciaBD = $this->load->database('rebenciaBD', TRUE);
+        $this->load->database('wordpress');
+        $wp_db = $this->load->database('wordpress', TRUE);
         
-        // Utiliser les vraies tables WordPress avec les jointures
-        $this->rebenciaBD->select('
+        // Utiliser les vraies tables WordPress - le préfixe wp_Hrg8P_ est déjà configuré
+        $wp_db->select('
             p.ID as user_id,
             p.post_title as display_name,
             u.user_email,
@@ -1466,30 +1466,30 @@ class Agent_model extends CI_Model {
             agency.ID as agency_id
         ');
         
-        $this->rebenciaBD->from('wp_Hrg8P_posts p');
-        $this->rebenciaBD->join('wp_Hrg8P_postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
-        $this->rebenciaBD->join('wp_Hrg8P_users u', 'u.user_email = pm_email.meta_value', 'inner');
-        $this->rebenciaBD->join('wp_Hrg8P_postmeta pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left');
-        $this->rebenciaBD->join('wp_Hrg8P_posts agency', 'agency.ID = pm_agency.meta_value AND agency.post_type = "houzez_agency"', 'left');
-        $this->rebenciaBD->join('wp_Hrg8P_postmeta pm_avatar', 'pm_avatar.post_id = p.ID AND pm_avatar.meta_key = "_thumbnail_id"', 'left');
+        $wp_db->from('posts p');
+        $wp_db->join('postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
+        $wp_db->join('users u', 'u.user_email = pm_email.meta_value', 'inner');
+        $wp_db->join('postmeta pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left');
+        $wp_db->join('posts agency', 'agency.ID = pm_agency.meta_value AND agency.post_type = "houzez_agency"', 'left');
+        $wp_db->join('postmeta pm_avatar', 'pm_avatar.post_id = p.ID AND pm_avatar.meta_key = "_thumbnail_id"', 'left');
         
         // Sous-requête pour compter les propriétés
-        $this->rebenciaBD->join('(SELECT pm_prop.meta_value as agent_id, COUNT(*) as property_count 
-                                 FROM wp_Hrg8P_posts prop 
-                                 INNER JOIN wp_Hrg8P_postmeta pm_prop ON prop.ID = pm_prop.post_id 
+        $wp_db->join('(SELECT pm_prop.meta_value as agent_id, COUNT(*) as property_count 
+                                 FROM ' . $wp_db->dbprefix . 'posts prop 
+                                 INNER JOIN ' . $wp_db->dbprefix . 'postmeta pm_prop ON prop.ID = pm_prop.post_id 
                                  WHERE pm_prop.meta_key = "fave_property_agent" 
                                  AND prop.post_type = "property" 
                                  AND prop.post_status = "publish"
                                  GROUP BY pm_prop.meta_value) prop_count', 'prop_count.agent_id = p.ID', 'left');
         
         // Filtrer par agence et inclure les agents ET managers
-        $this->rebenciaBD->where('agency.ID', $manager_agency_id);
-        $this->rebenciaBD->where_in('p.post_type', ['houzez_agent', 'houzez_manager']);
-        $this->rebenciaBD->where('p.post_status', 'publish');
+        $wp_db->where('agency.ID', $manager_agency_id);
+        $wp_db->where_in('p.post_type', ['houzez_agent', 'houzez_manager']);
+        $wp_db->where('p.post_status', 'publish');
         
-        $this->rebenciaBD->order_by('p.post_title', 'ASC');
+        $wp_db->order_by('p.post_title', 'ASC');
         
-        $query = $this->rebenciaBD->get();
+        $query = $wp_db->get();
         $agents = $query->result();
         
         // Nettoyer et enrichir les données
@@ -1504,11 +1504,11 @@ class Agent_model extends CI_Model {
     public function get_agents_by_agency_with_avatars($agency_id) {
         if (!$agency_id) return [];
         
-        $this->load->database('rebenciaBD');
-        $this->rebenciaBD = $this->load->database('rebenciaBD', TRUE);
+        $this->load->database('wordpress');
+        $wp_db = $this->load->database('wordpress', TRUE);
         
-        // Utiliser les vraies tables WordPress avec les jointures
-        $this->rebenciaBD->select('
+        // Utiliser les vraies tables WordPress - le préfixe wp_Hrg8P_ est déjà configuré
+        $wp_db->select('
             p.ID as user_id,
             p.post_title as display_name,
             u.user_email,
@@ -1525,30 +1525,30 @@ class Agent_model extends CI_Model {
             agency.ID as agency_id
         ');
         
-        $this->rebenciaBD->from('wp_Hrg8P_posts p');
-        $this->rebenciaBD->join('wp_Hrg8P_postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
-        $this->rebenciaBD->join('wp_Hrg8P_users u', 'u.user_email = pm_email.meta_value', 'inner');
-        $this->rebenciaBD->join('wp_Hrg8P_postmeta pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left');
-        $this->rebenciaBD->join('wp_Hrg8P_posts agency', 'agency.ID = pm_agency.meta_value AND agency.post_type = "houzez_agency"', 'left');
-        $this->rebenciaBD->join('wp_Hrg8P_postmeta pm_avatar', 'pm_avatar.post_id = p.ID AND pm_avatar.meta_key = "_thumbnail_id"', 'left');
+        $wp_db->from('posts p');
+        $wp_db->join('postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
+        $wp_db->join('users u', 'u.user_email = pm_email.meta_value', 'inner');
+        $wp_db->join('postmeta pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left');
+        $wp_db->join('posts agency', 'agency.ID = pm_agency.meta_value AND agency.post_type = "houzez_agency"', 'left');
+        $wp_db->join('postmeta pm_avatar', 'pm_avatar.post_id = p.ID AND pm_avatar.meta_key = "_thumbnail_id"', 'left');
         
         // Sous-requête pour compter les propriétés
-        $this->rebenciaBD->join('(SELECT pm_prop.meta_value as agent_id, COUNT(*) as property_count 
-                                 FROM wp_Hrg8P_posts prop 
-                                 INNER JOIN wp_Hrg8P_postmeta pm_prop ON prop.ID = pm_prop.post_id 
+        $wp_db->join('(SELECT pm_prop.meta_value as agent_id, COUNT(*) as property_count 
+                                 FROM ' . $wp_db->dbprefix . 'posts prop 
+                                 INNER JOIN ' . $wp_db->dbprefix . 'postmeta pm_prop ON prop.ID = pm_prop.post_id 
                                  WHERE pm_prop.meta_key = "fave_property_agent" 
                                  AND prop.post_type = "property" 
                                  AND prop.post_status = "publish"
                                  GROUP BY pm_prop.meta_value) prop_count', 'prop_count.agent_id = p.ID', 'left');
         
         // Filtrer par agence et inclure agents et managers
-        $this->rebenciaBD->where('agency.ID', $agency_id);
-        $this->rebenciaBD->where_in('p.post_type', ['houzez_agent', 'houzez_manager']);
-        $this->rebenciaBD->where('p.post_status', 'publish');
+        $wp_db->where('agency.ID', $agency_id);
+        $wp_db->where_in('p.post_type', ['houzez_agent', 'houzez_manager']);
+        $wp_db->where('p.post_status', 'publish');
         
-        $this->rebenciaBD->order_by('p.post_title', 'ASC');
+        $wp_db->order_by('p.post_title', 'ASC');
         
-        $query = $this->rebenciaBD->get();
+        $query = $wp_db->get();
         $agents = $query->result();
         
         // Nettoyer et enrichir les données
