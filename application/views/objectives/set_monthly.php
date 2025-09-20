@@ -35,6 +35,14 @@
 
             <div class="row">
                 <div class="col-lg-8 mx-auto">
+                    <?php if (isset($is_manager_view) && $is_manager_view): ?>
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <i class="ri-information-line me-2"></i>
+                            <strong>Vue Manager :</strong> Vous ne voyez que les agents de votre agence.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+                    
                     <div class="card border-0 shadow-sm">
                         <div class="card-header">
                             <h5 class="card-title mb-0">

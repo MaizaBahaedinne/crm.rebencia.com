@@ -149,8 +149,17 @@ class Objectives extends BaseController {
             $data['title'] = 'Définir les Objectifs Mensuels';
             $data['selected_month'] = $this->input->get('month') ?: date('Y-m');
             
-            // Récupérer la liste des agents depuis le modèle
-            $data['agents'] = $this->Objective_model->get_agents();
+            // Récupérer la liste des agents selon le rôle de l'utilisateur
+            if ($this->roleText === 'Manager' && !empty($this->agencyId)) {
+                // Manager : récupérer seulement les agents de son agence
+                $data['agents'] = $this->Objective_model->get_agents_by_agency($this->agencyId);
+                $data['is_manager_view'] = true;
+                $data['agency_id'] = $this->agencyId;
+            } else {
+                // Admin ou autres rôles : récupérer tous les agents
+                $data['agents'] = $this->Objective_model->get_agents();
+                $data['is_manager_view'] = false;
+            }
             
             // Récupérer les objectifs existants si il y en a
             $existing_objectives = $this->Objective_model->get_monthly_objectives($data['selected_month']);
@@ -203,6 +212,18 @@ class Objectives extends BaseController {
             $this->session->set_flashdata('error', 'Erreur de session : utilisateur non identifié.');
             redirect('objectives/set_monthly');
             return;
+        }
+
+        // Validation supplémentaire pour les managers : vérifier que l'agent appartient à leur agence
+        if ($this->roleText === 'Manager' && !empty($this->agencyId)) {
+            $agency_agents = $this->Objective_model->get_agents_by_agency($this->agencyId);
+            $allowed_agent_ids = array_column($agency_agents, 'ID');
+            
+            if (!in_array($agent_id, $allowed_agent_ids)) {
+                $this->session->set_flashdata('error', 'Vous ne pouvez définir des objectifs que pour les agents de votre agence.');
+                redirect('objectives/set_monthly');
+                return;
+            }
         }
 
         $objectives = [

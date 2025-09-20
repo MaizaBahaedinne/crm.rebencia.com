@@ -474,6 +474,42 @@ class Objective_model extends CI_Model
     }
 
     /**
+     * Récupérer la liste des agents d'une agence spécifique
+     * @param int $agency_id L'ID de l'agence
+     * @return object[] Liste des agents de l'agence
+     */
+    public function get_agents_by_agency($agency_id) {
+        if (empty($agency_id)) {
+            return [];
+        }
+        
+        // Requête pour récupérer les agents d'une agence spécifique
+        $query = "
+            SELECT DISTINCT 
+                u.ID, 
+                u.display_name, 
+                u.user_email,
+                p.ID as agent_post_id,
+                p.post_title as agent_name,
+                agency.post_title as agency_name
+            FROM rebencia_RebenciaBD.wp_Hrg8P_users u
+            JOIN rebencia_RebenciaBD.wp_Hrg8P_usermeta um ON um.user_id = u.ID
+            JOIN rebencia_RebenciaBD.wp_Hrg8P_posts p ON p.post_author = u.ID
+            JOIN rebencia_RebenciaBD.wp_Hrg8P_postmeta pm ON pm.post_id = p.ID
+            JOIN rebencia_RebenciaBD.wp_Hrg8P_posts agency ON agency.ID = pm.meta_value
+            WHERE um.meta_key = 'wp_Hrg8P_capabilities'
+            AND um.meta_value LIKE '%houzez_agent%'
+            AND p.post_type = 'houzez_agent'
+            AND p.post_status = 'publish'
+            AND pm.meta_key = 'fave_agent_agencies'
+            AND pm.meta_value = ?
+            ORDER BY u.display_name ASC
+        ";
+        
+        return $this->wp_db->query($query, [$agency_id])->result();
+    }
+
+    /**
      * Mettre à jour les performances de tous les agents pour un mois donné
      */
     public function update_all_agents_performance($month) {
