@@ -1511,7 +1511,6 @@ class Agent_model extends CI_Model {
             u.user_email,
             u.user_nicename,
             p.ID as agent_post_id,
-            pm_avatar.meta_value as avatar_url,
             pm_avatar.meta_value as avatar_id,
             COALESCE(prop_count.property_count, 0) as property_count,
             p.post_type as user_role,
@@ -1550,6 +1549,9 @@ class Agent_model extends CI_Model {
             // Nettoyer les données
             $agent = $this->clean_agent_data($agent);
             
+            // Récupérer l'avatar complet
+            $agent->avatar_url = $this->get_agent_avatar_url($agent->user_id, $agent->avatar_id);
+            
             // Ajouter des statistiques par défaut si manquantes
             if (!isset($agent->properties_count)) {
                 $agent->properties_count = 0;
@@ -1563,6 +1565,78 @@ class Agent_model extends CI_Model {
         }
 
         return $agents;
+    }
+    
+    /**
+     * Récupère l'URL de l'avatar d'un agent
+     * @param int $user_id ID de l'utilisateur WordPress
+     * @param int $avatar_id ID de l'attachment avatar
+     * @return string|null URL de l'avatar
+     */
+    private function get_agent_avatar_url($user_id, $avatar_id = null) {
+        // Méthode 1: Avatar personnalisé HOUZEZ (fave_author_custom_picture)
+        $custom_avatar = $this->wp_db->select('meta_value')
+            ->from($this->usermeta_table)
+            ->where('user_id', $user_id)
+            ->where('meta_key', 'fave_author_custom_picture')
+            ->get()->row();
+            
+        if ($custom_avatar && !empty($custom_avatar->meta_value)) {
+            // Vérifier si c'est une URL directe ou un ID d'attachment
+            if (filter_var($custom_avatar->meta_value, FILTER_VALIDATE_URL)) {
+                return $custom_avatar->meta_value;
+            } elseif (is_numeric($custom_avatar->meta_value)) {
+                // Récupérer l'URL depuis l'attachment
+                $attachment = $this->wp_db->select('guid')
+                    ->from($this->posts_table)
+                    ->where('ID', $custom_avatar->meta_value)
+                    ->where('post_type', 'attachment')
+                    ->get()->row();
+                    
+                if ($attachment && !empty($attachment->guid)) {
+                    return $attachment->guid;
+                }
+            }
+        }
+        
+        // Méthode 2: Thumbnail ID (si fourni)
+        if ($avatar_id && is_numeric($avatar_id)) {
+            $thumbnail = $this->wp_db->select('guid')
+                ->from($this->posts_table)
+                ->where('ID', $avatar_id)
+                ->where('post_type', 'attachment')
+                ->get()->row();
+                
+            if ($thumbnail && !empty($thumbnail->guid)) {
+                return $thumbnail->guid;
+            }
+        }
+        
+        // Méthode 3: Avatar WordPress standard dans usermeta
+        $wp_avatar = $this->wp_db->select('meta_value')
+            ->from($this->usermeta_table)
+            ->where('user_id', $user_id)
+            ->where_in('meta_key', ['wp_user_avatar', 'avatar', 'profile_picture'])
+            ->get()->row();
+            
+        if ($wp_avatar && !empty($wp_avatar->meta_value)) {
+            if (filter_var($wp_avatar->meta_value, FILTER_VALIDATE_URL)) {
+                return $wp_avatar->meta_value;
+            } elseif (is_numeric($wp_avatar->meta_value)) {
+                $attachment = $this->wp_db->select('guid')
+                    ->from($this->posts_table)
+                    ->where('ID', $wp_avatar->meta_value)
+                    ->where('post_type', 'attachment')
+                    ->get()->row();
+                    
+                if ($attachment && !empty($attachment->guid)) {
+                    return $attachment->guid;
+                }
+            }
+        }
+        
+        // Aucun avatar trouvé
+        return null;
     }
 
 }

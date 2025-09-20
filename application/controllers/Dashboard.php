@@ -524,6 +524,168 @@ class Dashboard extends BaseController {
     }
     
     /**
+     * Test de la récupération d'avatars des agents
+     */
+    public function test_avatars() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Test Avatars - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".agent-card { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; }";
+        echo ".avatar { width: 60px; height: 60px; border-radius: 50%; margin-right: 15px; object-fit: cover; }";
+        echo ".avatar-placeholder { width: 60px; height: 60px; border-radius: 50%; margin-right: 15px; background: #007bff; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }";
+        echo ".success { background: #d4edda; border-color: #c3e6cb; }";
+        echo ".error { background: #f8d7da; border-color: #f5c6cb; }";
+        echo "pre { background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 12px; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🖼️ Test des Avatars des Agents</h1>";
+        
+        // Récupérer l'agency_id
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        echo "<p><strong>Agency ID utilisé:</strong> $agency_id</p>";
+        
+        // Récupérer les agents
+        echo "<h2>📋 Agents avec Avatars</h2>";
+        
+        try {
+            $agents = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
+            echo "<p><strong>Nombre d'agents trouvés:</strong> " . count($agents) . "</p>";
+            
+            if (!empty($agents)) {
+                foreach ($agents as $agent) {
+                    $has_avatar = !empty($agent->avatar_url);
+                    echo "<div class='agent-card " . ($has_avatar ? 'success' : 'error') . "'>";
+                    
+                    // Avatar ou placeholder
+                    if ($has_avatar) {
+                        echo "<img src='" . htmlspecialchars($agent->avatar_url) . "' alt='Avatar' class='avatar' onerror='this.style.display=\"none\"; this.nextElementSibling.style.display=\"flex\";'>";
+                        echo "<div class='avatar-placeholder' style='display: none;'>" . strtoupper(substr($agent->display_name, 0, 2)) . "</div>";
+                    } else {
+                        echo "<div class='avatar-placeholder'>" . strtoupper(substr($agent->display_name, 0, 2)) . "</div>";
+                    }
+                    
+                    echo "<div>";
+                    echo "<h3>" . htmlspecialchars($agent->display_name) . "</h3>";
+                    echo "<p><strong>Email:</strong> " . htmlspecialchars($agent->user_email) . "</p>";
+                    echo "<p><strong>User ID:</strong> " . $agent->user_id . "</p>";
+                    echo "<p><strong>Avatar URL:</strong> " . ($has_avatar ? htmlspecialchars($agent->avatar_url) : '<em>Aucun avatar</em>') . "</p>";
+                    
+                    if (isset($agent->avatar_id) && $agent->avatar_id) {
+                        echo "<p><strong>Avatar ID:</strong> " . $agent->avatar_id . "</p>";
+                    }
+                    
+                    echo "<details>";
+                    echo "<summary>Données complètes</summary>";
+                    echo "<pre>" . print_r($agent, true) . "</pre>";
+                    echo "</details>";
+                    echo "</div>";
+                    echo "</div>";
+                }
+            } else {
+                echo "<p class='error'>Aucun agent trouvé pour l'agence $agency_id</p>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<div class='error'>";
+            echo "<strong>Erreur:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        // Test des top performers
+        echo "<h2>🏆 Top Performers avec Avatars</h2>";
+        
+        try {
+            $top_performers = $this->get_top_performing_agents($agency_id);
+            echo "<p><strong>Nombre de top performers:</strong> " . count($top_performers) . "</p>";
+            
+            if (!empty($top_performers)) {
+                foreach ($top_performers as $index => $agent) {
+                    $has_avatar = !empty($agent->avatar_url);
+                    echo "<div class='agent-card " . ($has_avatar ? 'success' : 'error') . "'>";
+                    
+                    // Avatar ou placeholder
+                    if ($has_avatar) {
+                        echo "<img src='" . htmlspecialchars($agent->avatar_url) . "' alt='Avatar' class='avatar' onerror='this.style.display=\"none\"; this.nextElementSibling.style.display=\"flex\";'>";
+                        echo "<div class='avatar-placeholder' style='display: none;'>" . strtoupper(substr($agent->display_name, 0, 2)) . "</div>";
+                    } else {
+                        echo "<div class='avatar-placeholder'>" . strtoupper(substr($agent->display_name, 0, 2)) . "</div>";
+                    }
+                    
+                    echo "<div>";
+                    echo "<h3>#" . ($index + 1) . " - " . htmlspecialchars($agent->display_name) . "</h3>";
+                    echo "<p><strong>Ventes:</strong> " . ($agent->sales_count ?? 0) . " | <strong>Revenus:</strong> " . number_format($agent->revenue ?? 0, 0, ',', ' ') . " €</p>";
+                    echo "<p><strong>Avatar URL:</strong> " . ($has_avatar ? htmlspecialchars($agent->avatar_url) : '<em>Aucun avatar</em>') . "</p>";
+                    echo "</div>";
+                    echo "</div>";
+                }
+            }
+            
+        } catch (Exception $e) {
+            echo "<div class='error'>";
+            echo "<strong>Erreur Top Performers:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        // Test de recherche directe dans la base de données
+        echo "<h2>🔍 Recherche Directe Avatar dans WordPress</h2>";
+        
+        try {
+            $this->load->database('wordpress');
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            // Rechercher les avatars personnalisés HOUZEZ
+            $avatars_query = $wp_db->select('u.ID, u.user_login, u.user_email, um.meta_value as avatar')
+                                   ->from('users u')
+                                   ->join('usermeta um', 'u.ID = um.user_id')
+                                   ->where('um.meta_key', 'fave_author_custom_picture')
+                                   ->where('um.meta_value !=', '')
+                                   ->limit(10)
+                                   ->get();
+            
+            echo "<h3>Avatars HOUZEZ trouvés (fave_author_custom_picture):</h3>";
+            if ($avatars_query->num_rows() > 0) {
+                foreach ($avatars_query->result() as $avatar_user) {
+                    echo "<div class='agent-card'>";
+                    
+                    // Tester si c'est une URL ou un ID
+                    $avatar_value = $avatar_user->avatar;
+                    if (filter_var($avatar_value, FILTER_VALIDATE_URL)) {
+                        echo "<img src='" . htmlspecialchars($avatar_value) . "' alt='Avatar' class='avatar' onerror='this.style.display=\"none\"; this.nextElementSibling.style.display=\"flex\";'>";
+                        echo "<div class='avatar-placeholder' style='display: none;'>" . strtoupper(substr($avatar_user->user_login, 0, 2)) . "</div>";
+                    } else {
+                        echo "<div class='avatar-placeholder'>" . strtoupper(substr($avatar_user->user_login, 0, 2)) . "</div>";
+                    }
+                    
+                    echo "<div>";
+                    echo "<strong>" . htmlspecialchars($avatar_user->user_login) . "</strong><br>";
+                    echo "<small>" . htmlspecialchars($avatar_user->user_email) . "</small><br>";
+                    echo "<small>Avatar: " . htmlspecialchars($avatar_value) . "</small>";
+                    echo "</div>";
+                    echo "</div>";
+                }
+            } else {
+                echo "<p>Aucun avatar HOUZEZ trouvé</p>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<div class='error'>";
+            echo "<strong>Erreur recherche directe:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
+    /**
      * Test de la récupération d'agency_id depuis wp_Hrg8P_crm_agents
      */
     public function test_agency_id_recovery() {
