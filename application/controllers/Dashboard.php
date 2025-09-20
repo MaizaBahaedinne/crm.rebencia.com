@@ -452,6 +452,77 @@ class Dashboard extends BaseController {
         $this->loadViews('dashboard/manager', $this->global, $data, NULL);
     }
     
+    /**
+     * Méthode de débogage pour voir la structure des données d'agents
+     */
+    public function debug_agents() {
+        $this->isLoggedIn();
+        
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        
+        echo "<h1>Debug - Structure des agents</h1>";
+        echo "<p><strong>Agency ID:</strong> $agency_id</p>";
+        
+        // Test de la vue directement
+        try {
+            $this->load->database('wordpress');
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            // Vérifier l'existence de la vue
+            $check = $wp_db->query("SHOW TABLES LIKE 'wp_Hrg8P_crm_agents'");
+            echo "<p><strong>Vue wp_Hrg8P_crm_agents existe:</strong> " . ($check->num_rows() > 0 ? 'OUI' : 'NON') . "</p>";
+            
+            if ($check->num_rows() > 0) {
+                // Afficher la structure
+                $columns = $wp_db->query("SHOW COLUMNS FROM wp_Hrg8P_crm_agents");
+                echo "<h2>Colonnes disponibles:</h2><ul>";
+                foreach ($columns->result() as $col) {
+                    echo "<li><strong>" . $col->Field . "</strong> (" . $col->Type . ")</li>";
+                }
+                echo "</ul>";
+                
+                // Afficher un échantillon de données
+                $sample = $wp_db->query("SELECT * FROM wp_Hrg8P_crm_agents WHERE agency_id = $agency_id LIMIT 3");
+                echo "<h2>Données d'exemple (agency_id = $agency_id):</h2>";
+                if ($sample->num_rows() > 0) {
+                    echo "<pre>";
+                    foreach ($sample->result() as $row) {
+                        print_r($row);
+                        echo "\n---\n";
+                    }
+                    echo "</pre>";
+                } else {
+                    echo "<p>Aucune donnée trouvée pour agency_id = $agency_id</p>";
+                    
+                    // Essayer avec toutes les agences
+                    $all_sample = $wp_db->query("SELECT * FROM wp_Hrg8P_crm_agents LIMIT 3");
+                    echo "<h3>Données d'exemple (toutes agences):</h3>";
+                    if ($all_sample->num_rows() > 0) {
+                        echo "<pre>";
+                        foreach ($all_sample->result() as $row) {
+                            print_r($row);
+                            echo "\n---\n";
+                        }
+                        echo "</pre>";
+                    }
+                }
+            }
+            
+        } catch (Exception $e) {
+            echo "<p style='color: red;'>Erreur: " . $e->getMessage() . "</p>";
+        }
+        
+        // Test de la méthode filtrée
+        echo "<h2>Test de get_filtered_agents_from_view():</h2>";
+        $agents = $this->get_filtered_agents_from_view($agency_id);
+        echo "<p><strong>Nombre d'agents retournés:</strong> " . count($agents) . "</p>";
+        if (!empty($agents)) {
+            echo "<h3>Premier agent:</h3><pre>";
+            print_r($agents[0]);
+            echo "</pre>";
+        }
+    }
+    
     // Méthodes helper pour les statistiques du dashboard manager
     private function get_agency_properties_count($agency_id) {
         try {
@@ -597,42 +668,31 @@ class Dashboard extends BaseController {
             $this->load->database('wordpress');
             $wp_db = $this->load->database('wordpress', TRUE);
             
+            // D'abord, récupérer la structure de la vue pour connaître les colonnes disponibles
+            $columns_query = $wp_db->query("SHOW COLUMNS FROM wp_Hrg8P_crm_agents");
+            $available_columns = [];
+            if ($columns_query) {
+                foreach ($columns_query->result() as $col) {
+                    $available_columns[] = $col->Field;
+                }
+            }
+            
             // Utiliser directement la vue wp_Hrg8P_crm_agents avec filtre par agency_id
             $wp_db->select('*');
             $wp_db->from('wp_Hrg8P_crm_agents');
             $wp_db->where('agency_id', $agency_id);
-            // Pas de tri pour éviter les erreurs de colonnes inexistantes
             
             $query = $wp_db->get();
             $agents = $query->result();
             
-            // Nettoyer et enrichir les données si nécessaire
+            // Nettoyer et enrichir les données selon les colonnes disponibles
             foreach ($agents as &$agent) {
-                // S'assurer que les propriétés nécessaires existent
-                if (!isset($agent->property_count)) {
-                    $agent->property_count = 0;
-                }
-                if (!isset($agent->avatar_url)) {
-                    $agent->avatar_url = '';
-                }
-                // Mapper les champs si nécessaire pour compatibilité
-                if (!isset($agent->display_name) && isset($agent->user_login)) {
-                    $agent->display_name = $agent->user_login;
-                }
-                if (!isset($agent->display_name) && isset($agent->user_email)) {
-                    $agent->display_name = $agent->user_email;
-                }
-                if (!isset($agent->display_name)) {
-                    $agent->display_name = 'Agent';
-                }
-                $agent->user_id = $agent->ID ?? 0;
-                $agent->agent_post_id = $agent->ID ?? 0;
+                // Mapping intelligent des champs selon les colonnes disponibles
+                $this->map_agent_fields($agent, $available_columns);
             }
             
-            // Tri en PHP pour éviter les problèmes SQL
-            usort($agents, function($a, $b) {
-                return strcmp($a->display_name, $b->display_name);
-            });
+            // Tri en PHP selon le champ de nom disponible
+            $this->sort_agents_by_name($agents);
             
             return $agents;
             
@@ -640,6 +700,70 @@ class Dashboard extends BaseController {
             // En cas d'erreur, utiliser la méthode de fallback
             return $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
         }
+    }
+    
+    /**
+     * Mappe les champs de l'agent selon les colonnes disponibles
+     */
+    private function map_agent_fields(&$agent, $available_columns) {
+        // S'assurer que les propriétés nécessaires existent
+        if (!isset($agent->property_count)) {
+            $agent->property_count = 0;
+        }
+        if (!isset($agent->avatar_url)) {
+            $agent->avatar_url = '';
+        }
+        
+        // Mapping du nom d'affichage selon les colonnes disponibles
+        if (!isset($agent->display_name)) {
+            if (in_array('user_nicename', $available_columns) && !empty($agent->user_nicename)) {
+                $agent->display_name = $agent->user_nicename;
+            } elseif (in_array('user_login', $available_columns) && !empty($agent->user_login)) {
+                $agent->display_name = $agent->user_login;
+            } elseif (in_array('user_email', $available_columns) && !empty($agent->user_email)) {
+                $agent->display_name = explode('@', $agent->user_email)[0];
+            } elseif (in_array('post_title', $available_columns) && !empty($agent->post_title)) {
+                $agent->display_name = $agent->post_title;
+            } else {
+                $agent->display_name = 'Agent #' . ($agent->ID ?? 'N/A');
+            }
+        }
+        
+        // Mapping de l'email
+        if (!isset($agent->user_email) && in_array('user_email', $available_columns)) {
+            $agent->user_email = $agent->user_email ?? '';
+        }
+        
+        // Mapping du nom d'utilisateur
+        if (!isset($agent->user_nicename) && in_array('user_nicename', $available_columns)) {
+            $agent->user_nicename = $agent->user_nicename ?? $agent->display_name;
+        }
+        
+        // Mapping du rôle utilisateur
+        if (!isset($agent->user_role)) {
+            if (in_array('post_type', $available_columns) && !empty($agent->post_type)) {
+                $agent->user_role = $agent->post_type;
+            } elseif (in_array('user_role', $available_columns) && !empty($agent->user_role)) {
+                // Déjà défini
+            } else {
+                $agent->user_role = 'houzez_agent'; // Valeur par défaut
+            }
+        }
+        
+        // Mapping des IDs
+        $agent->user_id = $agent->ID ?? $agent->user_id ?? 0;
+        $agent->agent_post_id = $agent->ID ?? $agent->agent_post_id ?? 0;
+    }
+    
+    /**
+     * Trie les agents par nom
+     */
+    private function sort_agents_by_name(&$agents) {
+        usort($agents, function($a, $b) {
+            $name_a = $a->display_name ?? '';
+            $name_b = $b->display_name ?? '';
+            return strcmp($name_a, $name_b);
+        });
     }
 
     // Vue Agent : tableau de bord moderne et premium
