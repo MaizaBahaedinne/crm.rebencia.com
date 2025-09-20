@@ -416,22 +416,8 @@ class Dashboard extends BaseController {
         $data = $this->global;
         $data['pageTitle'] = 'Tableau de bord Manager';
         
-        // Récupérer l'agency_id depuis la session ou les métadonnées
-        $agency_id = $this->session->userdata('agency_id');
-        $user_id = $this->session->userdata('wp_id');
-        
-        // Si pas d'agency_id en session, le récupérer depuis les métadonnées
-        if (!$agency_id && $user_id) {
-            $wp_db = $this->load->database('wordpress', TRUE);
-            $meta_query = $wp_db->where('user_id', $user_id)
-                                ->where('meta_key', 'houzez_agency_id')
-                                ->get('wp_Hrg8P_usermeta');
-            if ($meta_query->num_rows() > 0) {
-                $agency_id = $meta_query->row()->meta_value;
-                // Sauvegarder en session pour les prochaines fois
-                $this->session->set_userdata('agency_id', $agency_id);
-            }
-        }
+        // Récupérer l'agency_id depuis BaseController (session)
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id');
         
         // Fallback agency_id par défaut si toujours pas trouvé
         if (!$agency_id) {
@@ -440,7 +426,7 @@ class Dashboard extends BaseController {
         
         // Récupérer les données de l'agence et ses agents avec avatars
         $data['agency'] = $this->agency_model->get_agency($agency_id);
-        $data['agents'] = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
+        $data['agents'] = $this->get_filtered_agents_from_view($agency_id);
         
         // Statistiques détaillées pour le tableau de bord
         $data['stats'] = [
@@ -601,6 +587,45 @@ class Dashboard extends BaseController {
             'Vendu' => rand(5, 15),
             'Loué' => rand(8, 20)
         ];
+    }
+    
+    /**
+     * Récupère les agents filtrés depuis la vue wp_Hrg8P_crm_agents par agency_id
+     */
+    private function get_filtered_agents_from_view($agency_id) {
+        try {
+            $this->load->database('wordpress');
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            // Utiliser directement la vue wp_Hrg8P_crm_agents avec filtre par agency_id
+            $wp_db->select('*');
+            $wp_db->from('wp_Hrg8P_crm_agents');
+            $wp_db->where('agency_id', $agency_id);
+            $wp_db->order_by('display_name', 'ASC');
+            
+            $query = $wp_db->get();
+            $agents = $query->result();
+            
+            // Nettoyer et enrichir les données si nécessaire
+            foreach ($agents as &$agent) {
+                // S'assurer que les propriétés nécessaires existent
+                if (!isset($agent->property_count)) {
+                    $agent->property_count = 0;
+                }
+                if (!isset($agent->avatar_url)) {
+                    $agent->avatar_url = '';
+                }
+                // Mapper les champs si nécessaire
+                $agent->user_id = $agent->ID ?? 0;
+                $agent->agent_post_id = $agent->ID ?? 0;
+            }
+            
+            return $agents;
+            
+        } catch (Exception $e) {
+            // En cas d'erreur, utiliser la méthode de fallback
+            return $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
+        }
     }
 
     // Vue Agent : tableau de bord moderne et premium
