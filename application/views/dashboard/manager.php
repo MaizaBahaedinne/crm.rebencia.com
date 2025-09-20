@@ -390,6 +390,155 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Section Transactions : Évolution des ventes et locations + Objectifs -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-0 pb-0">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-exchange-line me-2 text-success"></i>
+                                Rubrique Transactions
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Évolution des ventes et locations -->
+                            <div class="row mb-4">
+                                <div class="col-lg-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-header bg-transparent border-0">
+                                            <h6 class="mb-0 text-success">
+                                                <i class="ri-home-4-line me-2"></i>
+                                                Évolution des Ventes
+                                            </h6>
+                                        </div>
+                                        <div class="card-body pt-2">
+                                            <canvas id="salesEvolutionChart" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-header bg-transparent border-0">
+                                            <h6 class="mb-0 text-info">
+                                                <i class="ri-key-2-line me-2"></i>
+                                                Évolution des Locations
+                                            </h6>
+                                        </div>
+                                        <div class="card-body pt-2">
+                                            <canvas id="rentalsEvolutionChart" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Affichage des objectifs et pourcentages d'avancement -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6 class="mb-3">
+                                        <i class="ri-target-line me-2 text-warning"></i>
+                                        Objectifs et Progression des Agents
+                                    </h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Agent</th>
+                                                    <th class="text-center">Estimations</th>
+                                                    <th class="text-center">Transactions</th>
+                                                    <th class="text-center">Chiffre d'Affaires</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php if (!empty($transactions_data['objectives_progress'])): ?>
+                                                    <?php foreach ($transactions_data['objectives_progress'] as $objective): ?>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center me-3">
+                                                                    <span class="text-primary fw-bold">
+                                                                        <?= strtoupper(substr($objective['agent_name'], 0, 2)) ?>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <h6 class="mb-0"><?= htmlspecialchars($objective['agent_name']) ?></h6>
+                                                                    <small class="text-muted">Agent ID: <?= $objective['agent_id'] ?></small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">
+                                                                    <?= $objective['estimations_actual'] ?> / <?= $objective['estimations_target'] ?>
+                                                                </small>
+                                                            </div>
+                                                            <div class="progress" style="height: 8px;">
+                                                                <div class="progress-bar bg-primary" 
+                                                                     style="width: <?= min($objective['estimations_progress'], 100) ?>%"
+                                                                     title="<?= $objective['estimations_progress'] ?>%">
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-1">
+                                                                <span class="badge <?= $objective['estimations_progress'] >= 100 ? 'bg-success' : 'bg-warning' ?> fs-12">
+                                                                    <?= $objective['estimations_progress'] ?>%
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">
+                                                                    <?= $objective['transactions_actual'] ?> / <?= $objective['transactions_target'] ?>
+                                                                </small>
+                                                            </div>
+                                                            <div class="progress" style="height: 8px;">
+                                                                <div class="progress-bar bg-success" 
+                                                                     style="width: <?= min($objective['transactions_progress'], 100) ?>%"
+                                                                     title="<?= $objective['transactions_progress'] ?>%">
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-1">
+                                                                <span class="badge <?= $objective['transactions_progress'] >= 100 ? 'bg-success' : 'bg-warning' ?> fs-12">
+                                                                    <?= $objective['transactions_progress'] ?>%
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">
+                                                                    <?= number_format($objective['revenue_actual'], 0, ',', ' ') ?> TND / <?= number_format($objective['revenue_target'], 0, ',', ' ') ?> TND
+                                                                </small>
+                                                            </div>
+                                                            <div class="progress" style="height: 8px;">
+                                                                <div class="progress-bar bg-info" 
+                                                                     style="width: <?= min($objective['revenue_progress'], 100) ?>%"
+                                                                     title="<?= $objective['revenue_progress'] ?>%">
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-1">
+                                                                <span class="badge <?= $objective['revenue_progress'] >= 100 ? 'bg-success' : 'bg-warning' ?> fs-12">
+                                                                    <?= $objective['revenue_progress'] ?>%
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted py-4">
+                                                            <i class="ri-information-line me-2"></i>
+                                                            Aucun objectif défini pour ce mois
+                                                        </td>
+                                                    </tr>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -490,6 +639,152 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateCounter();
     });
+    
+    // Graphique d'évolution des ventes
+    const salesEvolutionCtx = document.getElementById('salesEvolutionChart');
+    if (salesEvolutionCtx) {
+        new Chart(salesEvolutionCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [<?php 
+                    if (!empty($transactions_data['sales_evolution'])) {
+                        echo implode(',', array_map(function($item) { 
+                            return '"' . $item['month'] . '"'; 
+                        }, $transactions_data['sales_evolution']));
+                    }
+                ?>],
+                datasets: [{
+                    label: 'Nombre de ventes',
+                    data: [<?php 
+                        if (!empty($transactions_data['sales_evolution'])) {
+                            echo implode(',', array_map(function($item) { 
+                                return $item['count']; 
+                            }, $transactions_data['sales_evolution']));
+                        }
+                    ?>],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Montant des ventes (TND)',
+                    data: [<?php 
+                        if (!empty($transactions_data['sales_evolution'])) {
+                            echo implode(',', array_map(function($item) { 
+                                return $item['amount']; 
+                            }, $transactions_data['sales_evolution']));
+                        }
+                    ?>],
+                    borderColor: '#17a2b8',
+                    backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Nombre de ventes'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Montant (TND)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+    }
+    
+    // Graphique d'évolution des locations
+    const rentalsEvolutionCtx = document.getElementById('rentalsEvolutionChart');
+    if (rentalsEvolutionCtx) {
+        new Chart(rentalsEvolutionCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [<?php 
+                    if (!empty($transactions_data['rentals_evolution'])) {
+                        echo implode(',', array_map(function($item) { 
+                            return '"' . $item['month'] . '"'; 
+                        }, $transactions_data['rentals_evolution']));
+                    }
+                ?>],
+                datasets: [{
+                    label: 'Nombre de locations',
+                    data: [<?php 
+                        if (!empty($transactions_data['rentals_evolution'])) {
+                            echo implode(',', array_map(function($item) { 
+                                return $item['count']; 
+                            }, $transactions_data['rentals_evolution']));
+                        }
+                    ?>],
+                    borderColor: '#6f42c1',
+                    backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Montant des locations (TND)',
+                    data: [<?php 
+                        if (!empty($transactions_data['rentals_evolution'])) {
+                            echo implode(',', array_map(function($item) { 
+                                return $item['amount']; 
+                            }, $transactions_data['rentals_evolution']));
+                        }
+                    ?>],
+                    borderColor: '#20c997',
+                    backgroundColor: 'rgba(32, 201, 151, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Nombre de locations'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Montant (TND)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+    }
 });
 </script>
 
