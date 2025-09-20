@@ -523,6 +523,179 @@ class Dashboard extends BaseController {
         }
     }
     
+    /**
+     * Affiche tous les détails de la session utilisateur connecté
+     */
+    public function debug_session() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Debug Session - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo "h2 { background: #ecf0f1; padding: 10px; border-left: 4px solid #3498db; }";
+        echo ".info-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo "pre { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; }";
+        echo ".property { margin: 5px 0; padding: 5px; background: #e8f4fd; border-left: 3px solid #007bff; }";
+        echo ".value { font-weight: bold; color: #007bff; }";
+        echo ".null { color: #dc3545; font-style: italic; }";
+        echo ".empty { color: #ffc107; font-style: italic; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🔍 Debug - Session Utilisateur Connecté</h1>";
+        echo "<p><strong>Date/Heure:</strong> " . date('Y-m-d H:i:s') . "</p>";
+        
+        // 1. Données de session CodeIgniter
+        echo "<h2>📊 Données de Session CodeIgniter</h2>";
+        echo "<div class='info-box'>";
+        $session_data = $this->session->all_userdata();
+        if (!empty($session_data)) {
+            foreach ($session_data as $key => $value) {
+                echo "<div class='property'>";
+                echo "<strong>$key:</strong> ";
+                if (is_null($value)) {
+                    echo "<span class='null'>NULL</span>";
+                } elseif (is_array($value) || is_object($value)) {
+                    echo "<pre>" . print_r($value, true) . "</pre>";
+                } elseif (empty($value) && $value !== '0') {
+                    echo "<span class='empty'>EMPTY</span>";
+                } else {
+                    echo "<span class='value'>" . htmlspecialchars($value) . "</span>";
+                }
+                echo "</div>";
+            }
+        } else {
+            echo "<p>Aucune donnée de session trouvée</p>";
+        }
+        echo "</div>";
+        
+        // 2. Propriétés du BaseController
+        echo "<h2>🏗️ Propriétés BaseController</h2>";
+        echo "<div class='info-box'>";
+        $properties = [
+            'role' => $this->role,
+            'vendorId' => $this->vendorId,
+            'name' => $this->name,
+            'roleText' => $this->roleText,
+            'isAdmin' => $this->isAdmin,
+            'lastLogin' => $this->lastLogin,
+            'module' => $this->module,
+            'wp_avatar' => $this->wp_avatar,
+            'userPostId' => $this->userPostId,
+            'agencyId' => $this->agencyId,
+        ];
+        
+        foreach ($properties as $prop => $value) {
+            echo "<div class='property'>";
+            echo "<strong>$prop:</strong> ";
+            if (is_null($value)) {
+                echo "<span class='null'>NULL</span>";
+            } elseif (empty($value) && $value !== '0') {
+                echo "<span class='empty'>EMPTY</span>";
+            } else {
+                echo "<span class='value'>" . htmlspecialchars($value) . "</span>";
+            }
+            echo "</div>";
+        }
+        echo "</div>";
+        
+        // 3. Variable globale $this->global
+        echo "<h2>🌐 Variable Global</h2>";
+        echo "<div class='info-box'>";
+        if (!empty($this->global)) {
+            foreach ($this->global as $key => $value) {
+                echo "<div class='property'>";
+                echo "<strong>$key:</strong> ";
+                if (is_null($value)) {
+                    echo "<span class='null'>NULL</span>";
+                } elseif (is_array($value) || is_object($value)) {
+                    echo "<pre>" . print_r($value, true) . "</pre>";
+                } elseif (empty($value) && $value !== '0') {
+                    echo "<span class='empty'>EMPTY</span>";
+                } else {
+                    echo "<span class='value'>" . htmlspecialchars($value) . "</span>";
+                }
+                echo "</div>";
+            }
+        } else {
+            echo "<p>Variable global vide</p>";
+        }
+        echo "</div>";
+        
+        // 4. Informations sur l'utilisateur WordPress
+        echo "<h2>👤 Informations Utilisateur WordPress</h2>";
+        echo "<div class='info-box'>";
+        $wp_id = $this->session->userdata('wp_id');
+        if ($wp_id) {
+            try {
+                $this->load->database('wordpress');
+                $wp_db = $this->load->database('wordpress', TRUE);
+                
+                // Récupérer les données utilisateur
+                $user_query = $wp_db->where('ID', $wp_id)->get('users');
+                if ($user_query->num_rows() > 0) {
+                    $user = $user_query->row();
+                    echo "<h3>Données utilisateur:</h3>";
+                    echo "<pre>" . print_r($user, true) . "</pre>";
+                }
+                
+                // Récupérer les métadonnées utilisateur
+                $meta_query = $wp_db->where('user_id', $wp_id)->get('usermeta');
+                if ($meta_query->num_rows() > 0) {
+                    echo "<h3>Métadonnées utilisateur:</h3>";
+                    foreach ($meta_query->result() as $meta) {
+                        echo "<div class='property'>";
+                        echo "<strong>" . $meta->meta_key . ":</strong> ";
+                        echo "<span class='value'>" . htmlspecialchars($meta->meta_value) . "</span>";
+                        echo "</div>";
+                    }
+                }
+                
+            } catch (Exception $e) {
+                echo "<p style='color: red;'>Erreur: " . $e->getMessage() . "</p>";
+            }
+        } else {
+            echo "<p>Aucun wp_id en session</p>";
+        }
+        echo "</div>";
+        
+        // 5. Test de récupération d'agency_id
+        echo "<h2>🏢 Test Récupération Agency ID</h2>";
+        echo "<div class='info-box'>";
+        echo "<div class='property'><strong>agencyId (BaseController):</strong> <span class='value'>" . ($this->agencyId ?: 'EMPTY') . "</span></div>";
+        echo "<div class='property'><strong>agency_id (Session):</strong> <span class='value'>" . ($this->session->userdata('agency_id') ?: 'EMPTY') . "</span></div>";
+        
+        // Méthode utilisée dans le dashboard manager
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id');
+        if (!$agency_id) {
+            $agency_id = 1; // Fallback
+        }
+        echo "<div class='property'><strong>agency_id final utilisé:</strong> <span class='value'>$agency_id</span></div>";
+        echo "</div>";
+        
+        // 6. Variables superglobales utiles
+        echo "<h2>🔧 Variables Serveur</h2>";
+        echo "<div class='info-box'>";
+        $server_vars = ['HTTP_HOST', 'REQUEST_URI', 'HTTP_USER_AGENT', 'REMOTE_ADDR'];
+        foreach ($server_vars as $var) {
+            if (isset($_SERVER[$var])) {
+                echo "<div class='property'>";
+                echo "<strong>$var:</strong> ";
+                echo "<span class='value'>" . htmlspecialchars($_SERVER[$var]) . "</span>";
+                echo "</div>";
+            }
+        }
+        echo "</div>";
+        
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
     // Méthodes helper pour les statistiques du dashboard manager
     private function get_agency_properties_count($agency_id) {
         try {
