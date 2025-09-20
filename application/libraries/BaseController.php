@@ -55,6 +55,17 @@ class BaseController extends CI_Controller {
 			$this->wp_avatar = $CI->session->userdata('wp_avatar');
 			$this->userPostId = $CI->session->userdata('user_post_id');
 			
+			// Vérification et correction de user_post_id si nécessaire
+			if (empty($this->userPostId) || $this->userPostId == $this->vendorId) {
+				// Récupérer le vrai agent_post_id depuis wp_Hrg8P_crm_agents
+				$real_agent_post_id = $this->getRealAgentPostId($this->vendorId);
+				if ($real_agent_post_id) {
+					$this->userPostId = $real_agent_post_id;
+					// Mettre à jour la session
+					$CI->session->set_userdata('user_post_id', $real_agent_post_id);
+				}
+			}
+			
 			// Récupération intelligente de l'agency_id
 			$this->agencyId = $CI->session->userdata('agency_id');
 			
@@ -263,5 +274,25 @@ class BaseController extends CI_Controller {
 			"page" => $page,
 			"segment" => $segment
 		);
+	}
+	
+	/**
+	 * Récupère le vrai agent_post_id depuis wp_Hrg8P_crm_agents
+	 */
+	private function getRealAgentPostId($user_id) {
+		$CI =& get_instance();
+		$CI->load->database();
+		
+		$query = $CI->db->select('agent_post_id')
+						->from('wp_Hrg8P_crm_agents')
+						->where('user_id', $user_id)
+						->get();
+		
+		if ($query->num_rows() > 0) {
+			$result = $query->row();
+			return $result->agent_post_id;
+		}
+		
+		return null;
 	}
 }
