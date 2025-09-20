@@ -217,7 +217,7 @@ class Objectives extends BaseController {
         // Validation supplémentaire pour les managers : vérifier que l'agent appartient à leur agence
         if ($this->roleText === 'Manager' && !empty($this->agencyId)) {
             $agency_agents = $this->Objective_model->get_agents_by_agency($this->agencyId);
-            $allowed_agent_ids = array_column($agency_agents, 'ID');
+            $allowed_agent_ids = array_column($agency_agents, 'user_id');
             
             if (!in_array($agent_id, $allowed_agent_ids)) {
                 $this->session->set_flashdata('error', 'Vous ne pouvez définir des objectifs que pour les agents de votre agence.');

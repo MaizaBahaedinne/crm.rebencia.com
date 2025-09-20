@@ -460,14 +460,43 @@ class Objective_model extends CI_Model
      * Récupérer la liste des agents depuis WordPress
      */
     public function get_agents() {
-        // Utiliser une requête SQL directe pour s'assurer d'utiliser la bonne base
+        // Utiliser la vue wp_Hrg8P_crm_agents pour avoir toutes les données complètes
         $query = "
-            SELECT u.ID, u.display_name, u.user_email
-            FROM rebencia_RebenciaBD.wp_Hrg8P_users u
-            JOIN rebencia_RebenciaBD.wp_Hrg8P_usermeta um ON um.user_id = u.ID
-            WHERE um.meta_key = 'wp_Hrg8P_capabilities'
-            AND um.meta_value LIKE '%houzez_agent%'
-            ORDER BY u.display_name ASC
+            SELECT 
+                user_id,
+                user_login,
+                user_email,
+                user_status,
+                registration_date,
+                agent_post_id,
+                agent_name,
+                post_status,
+                agent_email,
+                agency_id,
+                agency_name,
+                phone,
+                mobile,
+                whatsapp,
+                skype,
+                website,
+                agent_avatar,
+                position,
+                facebook,
+                twitter,
+                linkedin,
+                googleplus,
+                youtube,
+                tiktok,
+                instagram,
+                pinterest,
+                vimeo,
+                postal_code,
+                user_roles,
+                user_id as ID,
+                agent_name as display_name
+            FROM rebencia_RebenciaBD.wp_Hrg8P_crm_agents
+            WHERE post_status = 'publish'
+            ORDER BY agent_name ASC
         ";
         
         return $this->wp_db->query($query)->result();
@@ -483,27 +512,44 @@ class Objective_model extends CI_Model
             return [];
         }
         
-        // Requête pour récupérer les agents d'une agence spécifique
+        // Utiliser la vue wp_Hrg8P_crm_agents existante pour avoir toutes les données complètes
         $query = "
-            SELECT DISTINCT 
-                u.ID, 
-                u.display_name, 
-                u.user_email,
-                p.ID as agent_post_id,
-                p.post_title as agent_name,
-                agency.post_title as agency_name
-            FROM rebencia_RebenciaBD.wp_Hrg8P_users u
-            JOIN rebencia_RebenciaBD.wp_Hrg8P_usermeta um ON um.user_id = u.ID
-            JOIN rebencia_RebenciaBD.wp_Hrg8P_posts p ON p.post_author = u.ID
-            JOIN rebencia_RebenciaBD.wp_Hrg8P_postmeta pm ON pm.post_id = p.ID
-            JOIN rebencia_RebenciaBD.wp_Hrg8P_posts agency ON agency.ID = pm.meta_value
-            WHERE um.meta_key = 'wp_Hrg8P_capabilities'
-            AND um.meta_value LIKE '%houzez_agent%'
-            AND p.post_type = 'houzez_agent'
-            AND p.post_status = 'publish'
-            AND pm.meta_key = 'fave_agent_agencies'
-            AND pm.meta_value = ?
-            ORDER BY u.display_name ASC
+            SELECT 
+                user_id,
+                user_login,
+                user_email,
+                user_status,
+                registration_date,
+                agent_post_id,
+                agent_name,
+                post_status,
+                agent_email,
+                agency_id,
+                agency_name,
+                phone,
+                mobile,
+                whatsapp,
+                skype,
+                website,
+                agent_avatar,
+                position,
+                facebook,
+                twitter,
+                linkedin,
+                googleplus,
+                youtube,
+                tiktok,
+                instagram,
+                pinterest,
+                vimeo,
+                postal_code,
+                user_roles,
+                user_id as ID,
+                agent_name as display_name
+            FROM rebencia_RebenciaBD.wp_Hrg8P_crm_agents
+            WHERE agency_id = ?
+            AND post_status = 'publish'
+            ORDER BY agent_name ASC
         ";
         
         return $this->wp_db->query($query, [$agency_id])->result();

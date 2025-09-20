@@ -70,8 +70,11 @@
                                                 <option value="">Sélectionner un agent</option>
                                                 <?php if (!empty($agents)): ?>
                                                     <?php foreach ($agents as $agent): ?>
-                                                        <option value="<?php echo $agent->ID; ?>">
-                                                            <?php echo htmlspecialchars($agent->display_name); ?>
+                                                        <option value="<?php echo $agent->user_id ?? $agent->ID; ?>">
+                                                            <?php echo htmlspecialchars($agent->agent_name ?? $agent->display_name); ?>
+                                                            <?php if (!empty($agent->agency_name)): ?>
+                                                                <small> - <?php echo htmlspecialchars($agent->agency_name); ?></small>
+                                                            <?php endif; ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 <?php endif; ?>
