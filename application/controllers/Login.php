@@ -164,7 +164,7 @@ class Login extends CI_Controller {
                 } else {
                     $sessionData['user_post_id'] = $user->ID;
                 }
-                if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; }
+                if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; $sessionData['agency_id'] = $agency_id; }
                 if ($mappedRole === 'agency') { $sessionData['agency_id'] = $agency_id; }
                 // Assurer disponibilité session
                 $this->session->set_userdata($sessionData);
