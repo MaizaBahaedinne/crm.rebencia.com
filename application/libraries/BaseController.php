@@ -276,23 +276,22 @@ class BaseController extends CI_Controller {
 		);
 	}
 	
-	/**
-	 * Récupère le vrai agent_post_id depuis wp_Hrg8P_crm_agents
-	 */
-	private function getRealAgentPostId($user_id) {
-		$CI =& get_instance();
-		$CI->load->database();
-		
-		$query = $CI->db->select('agent_post_id')
-						->from('wp_Hrg8P_crm_agents')
-						->where('user_id', $user_id)
-						->get();
-		
-		if ($query->num_rows() > 0) {
-			$result = $query->row();
-			return $result->agent_post_id;
-		}
-		
-		return null;
-	}
+       /**
+	* Récupère le vrai agent_post_id depuis la base WordPress
+	*/
+       private function getRealAgentPostId($user_id) {
+	       $CI =& get_instance();
+	       // Charger la connexion WordPress
+	       $wpdb = $CI->load->database('wordpress', TRUE);
+	       $table = $wpdb->dbprefix . 'crm_agents';
+	       $query = $wpdb->select('agent_post_id')
+			       ->from($table)
+			       ->where('user_id', $user_id)
+			       ->get();
+	       if ($query->num_rows() > 0) {
+		       $result = $query->row();
+		       return $result->agent_post_id;
+	       }
+	       return null;
+       }
 }
