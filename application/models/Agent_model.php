@@ -1458,10 +1458,7 @@ class Agent_model extends CI_Model {
             pm_avatar.meta_value as avatar_url,
             pm_avatar.meta_value as avatar_id,
             COALESCE(prop_count.property_count, 0) as property_count,
-            CASE 
-                WHEN p.post_type = "houzez_manager" THEN "houzez_manager"
-                ELSE "houzez_agent"
-            END as user_role,
+            p.post_type as user_role,
             agency.post_title as agency_name,
             agency.ID as agency_id
         ', FALSE);
@@ -1517,10 +1514,7 @@ class Agent_model extends CI_Model {
             pm_avatar.meta_value as avatar_url,
             pm_avatar.meta_value as avatar_id,
             COALESCE(prop_count.property_count, 0) as property_count,
-            CASE 
-                WHEN p.post_type = "houzez_manager" THEN "houzez_manager"
-                ELSE "houzez_agent"
-            END as user_role,
+            p.post_type as user_role,
             agency.post_title as agency_name,
             agency.ID as agency_id
         ', FALSE);
