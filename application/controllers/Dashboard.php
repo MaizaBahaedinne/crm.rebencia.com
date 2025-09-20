@@ -524,6 +524,152 @@ class Dashboard extends BaseController {
     }
     
     /**
+     * Test de la récupération d'agency_id depuis wp_Hrg8P_crm_agents
+     */
+    public function test_agency_id_recovery() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Test Agency ID Recovery - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".result { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo ".success { background: #d4edda; border-color: #c3e6cb; color: #155724; }";
+        echo ".error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }";
+        echo ".info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }";
+        echo "pre { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🔧 Test de Récupération Agency ID</h1>";
+        
+        // 1. Informations actuelles
+        echo "<h2>📊 État Actuel</h2>";
+        echo "<div class='result info'>";
+        echo "<strong>agencyId (BaseController):</strong> " . ($this->agencyId ?: 'NULL') . "<br>";
+        echo "<strong>agency_id (Session):</strong> " . ($this->session->userdata('agency_id') ?: 'NULL') . "<br>";
+        echo "<strong>user_post_id (Session):</strong> " . ($this->session->userdata('user_post_id') ?: 'NULL') . "<br>";
+        echo "<strong>wp_id (Session):</strong> " . ($this->session->userdata('wp_id') ?: 'NULL') . "<br>";
+        echo "</div>";
+        
+        // 2. Test de la méthode de récupération
+        $user_post_id = $this->session->userdata('user_post_id');
+        if ($user_post_id) {
+            echo "<h2>🔍 Test de Récupération via wp_Hrg8P_crm_agents</h2>";
+            
+            try {
+                $this->load->database('wordpress');
+                $wp_db = $this->load->database('wordpress', TRUE);
+                
+                // Test direct de la requête
+                $query = $wp_db->select('*')
+                               ->from('wp_Hrg8P_crm_agents')
+                               ->where('agent_post_id', $user_post_id)
+                               ->get();
+                
+                echo "<div class='result'>";
+                echo "<strong>Requête SQL exécutée:</strong><br>";
+                echo "<code>SELECT * FROM wp_Hrg8P_crm_agents WHERE agent_post_id = $user_post_id</code><br><br>";
+                echo "<strong>Résultats trouvés:</strong> " . $query->num_rows() . "<br>";
+                
+                if ($query->num_rows() > 0) {
+                    $agent = $query->row();
+                    echo "<div class='result success'>";
+                    echo "<strong>✅ Agency ID trouvé:</strong> " . ($agent->agency_id ?: 'NULL') . "<br>";
+                    echo "<strong>Données complètes:</strong><br>";
+                    echo "<pre>" . print_r($agent, true) . "</pre>";
+                    echo "</div>";
+                    
+                    // Test de mise à jour en session
+                    if (!empty($agent->agency_id)) {
+                        $this->session->set_userdata('agency_id', $agent->agency_id);
+                        echo "<div class='result success'>";
+                        echo "✅ Agency ID sauvegardé en session: " . $agent->agency_id;
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<div class='result error'>";
+                    echo "❌ Aucun résultat trouvé pour agent_post_id = $user_post_id<br>";
+                    echo "</div>";
+                    
+                    // Essayer avec d'autres colonnes
+                    echo "<h3>🔍 Recherche alternative...</h3>";
+                    
+                    // Essayer avec ID
+                    $query_id = $wp_db->select('*')
+                                      ->from('wp_Hrg8P_crm_agents')
+                                      ->where('ID', $user_post_id)
+                                      ->get();
+                    
+                    echo "<div class='result'>";
+                    echo "<strong>Test avec ID = $user_post_id:</strong> " . $query_id->num_rows() . " résultat(s)<br>";
+                    if ($query_id->num_rows() > 0) {
+                        $agent = $query_id->row();
+                        echo "<div class='result success'>";
+                        echo "<strong>✅ Agency ID trouvé via ID:</strong> " . ($agent->agency_id ?: 'NULL') . "<br>";
+                        echo "<pre>" . print_r($agent, true) . "</pre>";
+                        echo "</div>";
+                    }
+                    echo "</div>";
+                    
+                    // Montrer un échantillon des données
+                    echo "<h3>📋 Échantillon des données disponibles</h3>";
+                    $sample = $wp_db->select('agent_post_id, ID, agency_id, display_name')
+                                    ->from('wp_Hrg8P_crm_agents')
+                                    ->limit(10)
+                                    ->get();
+                    
+                    if ($sample->num_rows() > 0) {
+                        echo "<div class='result info'>";
+                        echo "<strong>Premiers agents dans la vue:</strong><br>";
+                        echo "<table border='1' cellpadding='5' cellspacing='0'>";
+                        echo "<tr><th>agent_post_id</th><th>ID</th><th>agency_id</th><th>display_name</th></tr>";
+                        foreach ($sample->result() as $row) {
+                            echo "<tr>";
+                            echo "<td>" . ($row->agent_post_id ?: 'NULL') . "</td>";
+                            echo "<td>" . ($row->ID ?: 'NULL') . "</td>";
+                            echo "<td>" . ($row->agency_id ?: 'NULL') . "</td>";
+                            echo "<td>" . ($row->display_name ?: 'NULL') . "</td>";
+                            echo "</tr>";
+                        }
+                        echo "</table>";
+                        echo "</div>";
+                    }
+                }
+                echo "</div>";
+                
+            } catch (Exception $e) {
+                echo "<div class='result error'>";
+                echo "<strong>❌ Erreur:</strong> " . $e->getMessage();
+                echo "</div>";
+            }
+        } else {
+            echo "<div class='result error'>";
+            echo "❌ Aucun user_post_id en session pour effectuer le test";
+            echo "</div>";
+        }
+        
+        // 3. Test final
+        echo "<h2>🎯 Test Final</h2>";
+        echo "<div class='result'>";
+        echo "<strong>Agency ID final (après test):</strong> " . ($this->session->userdata('agency_id') ?: 'NULL') . "<br>";
+        echo "<strong>Recommandation:</strong> ";
+        if ($this->session->userdata('agency_id')) {
+            echo "<span style='color: green;'>✅ Agency ID récupéré avec succès!</span>";
+        } else {
+            echo "<span style='color: red;'>❌ Agency ID non récupéré. Vérifier les données dans wp_Hrg8P_crm_agents.</span>";
+        }
+        echo "</div>";
+        
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
+    /**
      * Affiche tous les détails de la session utilisateur connecté
      */
     public function debug_session() {
@@ -664,11 +810,77 @@ class Dashboard extends BaseController {
         }
         echo "</div>";
         
-        // 5. Test de récupération d'agency_id
-        echo "<h2>🏢 Test Récupération Agency ID</h2>";
+        // 7. Test de récupération d'agency_id depuis wp_Hrg8P_crm_agents
+        echo "<h2>🔍 Test Récupération Agency ID depuis wp_Hrg8P_crm_agents</h2>";
         echo "<div class='info-box'>";
         echo "<div class='property'><strong>agencyId (BaseController):</strong> <span class='value'>" . ($this->agencyId ?: 'EMPTY') . "</span></div>";
         echo "<div class='property'><strong>agency_id (Session):</strong> <span class='value'>" . ($this->session->userdata('agency_id') ?: 'EMPTY') . "</span></div>";
+        echo "<div class='property'><strong>user_post_id (Session):</strong> <span class='value'>" . ($this->session->userdata('user_post_id') ?: 'EMPTY') . "</span></div>";
+        
+        // Test direct de la vue wp_Hrg8P_crm_agents
+        $user_post_id = $this->session->userdata('user_post_id');
+        if ($user_post_id) {
+            try {
+                $this->load->database('wordpress');
+                $wp_db = $this->load->database('wordpress', TRUE);
+                
+                // Vérifier l'existence de la vue
+                $check = $wp_db->query("SHOW TABLES LIKE 'wp_Hrg8P_crm_agents'");
+                echo "<div class='property'><strong>Vue wp_Hrg8P_crm_agents existe:</strong> <span class='value'>" . ($check->num_rows() > 0 ? 'OUI' : 'NON') . "</span></div>";
+                
+                if ($check->num_rows() > 0) {
+                    // Rechercher l'agent par agent_post_id
+                    $agent_query = $wp_db->select('*')
+                                         ->from('wp_Hrg8P_crm_agents')
+                                         ->where('agent_post_id', $user_post_id)
+                                         ->get();
+                    
+                    echo "<div class='property'><strong>Agents trouvés pour agent_post_id=$user_post_id:</strong> <span class='value'>" . $agent_query->num_rows() . "</span></div>";
+                    
+                    if ($agent_query->num_rows() > 0) {
+                        $agent = $agent_query->row();
+                        echo "<div class='property'><strong>agency_id trouvé:</strong> <span class='value'>" . ($agent->agency_id ?: 'EMPTY') . "</span></div>";
+                        echo "<h3>Données complètes de l'agent:</h3>";
+                        echo "<pre>" . print_r($agent, true) . "</pre>";
+                    } else {
+                        // Essayer avec ID au lieu de agent_post_id
+                        $agent_query_id = $wp_db->select('*')
+                                                ->from('wp_Hrg8P_crm_agents')
+                                                ->where('ID', $user_post_id)
+                                                ->get();
+                        
+                        echo "<div class='property'><strong>Agents trouvés pour ID=$user_post_id:</strong> <span class='value'>" . $agent_query_id->num_rows() . "</span></div>";
+                        
+                        if ($agent_query_id->num_rows() > 0) {
+                            $agent = $agent_query_id->row();
+                            echo "<div class='property'><strong>agency_id trouvé (via ID):</strong> <span class='value'>" . ($agent->agency_id ?: 'EMPTY') . "</span></div>";
+                            echo "<h3>Données complètes de l'agent (via ID):</h3>";
+                            echo "<pre>" . print_r($agent, true) . "</pre>";
+                        } else {
+                            // Montrer un échantillon des données pour debug
+                            $sample_query = $wp_db->select('*')
+                                                  ->from('wp_Hrg8P_crm_agents')
+                                                  ->limit(3)
+                                                  ->get();
+                            
+                            echo "<h3>Échantillon des données dans wp_Hrg8P_crm_agents:</h3>";
+                            if ($sample_query->num_rows() > 0) {
+                                foreach ($sample_query->result() as $sample) {
+                                    echo "<pre>" . print_r($sample, true) . "</pre><hr>";
+                                }
+                            } else {
+                                echo "<p>Aucune donnée dans wp_Hrg8P_crm_agents</p>";
+                            }
+                        }
+                    }
+                }
+                
+            } catch (Exception $e) {
+                echo "<p style='color: red;'>Erreur: " . $e->getMessage() . "</p>";
+            }
+        } else {
+            echo "<p>Aucun user_post_id en session pour tester</p>";
+        }
         
         // Méthode utilisée dans le dashboard manager
         $agency_id = $this->agencyId ?: $this->session->userdata('agency_id');
