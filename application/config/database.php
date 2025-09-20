@@ -95,7 +95,7 @@ $db['default'] = array(
 	'save_queries' => TRUE
 );
 
-
+// Configuration pour la base de données WordPress (alias rebenciaBD)
 $db['wordpress'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
@@ -117,3 +117,4 @@ $db['wordpress'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
