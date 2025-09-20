@@ -156,7 +156,7 @@ class Agent_model extends CI_Model {
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
-            ->where('p.post_type', 'houzez_agent')
+            ->where_in('p.post_type', ['houzez_agent', 'houzez_manager'])
             ->where('p.post_status', 'publish');
 
         // Appliquer les filtres
@@ -241,7 +241,7 @@ class Agent_model extends CI_Model {
         
         $this->wp_db->from($this->users_table . ' u')
             ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email AND pm_email.meta_key = "fave_agent_email"', 'inner')
-            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type = "houzez_agent" AND p.post_status = "publish"', 'inner')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type IN ("houzez_agent", "houzez_manager") AND p.post_status = "publish"', 'inner')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left');
