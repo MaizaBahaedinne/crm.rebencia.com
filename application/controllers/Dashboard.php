@@ -601,7 +601,7 @@ class Dashboard extends BaseController {
             $wp_db->select('*');
             $wp_db->from('wp_Hrg8P_crm_agents');
             $wp_db->where('agency_id', $agency_id);
-            $wp_db->order_by('display_name', 'ASC');
+            // Pas de tri pour éviter les erreurs de colonnes inexistantes
             
             $query = $wp_db->get();
             $agents = $query->result();
@@ -615,10 +615,24 @@ class Dashboard extends BaseController {
                 if (!isset($agent->avatar_url)) {
                     $agent->avatar_url = '';
                 }
-                // Mapper les champs si nécessaire
+                // Mapper les champs si nécessaire pour compatibilité
+                if (!isset($agent->display_name) && isset($agent->user_login)) {
+                    $agent->display_name = $agent->user_login;
+                }
+                if (!isset($agent->display_name) && isset($agent->user_email)) {
+                    $agent->display_name = $agent->user_email;
+                }
+                if (!isset($agent->display_name)) {
+                    $agent->display_name = 'Agent';
+                }
                 $agent->user_id = $agent->ID ?? 0;
                 $agent->agent_post_id = $agent->ID ?? 0;
             }
+            
+            // Tri en PHP pour éviter les problèmes SQL
+            usort($agents, function($a, $b) {
+                return strcmp($a->display_name, $b->display_name);
+            });
             
             return $agents;
             
