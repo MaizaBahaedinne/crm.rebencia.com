@@ -19,6 +19,7 @@ class BaseController extends CI_Controller {
 	protected $module = '';
 	protected $wp_avatar = '';
 	protected $userPostId = '';
+	protected $agencyId = '';
 
 	/**
 	 * This is default constructor
@@ -53,6 +54,7 @@ class BaseController extends CI_Controller {
 			if(!is_array($this->accessInfo)) { $this->accessInfo = []; }
 			$this->wp_avatar = $CI->session->userdata('wp_avatar');
 			$this->userPostId = $CI->session->userdata('user_post_id');
+			$this->agencyId = $CI->session->userdata('agency_id');
 			
 			$this->global['userId'] = $this->vendorId ;
 			$this->global['name'] = $this->name;
@@ -63,6 +65,7 @@ class BaseController extends CI_Controller {
 			$this->global['access_info'] = $this->accessInfo;
 			$this->global['wp_avatar'] = $this->wp_avatar;
 			$this->global['user_post_id'] = $this->userPostId;
+			$this->global['agency_id'] = $this->agencyId;
 		}
 	}
 	

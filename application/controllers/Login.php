@@ -174,7 +174,8 @@ class Login extends CI_Controller {
                             $user_agency_id = $agent_record->agency_id;
                         }
                     }
-                    $sessionData['agency_id'] = $user_agency_id ?: $agency_id;
+                    // Injection garantie de l'agency_id
+                    $sessionData['agency_id'] = $user_agency_id;
                 }
                 
                 if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID; }
