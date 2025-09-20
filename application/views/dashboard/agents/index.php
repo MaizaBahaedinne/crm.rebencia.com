@@ -256,7 +256,9 @@
             <div class="row" id="agentsContainer">
                 <?php if (!empty($agents)) : ?>
                     <?php foreach ($agents as $agent) : ?>
-                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4 agent-card-wrapper" data-agent-id="<?= $agent->agent_id ?>" data-agent-email="<?= htmlspecialchars($agent->agent_email) ?>">
+                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4 agent-card-wrapper" 
+                         data-agent-id="<?= isset($agent->agent_id) ? $agent->agent_id : (isset($agent->agent_post_id) ? $agent->agent_post_id : (isset($agent->user_id) ? $agent->user_id : '')) ?>" 
+                         data-agent-email="<?= htmlspecialchars(isset($agent->agent_email) ? $agent->agent_email : (isset($agent->user_email) ? $agent->user_email : '')) ?>">
                         <div class="agent-card h-100">
                             <!-- Agent Card Header -->
                             <div class="agent-card-header">
@@ -268,7 +270,7 @@
                                     ?>
                                     <div class="agent-avatar">
                                         <img src="<?php echo $avatar_url; ?>" 
-                                             alt="<?php echo htmlspecialchars($agent->agent_name); ?>" 
+                                             alt="<?php echo htmlspecialchars($agent->agent_name ?? $agent->user_login ?? 'Agent'); ?>" 
                                              class="avatar-img"
                                              onerror="this.onerror=null; this.src='<?php echo $fallback_avatar; ?>';">
                                         <div class="agent-status <?php echo ($agent->is_active ?? 1) ? 'active' : 'inactive'; ?>"></div>
@@ -277,7 +279,7 @@
                                 <div class="agent-info">
                                     <h5 class="agent-name">
                                         <a href="<?php echo base_url('agents/view/' . ($agent->agent_id ?? $agent->user_id ?? 0)); ?>" class="agent-link">
-                                            <?php echo htmlspecialchars($agent->agent_name); ?>
+                                            <?php echo htmlspecialchars($agent->agent_name ?? $agent->user_login ?? 'Agent'); ?>
                                         </a>
                                     </h5>
                                     <div class="agent-badges">
@@ -308,7 +310,7 @@
                                         <i class="ri-home-line"></i>
                                     </div>
                                     <div class="stat-content">
-                                        <span class="stat-value"><?php echo $agent->properties_count; ?></span>
+                                        <span class="stat-value"><?php echo $agent->properties_count ?? 0; ?></span>
                                         <span class="stat-label">Propriétés</span>
                                     </div>
                                 </div>
@@ -335,15 +337,15 @@
                             <!-- Contact Actions -->
                             <div class="agent-contact">
                                 <?php if (!empty($agent->phone)) : ?>
-                                <a href="tel:<?php echo $agent->phone; ?>" class="contact-btn contact-btn-phone" title="Appeler">
+                                <a href="tel:<?php echo htmlspecialchars($agent->phone); ?>" class="contact-btn contact-btn-phone" title="Appeler">
                                     <i class="ri-phone-line"></i>
-                                    <span><?php echo $agent->phone; ?></span>
+                                    <span><?php echo htmlspecialchars($agent->phone); ?></span>
                                 </a>
                                 <?php endif; ?>
                                 <?php if (!empty($agent->mobile)) : ?>
-                                <a href="tel:<?php echo $agent->mobile; ?>" class="contact-btn contact-btn-mobile" title="Mobile">
+                                <a href="tel:<?php echo htmlspecialchars($agent->mobile); ?>" class="contact-btn contact-btn-mobile" title="Mobile">
                                     <i class="ri-smartphone-line"></i>
-                                    <span><?php echo $agent->mobile; ?></span>
+                                    <span><?php echo htmlspecialchars($agent->mobile); ?></span>
                                 </a>
                                 <?php endif; ?>
                                 <?php if (!empty($agent->whatsapp)) : ?>
