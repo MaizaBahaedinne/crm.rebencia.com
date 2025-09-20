@@ -2967,37 +2967,4 @@ class Dashboard extends BaseController {
         ];
     }
     
-    /**
-     * Méthode de debug pour tester les données de transactions
-     */
-    public function debug_transactions() {
-        $this->isLoggedIn();
-        
-        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
-        
-        echo "<h1>Debug - Données de Transactions</h1>";
-        echo "<p><strong>Agency ID:</strong> $agency_id</p>";
-        
-        // Test des données de ventes
-        echo "<h2>Évolution des Ventes</h2>";
-        $sales_data = $this->get_sales_evolution($agency_id);
-        echo "<pre>" . print_r($sales_data, true) . "</pre>";
-        
-        // Test des données de locations
-        echo "<h2>Évolution des Locations</h2>";
-        $rentals_data = $this->get_rentals_evolution($agency_id);
-        echo "<pre>" . print_r($rentals_data, true) . "</pre>";
-        
-        // Test des objectifs
-        echo "<h2>Objectifs avec Progression</h2>";
-        $objectives_data = $this->get_objectives_with_progress($agency_id);
-        echo "<pre>" . print_r($objectives_data, true) . "</pre>";
-        
-        // Test des agents de l'agence
-        echo "<h2>Agents de l'agence</h2>";
-        $agents = $this->get_filtered_agents_from_view($agency_id);
-        echo "<pre>" . print_r($agents, true) . "</pre>";
-    }
-
-    
 }
