@@ -535,6 +535,48 @@
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
                         <h6 class="dropdown-header">Bienvenue <?php echo $name; ?> !</h6>
+                        
+                        <!-- Informations utilisateur -->
+                        <div class="dropdown-item-text">
+                            <div class="d-flex flex-column text-muted small">
+                                <span class="mb-1">
+                                    <i class="mdi mdi-identifier text-info me-2"></i>
+                                    <strong>User ID:</strong> <?php echo $userId ?? 'N/A'; ?>
+                                </span>
+                                <span class="mb-1">
+                                    <i class="mdi mdi-badge-account text-primary me-2"></i>
+                                    <strong>Matricule:</strong> <?php echo $user_post_id ?? 'N/A'; ?>
+                                </span>
+                                <?php if (!empty($agency_id)): ?>
+                                <span class="mb-1">
+                                    <i class="mdi mdi-office-building text-warning me-2"></i>
+                                    <strong>Agency ID:</strong> <?php echo $agency_id; ?>
+                                </span>
+                                <?php endif; ?>
+                                <?php 
+                                // Récupérer le nom de l'agence si agency_id est disponible
+                                $agency_name = '';
+                                if (!empty($agency_id)) {
+                                    $CI =& get_instance();
+                                    $CI->load->database('wordpress');
+                                    $wp_db = $CI->load->database('wordpress', TRUE);
+                                    $agency_query = $wp_db->query("SELECT post_title FROM rebencia_RebenciaBD.wp_Hrg8P_posts WHERE ID = ? AND post_type = 'houzez_agency'", [$agency_id]);
+                                    if ($agency_query->num_rows() > 0) {
+                                        $agency_name = $agency_query->row()->post_title;
+                                    }
+                                }
+                                ?>
+                                <?php if (!empty($agency_name)): ?>
+                                <span class="mb-1">
+                                    <i class="mdi mdi-domain text-success me-2"></i>
+                                    <strong>Agence:</strong> <?php echo htmlspecialchars($agency_name); ?>
+                                </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown-divider"></div>
+                        
                         <a class="dropdown-item" href="<?php echo base_url('profile'); ?>">
                             <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
                             <span class="align-middle">Profil</span>
@@ -604,25 +646,70 @@
             <div class="dropdown sidebar-user m-1 rounded">
                 <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="d-flex align-items-center gap-2">
+                        <?php if (!empty($wp_avatar)): ?>
+                        <img class="rounded header-profile-user" src="<?php echo $wp_avatar; ?>" alt="Header Avatar">
+                        <?php else: ?>
                         <img class="rounded header-profile-user" src="<?php echo base_url() ?>assets/images/users/avatar-1.jpg" alt="Header Avatar">
+                        <?php endif; ?>
                         <span class="text-start">
-                            <span class="d-block fw-medium sidebar-user-name-text"><?php echo $name ?></span>
+                            <span class="d-block fw-medium sidebar-user-name-text"><?php echo $name; ?></span>
                             <span class="d-block fs-14 sidebar-user-name-sub-text"><i class="ri ri-circle-fill fs-10 text-success align-baseline"></i> <span class="align-middle">En ligne</span></span>
                         </span>
                     </span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <!-- item-->
-                    <h6 class="dropdown-header">Bienvenue Anna!</h6>
-                    <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profil</span></a>
+                    <h6 class="dropdown-header">Bienvenue <?php echo $name; ?>!</h6>
+                    
+                    <!-- Informations utilisateur -->
+                    <div class="dropdown-item-text">
+                        <div class="d-flex flex-column text-muted small">
+                            <span class="mb-1">
+                                <i class="mdi mdi-identifier text-info me-2"></i>
+                                <strong>User ID:</strong> <?php echo $userId ?? 'N/A'; ?>
+                            </span>
+                            <span class="mb-1">
+                                <i class="mdi mdi-badge-account text-primary me-2"></i>
+                                <strong>Matricule:</strong> <?php echo $user_post_id ?? 'N/A'; ?>
+                            </span>
+                            <?php if (!empty($agency_id)): ?>
+                            <span class="mb-1">
+                                <i class="mdi mdi-office-building text-warning me-2"></i>
+                                <strong>Agency ID:</strong> <?php echo $agency_id; ?>
+                            </span>
+                            <?php endif; ?>
+                            <?php 
+                            // Récupérer le nom de l'agence si agency_id est disponible
+                            $agency_name_sidebar = '';
+                            if (!empty($agency_id)) {
+                                $CI =& get_instance();
+                                $CI->load->database('wordpress');
+                                $wp_db = $CI->load->database('wordpress', TRUE);
+                                $agency_query = $wp_db->query("SELECT post_title FROM rebencia_RebenciaBD.wp_Hrg8P_posts WHERE ID = ? AND post_type = 'houzez_agency'", [$agency_id]);
+                                if ($agency_query->num_rows() > 0) {
+                                    $agency_name_sidebar = $agency_query->row()->post_title;
+                                }
+                            }
+                            ?>
+                            <?php if (!empty($agency_name_sidebar)): ?>
+                            <span class="mb-1">
+                                <i class="mdi mdi-domain text-success me-2"></i>
+                                <strong>Agence:</strong> <?php echo htmlspecialchars($agency_name_sidebar); ?>
+                            </span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-divider"></div>
+                    
+                    <a class="dropdown-item" href="<?php echo base_url('profile'); ?>"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profil</span></a>
                     <a class="dropdown-item" href="apps-chat.html"><i class="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Messages</span></a>
                     <a class="dropdown-item" href="apps-tasks-kanban.html"><i class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Tableau des tâches</span></a>
                     <a class="dropdown-item" href="pages-faqs.html"><i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Aide</span></a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Solde : <b>$5971.67</b></span></a>
                     <a class="dropdown-item" href="pages-profile-settings.html"><span class="badge bg-success-subtle text-success mt-1 float-end">Nouveau</span><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Paramètres</span></a>
                     <a class="dropdown-item" href="auth-lockscreen-basic.html"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Écran de verrouillage</span></a>
-                    <a class="dropdown-item" href="auth-logout-basic.html"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">Déconnexion</span></a>
+                    <a class="dropdown-item" href="<?php echo base_url('logout'); ?>"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">Déconnexion</span></a>
                 </div>
             </div>
             <div id="scrollbar">
