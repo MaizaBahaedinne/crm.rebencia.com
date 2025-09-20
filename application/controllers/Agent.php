@@ -175,13 +175,18 @@ class Agent extends BaseController {
                 $user_info = $this->User_model->get_wp_user($user_id);
                 $agency_id = $user_info->agency_id ?? null;
                 
+                // Debug pour les managers
+                log_message('debug', 'Manager access - User ID: ' . $user_id . ', Agency ID: ' . $agency_id);
+                
                 if ($agency_id) {
                     // Utiliser la méthode spécifique pour les managers
                     $agents = $this->agent_model->get_manager_team_agents($agency_id);
+                    log_message('debug', 'Manager team agents count: ' . count($agents));
                     $data['pageTitle'] = 'Mon agence';
                 } else {
                     $agents = [];
                     $data['error'] = 'Manager non associé à une agence.';
+                    log_message('error', 'Manager without agency - User ID: ' . $user_id);
                 }
             } else {
                 // Pour les autres rôles (admin, agency_admin), récupérer tous les agents avec rôles et agences
