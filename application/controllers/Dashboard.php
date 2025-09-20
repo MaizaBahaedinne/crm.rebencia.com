@@ -2012,19 +2012,6 @@ class Dashboard extends BaseController {
         return $months;
     }
     
-    private function get_monthly_sales_data($agency_id) {
-        $data = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $month = date('M', strtotime("-$i months"));
-            $data[] = [
-                'month' => $month,
-                'sales' => rand(2, 15),
-                'revenue' => rand(20000, 120000)
-            ];
-        }
-        return $data;
-    }
-    
     private function get_agents_performance_data($agency_id) {
         $agents = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
         $performance = [];
