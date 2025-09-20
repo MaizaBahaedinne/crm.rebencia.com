@@ -386,23 +386,23 @@ class Objective_model extends CI_Model
             $performance['commission_earned'] = $row->total_commission ?? 0;
         }
 
-        // 4. Si pas de données dans agent_commissions, essayer depuis tbl_booking
+        // 4. Si pas de données dans agent_commissions, essayer depuis crm_transactions
         if ($performance['transactions_count'] == 0) {
-            $booking_query = "
+            $crm_transactions_query = "
                 SELECT 
                     COUNT(*) as count,
                     SUM(CASE 
-                        WHEN bookingStatus = 'confirmed' THEN bookingAmount 
+                        WHEN statut = 'cloture' THEN montant 
                         ELSE 0 
                     END) as total_revenue
-                FROM tbl_booking 
-                WHERE userId = ? 
-                AND DATE(createdDtm) BETWEEN ? AND ?
-                AND bookingStatus IN ('confirmed', 'completed')
+                FROM crm_transactions 
+                WHERE agent_id = ? 
+                AND DATE(created_at) BETWEEN ? AND ?
+                AND statut IN ('actif', 'cloture')
             ";
-            $booking_result = $this->db->query($booking_query, [$agent_id, $month_start, $month_end]);
-            if ($booking_result && $booking_result->num_rows() > 0) {
-                $row = $booking_result->row();
+            $crm_result = $this->db->query($crm_transactions_query, [$agent_id, $month_start, $month_end]);
+            if ($crm_result && $crm_result->num_rows() > 0) {
+                $row = $crm_result->row();
                 $performance['transactions_count'] = $row->count ?? 0;
                 $performance['revenue_amount'] = $row->total_revenue ?? 0;
                 // Calculer une commission estimée (5% du CA)
