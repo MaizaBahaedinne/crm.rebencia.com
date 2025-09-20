@@ -136,7 +136,9 @@ class Login extends CI_Controller {
                             }
                         }
                     }
-                    $sessionData['user_post_id'] = $agent_post_id ?: $user->ID;
+                    // Ne pas utiliser user->ID comme fallback pour user_post_id
+                    // Si agent_post_id n'existe pas, laisser null pour indiquer qu'il n'y a pas de profil agent
+                    $sessionData['user_post_id'] = $agent_post_id ?: null;
                     $sessionData['agent_id'] = $user->ID;
                 } else {
                     $sessionData['user_post_id'] = $user->ID;

@@ -545,7 +545,18 @@
                                 </span>
                                 <span class="mb-1">
                                     <i class="mdi mdi-badge-account text-primary me-2"></i>
-                                    <strong>Matricule:</strong> <?php echo $user_post_id ?? 'N/A'; ?>
+                                    <strong>Matricule:</strong> 
+                                    <?php 
+                                    // Vérifier si user_post_id est différent de userId
+                                    $post_id = $user_post_id ?? 'N/A';
+                                    $user_id_val = $userId ?? 'N/A';
+                                    
+                                    if ($post_id === $user_id_val) {
+                                        echo '<span style="color: orange;">Pas de profil agent</span>';
+                                    } else {
+                                        echo $post_id;
+                                    }
+                                    ?>
                                 </span>
                                 <?php if (!empty($agency_id)): ?>
                                 <span class="mb-1">
@@ -670,7 +681,18 @@
                             </span>
                             <span class="mb-1">
                                 <i class="mdi mdi-badge-account text-primary me-2"></i>
-                                <strong>Matricule:</strong> <?php echo $user_post_id ?? 'N/A'; ?>
+                                <strong>Matricule:</strong> 
+                                <?php 
+                                // Vérifier si user_post_id est différent de userId
+                                $post_id = $user_post_id ?? 'N/A';
+                                $user_id_val = $userId ?? 'N/A';
+                                
+                                if ($post_id === $user_id_val) {
+                                    echo '<span style="color: orange;">Pas de profil agent</span>';
+                                } else {
+                                    echo $post_id;
+                                }
+                                ?>
                             </span>
                             <?php if (!empty($agency_id)): ?>
                             <span class="mb-1">
