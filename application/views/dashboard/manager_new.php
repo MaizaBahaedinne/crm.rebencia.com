@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <p class="text-uppercase fw-medium text-muted text-truncate fs-12 mb-1">Agents Actifs</p>
-                                    <h3 class="fs-28 fw-bold mb-0 text-primary counter" data-target="<?= $stats['total_agents'] ?? 0 ?>">0</h3>
+                                    <h3 class="fs-28 fw-bold mb-0 text-primary counter" data-target="<?= $kpi['total_agents'] ?? 0 ?>">0</h3>
                                     <small class="text-success">
                                         <i class="ri-arrow-up-line me-1"></i>100% Opérationnels
                                     </small>
@@ -90,7 +90,7 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <p class="text-uppercase fw-medium text-muted text-truncate fs-12 mb-1">CA Mensuel</p>
-                                    <h3 class="fs-28 fw-bold mb-0 text-success"><?= number_format($stats['monthly_revenue'] ?? 0, 0, ',', ' ') ?> €</h3>
+                                    <h3 class="fs-28 fw-bold mb-0 text-success"><?= number_format($kpi['monthly_revenue'] ?? 0, 0, ',', ' ') ?> €</h3>
                                     <small class="text-success">
                                         <i class="ri-arrow-up-line me-1"></i>+12% vs mois dernier
                                     </small>
@@ -112,9 +112,9 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <p class="text-uppercase fw-medium text-muted text-truncate fs-12 mb-1">Portfolio</p>
-                                    <h3 class="fs-28 fw-bold mb-0 text-info counter" data-target="<?= $stats['total_properties'] ?? 0 ?>">0</h3>
+                                    <h3 class="fs-28 fw-bold mb-0 text-info counter" data-target="<?= $kpi['total_properties'] ?? 0 ?>">0</h3>
                                     <small class="text-info">
-                                        <i class="ri-building-line me-1"></i><?= $stats['active_listings'] ?? 0 ?> actives
+                                        <i class="ri-building-line me-1"></i><?= $kpi['active_listings'] ?? 0 ?> actives
                                     </small>
                                 </div>
                             </div>
@@ -134,7 +134,7 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <p class="text-uppercase fw-medium text-muted text-truncate fs-12 mb-1">Obj. Atteints</p>
-                                    <h3 class="fs-28 fw-bold mb-0 text-warning">85%</h3>
+                                    <h3 class="fs-28 fw-bold mb-0 text-warning"><?= round($kpi['objectives_completion'] ?? 85, 0) ?>%</h3>
                                     <small class="text-warning">
                                         <i class="ri-target-line me-1"></i>Bon niveau
                                     </small>
@@ -176,15 +176,15 @@
                         <div class="card-body">
                             <div class="row text-center mb-3">
                                 <div class="col-4">
-                                    <h4 class="text-primary mb-1"><?= isset($transactions_data['sales_evolution']) ? count($transactions_data['sales_evolution']) : 0 ?></h4>
+                                    <h4 class="text-primary mb-1"><?= isset($supervision['transactions']['sales_evolution']) ? count($supervision['transactions']['sales_evolution']) : 0 ?></h4>
                                     <p class="text-muted mb-0 fs-13">Ventes</p>
                                 </div>
                                 <div class="col-4">
-                                    <h4 class="text-success mb-1"><?= isset($transactions_data['rentals_evolution']) ? count($transactions_data['rentals_evolution']) : 0 ?></h4>
+                                    <h4 class="text-success mb-1"><?= isset($supervision['transactions']['rentals_evolution']) ? count($supervision['transactions']['rentals_evolution']) : 0 ?></h4>
                                     <p class="text-muted mb-0 fs-13">Locations</p>
                                 </div>
                                 <div class="col-4">
-                                    <h4 class="text-warning mb-1"><?= number_format(($stats['monthly_revenue'] ?? 0) / 1000, 0) ?>K €</h4>
+                                    <h4 class="text-warning mb-1"><?= number_format(($kpi['monthly_revenue'] ?? 0) / 1000, 0) ?>K €</h4>
                                     <p class="text-muted mb-0 fs-13">Volume</p>
                                 </div>
                             </div>
@@ -223,7 +223,7 @@
                             <!-- Alertes Rapides -->
                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                                 <i class="ri-alarm-warning-line me-2"></i>
-                                <strong><?= $stats['pending_tasks'] ?? 0 ?></strong> tâches en attente
+                                <strong><?= $activities['alerts']['pending_tasks'] ?? 0 ?></strong> tâches en attente
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         </div>
@@ -255,8 +255,8 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <?php if (!empty($stats['top_performers'])): ?>
-                                <?php foreach (array_slice($stats['top_performers'], 0, 5) as $index => $agent): ?>
+                            <?php if (!empty($team['top_performers'])): ?>
+                                <?php foreach (array_slice($team['top_performers'], 0, 5) as $index => $agent): ?>
                                 <div class="d-flex align-items-center mb-3 position-relative">
                                     <div class="position-absolute top-0 start-0">
                                         <span class="badge bg-<?= $index === 0 ? 'warning' : ($index === 1 ? 'info' : 'success') ?>-subtle text-<?= $index === 0 ? 'warning' : ($index === 1 ? 'info' : 'success') ?> fs-10">
@@ -327,7 +327,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach (array_slice($agents, 0, 6) as $agent): ?>
+                                        <?php foreach (array_slice($team['team_overview'], 0, 6) as $agent): ?>
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
@@ -397,10 +397,10 @@
                                 </table>
                             </div>
                             
-                            <?php if (count($agents) > 6): ?>
+                            <?php if (count($team['team_overview']) > 6): ?>
                             <div class="text-center mt-3">
                                 <a href="<?= base_url('agents'); ?>" class="btn btn-outline-primary">
-                                    Voir tous les agents (<?= count($agents) ?>)
+                                    Voir tous les agents (<?= count($team['team_overview']) ?>)
                                 </a>
                             </div>
                             <?php endif; ?>
@@ -438,9 +438,9 @@
                             </h6>
                         </div>
                         <div class="card-body">
-                            <?php if (!empty($stats['recent_activities'])): ?>
+                            <?php if (!empty($activities['recent_activities'])): ?>
                                 <div class="timeline">
-                                    <?php foreach (array_slice($stats['recent_activities'], 0, 5) as $activity): ?>
+                                    <?php foreach (array_slice($activities['recent_activities'], 0, 5) as $activity): ?>
                                     <div class="timeline-item">
                                         <div class="timeline-marker bg-primary"></div>
                                         <div class="timeline-content">
@@ -475,11 +475,11 @@
                         </div>
                         <div class="card-body">
                             <!-- Alerte Tâches -->
-                            <?php if (($stats['pending_tasks'] ?? 0) > 0): ?>
+                            <?php if (($activities['alerts']['pending_tasks'] ?? 0) > 0): ?>
                             <div class="alert alert-warning d-flex align-items-center" role="alert">
                                 <i class="ri-task-line me-2"></i>
                                 <div>
-                                    <strong><?= $stats['pending_tasks'] ?></strong> tâches en attente
+                                    <strong><?= $activities['alerts']['pending_tasks'] ?></strong> tâches en attente
                                     <br><small>Nécessitent votre attention</small>
                                 </div>
                             </div>
