@@ -20,9 +20,6 @@
                                     </div>
                                 </div>
                                 <div class="hero-actions">
-                                    <button class="btn btn-hero btn-lg me-2">
-                                        <i class="ri-add-line me-2"></i>Ajouter un agent
-                                    </button>
                                     <div class="btn-group">
                                         <button class="btn btn-hero-outline btn-lg dropdown-toggle" data-bs-toggle="dropdown">
                                             <i class="ri-download-line me-2"></i>Exporter
@@ -283,12 +280,17 @@
                                             <?php echo htmlspecialchars($agent->agent_name); ?>
                                         </a>
                                     </h5>
-                                    <p class="agent-email"><?php echo htmlspecialchars($agent->agent_email); ?></p>
                                     <div class="agent-badges">
                                         <span class="agent-badge agent-badge-<?php echo ($agent->is_active ?? 1) ? 'active' : 'inactive'; ?>">
                                             <i class="ri-<?php echo ($agent->is_active ?? 1) ? 'check' : 'close'; ?>-line me-1"></i>
                                             <?php echo ($agent->is_active ?? 1) ? 'Actif' : 'Inactif'; ?>
                                         </span>
+                                        <?php if (!empty($agent->user_role)) : ?>
+                                        <span class="agent-badge agent-badge-role">
+                                            <i class="ri-user-line me-1"></i>
+                                            <?php echo htmlspecialchars($agent->user_role); ?>
+                                        </span>
+                                        <?php endif; ?>
                                         <?php if (!empty($agent->agency_name)) : ?>
                                         <span class="agent-badge agent-badge-agency">
                                             <i class="ri-building-line me-1"></i>
@@ -351,10 +353,6 @@
                                     <span>WhatsApp</span>
                                 </a>
                                 <?php endif; ?>
-                                <a href="mailto:<?php echo $agent->agent_email; ?>" class="contact-btn contact-btn-email" title="Email">
-                                    <i class="ri-mail-line"></i>
-                                    <span>Email</span>
-                                </a>
                             </div>
 
                             <!-- Agent Actions -->
@@ -369,16 +367,6 @@
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="<?php echo base_url('properties?agent=' . ($agent->agent_id ?? $agent->user_id ?? 0)); ?>">
                                             <i class="ri-home-line me-2"></i>Ses propriétés
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="mailto:<?php echo $agent->agent_email; ?>">
-                                            <i class="ri-mail-line me-2"></i>Envoyer email
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#">
-                                            <i class="ri-edit-line me-2"></i>Modifier
-                                        </a></li>
-                                        <li><a class="dropdown-item text-danger" href="#">
-                                            <i class="ri-delete-bin-line me-2"></i>Supprimer
                                         </a></li>
                                     </ul>
                                 </div>
@@ -824,12 +812,6 @@
     color: #667eea;
 }
 
-.agent-email {
-    color: #6c757d;
-    font-size: 0.875rem;
-    margin: 0 0 1rem;
-}
-
 .agent-badges {
     display: flex;
     justify-content: center;
@@ -859,6 +841,11 @@
 .agent-badge-agency {
     background: rgba(102, 126, 234, 0.1);
     color: #667eea;
+}
+
+.agent-badge-role {
+    background: rgba(139, 69, 19, 0.1);
+    color: #8b4513;
 }
 
 /* Agent Stats */
@@ -961,18 +948,6 @@
 .contact-btn-whatsapp:hover {
     background: rgba(37, 211, 102, 0.2);
     color: #25d366;
-    transform: translateX(5px);
-}
-
-.contact-btn-email {
-    background: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-    border-color: rgba(220, 53, 69, 0.2);
-}
-
-.contact-btn-email:hover {
-    background: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
     transform: translateX(5px);
 }
 

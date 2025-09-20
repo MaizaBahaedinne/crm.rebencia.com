@@ -1329,4 +1329,107 @@ class Agent_model extends CI_Model {
         return $agents;
     }
 
+    /**
+     * Récupère tous les agents avec leurs rôles et agences depuis wp_Hrg8P_crm_agents
+     * Basé sur la vue wp_Hrg8P_crm_agents fournie par l'utilisateur
+     * @param array $filters Filtres de recherche
+     * @return object[]
+     */
+    public function get_agents_with_roles_and_agencies($filters = []) {
+        $this->wp_db->select("
+            u.ID AS user_id,
+            u.user_login AS user_login,
+            u.user_email AS user_email,
+            u.user_status AS user_status,
+            u.user_registered AS registration_date,
+            
+            p.ID AS agent_post_id,
+            p.post_title AS agent_name,
+            p.post_status AS post_status,
+            p.post_type AS post_type,
+            pm_email.meta_value AS agent_email,
+            
+            a.ID AS agency_id,
+            a.post_title AS agency_name,
+            
+            -- Contact info
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) AS phone,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) AS mobile,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) AS whatsapp,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) AS agent_avatar,
+            MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position,
+            
+            -- User role
+            ur.meta_value AS user_roles
+        ", FALSE);
+        
+        $this->wp_db->from($this->users_table . ' u')
+            ->join($this->postmeta_table . ' pm_email', 'pm_email.meta_value = u.user_email', 'left')
+            ->join($this->posts_table . ' p', 'p.ID = pm_email.post_id AND p.post_type IN ("houzez_agent", "houzez_manager")', 'left')
+            ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
+            ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
+            ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
+            ->join($this->posts_table . ' media', 'media.ID = pm_contact.meta_value AND pm_contact.meta_key = "fave_agent_picture" AND media.post_type = "attachment"', 'left')
+            ->join($this->usermeta_table . ' ur', 'ur.user_id = u.ID AND ur.meta_key = "wp_Hrg8P_capabilities"', 'left')
+            ->where('p.post_type IN ("houzez_agent", "houzez_manager")', NULL, FALSE)
+            ->where('p.post_status', 'publish');
+
+        // Appliquer les filtres
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $this->wp_db->group_start()
+                ->like('p.post_title', $search)
+                ->or_like('u.user_email', $search)
+                ->or_like('u.user_login', $search)
+                ->group_end();
+        }
+
+        if (!empty($filters['agency'])) {
+            $this->wp_db->where('a.ID', $filters['agency']);
+        }
+
+        $this->wp_db->group_by('
+            u.ID, u.user_login, u.user_email, u.user_status, u.user_registered,
+            p.ID, p.post_title, p.post_status, p.post_type, pm_email.meta_value,
+            a.ID, a.post_title, ur.meta_value
+        ');
+        $this->wp_db->order_by('p.post_title', 'ASC');
+
+        $query = $this->wp_db->get();
+        $agents = $query->result();
+
+        // Nettoyer et formater les données
+        foreach ($agents as $agent) {
+            // Extraire le rôle principal depuis user_roles
+            if (!empty($agent->user_roles)) {
+                $roles = unserialize($agent->user_roles);
+                if (is_array($roles)) {
+                    if (isset($roles['houzez_manager'])) {
+                        $agent->user_role = 'Manager';
+                    } elseif (isset($roles['houzez_agent'])) {
+                        $agent->user_role = 'Agent';
+                    } elseif (isset($roles['houzez_agency'])) {
+                        $agent->user_role = 'Agence';
+                    } elseif (isset($roles['administrator'])) {
+                        $agent->user_role = 'Administrateur';
+                    } else {
+                        $agent->user_role = 'Utilisateur';
+                    }
+                } else {
+                    $agent->user_role = 'Non défini';
+                }
+            } else {
+                $agent->user_role = 'Non défini';
+            }
+
+            // Déterminer le statut actif basé sur post_status
+            $agent->is_active = ($agent->post_status === 'publish') ? 1 : 0;
+            
+            // Nettoyer les données
+            $agent = $this->clean_agent_data($agent);
+        }
+
+        return $agents;
+    }
+
 }

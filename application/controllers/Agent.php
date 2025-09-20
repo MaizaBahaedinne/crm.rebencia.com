@@ -176,16 +176,18 @@ class Agent extends BaseController {
                 $agency_id = $user_info->agency_id ?? null;
                 
                 if ($agency_id) {
-                    // Récupérer uniquement les agents de son agence
-                    $agents = $this->agent_model->get_agents_by_agency($agency_id);
+                    // Ajouter le filtre d'agence
+                    $data['filters']['agency'] = $agency_id;
+                    // Récupérer tous les agents avec rôles et agences, filtré par agence
+                    $agents = $this->agent_model->get_agents_with_roles_and_agencies($data['filters']);
                     $data['pageTitle'] = 'Mon agence';
                 } else {
                     $agents = [];
                     $data['error'] = 'Manager non associé à une agence.';
                 }
             } else {
-                // Pour les autres rôles (admin, agency_admin), récupérer tous les agents
-                $agents = $this->agent_model->get_all_agents_from_posts($data['filters']);
+                // Pour les autres rôles (admin, agency_admin), récupérer tous les agents avec rôles et agences
+                $agents = $this->agent_model->get_agents_with_roles_and_agencies($data['filters']);
             }
             
             $data['agents'] = $agents;
