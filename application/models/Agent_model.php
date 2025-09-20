@@ -1464,7 +1464,7 @@ class Agent_model extends CI_Model {
             END as user_role,
             agency.post_title as agency_name,
             agency.ID as agency_id
-        ');
+        ', FALSE);
         
         $wp_db->from('posts p');
         $wp_db->join('postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
@@ -1523,7 +1523,7 @@ class Agent_model extends CI_Model {
             END as user_role,
             agency.post_title as agency_name,
             agency.ID as agency_id
-        ');
+        ', FALSE);
         
         $wp_db->from('posts p');
         $wp_db->join('postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
