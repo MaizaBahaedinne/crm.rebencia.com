@@ -670,6 +670,196 @@ class Dashboard extends BaseController {
     }
     
     /**
+     * Débogue les données de transactions pour le dashboard manager
+     */
+    public function debug_transactions() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Debug Transactions - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".result { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo ".success { background: #d4edda; border-color: #c3e6cb; color: #155724; }";
+        echo ".error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }";
+        echo ".info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }";
+        echo "table { width: 100%; border-collapse: collapse; margin: 15px 0; }";
+        echo "th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }";
+        echo "th { background: #f8f9fa; font-weight: bold; }";
+        echo "pre { background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 12px; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🔍 Debug - Données des Transactions</h1>";
+        
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        echo "<p><strong>Agency ID utilisé:</strong> $agency_id</p>";
+        
+        // 1. Vérifier les agents de l'agence
+        echo "<h2>👥 Agents de l'agence</h2>";
+        $agents = $this->get_filtered_agents_from_view($agency_id);
+        $agent_ids = array_column($agents, 'ID');
+        
+        echo "<div class='result info'>";
+        echo "<strong>Nombre d'agents trouvés:</strong> " . count($agents) . "<br>";
+        echo "<strong>IDs des agents:</strong> " . implode(', ', $agent_ids) . "<br>";
+        echo "</div>";
+        
+        if (!empty($agents)) {
+            echo "<table>";
+            echo "<tr><th>ID</th><th>Nom</th><th>Email</th></tr>";
+            foreach (array_slice($agents, 0, 5) as $agent) {
+                echo "<tr>";
+                echo "<td>" . ($agent->ID ?? 'N/A') . "</td>";
+                echo "<td>" . htmlspecialchars($agent->display_name ?? 'N/A') . "</td>";
+                echo "<td>" . htmlspecialchars($agent->user_email ?? 'N/A') . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        }
+        
+        // 2. Vérifier la table crm_transactions
+        echo "<h2>💰 Table crm_transactions</h2>";
+        
+        try {
+            // Compter toutes les transactions
+            $total_count = $this->db->query("SELECT COUNT(*) as count FROM crm_transactions")->row()->count;
+            echo "<div class='result info'>";
+            echo "<strong>Total transactions dans crm_transactions:</strong> $total_count<br>";
+            echo "</div>";
+            
+            if ($total_count > 0) {
+                // Échantillon de données
+                $sample = $this->db->query("SELECT * FROM crm_transactions ORDER BY created_at DESC LIMIT 3")->result();
+                echo "<h3>Échantillon de transactions:</h3>";
+                echo "<table>";
+                echo "<tr><th>ID</th><th>Agent ID</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th></tr>";
+                foreach ($sample as $transaction) {
+                    echo "<tr>";
+                    echo "<td>" . ($transaction->id ?? 'N/A') . "</td>";
+                    echo "<td>" . ($transaction->agent_id ?? 'N/A') . "</td>";
+                    echo "<td>" . ($transaction->type ?? 'N/A') . "</td>";
+                    echo "<td>" . ($transaction->montant ?? 'N/A') . "</td>";
+                    echo "<td>" . ($transaction->statut ?? 'N/A') . "</td>";
+                    echo "<td>" . ($transaction->created_at ?? 'N/A') . "</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+                
+                // Statistiques par type
+                $types_count = $this->db->query("SELECT type, COUNT(*) as count FROM crm_transactions GROUP BY type")->result();
+                echo "<h3>Répartition par type:</h3>";
+                echo "<table>";
+                echo "<tr><th>Type</th><th>Nombre</th></tr>";
+                foreach ($types_count as $type) {
+                    echo "<tr><td>" . ($type->type ?? 'N/A') . "</td><td>" . $type->count . "</td></tr>";
+                }
+                echo "</table>";
+                
+                // Transactions pour les agents de l'agence
+                if (!empty($agent_ids)) {
+                    $agent_ids_str = implode(',', array_map('intval', $agent_ids));
+                    $agency_transactions = $this->db->query("SELECT * FROM crm_transactions WHERE agent_id IN ($agent_ids_str) ORDER BY created_at DESC LIMIT 5")->result();
+                    
+                    echo "<h3>Transactions pour cette agence (5 dernières):</h3>";
+                    if (!empty($agency_transactions)) {
+                        echo "<table>";
+                        echo "<tr><th>ID</th><th>Agent ID</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th></tr>";
+                        foreach ($agency_transactions as $transaction) {
+                            echo "<tr>";
+                            echo "<td>" . ($transaction->id ?? 'N/A') . "</td>";
+                            echo "<td>" . ($transaction->agent_id ?? 'N/A') . "</td>";
+                            echo "<td>" . ($transaction->type ?? 'N/A') . "</td>";
+                            echo "<td>" . ($transaction->montant ?? 'N/A') . "</td>";
+                            echo "<td>" . ($transaction->statut ?? 'N/A') . "</td>";
+                            echo "<td>" . ($transaction->created_at ?? 'N/A') . "</td>";
+                            echo "</tr>";
+                        }
+                        echo "</table>";
+                    } else {
+                        echo "<div class='result error'>Aucune transaction trouvée pour les agents de cette agence</div>";
+                    }
+                }
+            }
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "<strong>Erreur crm_transactions:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        // 3. Vérifier la table agent_commissions
+        echo "<h2>💼 Table agent_commissions</h2>";
+        
+        try {
+            $total_commissions = $this->db->query("SELECT COUNT(*) as count FROM agent_commissions")->row()->count;
+            echo "<div class='result info'>";
+            echo "<strong>Total commissions dans agent_commissions:</strong> $total_commissions<br>";
+            echo "</div>";
+            
+            if ($total_commissions > 0) {
+                // Échantillon de données
+                $sample_commissions = $this->db->query("SELECT * FROM agent_commissions ORDER BY created_at DESC LIMIT 3")->result();
+                echo "<h3>Échantillon de commissions:</h3>";
+                echo "<table>";
+                echo "<tr><th>ID</th><th>Agent ID</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th></tr>";
+                foreach ($sample_commissions as $commission) {
+                    echo "<tr>";
+                    echo "<td>" . ($commission->id ?? 'N/A') . "</td>";
+                    echo "<td>" . ($commission->agent_id ?? 'N/A') . "</td>";
+                    echo "<td>" . ($commission->transaction_type ?? 'N/A') . "</td>";
+                    echo "<td>" . ($commission->base_amount ?? 'N/A') . "</td>";
+                    echo "<td>" . ($commission->status ?? 'N/A') . "</td>";
+                    echo "<td>" . ($commission->created_at ?? 'N/A') . "</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            }
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "<strong>Erreur agent_commissions:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        // 4. Test des méthodes de récupération des données
+        echo "<h2>🧪 Test des méthodes de données</h2>";
+        
+        try {
+            echo "<h3>Évolution des ventes:</h3>";
+            $sales_data = $this->get_sales_evolution($agency_id);
+            echo "<div class='result'>";
+            echo "<pre>" . print_r($sales_data, true) . "</pre>";
+            echo "</div>";
+            
+            echo "<h3>Évolution des locations:</h3>";
+            $rentals_data = $this->get_rentals_evolution($agency_id);
+            echo "<div class='result'>";
+            echo "<pre>" . print_r($rentals_data, true) . "</pre>";
+            echo "</div>";
+            
+            echo "<h3>Objectifs et progression:</h3>";
+            $objectives_data = $this->get_objectives_with_progress($agency_id);
+            echo "<div class='result'>";
+            echo "<pre>" . print_r($objectives_data, true) . "</pre>";
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "<strong>Erreur test méthodes:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        echo "<p><a href='" . base_url('dashboard/manager') . "' style='display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Retour au Dashboard Manager</a></p>";
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
+    /**
      * Ajoute des avatars par défaut pour les agents sans avatar
      */
     public function set_default_avatars() {
