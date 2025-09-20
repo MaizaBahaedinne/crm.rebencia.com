@@ -1359,13 +1359,7 @@ class Agent_model extends CI_Model {
             avatar_view.image_url AS agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position,
             
-            (SELECT COUNT(*) 
-             FROM " . $this->posts_table . " prop 
-             LEFT JOIN " . $this->postmeta_table . " prop_agent ON prop.ID = prop_agent.post_id AND prop_agent.meta_key = 'fave_property_agent'
-             WHERE prop.post_type = 'property' 
-             AND prop.post_status = 'publish'
-             AND prop_agent.meta_value = p.ID
-            ) as properties_count,
+            COUNT(DISTINCT prop_view.property_id) as properties_count,
             
             ur.meta_value AS user_roles
         ", FALSE);
@@ -1377,6 +1371,7 @@ class Agent_model extends CI_Model {
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm_contact', 'pm_contact.post_id = p.ID', 'left')
             ->join('wp_Hrg8P_crm_avatar_agents avatar_view', 'avatar_view.agent_post_id = p.ID', 'left')
+            ->join('wp_Hrg8P_prop_agen prop_view', 'prop_view.agent_id = p.ID AND prop_view.property_status = "publish"', 'left')
             ->join($this->usermeta_table . ' ur', 'ur.user_id = u.ID AND ur.meta_key = "wp_Hrg8P_capabilities"', 'left')
             ->where('p.post_type IN ("houzez_agent", "houzez_manager")', NULL, FALSE)
             ->where('p.post_status', 'publish');
