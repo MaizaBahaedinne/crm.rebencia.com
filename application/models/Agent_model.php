@@ -152,7 +152,7 @@ class Agent_model extends CI_Model {
         ", FALSE);
         
         $this->wp_db->from($this->posts_table . ' p')
-            ->join('crm_avatar_agents avatar', 'avatar.agent_id = p.ID', 'left')
+            ->join('wp_Hrg8P_crm_avatar_agents avatar', 'avatar.agent_post_id = p.ID', 'left')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
@@ -649,7 +649,7 @@ class Agent_model extends CI_Model {
         ", FALSE);
         
         $this->wp_db->from($this->posts_table . ' p')
-            ->join('crm_avatar_agents avatar', 'avatar.agent_id = p.ID', 'left')
+            ->join('wp_Hrg8P_crm_avatar_agents avatar', 'avatar.agent_post_id = p.ID', 'left')
             ->join($this->postmeta_table . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left')
             ->join($this->posts_table . ' a', 'a.ID = pm_agency.meta_value AND a.post_type = "houzez_agency"', 'left')
             ->join($this->postmeta_table . ' pm', 'pm.post_id = p.ID', 'left')
@@ -1280,8 +1280,8 @@ class Agent_model extends CI_Model {
      */
     public function get_agent_avatar_url_by_id($agent_id) {
         $result = $this->wp_db->select('image_url')
-            ->from('crm_avatar_agents')
-            ->where('agent_id', $agent_id)
+            ->from('wp_Hrg8P_crm_avatar_agents')
+            ->where('agent_post_id', $agent_id)
             ->get()
             ->row();
             
@@ -1305,16 +1305,16 @@ class Agent_model extends CI_Model {
         }, $agents);
         
         // Récupérer tous les avatars en une seule requête
-        $avatars = $this->wp_db->select('agent_id, image_url')
-            ->from('crm_avatar_agents')
-            ->where_in('agent_id', $agent_ids)
+        $avatars = $this->wp_db->select('agent_post_id, image_url')
+            ->from('wp_Hrg8P_crm_avatar_agents')
+            ->where_in('agent_post_id', $agent_ids)
             ->get()
             ->result();
         
         // Créer un tableau associatif pour un accès rapide
         $avatar_map = [];
         foreach ($avatars as $avatar) {
-            $avatar_map[$avatar->agent_id] = $avatar->image_url;
+            $avatar_map[$avatar->agent_post_id] = $avatar->image_url;
         }
         
         // Affecter les avatars aux agents
