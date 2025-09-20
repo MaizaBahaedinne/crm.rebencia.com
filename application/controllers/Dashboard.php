@@ -524,6 +524,133 @@ class Dashboard extends BaseController {
     }
     
     /**
+     * Ajoute des avatars par défaut pour les agents sans avatar
+     */
+    public function set_default_avatars() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Avatars par Défaut - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".result { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo ".success { background: #d4edda; border-color: #c3e6cb; color: #155724; }";
+        echo ".error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }";
+        echo ".info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }";
+        echo ".avatar-demo { width: 60px; height: 60px; border-radius: 50%; margin: 10px; display: inline-block; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>👤 Configuration des Avatars par Défaut</h1>";
+        
+        // URLs d'avatars par défaut de qualité
+        $default_avatars = [
+            'https://i.pravatar.cc/150?img=1',  // Avatar homme 1
+            'https://i.pravatar.cc/150?img=2',  // Avatar femme 1
+            'https://i.pravatar.cc/150?img=3',  // Avatar homme 2
+            'https://i.pravatar.cc/150?img=4',  // Avatar femme 2
+            'https://i.pravatar.cc/150?img=5',  // Avatar homme 3
+            'https://i.pravatar.cc/150?img=6',  // Avatar femme 3
+            'https://i.pravatar.cc/150?img=7',  // Avatar homme 4
+            'https://i.pravatar.cc/150?img=8',  // Avatar femme 4
+        ];
+        
+        echo "<h2>🎨 Aperçu des Avatars par Défaut</h2>";
+        echo "<div class='result info'>";
+        echo "<p>Voici les avatars par défaut qui seront assignés :</p>";
+        foreach ($default_avatars as $index => $avatar_url) {
+            echo "<img src='$avatar_url' alt='Avatar " . ($index + 1) . "' class='avatar-demo'>";
+        }
+        echo "</div>";
+        
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        
+        try {
+            $agents = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
+            $updated_count = 0;
+            
+            echo "<h2>📝 Attribution des Avatars</h2>";
+            
+            foreach ($agents as $index => $agent) {
+                $has_avatar = !empty($agent->avatar_url);
+                
+                echo "<div class='result " . ($has_avatar ? 'success' : 'info') . "'>";
+                echo "<strong>{$agent->display_name}</strong> (User ID: {$agent->user_id})<br>";
+                
+                if ($has_avatar) {
+                    echo "✅ Possède déjà un avatar: " . htmlspecialchars($agent->avatar_url);
+                } else {
+                    // Assigner un avatar par défaut basé sur l'index
+                    $default_avatar = $default_avatars[$index % count($default_avatars)];
+                    
+                    echo "🎯 Avatar par défaut assigné: <br>";
+                    echo "<img src='$default_avatar' alt='Avatar par défaut' class='avatar-demo'><br>";
+                    echo "URL: " . htmlspecialchars($default_avatar) . "<br>";
+                    
+                    // Ici, vous pourriez ajouter la logique pour sauvegarder l'avatar dans WordPress
+                    // Par exemple, en mettant à jour wp_usermeta avec fave_author_custom_picture
+                    
+                    try {
+                        $this->load->database('wordpress');
+                        $wp_db = $this->load->database('wordpress', TRUE);
+                        
+                        // Vérifier si l'utilisateur a déjà une entrée fave_author_custom_picture
+                        $existing = $wp_db->select('umeta_id')
+                                          ->from('usermeta')
+                                          ->where('user_id', $agent->user_id)
+                                          ->where('meta_key', 'fave_author_custom_picture')
+                                          ->get()->row();
+                        
+                        if ($existing) {
+                            // Mettre à jour
+                            $wp_db->where('umeta_id', $existing->umeta_id)
+                                  ->update('usermeta', ['meta_value' => $default_avatar]);
+                            echo "✅ Avatar mis à jour dans WordPress";
+                        } else {
+                            // Insérer
+                            $wp_db->insert('usermeta', [
+                                'user_id' => $agent->user_id,
+                                'meta_key' => 'fave_author_custom_picture',
+                                'meta_value' => $default_avatar
+                            ]);
+                            echo "✅ Avatar ajouté dans WordPress";
+                        }
+                        
+                        $updated_count++;
+                        
+                    } catch (Exception $e) {
+                        echo "❌ Erreur lors de la sauvegarde: " . $e->getMessage();
+                    }
+                }
+                echo "</div>";
+            }
+            
+            echo "<div class='result success'>";
+            echo "<strong>✅ Terminé!</strong><br>";
+            echo "Avatars assignés: $updated_count<br>";
+            echo "Total d'agents: " . count($agents);
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "<strong>Erreur:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        echo "<div class='result info'>";
+        echo "<p><strong>Note:</strong> Les avatars par défaut sont fournis par Pravatar.cc et sont de haute qualité. Ils seront visibles immédiatement dans le dashboard.</p>";
+        echo "<p><a href='" . base_url('dashboard/manager') . "' class='btn btn-primary' style='display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Voir le Dashboard Manager</a></p>";
+        echo "</div>";
+        
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
+    /**
      * Force la mise à jour des avatars depuis différentes sources
      */
     public function update_avatars() {

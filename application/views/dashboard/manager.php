@@ -191,18 +191,55 @@
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar-sm">
-                                            <?php if (!empty($agent->avatar_url)): ?>
-                                                <img src="<?= $agent->avatar_url ?>" alt="Avatar" class="avatar-sm rounded-circle">
+                                            <?php 
+                                            $avatar_url = '';
+                                            // Vérifier plusieurs propriétés possibles pour l'avatar
+                                            if (!empty($agent->avatar_url)) {
+                                                $avatar_url = $agent->avatar_url;
+                                            } elseif (!empty($agent->wp_avatar)) {
+                                                $avatar_url = $agent->wp_avatar;
+                                            } elseif (!empty($agent->fave_author_custom_picture)) {
+                                                $avatar_url = $agent->fave_author_custom_picture;
+                                            }
+                                            
+                                            // Nettoyer l'URL si nécessaire
+                                            if ($avatar_url && !filter_var($avatar_url, FILTER_VALIDATE_URL)) {
+                                                // Si c'est un ID d'attachment, construire l'URL WordPress
+                                                if (is_numeric($avatar_url)) {
+                                                    $avatar_url = ''; // Laisser vide pour utiliser le placeholder
+                                                }
+                                            }
+                                            ?>
+                                            
+                                            <?php if ($avatar_url): ?>
+                                                <img src="<?= htmlspecialchars($avatar_url) ?>" 
+                                                     alt="Avatar <?= htmlspecialchars($agent->display_name) ?>" 
+                                                     class="avatar-sm rounded-circle"
+                                                     style="width: 40px; height: 40px; object-fit: cover;"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <span class="avatar-sm bg-primary-subtle text-primary rounded-circle d-none align-items-center justify-content-center"
+                                                      style="width: 40px; height: 40px; font-size: 14px; font-weight: bold;">
+                                                    <?= strtoupper(substr($agent->display_name ?? 'A', 0, 2)) ?>
+                                                </span>
                                             <?php else: ?>
-                                                <span class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center">
-                                                    <?= strtoupper(substr($agent->display_name, 0, 2)) ?>
+                                                <span class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                                      style="width: 40px; height: 40px; font-size: 14px; font-weight: bold;">
+                                                    <?= strtoupper(substr($agent->display_name ?? 'A', 0, 2)) ?>
                                                 </span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-medium"><?= htmlspecialchars($agent->display_name) ?></h6>
-                                        <p class="text-muted mb-0 fs-13"><?= $agent->sales_count ?? 0 ?> ventes • <?= number_format($agent->revenue ?? 0, 0, ',', ' ') ?> €</p>
+                                        <h6 class="mb-1 fw-medium"><?= htmlspecialchars($agent->display_name ?? 'Agent') ?></h6>
+                                        <p class="text-muted mb-0 fs-13">
+                                            <?= $agent->sales_count ?? 0 ?> ventes • 
+                                            <?= number_format($agent->revenue ?? 0, 0, ',', ' ') ?> €
+                                        </p>
+                                        <?php if (empty($avatar_url)): ?>
+                                            <small class="text-warning">
+                                                <i class="ri-image-line me-1"></i>Avatar non défini
+                                            </small>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="flex-shrink-0">
                                         <span class="badge bg-<?= $index === 0 ? 'warning' : ($index === 1 ? 'info' : 'success') ?>-subtle text-<?= $index === 0 ? 'warning' : ($index === 1 ? 'info' : 'success') ?>">#<?= $index + 1 ?></span>
