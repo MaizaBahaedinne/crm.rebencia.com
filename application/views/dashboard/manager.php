@@ -302,7 +302,9 @@
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 fw-medium"><?= htmlspecialchars($agent->display_name) ?></h6>
-                                                        <small class="text-muted"><?= htmlspecialchars($agent->user_nicename) ?></small>
+                                                        <small class="text-muted">
+                                                            <?= htmlspecialchars($agent->user_nicename ?? $agent->user_email ?? 'Agent') ?>
+                                                        </small>
                                                     </div>
                                                 </div>
                                             </td>

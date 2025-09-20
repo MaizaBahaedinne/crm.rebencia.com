@@ -1549,6 +1549,11 @@ class Agent_model extends CI_Model {
             // Nettoyer les données
             $agent = $this->clean_agent_data($agent);
             
+            // S'assurer que user_nicename existe
+            if (!isset($agent->user_nicename) || empty($agent->user_nicename)) {
+                $agent->user_nicename = $agent->user_email ? explode('@', $agent->user_email)[0] : 'agent';
+            }
+            
             // Récupérer l'avatar complet
             $agent->avatar_url = $this->get_agent_avatar_url($agent->user_id, $agent->avatar_id);
             

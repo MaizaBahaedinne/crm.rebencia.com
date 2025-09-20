@@ -1431,8 +1431,21 @@ class Dashboard extends BaseController {
         }
         
         // Mapping du nom d'utilisateur
-        if (!isset($agent->user_nicename) && in_array('user_nicename', $available_columns)) {
-            $agent->user_nicename = $agent->user_nicename ?? $agent->display_name;
+        if (!isset($agent->user_nicename)) {
+            if (in_array('user_nicename', $available_columns) && !empty($agent->user_nicename)) {
+                // Déjà défini
+            } elseif (in_array('user_login', $available_columns) && !empty($agent->user_login)) {
+                $agent->user_nicename = $agent->user_login;
+            } elseif (in_array('user_email', $available_columns) && !empty($agent->user_email)) {
+                $agent->user_nicename = explode('@', $agent->user_email)[0];
+            } else {
+                $agent->user_nicename = $agent->display_name ?? 'agent';
+            }
+        }
+        
+        // S'assurer que user_nicename n'est jamais vide
+        if (empty($agent->user_nicename)) {
+            $agent->user_nicename = $agent->user_email ? explode('@', $agent->user_email)[0] : 'agent';
         }
         
         // Mapping du rôle utilisateur
