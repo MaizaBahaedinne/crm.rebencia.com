@@ -2257,9 +2257,6 @@ class Dashboard extends BaseController {
      */
     private function get_sales_evolution($agency_id) {
         try {
-            // Charger le modèle Transaction
-            $this->load->model('Transaction_model');
-            
             // Récupérer les agents de l'agence
             $agents = $this->get_filtered_agents_from_view($agency_id);
             $agent_ids = array_column($agents, 'ID');
@@ -2268,19 +2265,21 @@ class Dashboard extends BaseController {
                 return $this->get_sample_sales_data();
             }
             
-            // Récupérer les transactions de vente des 6 derniers mois
+            // Récupérer les vraies transactions de vente des 6 derniers mois depuis crm_transactions
             $sales_data = [];
             for ($i = 5; $i >= 0; $i--) {
                 $month = date('Y-m', strtotime("-$i months"));
                 $month_start = $month . '-01';
                 $month_end = date('Y-m-t', strtotime($month_start));
                 
-                $sql = "SELECT COUNT(*) as count, SUM(base_amount) as total_amount 
-                       FROM agent_commissions 
-                       WHERE agent_id IN (" . implode(',', $agent_ids) . ") 
-                       AND transaction_type = 'sale'
+                // Utiliser la vraie table crm_transactions
+                $agent_ids_str = implode(',', array_map('intval', $agent_ids));
+                $sql = "SELECT COUNT(*) as count, SUM(montant) as total_amount 
+                       FROM crm_transactions 
+                       WHERE agent_id IN ($agent_ids_str) 
+                       AND type = 'vente'
                        AND DATE(created_at) BETWEEN ? AND ?
-                       AND status != 'cancelled'";
+                       AND statut IN ('actif', 'cloture')";
                 
                 $result = $this->db->query($sql, [$month_start, $month_end]);
                 $row = $result ? $result->row() : null;
@@ -2290,6 +2289,32 @@ class Dashboard extends BaseController {
                     'count' => $row ? (int)$row->count : 0,
                     'amount' => $row ? (float)$row->total_amount : 0
                 ];
+            }
+            
+            // Si aucune donnée dans crm_transactions, essayer agent_commissions
+            $has_data = array_sum(array_column($sales_data, 'count')) > 0;
+            if (!$has_data) {
+                for ($i = 5; $i >= 0; $i--) {
+                    $month = date('Y-m', strtotime("-$i months"));
+                    $month_start = $month . '-01';
+                    $month_end = date('Y-m-t', strtotime($month_start));
+                    
+                    $sql = "SELECT COUNT(*) as count, SUM(base_amount) as total_amount 
+                           FROM agent_commissions 
+                           WHERE agent_id IN ($agent_ids_str) 
+                           AND transaction_type = 'sale'
+                           AND DATE(created_at) BETWEEN ? AND ?
+                           AND status != 'cancelled'";
+                    
+                    $result = $this->db->query($sql, [$month_start, $month_end]);
+                    $row = $result ? $result->row() : null;
+                    
+                    $sales_data[$i] = [
+                        'month' => date('M Y', strtotime($month_start)),
+                        'count' => $row ? (int)$row->count : 0,
+                        'amount' => $row ? (float)$row->total_amount : 0
+                    ];
+                }
             }
             
             return $sales_data;
@@ -2304,9 +2329,6 @@ class Dashboard extends BaseController {
      */
     private function get_rentals_evolution($agency_id) {
         try {
-            // Charger le modèle Transaction
-            $this->load->model('Transaction_model');
-            
             // Récupérer les agents de l'agence
             $agents = $this->get_filtered_agents_from_view($agency_id);
             $agent_ids = array_column($agents, 'ID');
@@ -2315,19 +2337,21 @@ class Dashboard extends BaseController {
                 return $this->get_sample_rentals_data();
             }
             
-            // Récupérer les transactions de location des 6 derniers mois
+            // Récupérer les vraies transactions de location des 6 derniers mois depuis crm_transactions
             $rentals_data = [];
             for ($i = 5; $i >= 0; $i--) {
                 $month = date('Y-m', strtotime("-$i months"));
                 $month_start = $month . '-01';
                 $month_end = date('Y-m-t', strtotime($month_start));
                 
-                $sql = "SELECT COUNT(*) as count, SUM(base_amount) as total_amount 
-                       FROM agent_commissions 
-                       WHERE agent_id IN (" . implode(',', $agent_ids) . ") 
-                       AND transaction_type = 'rental'
+                // Utiliser la vraie table crm_transactions
+                $agent_ids_str = implode(',', array_map('intval', $agent_ids));
+                $sql = "SELECT COUNT(*) as count, SUM(montant) as total_amount 
+                       FROM crm_transactions 
+                       WHERE agent_id IN ($agent_ids_str) 
+                       AND type = 'location'
                        AND DATE(created_at) BETWEEN ? AND ?
-                       AND status != 'cancelled'";
+                       AND statut IN ('actif', 'cloture')";
                 
                 $result = $this->db->query($sql, [$month_start, $month_end]);
                 $row = $result ? $result->row() : null;
@@ -2337,6 +2361,32 @@ class Dashboard extends BaseController {
                     'count' => $row ? (int)$row->count : 0,
                     'amount' => $row ? (float)$row->total_amount : 0
                 ];
+            }
+            
+            // Si aucune donnée dans crm_transactions, essayer agent_commissions
+            $has_data = array_sum(array_column($rentals_data, 'count')) > 0;
+            if (!$has_data) {
+                for ($i = 5; $i >= 0; $i--) {
+                    $month = date('Y-m', strtotime("-$i months"));
+                    $month_start = $month . '-01';
+                    $month_end = date('Y-m-t', strtotime($month_start));
+                    
+                    $sql = "SELECT COUNT(*) as count, SUM(base_amount) as total_amount 
+                           FROM agent_commissions 
+                           WHERE agent_id IN ($agent_ids_str) 
+                           AND transaction_type = 'rental'
+                           AND DATE(created_at) BETWEEN ? AND ?
+                           AND status != 'cancelled'";
+                    
+                    $result = $this->db->query($sql, [$month_start, $month_end]);
+                    $row = $result ? $result->row() : null;
+                    
+                    $rentals_data[$i] = [
+                        'month' => date('M Y', strtotime($month_start)),
+                        'count' => $row ? (int)$row->count : 0,
+                        'amount' => $row ? (float)$row->total_amount : 0
+                    ];
+                }
             }
             
             return $rentals_data;
@@ -2351,9 +2401,6 @@ class Dashboard extends BaseController {
      */
     private function get_objectives_with_progress($agency_id) {
         try {
-            // Charger le modèle Objective
-            $this->load->model('Objective_model');
-            
             // Récupérer les agents de l'agence
             $agents = $this->get_filtered_agents_from_view($agency_id);
             $agent_ids = array_column($agents, 'ID');
@@ -2362,32 +2409,72 @@ class Dashboard extends BaseController {
                 return $this->get_sample_objectives_data();
             }
             
-            // Récupérer les objectifs du mois courant
+            // Récupérer les objectifs du mois courant depuis la vraie table monthly_objectives
             $current_month = date('Y-m');
             $objectives_data = [];
             
             foreach ($agent_ids as $agent_id) {
-                $objectives = $this->Objective_model->get_agent_objectives($agent_id, $current_month);
-                if (!empty($objectives)) {
-                    // Calculer les performances réelles
-                    $performance = $this->Objective_model->calculate_real_performance($agent_id, $current_month);
+                // Récupérer les objectifs depuis monthly_objectives
+                $sql_objectives = "SELECT * FROM monthly_objectives 
+                                  WHERE agent_id = ? AND month = ?";
+                $objectives_result = $this->db->query($sql_objectives, [$agent_id, $current_month . '-01']);
+                
+                if ($objectives_result && $objectives_result->num_rows() > 0) {
+                    $objective = $objectives_result->row();
                     
-                    $objective = $objectives[0]; // Premier objectif trouvé
+                    // Calculer les performances réelles pour ce mois
+                    $month_start = $current_month . '-01';
+                    $month_end = date('Y-m-t', strtotime($month_start));
+                    
+                    // 1. Estimations (depuis crm_properties)
+                    $sql_estimations = "SELECT COUNT(*) as count FROM crm_properties 
+                                       WHERE agent_id = ? AND DATE(created_at) BETWEEN ? AND ?";
+                    $estimations_result = $this->db->query($sql_estimations, [$agent_id, $month_start, $month_end]);
+                    $estimations_count = $estimations_result ? $estimations_result->row()->count : 0;
+                    
+                    // 2. Transactions (depuis crm_transactions)
+                    $sql_transactions = "SELECT COUNT(*) as count FROM crm_transactions 
+                                        WHERE agent_id = ? AND DATE(created_at) BETWEEN ? AND ? 
+                                        AND statut IN ('actif', 'cloture')";
+                    $transactions_result = $this->db->query($sql_transactions, [$agent_id, $month_start, $month_end]);
+                    $transactions_count = $transactions_result ? $transactions_result->row()->count : 0;
+                    
+                    // 3. Chiffre d'affaires (depuis crm_transactions)
+                    $sql_revenue = "SELECT SUM(montant) as revenue FROM crm_transactions 
+                                   WHERE agent_id = ? AND DATE(created_at) BETWEEN ? AND ? 
+                                   AND statut = 'cloture'";
+                    $revenue_result = $this->db->query($sql_revenue, [$agent_id, $month_start, $month_end]);
+                    $revenue_amount = $revenue_result ? ($revenue_result->row()->revenue ?? 0) : 0;
+                    
+                    // Si pas de données dans crm_transactions, essayer agent_commissions
+                    if ($transactions_count == 0 && $revenue_amount == 0) {
+                        $sql_commissions = "SELECT COUNT(*) as count, SUM(base_amount) as revenue 
+                                           FROM agent_commissions 
+                                           WHERE agent_id = ? AND DATE(created_at) BETWEEN ? AND ? 
+                                           AND status != 'cancelled'";
+                        $commissions_result = $this->db->query($sql_commissions, [$agent_id, $month_start, $month_end]);
+                        if ($commissions_result) {
+                            $commission_row = $commissions_result->row();
+                            $transactions_count = $commission_row->count ?? 0;
+                            $revenue_amount = $commission_row->revenue ?? 0;
+                        }
+                    }
+                    
                     $objectives_data[] = [
                         'agent_id' => $agent_id,
                         'agent_name' => $this->get_agent_name($agent_id),
                         'estimations_target' => $objective->estimations_target,
-                        'estimations_actual' => $performance['estimations_count'],
+                        'estimations_actual' => $estimations_count,
                         'estimations_progress' => $objective->estimations_target > 0 ? 
-                            round(($performance['estimations_count'] / $objective->estimations_target) * 100, 1) : 0,
+                            round(($estimations_count / $objective->estimations_target) * 100, 1) : 0,
                         'transactions_target' => $objective->transactions_target,
-                        'transactions_actual' => $performance['transactions_count'],
+                        'transactions_actual' => $transactions_count,
                         'transactions_progress' => $objective->transactions_target > 0 ? 
-                            round(($performance['transactions_count'] / $objective->transactions_target) * 100, 1) : 0,
+                            round(($transactions_count / $objective->transactions_target) * 100, 1) : 0,
                         'revenue_target' => $objective->revenue_target,
-                        'revenue_actual' => $performance['revenue_amount'],
+                        'revenue_actual' => $revenue_amount,
                         'revenue_progress' => $objective->revenue_target > 0 ? 
-                            round(($performance['revenue_amount'] / $objective->revenue_target) * 100, 1) : 0
+                            round(($revenue_amount / $objective->revenue_target) * 100, 1) : 0
                     ];
                 }
             }
