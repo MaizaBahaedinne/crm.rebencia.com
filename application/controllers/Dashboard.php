@@ -524,6 +524,140 @@ class Dashboard extends BaseController {
     }
     
     /**
+     * Force la mise à jour des avatars depuis différentes sources
+     */
+    public function update_avatars() {
+        $this->isLoggedIn();
+        
+        echo "<!DOCTYPE html>";
+        echo "<html><head>";
+        echo "<title>Mise à jour Avatars - CRM Rebencia</title>";
+        echo "<style>";
+        echo "body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }";
+        echo ".container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }";
+        echo "h1, h2 { color: #2c3e50; }";
+        echo ".result { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px; }";
+        echo ".success { background: #d4edda; border-color: #c3e6cb; color: #155724; }";
+        echo ".error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }";
+        echo ".info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }";
+        echo "</style>";
+        echo "</head><body>";
+        
+        echo "<div class='container'>";
+        echo "<h1>🔄 Mise à jour des Avatars</h1>";
+        
+        $agency_id = $this->agencyId ?: $this->session->userdata('agency_id') ?: 1;
+        
+        try {
+            $this->load->database('wordpress');
+            $wp_db = $this->load->database('wordpress', TRUE);
+            
+            // Rechercher tous les utilisateurs WordPress avec des avatars
+            echo "<h2>1. Recherche des avatars dans wp_usermeta</h2>";
+            
+            $avatars_meta = $wp_db->select('u.ID, u.user_login, u.user_email, um.meta_key, um.meta_value')
+                                  ->from('users u')
+                                  ->join('usermeta um', 'u.ID = um.user_id')
+                                  ->where_in('um.meta_key', ['fave_author_custom_picture', 'wp_user_avatar', 'avatar', '_wp_attachment_id'])
+                                  ->where('um.meta_value !=', '')
+                                  ->get();
+            
+            echo "<div class='result info'>";
+            echo "<strong>Avatars trouvés dans usermeta:</strong> " . $avatars_meta->num_rows() . "<br>";
+            
+            $avatar_data = [];
+            foreach ($avatars_meta->result() as $meta) {
+                if (!isset($avatar_data[$meta->ID])) {
+                    $avatar_data[$meta->ID] = [
+                        'user_login' => $meta->user_login,
+                        'user_email' => $meta->user_email,
+                        'avatars' => []
+                    ];
+                }
+                $avatar_data[$meta->ID]['avatars'][$meta->meta_key] = $meta->meta_value;
+            }
+            
+            foreach ($avatar_data as $user_id => $data) {
+                echo "<strong>User ID $user_id ({$data['user_login']}):</strong><br>";
+                foreach ($data['avatars'] as $key => $value) {
+                    echo "&nbsp;&nbsp;- $key: " . htmlspecialchars($value) . "<br>";
+                }
+                echo "<br>";
+            }
+            echo "</div>";
+            
+            // Rechercher les thumbnails dans wp_postmeta
+            echo "<h2>2. Recherche des thumbnails dans wp_postmeta</h2>";
+            
+            $thumbnails = $wp_db->select('p.ID, p.post_title, pm.meta_value as thumbnail_id, att.guid')
+                                ->from('posts p')
+                                ->join('postmeta pm', 'p.ID = pm.post_id AND pm.meta_key = "_thumbnail_id"')
+                                ->join('posts att', 'att.ID = pm.meta_value AND att.post_type = "attachment"')
+                                ->where_in('p.post_type', ['houzez_agent', 'houzez_manager'])
+                                ->where('p.post_status', 'publish')
+                                ->get();
+            
+            echo "<div class='result info'>";
+            echo "<strong>Thumbnails trouvés:</strong> " . $thumbnails->num_rows() . "<br>";
+            
+            foreach ($thumbnails->result() as $thumb) {
+                echo "<strong>{$thumb->post_title} (ID: {$thumb->ID}):</strong><br>";
+                echo "&nbsp;&nbsp;Thumbnail ID: {$thumb->thumbnail_id}<br>";
+                echo "&nbsp;&nbsp;URL: " . htmlspecialchars($thumb->guid) . "<br><br>";
+            }
+            echo "</div>";
+            
+            // Mise à jour des agents de l'agence
+            echo "<h2>3. Mise à jour des agents de l'agence $agency_id</h2>";
+            
+            $agents = $this->agent_model->get_agents_by_agency_with_avatars($agency_id);
+            $updated_count = 0;
+            
+            echo "<div class='result'>";
+            foreach ($agents as $agent) {
+                $has_avatar = !empty($agent->avatar_url);
+                $status_class = $has_avatar ? 'success' : 'error';
+                
+                echo "<div class='result $status_class'>";
+                echo "<strong>{$agent->display_name}</strong><br>";
+                echo "User ID: {$agent->user_id}<br>";
+                echo "Avatar: " . ($has_avatar ? htmlspecialchars($agent->avatar_url) : 'AUCUN') . "<br>";
+                
+                if ($has_avatar) {
+                    $updated_count++;
+                    echo "✅ Avatar disponible";
+                } else {
+                    echo "❌ Avatar manquant";
+                    
+                    // Essayer de trouver un avatar alternatif
+                    if (isset($avatar_data[$agent->user_id])) {
+                        echo "<br>Avatars alternatifs trouvés:";
+                        foreach ($avatar_data[$agent->user_id]['avatars'] as $key => $value) {
+                            echo "<br>&nbsp;&nbsp;- $key: " . htmlspecialchars($value);
+                        }
+                    }
+                }
+                echo "</div>";
+            }
+            
+            echo "</div>";
+            
+            echo "<div class='result " . ($updated_count > 0 ? 'success' : 'error') . "'>";
+            echo "<strong>Résultat:</strong> $updated_count agents sur " . count($agents) . " ont un avatar.";
+            echo "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>";
+            echo "<strong>Erreur:</strong> " . $e->getMessage();
+            echo "</div>";
+        }
+        
+        echo "<p><a href='" . base_url('dashboard/manager') . "' class='btn btn-primary'>Retour au Dashboard Manager</a></p>";
+        echo "</div>";
+        echo "</body></html>";
+    }
+    
+    /**
      * Test de la récupération d'avatars des agents
      */
     public function test_avatars() {
