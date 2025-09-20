@@ -1,8 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-
-
 /**
  * @property CI_Session $session
  * @property CI_Form_validation $form_validation
@@ -13,16 +11,12 @@ class Login extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('login_model');
-        $this->load->library('form_validation');
-        $this->load->library('session');
-        $this->load->helper('url');
-        $this->load->helper('form');
-        // $this->input is available by default in CI_Controller, but you can ensure it's loaded
+        $this->load->library(['form_validation', 'session']);
+        $this->load->helper(['url', 'form']);
     }
 
     public function index() {
-        $isLoggedIn = $this->session->userdata('isLoggedIn');
-        if($isLoggedIn){
+        if ($this->session->userdata('isLoggedIn')) {
             redirect('dashboard');
         } else {
             $this->load->view('users/login');
@@ -30,31 +24,14 @@ class Login extends CI_Controller {
     }
 
     public function isLoggedIn() {
-        $isLoggedIn = $this->session->userdata('isLoggedIn');
-     
-        if(empty($isLoggedIn)) {
-            
-                $this->load->view('users/login');
-            
+        if (!$this->session->userdata('isLoggedIn')) {
+            $this->load->view('users/login');
         } else {
             redirect('dashboard');
         }
     }
 
     public function loginMe() {
-        // Ensure form_validation, session, and input are loaded
-        if (!isset($this->form_validation)) {
-            $this->load->library('form_validation');
-        }
-        if (!isset($this->session)) {
-            $this->load->library('session');
-        }
-        if (!isset($this->input)) {
-            $this->load->library('input');
-        }
-
-        // Set validation rules
-       
         $this->form_validation->set_rules('password', 'Password', 'required|max_length[32]');
 
         if ($this->form_validation->run() == FALSE) {
@@ -62,19 +39,15 @@ class Login extends CI_Controller {
             return;
         }
 
-        // Get input values
         $username = $this->input->post('email');
         $password = $this->input->post('password');
-
-        // Load WordPress database connection (add 'wordpress' config in application/config/database.php)
         $wp_db = $this->load->database('wordpress', TRUE);
 
-        // Get user by email from wp_Hrg8P_users
         $wp_db->where('user_login', $username);
         $user = $wp_db->get('wp_Hrg8P_users')->row();
 
-    if ($user) {
-            // Verify password using WordPress hash
+        if ($user) {
+            // Load WordPress password hasher if needed
             if (!class_exists('PasswordHash')) {
                 require_once(APPPATH . 'libraries/class-phpass.php');
             }
@@ -86,10 +59,7 @@ class Login extends CI_Controller {
                     return $original;
                 }
                 function is_serialized($data) {
-                    // if it isn't a string, it isn't serialized
-                    if (!is_string($data)) {
-                        return false;
-                    }
+                    if (!is_string($data)) return false;
                     $data = trim($data);
                     if ('N;' == $data) return true;
                     if (!preg_match('/^([adObis]):/', $data, $badions)) return false;
@@ -97,12 +67,12 @@ class Login extends CI_Controller {
                         case 'a':
                         case 'O':
                         case 's':
-                            if (preg_match( "/^{$badions[1]}:[0-9]+:/s", $data )) return true;
+                            if (preg_match("/^{$badions[1]}:[0-9]+:/s", $data)) return true;
                             break;
                         case 'b':
                         case 'i':
                         case 'd':
-                            if (preg_match( "/^{$badions[1]}:[0-9.E-]+;$/", $data )) return true;
+                            if (preg_match("/^{$badions[1]}:[0-9.E-]+;$/", $data)) return true;
                             break;
                     }
                     return false;
@@ -111,15 +81,15 @@ class Login extends CI_Controller {
             $wp_hasher = new \PasswordHash(8, TRUE);
 
             if ($wp_hasher->CheckPassword($password, $user->user_pass)) {
-                // Récupération métas
+                // Get user meta
                 $wp_db->where('user_id', $user->ID);
                 $meta = $wp_db->get('wp_Hrg8P_usermeta')->result();
                 $role = '';
                 $avatar_url = null;
                 $agency_id = null;
-                $prefix = $wp_db->dbprefix; // ex: wp_Hrg8P_
+                $prefix = $wp_db->dbprefix;
+
                 foreach ($meta as $m) {
-                    // Capabilities
                     if ($m->meta_key === $prefix.'capabilities') {
                         $roles = maybe_unserialize($m->meta_value);
                         if (is_array($roles) && !empty($roles)) {
@@ -133,11 +103,13 @@ class Login extends CI_Controller {
                         $avatar_url = $m->meta_value;
                     }
                 }
-                // Normalisation : mapper rôles houzez_* vers interne
+
+                // Map roles
                 $mappedRole = $role;
-                if ($role === 'houzez_agency') { $mappedRole = 'agency'; }
-                if ($role === 'houzez_agent') { $mappedRole = 'agent'; }
-                if ($role === 'houzez_manager') { $mappedRole = 'manager'; }
+                if ($role === 'houzez_agency') $mappedRole = 'agency';
+                if ($role === 'houzez_agent') $mappedRole = 'agent';
+                if ($role === 'houzez_manager') $mappedRole = 'manager';
+
                 $sessionData = [
                     'logged_in'   => true,
                     'wp_id'       => $user->ID,
@@ -149,47 +121,39 @@ class Login extends CI_Controller {
                     'isLoggedIn'  => TRUE,
                     'wp_url'      => null
                 ];
-                
-                // Récupérer agent_post_id depuis wp_Hrg8P_crm_agents si agent
+
+                // Agent specific
                 if ($mappedRole === 'agent') {
                     $agent_post_id = null;
                     if ($wp_db->table_exists('wp_Hrg8P_crm_agents')) {
                         $agent_record = $wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row();
-                        if ($agent_record && isset($agent_record->agent_post_id)) {
-                            $agent_post_id = $agent_record->agent_post_id;
+                        if ($agent_record) {
+                            if (isset($agent_record->agent_post_id)) {
+                                $agent_post_id = $agent_record->agent_post_id;
+                            }
                             if (isset($agent_record->agency_id)) {
                                 $sessionData['agency_id'] = $agent_record->agency_id;
                             }
                         }
                     }
-                    // Fallback vers user->ID si pas d'agent_post_id trouvé
                     $sessionData['user_post_id'] = $agent_post_id ?: $user->ID;
+                    $sessionData['agent_id'] = $user->ID;
                 } else {
                     $sessionData['user_post_id'] = $user->ID;
                 }
-                if ($mappedRole === 'agent') { $sessionData['agent_id'] = $user->ID;  
-                    if ($wp_db->table_exists('wp_Hrg8P_crm_agents')) {
-                        $agent_record = $wp_db->where('user_id', $user->ID)->get('wp_Hrg8P_crm_agents')->row();
-                        if ($agent_record && isset($agent_record->agent_post_id)) {
-                            $agent_post_id = $agent_record->agent_post_id;
-                            if (isset($agent_record->agency_id)) {
-                                $sessionData['agency_id'] = $agent_record->agency_id;
-                            }
-                        }
-                    }
-                    
+
+                if ($mappedRole === 'agency') {
+                    $sessionData['agency_id'] = $agency_id;
                 }
-                if ($mappedRole === 'agency') { $sessionData['agency_id'] = $agency_id; }
-                // Assurer disponibilité session
+
                 $this->session->set_userdata($sessionData);
 
-                // Redirection
+                // Redirect by role
                 if ($mappedRole === 'administrator') {
                     redirect('dashboard/admin');
                 } elseif ($mappedRole === 'agency') {
                     redirect('dashboard/agency/'.$agency_id);
                 } elseif ($mappedRole === 'agent') {
-                    // Utiliser une route simplifiée puisque user_post_id est en session
                     redirect('dashboard/agent');
                 } else {
                     redirect('dashboard');
@@ -197,10 +161,8 @@ class Login extends CI_Controller {
             }
         }
 
-    $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe.');
+        $this->session->set_flashdata('error', 'Login WordPress échoué. Vérifie le mot de passe.');
         redirect('login');
     }
-
-    // Fonctions forgot/reset password idem, ajoute check file_exists avant load->view
 }
 ?>
