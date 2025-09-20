@@ -1344,6 +1344,7 @@ class Agent_model extends CI_Model {
             u.user_registered AS registration_date,
             
             p.ID AS agent_post_id,
+            p.ID AS agent_id,
             p.post_title AS agent_name,
             p.post_status AS post_status,
             p.post_type AS post_type,
@@ -1357,6 +1358,14 @@ class Agent_model extends CI_Model {
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) AS whatsapp,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) AS agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position,
+            
+            (SELECT COUNT(*) 
+             FROM " . $this->posts_table . " prop 
+             LEFT JOIN " . $this->postmeta_table . " prop_agent ON prop.ID = prop_agent.post_id AND prop_agent.meta_key = 'fave_property_agent'
+             WHERE prop.post_type = 'property' 
+             AND prop.post_status = 'publish'
+             AND prop_agent.meta_value = p.ID
+            ) as properties_count,
             
             ur.meta_value AS user_roles
         ", FALSE);
@@ -1422,6 +1431,16 @@ class Agent_model extends CI_Model {
 
             // Déterminer le statut actif basé sur post_status
             $agent->is_active = ($agent->post_status === 'publish') ? 1 : 0;
+            
+            // Ajouter des propriétés par défaut si manquantes
+            if (!isset($agent->properties_count)) {
+                $agent->properties_count = 0;
+            }
+            
+            // S'assurer que les dates existent
+            if (!isset($agent->created_date)) {
+                $agent->created_date = $agent->registration_date ?? date('Y-m-d H:i:s');
+            }
             
             // Nettoyer les données
             $agent = $this->clean_agent_data($agent);
