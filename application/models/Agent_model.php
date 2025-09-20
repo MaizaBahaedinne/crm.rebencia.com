@@ -1445,11 +1445,10 @@ class Agent_model extends CI_Model {
     }
 
     public function get_manager_team_agents($manager_agency_id) {
-        $this->load->database('rebenciaBD');
-        $this->rebenciaBD = $this->load->database('rebenciaBD', TRUE);
+        
         
         // Utiliser les 3 vues pour récupérer les agents de l'agence du manager
-        $this->rebenciaBD->select('
+        $this->wp_db->select('
             a.ID as user_id,
             a.display_name,
             a.user_email,
@@ -1463,17 +1462,17 @@ class Agent_model extends CI_Model {
             a.agency_id
         ');
         
-        $this->rebenciaBD->from('wp_Hrg8P_crm_agents a');
-        $this->rebenciaBD->join('wp_Hrg8P_crm_avatar_agents ava', 'a.ID = ava.agent_post_id', 'left');
-        $this->rebenciaBD->join('wp_Hrg8P_prop_agen prop', 'a.ID = prop.agent_post_id', 'left');
+        $this->wp_db->from('wp_Hrg8P_crm_agents a');
+        $this->wp_db->join('wp_Hrg8P_crm_avatar_agents ava', 'a.ID = ava.agent_post_id', 'left');
+        $this->wp_db->join('wp_Hrg8P_prop_agen prop', 'a.ID = prop.agent_post_id', 'left');
         
         // Filtrer par agence et inclure les agents ET managers
-        $this->rebenciaBD->where('a.agency_id', $manager_agency_id);
-        $this->rebenciaBD->where_in('a.user_role', ['houzez_agent', 'houzez_manager']);
+        $this->wp_db->where('a.agency_id', $manager_agency_id);
+        $this->wp_db->where_in('a.user_role', ['houzez_agent', 'houzez_manager']);
         
-        $this->rebenciaBD->order_by('a.display_name', 'ASC');
+        $this->wp_db->order_by('a.display_name', 'ASC');
         
-        $query = $this->rebenciaBD->get();
+        $query = $this->wp_db->get();
         $agents = $query->result();
         
         // Nettoyer et enrichir les données
@@ -1488,11 +1487,10 @@ class Agent_model extends CI_Model {
     public function get_agents_by_agency_with_avatars($agency_id) {
         if (!$agency_id) return [];
         
-        $this->load->database('rebenciaBD');
-        $this->rebenciaBD = $this->load->database('rebenciaBD', TRUE);
+     
         
         // Utiliser les vues optimisées pour récupérer les agents avec avatars
-        $this->rebenciaBD->select('
+        $this->wp_db->select('
             a.ID as user_id,
             a.display_name,
             a.user_email,
@@ -1506,17 +1504,17 @@ class Agent_model extends CI_Model {
             a.agency_id
         ');
         
-        $this->rebenciaBD->from('wp_Hrg8P_crm_agents a');
-        $this->rebenciaBD->join('wp_Hrg8P_crm_avatar_agents ava', 'a.ID = ava.agent_post_id', 'left');
-        $this->rebenciaBD->join('wp_Hrg8P_prop_agen prop', 'a.ID = prop.agent_post_id', 'left');
+        $this->wp_db->from('wp_Hrg8P_crm_agents a');
+        $this->wp_db->join('wp_Hrg8P_crm_avatar_agents ava', 'a.ID = ava.agent_post_id', 'left');
+        $this->wp_db->join('wp_Hrg8P_prop_agen prop', 'a.ID = prop.agent_post_id', 'left');
         
         // Filtrer par agence et inclure agents et managers
-        $this->rebenciaBD->where('a.agency_id', $agency_id);
-        $this->rebenciaBD->where_in('a.user_role', ['houzez_agent', 'houzez_manager']);
+        $this->wp_db->where('a.agency_id', $agency_id);
+        $this->wp_db->where_in('a.user_role', ['houzez_agent', 'houzez_manager']);
         
-        $this->rebenciaBD->order_by('a.display_name', 'ASC');
+        $this->wp_db->order_by('a.display_name', 'ASC');
         
-        $query = $this->rebenciaBD->get();
+        $query = $this->wp_db->get();
         $agents = $query->result();
         
         // Nettoyer et enrichir les données
