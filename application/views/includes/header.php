@@ -914,6 +914,22 @@
                                     <i class="ri-shopping-bag-3-line"></i> <span>Ventes & Locations</span>
                                 </a>
                             </li>
+                            <li class="menu-title"><span>Objectifs & Performance</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/agency'); ?>">
+                                    <i class="ri-target-line"></i> <span>Objectifs de l'agence</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/agents'); ?>">
+                                    <i class="ri-team-line"></i> <span>Objectifs des agents</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/performance'); ?>">
+                                    <i class="ri-trophy-line"></i> <span>Performance équipe</span>
+                                </a>
+                            </li>
                             <li class="menu-title"><span>Rapports</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('reports/manager'); ?>">
