@@ -54,7 +54,19 @@ class BaseController extends CI_Controller {
 			if(!is_array($this->accessInfo)) { $this->accessInfo = []; }
 			$this->wp_avatar = $CI->session->userdata('wp_avatar');
 			$this->userPostId = $CI->session->userdata('user_post_id');
+			
+			// Récupération intelligente de l'agency_id
 			$this->agencyId = $CI->session->userdata('agency_id');
+			
+			// Si agency_id n'est pas en session, le récupérer depuis wp_Hrg8P_crm_agents
+			if (empty($this->agencyId) && !empty($this->userPostId)) {
+				$this->agencyId = $this->getAgencyIdFromCrmAgents($this->userPostId);
+				
+				// Sauvegarder en session pour éviter les requêtes répétées
+				if (!empty($this->agencyId)) {
+					$CI->session->set_userdata('agency_id', $this->agencyId);
+				}
+			}
 			
 			$this->global['userId'] = $this->vendorId ;
 			$this->global['name'] = $this->name;
@@ -66,6 +78,39 @@ class BaseController extends CI_Controller {
 			$this->global['wp_avatar'] = $this->wp_avatar;
 			$this->global['user_post_id'] = $this->userPostId;
 			$this->global['agency_id'] = $this->agencyId;
+		}
+	}
+	
+	/**
+	 * Récupère l'agency_id depuis la vue wp_Hrg8P_crm_agents
+	 * @param int $agent_post_id L'ID du post agent
+	 * @return int|null L'agency_id ou null si non trouvé
+	 */
+	private function getAgencyIdFromCrmAgents($agent_post_id) {
+		try {
+			$CI =& get_instance();
+			
+			// Charger la connexion WordPress
+			$CI->load->database('wordpress');
+			$wp_db = $CI->load->database('wordpress', TRUE);
+			
+			// Requête pour récupérer l'agency_id
+			$query = $wp_db->select('agency_id')
+							->from('wp_Hrg8P_crm_agents')
+							->where('agent_post_id', $agent_post_id)
+							->get();
+			
+			if ($query && $query->num_rows() > 0) {
+				$result = $query->row();
+				return $result->agency_id;
+			}
+			
+			return null;
+			
+		} catch (Exception $e) {
+			// En cas d'erreur, ne pas bloquer l'application
+			error_log('Erreur récupération agency_id: ' . $e->getMessage());
+			return null;
 		}
 	}
 	
