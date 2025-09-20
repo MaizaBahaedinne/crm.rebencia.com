@@ -1352,14 +1352,12 @@ class Agent_model extends CI_Model {
             a.ID AS agency_id,
             a.post_title AS agency_name,
             
-            -- Contact info
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_phone' THEN pm_contact.meta_value END) AS phone,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_mobile' THEN pm_contact.meta_value END) AS mobile,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_whatsapp' THEN pm_contact.meta_value END) AS whatsapp,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_picture' THEN media.guid END) AS agent_avatar,
             MAX(CASE WHEN pm_contact.meta_key = 'fave_agent_position' THEN pm_contact.meta_value END) AS position,
             
-            -- User role
             ur.meta_value AS user_roles
         ", FALSE);
         
