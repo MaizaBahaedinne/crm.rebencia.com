@@ -29,7 +29,11 @@ class Properties extends BaseController {
         
         // Récupérer les propriétés
         $properties = $this->property_model->get_all_properties();
-        echo '<pre>'; print_r($properties); echo '</pre>'; exit;
+        echo (json_decode($properties));
+        
+        //if ($role=='manager') {
+        //    $properties = $this->property_model->get_properties_with_agents_agencies($properties);
+        //}
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->ID);
             $property->status = $this->property_model->get_property_status($property->ID);
