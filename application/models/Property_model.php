@@ -671,4 +671,17 @@ class Property_model extends CI_Model {
         
         return $this->wp_db->get()->result();
     }
+
+
+    public function get_properties_agency($agency_id, $limit = null) 
+    {
+        $view_name = $this->wp_db->dbprefix('prop_agen');
+        $this->wp_db->from($view_name);
+        $this->wp_db->where('agency_id', $agency_id);
+        if ($limit) {
+            $this->wp_db->limit($limit);
+        }
+        return $this->wp_db->get()->result();
+    }
+       
 }

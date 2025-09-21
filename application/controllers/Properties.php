@@ -27,13 +27,15 @@ class Properties extends BaseController {
         $data['pageTitle'] = 'Liste des propriétés';
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
-        // Récupérer les propriétés
-        $properties = $this->property_model->get_all_properties();
-        echo (json_encode($properties));
+      
 
-        //if ($role=='manager') {
-        //    $properties = $this->property_model->get_properties_with_agents_agencies($properties);
-        //}
+        if ($this->role=='manager') {
+            $properties = $this->property_model->get_properties_agency($this->agencyId);
+        }else {
+            // Pour les autres rôles, récupérer toutes les propriétés
+            $properties = $this->property_model->get_all_properties();
+        }
+
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->ID);
             $property->status = $this->property_model->get_property_status($property->ID);
