@@ -19,6 +19,9 @@ class Property_model extends CI_Model {
         if (!empty($filters['post_date_gmt'])) {
             $this->wp_db->where('post_date_gmt', $filters['post_date_gmt']);
         }
+        if (!empty($filters['prop'])) {
+            $this->wp_db->where('post_date_gmt', $filters['post_date_gmt']);
+        }
 
     $results = $this->wp_db->get()->result();
     $filtered = [];
@@ -678,11 +681,8 @@ class Property_model extends CI_Model {
         $view_name = $this->wp_db->dbprefix('prop_agen');
         $this->wp_db->from($view_name);
         $this->wp_db->where('agency_id', $agency_id);
-        if ($limit) {
-            $this->wp_db->limit($limit);
-        }
         $prop = $this->wp_db->get()->result();
-        
+
         return $this->get_all_properties(filters: ['property_id' => array_column($prop, 'property_id')]);
     }
        
