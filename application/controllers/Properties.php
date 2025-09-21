@@ -27,24 +27,8 @@ class Properties extends BaseController {
         $data['pageTitle'] = 'Liste des propriétés';
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
         
-        // Récupérer les propriétés selon le rôle de l'utilisateur
-        $user_role = $this->session->userdata('role');
-        $user_id = $this->session->userdata('userId');
-
-        if ($user_role === 'manager' || $user_role === 'agent') {
-            // Pour un manager, récupérer les propriétés de son agence
-            $agent = $this->agent_model->get_agent_by_user_id($user_id);
-            if ($agent && isset($agent->agency_id)) {
-                $properties = $this->property_model->get_properties_by_agency($agent->agency_id );
-            } else {
-            $properties = [];
-            }
-        
-        } else {
-            // Pour les autres rôles, récupérer toutes les propriétés
-            $properties = $this->property_model->get_all_properties();
-        }
-
+        // Récupérer les propriétés
+        $properties = $this->property_model->get_all_properties();
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->ID);
             $property->status = $this->property_model->get_property_status($property->ID);
@@ -58,7 +42,7 @@ class Properties extends BaseController {
         $data['property_types'] = $this->property_model->get_property_types();
         $data['property_cities'] = $this->property_model->get_property_cities();
         
-     //   $this->loadViews('dashboard/properties/index', $data, $data);
+        $this->loadViews('dashboard/properties/index', $data, $data);
     }
 
     // Détails d'une propriété
