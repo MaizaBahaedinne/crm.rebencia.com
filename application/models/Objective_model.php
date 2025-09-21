@@ -595,12 +595,12 @@ class Objective_model extends CI_Model
                 user_id as ID,
                 agent_name as display_name
             FROM rebencia_RebenciaBD.wp_Hrg8P_crm_agents
-            WHERE agency_id = ?
+            WHERE agency_id = ".$agency_id."
             AND post_status = 'publish'
             ORDER BY agent_name ASC
         ";
         
-        return $this->wp_db->query($query, [$agency_id])->result();
+        return $this->wp_db->query($query)->result();
     }
 
     /**
