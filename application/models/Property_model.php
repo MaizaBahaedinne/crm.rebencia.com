@@ -676,13 +676,14 @@ class Property_model extends CI_Model {
     }
 
 
-    public function get_properties_agency($agency_id) 
-    {
-        $view_name = $this->wp_db->dbprefix('prop_agen');
-        $this->wp_db->from($view_name);
-        $this->wp_db->where('agency_id', $agency_id);
-        $prop = $this->wp_db->get()->result();
-        return $this->get_all_properties(filters: ['property_id' => array_column($prop, 'property_id')]);
-    }
+  public function get_properties_agency($agency_id) 
+{
+    $view_name = $this->wp_db->dbprefix('prop_agen');
+    $this->wp_db->from($view_name);
+    $this->wp_db->where('agency_id', $agency_id);
+    $prop = $this->wp_db->get()->result();
+    return $this->get_all_properties(['property_id' => array_column($prop, 'property_id')]);
+}
+
        
 }
