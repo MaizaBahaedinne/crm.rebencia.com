@@ -185,7 +185,7 @@ class Objectives extends BaseController {
                 return;
             }
 
-            echo (json_encode($data));
+            echo (json_encode($data['agents'] ));
 
          //   $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);
             
