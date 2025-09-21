@@ -1448,47 +1448,45 @@ class Agent_model extends CI_Model {
         $this->load->database('wordpress');
         $wp_db = $this->load->database('wordpress', TRUE);
         
-        // Utiliser les vraies tables WordPress - le préfixe wp_Hrg8P_ est déjà configuré
+        // Tables WordPress avec préfixe dynamique
         $wp_db->select('
             p.ID as user_id,
             p.post_title as display_name,
             u.user_email,
             u.user_nicename,
             p.ID as agent_post_id,
-            pm_avatar.meta_value as avatar_url,
             pm_avatar.meta_value as avatar_id,
             COALESCE(prop_count.property_count, 0) as property_count,
             p.post_type as user_role,
             agency.post_title as agency_name,
             agency.ID as agency_id
         ', FALSE);
-        
-        $wp_db->from('posts p');
-        $wp_db->join('postmeta pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
-        $wp_db->join('users u', 'u.user_email = pm_email.meta_value', 'inner');
-        $wp_db->join('postmeta pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left');
-        $wp_db->join('posts agency', 'agency.ID = pm_agency.meta_value AND agency.post_type = "houzez_agency"', 'left');
-        $wp_db->join('postmeta pm_avatar', 'pm_avatar.post_id = p.ID AND pm_avatar.meta_key = "_thumbnail_id"', 'left');
-        
+
+        $wp_db->from($wp_db->dbprefix('posts') . ' p');
+        $wp_db->join($wp_db->dbprefix('postmeta') . ' pm_email', 'pm_email.post_id = p.ID AND pm_email.meta_key = "fave_agent_email"', 'inner');
+        $wp_db->join($wp_db->dbprefix('users') . ' u', 'u.user_email = pm_email.meta_value', 'inner');
+        $wp_db->join($wp_db->dbprefix('postmeta') . ' pm_agency', 'pm_agency.post_id = p.ID AND pm_agency.meta_key = "fave_agent_agencies"', 'left');
+        $wp_db->join($wp_db->dbprefix('posts') . ' agency', 'agency.ID = pm_agency.meta_value AND agency.post_type = "houzez_agency"', 'left');
+        $wp_db->join($wp_db->dbprefix('postmeta') . ' pm_avatar', 'pm_avatar.post_id = p.ID AND pm_avatar.meta_key = "_thumbnail_id"', 'left');
+
         // Sous-requête pour compter les propriétés
-        $wp_db->join('(SELECT pm_prop.meta_value as agent_id, COUNT(*) as property_count 
-                                 FROM ' . $wp_db->dbprefix . 'posts prop 
-                                 INNER JOIN ' . $wp_db->dbprefix . 'postmeta pm_prop ON prop.ID = pm_prop.post_id 
-                                 WHERE pm_prop.meta_key = "fave_property_agent" 
-                                 AND prop.post_type = "property" 
-                                 AND prop.post_status = "publish"
-                                 GROUP BY pm_prop.meta_value) prop_count', 'prop_count.agent_id = p.ID', 'left');
-        
-        // Filtrer par agence et inclure les agents ET managers
+        $wp_db->join('(
+            SELECT pm_prop.meta_value as agent_id, COUNT(*) as property_count
+            FROM ' . $wp_db->dbprefix('posts') . ' prop
+            INNER JOIN ' . $wp_db->dbprefix('postmeta') . ' pm_prop ON prop.ID = pm_prop.post_id
+            WHERE pm_prop.meta_key = "fave_property_agent"
+            AND prop.post_type = "property"
+            AND prop.post_status = "publish"
+            GROUP BY pm_prop.meta_value
+        ) prop_count', 'prop_count.agent_id = p.ID', 'left');
+
         $wp_db->where('agency.ID', $manager_agency_id);
         $wp_db->where_in('p.post_type', ['houzez_agent', 'houzez_manager']);
         $wp_db->where('p.post_status', 'publish');
-        
         $wp_db->order_by('p.post_title', 'ASC');
-        
+
         $query = $wp_db->get();
         $agents = $query->result();
-        
         // Nettoyer et enrichir les données
         foreach ($agents as &$agent) {
             // Nettoyer les données
