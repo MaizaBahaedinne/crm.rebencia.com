@@ -330,13 +330,9 @@ class Property_model extends CI_Model {
         foreach ($agents as $agent) {
             // Essayer différentes colonnes possibles pour user_id
             $user_id = null;
-            if (!empty($agent->user_id)) {
-                $user_id = $agent->user_id;
-            } elseif (!empty($agent->wp_user_id)) {
-                $user_id = $agent->wp_user_id;
-            } elseif (!empty($agent->id)) {
-                $user_id = $agent->id;
-            }
+            if (!empty($agent->agent_post_id)) {
+                $user_id = $agent->agent_post_id;
+            } 
             
             if ($user_id) {
                 $agent_user_ids[] = $user_id;
