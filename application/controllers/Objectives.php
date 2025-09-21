@@ -26,7 +26,7 @@ class Objectives extends BaseController {
         
         $data['title'] = 'Tableau de Bord des Objectifs';
         $data['current_month'] = $month;
-        if ($this->roleText === 'manager' && !empty($this->agencyId)) {
+        if ($this->roleText === 'manager' ) {
                 // manager : récupérer seulement les agents de son agence
                 $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month, $this->agencyId);
                 $data['stats'] = $this->Objective_model->get_objectives_stats($month, $this->agencyId);
