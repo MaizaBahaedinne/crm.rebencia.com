@@ -30,6 +30,7 @@ class Objectives extends BaseController {
                 // manager : récupérer seulement les agents de son agence
                 $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month, $this->agencyId);
                 $data['stats'] = $this->Objective_model->get_objectives_stats($month, $this->agencyId);
+                echo(json_encode( $data['objectives_data'] ));
             } else {
                 $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month);
                 $data['stats'] = $this->Objective_model->get_objectives_stats($month);
@@ -41,7 +42,7 @@ class Objectives extends BaseController {
             $data['objectives_data'] = $this->get_sample_objectives_data();
         }
         
-        $this->loadViews('objectives/index', $this->global, $data, NULL);
+       // $this->loadViews('objectives/index', $this->global, $data, NULL);
     }
 
     /**
