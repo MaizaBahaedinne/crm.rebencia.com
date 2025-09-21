@@ -250,7 +250,7 @@ class Objective_model extends CI_Model
         if ($agency_id) {
             // Récupérer les IDs des agents de l'agence
             $agents = $this->get_agents_by_agency($agency_id);
-            echo(json_encode( $agents ));   
+              
             $agent_ids = array_column($agents, 'user_id');
             if (empty($agent_ids)) {
             $objectives = [];
@@ -270,7 +270,7 @@ class Objective_model extends CI_Model
                     ->result();
         }
 
-
+        echo(json_encode( $objectives ));
 
         $result = array();
         
