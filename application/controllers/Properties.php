@@ -29,6 +29,7 @@ class Properties extends BaseController {
         
         // Récupérer les propriétés
         $properties = $this->property_model->get_all_properties();
+        echo '<pre>'; print_r($properties); echo '</pre>'; exit;
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->ID);
             $property->status = $this->property_model->get_property_status($property->ID);
@@ -37,7 +38,7 @@ class Properties extends BaseController {
         }
         $data['properties'] = $properties;
         
-        echo '<pre>'; print_r($data['properties']); echo '</pre>'; exit;
+        
 
         // Récupérer les données pour les filtres
         $data['property_statuses'] = $this->property_model->get_property_statuses();
