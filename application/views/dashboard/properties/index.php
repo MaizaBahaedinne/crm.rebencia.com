@@ -123,9 +123,9 @@
                             <div class="position-relative">
                                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                                     <?php if (!empty($property->images['thumbnail'])) : ?>
-                                        <img src="<?php echo $property->images['thumbnail']; ?>" alt="<?php echo htmlspecialchars($property->post_title); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="<?php echo $property->images['thumbnail']; ?>" alt="<?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété')); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
                                     <?php elseif (!empty($property->images['gallery']) && count($property->images['gallery']) > 0) : ?>
-                                        <img src="<?php echo $property->images['gallery'][0]; ?>" alt="<?php echo htmlspecialchars($property->post_title); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="<?php echo $property->images['gallery'][0]; ?>" alt="<?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété')); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
                                     <?php else : ?>
                                         <div class="text-center text-muted">
                                             <i class="ri-home-line fs-1"></i>
@@ -153,30 +153,37 @@
                                     $status_name = 'Non défini';
                                     $status_color = 'secondary';
                                     
-                                    if (isset($property->status) && $property->status) {
+                                    if (isset($property->status) && $property->status && isset($property->status->name)) {
                                         $status_name = $property->status->name;
                                         // Couleurs basées sur le slug du statut
-                                        switch(strtolower($property->status->slug)) {
-                                            case 'for-sale':
-                                            case 'a-vendre':
-                                                $status_color = 'warning'; 
-                                                break;
-                                            case 'for-rent':
-                                            case 'a-louer':
-                                                $status_color = 'info'; 
-                                                break;
-                                            case 'sold':
-                                            case 'vendu':
-                                                $status_color = 'success'; 
-                                                break;
-                                            case 'rented':
-                                            case 'loue':
-                                                $status_color = 'dark'; 
-                                                break;
-                                            default: 
-                                                $status_color = 'secondary'; 
-                                                break;
+                                        if (isset($property->status->slug)) {
+                                            switch(strtolower($property->status->slug)) {
+                                                case 'for-sale':
+                                                case 'a-vendre':
+                                                    $status_color = 'warning'; 
+                                                    break;
+                                                case 'for-rent':
+                                                case 'a-louer':
+                                                    $status_color = 'info'; 
+                                                    break;
+                                                case 'sold':
+                                                case 'vendu':
+                                                    $status_color = 'success'; 
+                                                    break;
+                                                case 'rented':
+                                                case 'loue':
+                                                    $status_color = 'dark'; 
+                                                    break;
+                                                default: 
+                                                    $status_color = 'secondary'; 
+                                                    break;
+                                            }
+                                        } else {
+                                            $status_color = 'secondary';
                                         }
+                                    } else {
+                                        $status_name = 'Statut inconnu';
+                                        $status_color = 'secondary';
                                     }
                                     ?>
                                     <span class="badge bg-<?php echo $status_color; ?>">
@@ -196,8 +203,8 @@
                             <div class="card-body">
                                 <!-- Property Title -->
                                 <h5 class="card-title">
-                                    <a href="<?php echo base_url('properties/view/' . $property->ID); ?>" class="text-decoration-none">
-                                        <?php echo htmlspecialchars($property->post_title ?: 'Propriété sans titre'); ?>
+                                    <a href="<?php echo base_url('properties/view/' . (isset($property->ID) ? $property->ID : (isset($property->property_id) ? $property->property_id : 'unknown'))); ?>" class="text-decoration-none">
+                                        <?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété sans titre')); ?>
                                     </a>
                                 </h5>
 
@@ -218,7 +225,7 @@
                                     <div class="col-6">
                                         <small class="text-muted">Surface:</small><br>
                                         <span class="fw-medium">
-                                            <?php echo $property->surface_habitable ? $property->surface_habitable . ' m²' : 'Non spécifiée'; ?>
+                                            <?php echo isset($property->surface_habitable) && $property->surface_habitable ? $property->surface_habitable . ' m²' : 'Non spécifiée'; ?>
                                         </span>
                                     </div>
                                 </div>
@@ -227,7 +234,7 @@
                                 <div class="d-flex align-items-start mb-3">
                                     <i class="ri-map-pin-line text-muted me-2 mt-1"></i>
                                     <small class="text-muted">
-                                        <?php echo htmlspecialchars($property->zone_nom ?: 'Adresse non fournie'); ?>
+                                        <?php echo htmlspecialchars(isset($property->zone_nom) && $property->zone_nom ? $property->zone_nom : 'Adresse non fournie'); ?>
                                     </small>
                                 </div>
 
