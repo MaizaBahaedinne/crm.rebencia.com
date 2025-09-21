@@ -1025,13 +1025,8 @@
                             </li>
                             <li class="menu-title"><span>Objectifs & Performance</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/agency'); ?>">
-                                    <i class="ri-target-line"></i> <span>Objectifs de l'agence</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/agents'); ?>">
-                                    <i class="ri-team-line"></i> <span>Objectifs des agents</span>
+                                <a class="nav-link menu-link" href="<?php echo base_url('objectives'); ?>">
+                                    <i class="ri-dashboard-3-line"></i> <span>Tableau de Bord Objectifs</span>
                                 </a>
                             </li>
                             <li class="nav-item">
