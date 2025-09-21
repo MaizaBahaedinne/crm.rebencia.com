@@ -276,8 +276,8 @@ class Objective_model extends CI_Model
         foreach ($objectives as $objective) {
             // Récupérer les infos de l'agent depuis WordPress
             $query = "
-                SELECT ID, display_name
-                FROM rebencia_RebenciaBD.wp_Hrg8P_users
+                SELECT ID, agent_name as display_name
+                FROM rebencia_RebenciaBD.wp_Hrg8P_crm_agents
                 WHERE ID = {$objective->agent_id}
                 LIMIT 1
             ";
@@ -294,12 +294,33 @@ class Objective_model extends CI_Model
                                    ->get()
                                    ->row();
 
-            // Utiliser les vraies performances si disponibles, sinon utiliser les données de la table agent_performance
-            $estimations_count = $real_performance['estimations_count'] ?? ($performance->estimations_count ?? 0);
-            $contacts_count = $real_performance['contacts_count'] ?? ($performance->contacts_count ?? 0);
-            $transactions_count = $real_performance['transactions_count'] ?? ($performance->transactions_count ?? 0);
-            $revenue_amount = $real_performance['revenue_amount'] ?? ($performance->revenue_amount ?? 0);
-            $commission_earned = $real_performance['commission_earned'] ?? ($performance->commission_earned ?? 0);
+            // Recalculer les valeurs à partir des tables demandées
+
+            // 1. Estimations (crm_properties)
+            $estimations_count = $this->db
+                ->where('agent_id', $objective->agent_id)
+                ->count_all_results('crm_properties');
+
+            // 2. Transactions (crm_transactions)
+            $transactions_count = $this->db
+                ->where('agent_id', $objective->agent_id)
+                ->count_all_results('crm_transactions');
+
+            // 3. Chiffre d'affaires (crm_transactions)
+            $revenue_amount_row = $this->db
+                ->select_sum('montant')
+                ->where('agent_id', $objective->agent_id)
+                ->get('crm_transactions')
+                ->row();
+            $revenue_amount = $revenue_amount_row && isset($revenue_amount_row->montant) ? (float)$revenue_amount_row->montant : 0;
+
+            // 4. Commission (on peut laisser à 0 si non calculé ici)
+            $commission_earned = 0;
+
+            // 5. Contacts (optionnel, ici on laisse comme avant)
+            $contacts_count = $this->db
+                ->where('agent_id', $objective->agent_id)
+                ->count_all_results('crm_clients');
 
             // Calculer les progressions
             $estimations_progress = ($objective->estimations_target > 0) ? 
