@@ -419,8 +419,8 @@ class Objectives extends BaseController {
         $data['current_month'] = $month;
         $data['team_objectives'] = $this->Objective_model->get_objectives_dashboard($month,  $this->agencyId);
         $data['team_stats'] = $this->Objective_model->get_objectives_stats($month , $this->agencyId);
-
-        $this->loadViews('objectives/team', $this->global, $data, NULL);
+        echo(json_encode( $data['team_objectives'] ));
+      //  $this->loadViews('objectives/team', $this->global, $data, NULL);
     }
 
     /**
