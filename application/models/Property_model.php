@@ -681,7 +681,9 @@ class Property_model extends CI_Model {
         if ($limit) {
             $this->wp_db->limit($limit);
         }
-        return $this->wp_db->get()->result();
+        $prop = $this->wp_db->get()->result();
+        
+        return $this->get_all_properties(filters: ['property_id' => array_column($prop, 'property_id')]);
     }
        
 }
