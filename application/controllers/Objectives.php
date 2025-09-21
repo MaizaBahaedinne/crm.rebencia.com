@@ -417,8 +417,8 @@ class Objectives extends BaseController {
         
         $data['title'] = 'Objectifs par Équipe';
         $data['current_month'] = $month;
-        $data['team_objectives'] = $this->Objective_model->get_objectives_dashboard($month);
-        $data['team_stats'] = $this->Objective_model->get_objectives_stats($month);
+        $data['team_objectives'] = $this->Objective_model->get_objectives_dashboard($month,  $this->agencyId);
+        $data['team_stats'] = $this->Objective_model->get_objectives_stats($month , $this->agencyId);
 
         $this->loadViews('objectives/team', $this->global, $data, NULL);
     }
