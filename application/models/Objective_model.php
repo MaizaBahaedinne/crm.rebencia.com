@@ -241,17 +241,35 @@ class Objective_model extends CI_Model
     /**
      * Récupérer le tableau de bord des objectifs vs performances
      */
-    public function get_objectives_dashboard($month = null) {
+    public function get_objectives_dashboard($month = null, $agency_id = null ) {
         if (!$month) {
             $month = date('Y-m');
         }
 
-        // Version simplifiée utilisant Active Record
-        $objectives = $this->db->select('*')
-                              ->from('monthly_objectives')
-                              ->where('month', $month . '-01')
-                              ->get()
-                              ->result();
+        // Version avec filtre sur l'agence si agency_id est fourni
+        if ($agency_id) {
+            // Récupérer les IDs des agents de l'agence
+            $agents = $this->get_agents_by_agency($agency_id);
+            $agent_ids = array_column($agents, 'ID');
+            if (empty($agent_ids)) {
+            $objectives = [];
+            } else {
+            $this->db->select('*')
+                 ->from('monthly_objectives')
+                 ->where('month', $month . '-01')
+                 ->where_in('agent_id', $agent_ids);
+            $objectives = $this->db->get()->result();
+            }
+        } else {
+            // Tous les objectifs du mois
+            $objectives = $this->db->select('*')
+                    ->from('monthly_objectives')
+                    ->where('month', $month . '-01')
+                    ->get()
+                    ->result();
+        }
+
+
 
         $result = array();
         
@@ -416,9 +434,39 @@ class Objective_model extends CI_Model
     /**
      * Statistiques globales des objectifs
      */
-    public function get_objectives_stats($month = null) {
+    public function get_objectives_stats($month = null, $agency_id = null) {
         if (!$month) {
             $month = date('Y-m');
+        }
+
+        $params = [$month . '-01'];
+        $agency_filter = '';
+
+        if ($agency_id) {
+            // Get agent IDs for the agency
+            $agents = $this->get_agents_by_agency($agency_id);
+            $agent_ids = array_column($agents, 'ID');
+            if (empty($agent_ids)) {
+                // No agents, return zeros
+                return (object)[
+                    'total_agents' => 0,
+                    'total_estimations_target' => 0,
+                    'total_contacts_target' => 0,
+                    'total_transactions_target' => 0,
+                    'total_revenue_target' => 0,
+                    'total_estimations_actual' => 0,
+                    'total_contacts_actual' => 0,
+                    'total_transactions_actual' => 0,
+                    'total_revenue_actual' => 0,
+                    'avg_estimations_progress' => 0,
+                    'avg_contacts_progress' => 0,
+                    'avg_transactions_progress' => 0,
+                    'avg_revenue_progress' => 0
+                ];
+            }
+            $placeholders = implode(',', array_fill(0, count($agent_ids), '?'));
+            $agency_filter = " AND mo.agent_id IN ($placeholders)";
+            $params = array_merge($params, $agent_ids);
         }
 
         $sql = "
@@ -450,10 +498,10 @@ class Objective_model extends CI_Model
                 END) as avg_revenue_progress
             FROM monthly_objectives mo
             LEFT JOIN agent_performance ap ON ap.agent_id = mo.agent_id AND ap.month = mo.month
-            WHERE mo.month = ?
+            WHERE mo.month = ? $agency_filter
         ";
 
-        return $this->db->query($sql, [$month . '-01'])->row();
+        return $this->db->query($sql, $params)->row();
     }
 
     /**

@@ -21,12 +21,20 @@ class Objectives extends BaseController {
      */
     public function index() {
         $this->isLoggedIn();
+        
         $month = $this->input->get('month') ?: date('Y-m');
         
         $data['title'] = 'Tableau de Bord des Objectifs';
         $data['current_month'] = $month;
-        $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month);
-        $data['stats'] = $this->Objective_model->get_objectives_stats($month);
+        if ($this->roleText === 'manager' && !empty($this->agencyId)) {
+                // manager : récupérer seulement les agents de son agence
+                $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month, $this->agencyId);
+                $data['stats'] = $this->Objective_model->get_objectives_stats($month, $this->agencyId);
+            } else {
+                $data['objectives_data'] = $this->Objective_model->get_objectives_dashboard($month);
+                $data['stats'] = $this->Objective_model->get_objectives_stats($month);
+            }
+        
         
         // Si aucune donnée n'est trouvée, utiliser des données d'exemple pour le mois de septembre 2025
         if (empty($data['objectives_data']) && $month == '2025-09') {
