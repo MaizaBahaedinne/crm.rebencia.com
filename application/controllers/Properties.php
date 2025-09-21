@@ -37,6 +37,8 @@ class Properties extends BaseController {
         }
         $data['properties'] = $properties;
         
+        echo '<pre>'; print_r($data['properties']); echo '</pre>'; exit;
+
         // Récupérer les données pour les filtres
         $data['property_statuses'] = $this->property_model->get_property_statuses();
         $data['property_types'] = $this->property_model->get_property_types();
