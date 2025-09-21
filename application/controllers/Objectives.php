@@ -150,8 +150,8 @@ class Objectives extends BaseController {
             $data['selected_month'] = $this->input->get('month') ?: date('Y-m');
             
             // Récupérer la liste des agents selon le rôle de l'utilisateur
-            if ($this->roleText === 'Manager' && !empty($this->agencyId)) {
-                // Manager : récupérer seulement les agents de son agence
+            if ($this->roleText === 'manager' && !empty($this->agencyId)) {
+                // manager : récupérer seulement les agents de son agence
                 $data['agents'] = $this->Objective_model->get_agents_by_agency($this->agencyId);
                 $data['is_manager_view'] = true;
                 $data['agency_id'] = $this->agencyId;
@@ -214,8 +214,8 @@ class Objectives extends BaseController {
             return;
         }
 
-        // Validation supplémentaire pour les managers : vérifier que l'agent appartient à leur agence
-        if ($this->roleText === 'Manager' && !empty($this->agencyId)) {
+    // Validation supplémentaire pour les managers : vérifier que l'agent appartient à leur agence
+    if ($this->roleText === 'manager' && !empty($this->agencyId)) {
             $agency_agents = $this->Objective_model->get_agents_by_agency($this->agencyId);
             $allowed_agent_ids = array_column($agency_agents, 'user_id');
             
