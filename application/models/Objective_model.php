@@ -466,7 +466,7 @@ class Objective_model extends CI_Model
         if ($agency_id) {
             // Get agent IDs for the agency
             $agents = $this->get_agents_by_agency($agency_id);
-            $agent_ids = array_column($agents, 'ID');
+            $agent_ids = array_column($agents, 'agent_post_id');
             if (empty($agent_ids)) {
                 // No agents, return zeros
                 return (object)[
@@ -490,39 +490,29 @@ class Objective_model extends CI_Model
             $params = array_merge($params, $agent_ids);
         }
 
-        $sql = "
-            SELECT 
-                COUNT(mo.id) as total_agents,
-                SUM(mo.estimations_target) as total_estimations_target,
-                SUM(mo.contacts_target) as total_contacts_target,
-                SUM(mo.transactions_target) as total_transactions_target,
-                SUM(mo.revenue_target) as total_revenue_target,
-                SUM(COALESCE(ap.estimations_count, 0)) as total_estimations_actual,
-                SUM(COALESCE(ap.contacts_count, 0)) as total_contacts_actual,
-                SUM(COALESCE(ap.transactions_count, 0)) as total_transactions_actual,
-                SUM(COALESCE(ap.revenue_amount, 0)) as total_revenue_actual,
-                AVG(CASE 
-                    WHEN mo.estimations_target > 0 THEN (ap.estimations_count / mo.estimations_target) * 100
-                    ELSE NULL 
-                END) as avg_estimations_progress,
-                AVG(CASE 
-                    WHEN mo.contacts_target > 0 THEN (ap.contacts_count / mo.contacts_target) * 100
-                    ELSE NULL 
-                END) as avg_contacts_progress,
-                AVG(CASE 
-                    WHEN mo.transactions_target > 0 THEN (ap.transactions_count / mo.transactions_target) * 100
-                    ELSE NULL 
-                END) as avg_transactions_progress,
-                AVG(CASE 
-                    WHEN mo.revenue_target > 0 THEN (ap.revenue_amount / mo.revenue_target) * 100
-                    ELSE NULL 
-                END) as avg_revenue_progress
-            FROM monthly_objectives mo
-            LEFT JOIN agent_performance ap ON ap.agent_id = mo.agent_id AND ap.month = mo.month
-            WHERE mo.month = ? $agency_filter
-        ";
-
-        return $this->db->query($sql, $params)->row();
+        $this->db->select([
+            'COUNT(mo.id) as total_agents',
+            'SUM(mo.estimations_target) as total_estimations_target',
+            'SUM(mo.contacts_target) as total_contacts_target',
+            'SUM(mo.transactions_target) as total_transactions_target',
+            'SUM(mo.revenue_target) as total_revenue_target',
+            'SUM(COALESCE(ap.estimations_count, 0)) as total_estimations_actual',
+            'SUM(COALESCE(ap.contacts_count, 0)) as total_contacts_actual',
+            'SUM(COALESCE(ap.transactions_count, 0)) as total_transactions_actual',
+            'SUM(COALESCE(ap.revenue_amount, 0)) as total_revenue_actual',
+            'AVG(CASE WHEN mo.estimations_target > 0 THEN (ap.estimations_count / mo.estimations_target) * 100 ELSE NULL END) as avg_estimations_progress',
+            'AVG(CASE WHEN mo.contacts_target > 0 THEN (ap.contacts_count / mo.contacts_target) * 100 ELSE NULL END) as avg_contacts_progress',
+            'AVG(CASE WHEN mo.transactions_target > 0 THEN (ap.transactions_count / mo.transactions_target) * 100 ELSE NULL END) as avg_transactions_progress',
+            'AVG(CASE WHEN mo.revenue_target > 0 THEN (ap.revenue_amount / mo.revenue_target) * 100 ELSE NULL END) as avg_revenue_progress'
+        ]);
+        $this->db->from('monthly_objectives mo');
+        $this->db->join('agent_performance ap', 'ap.agent_id = mo.agent_id AND ap.month = mo.month', 'left');
+        $this->db->where('mo.month', $month . '-01');
+        if ($agency_filter) {
+            $this->db->where_in('mo.agent_id', $agent_ids);
+        }
+        $query = $this->db->get();
+        return $query->row();
     }
 
     /**
