@@ -185,9 +185,9 @@ class Objectives extends BaseController {
                 return;
             }
             
-            echo (json_encode($data['agents'] ));
+            
 
-         //   $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);
+           $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);
             
         } catch (Exception $e) {
             log_message('error', 'Erreur dans set_monthly: ' . $e->getMessage());
