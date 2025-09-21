@@ -298,18 +298,18 @@ class Objective_model extends CI_Model
 
             // 1. Estimations (crm_properties)
             $estimations_count = $this->db
-                ->where('agent_id', $objective->agent_post_id)
+                ->where('agent_id', $objective->agent_id)
                 ->count_all_results('crm_properties');
 
             // 2. Transactions (crm_transactions)
             $transactions_count = $this->db
-                ->where('agent_id', $objective->agent_post_id)
+                ->where('agent_id', $objective->agent_id)
                 ->count_all_results('crm_transactions');
 
             // 3. Chiffre d'affaires (crm_transactions)
             $revenue_amount_row = $this->db
                 ->select_sum('montant')
-                ->where('agent_id', $objective->agent_post_id)
+                ->where('agent_id', $objective->agent_id)
                 ->get('crm_transactions')
                 ->row();
             $revenue_amount = $revenue_amount_row && isset($revenue_amount_row->montant) ? (float)$revenue_amount_row->montant : 0;
@@ -319,7 +319,7 @@ class Objective_model extends CI_Model
 
             // 5. Contacts (optionnel, ici on laisse comme avant)
             $contacts_count = $this->db
-                ->where('agent_id', $objective->agent_post_id)
+                ->where('agent_id', $objective->agent_id)
                 ->count_all_results('crm_clients');
 
             // Calculer les progressions
