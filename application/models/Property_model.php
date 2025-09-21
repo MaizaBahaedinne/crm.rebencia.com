@@ -351,7 +351,7 @@ class Property_model extends CI_Model {
         $this->wp_db->join('wp_Hrg8P_postmeta pm3', 'p.ID = pm3.post_id AND pm3.meta_key = "fave_property_size"', 'left');
         $this->wp_db->where('p.post_type', 'property');
         $this->wp_db->where('p.post_status', 'publish');
-        $this->wp_db->where_in('p.post_author', $agent_user_ids);
+        $this->wp_db->where_in('p.houzez_agent', $agent_user_ids);
         $this->wp_db->order_by('p.post_date', 'DESC');
         
         if ($limit) {
