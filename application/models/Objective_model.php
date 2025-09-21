@@ -276,9 +276,9 @@ class Objective_model extends CI_Model
         foreach ($objectives as $objective) {
             // Récupérer les infos de l'agent depuis WordPress
             $query = "
-                SELECT  agent_post_id as ID, agent_name as display_name
+                SELECT  agent_post_id , agent_name as display_name
                 FROM rebencia_RebenciaBD.wp_Hrg8P_crm_agents
-                WHERE ID = {$objective->agent_id}
+                WHERE agent_post_id = {$objective->agent_id}
                 LIMIT 1
             ";
             $agent = $this->wp_db->query($query)->row();
