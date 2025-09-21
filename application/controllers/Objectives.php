@@ -42,7 +42,7 @@ class Objectives extends BaseController {
             $data['objectives_data'] = $this->get_sample_objectives_data();
         }
         
-       // $this->loadViews('objectives/index', $this->global, $data, NULL);
+        $this->loadViews('objectives/index', $this->global, $data, NULL);
     }
 
     /**

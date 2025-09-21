@@ -270,8 +270,7 @@ class Objective_model extends CI_Model
                     ->result();
         }
 
-        echo(json_encode( $objectives ));
-
+        
         $result = array();
         
         foreach ($objectives as $objective) {
