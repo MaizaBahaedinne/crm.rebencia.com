@@ -251,7 +251,7 @@ class Objective_model extends CI_Model
             // Récupérer les IDs des agents de l'agence
             $agents = $this->get_agents_by_agency($agency_id);
               
-            $agent_ids = array_column($agents, 'user_id');
+            $agent_ids = array_column($agents, 'agent_post_id');
             if (empty($agent_ids)) {
             $objectives = [];
             } else {
