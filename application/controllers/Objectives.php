@@ -158,11 +158,11 @@ class Objectives extends BaseController {
             $data['selected_month'] = $this->input->get('month') ?: date('Y-m');
             
             // Récupérer la liste des agents selon le rôle de l'utilisateur
-            if ($this->roleText === 'manager' && !empty($this->agencyId)) {
+            if ($this->role === 'manager' && !empty($this->agencyId)) {
                 // manager : récupérer seulement les agents de son agence
                 $data['agents'] = $this->Objective_model->get_agents_by_agency($this->agencyId);
                 $data['is_manager_view'] = true;
-                $data['agency_id'] = $this->agencyId;
+                
             } else {
                 // Admin ou autres rôles : récupérer tous les agents
                 $data['agents'] = $this->Objective_model->get_agents();
@@ -184,7 +184,7 @@ class Objectives extends BaseController {
                 $this->_process_monthly_objectives();
                 return;
             }
-            echo (json_encode($this->agencyId ));
+            
             echo (json_encode($data['agents'] ));
 
          //   $this->loadViews('objectives/set_monthly', $this->global, $data, NULL);

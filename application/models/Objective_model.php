@@ -556,51 +556,16 @@ class Objective_model extends CI_Model
      * @return object[] Liste des agents de l'agence
      */
     public function get_agents_by_agency($agency_id) {
-        if (empty($agency_id)) {
-            return [];
-        }
+    
         
-        // Utiliser la vue wp_Hrg8P_crm_agents existante pour avoir toutes les données complètes
-        $query = "
-            SELECT 
-                user_id,
-                user_login,
-                user_email,
-                user_status,
-                registration_date,
-                agent_post_id,
-                agent_name,
-                post_status,
-                agent_email,
-                agency_id,
-                agency_name,
-                phone,
-                mobile,
-                whatsapp,
-                skype,
-                website,
-                agent_avatar,
-                position,
-                facebook,
-                twitter,
-                linkedin,
-                googleplus,
-                youtube,
-                tiktok,
-                instagram,
-                pinterest,
-                vimeo,
-                postal_code,
-                user_roles,
-                user_id as ID,
-                agent_name as display_name
-            FROM rebencia_RebenciaBD.wp_Hrg8P_crm_agents
-            WHERE agency_id = ".$agency_id."
-            AND post_status = 'publish'
-            ORDER BY agent_name ASC
-        ";
-        
-        return $this->wp_db->query($query)->result();
+        // Utiliser Active Record de CodeIgniter pour plus de sécurité
+        return $this->wp_db->select('*')
+            ->from('wp_Hrg8P_crm_agents')
+            ->where('agency_id', $agency_id)
+            ->where('post_status', 'publish')
+            ->order_by('agent_name', 'ASC')
+            ->get()
+            ->result();
     }
 
     /**
