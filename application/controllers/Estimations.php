@@ -46,15 +46,14 @@ class Estimations extends BaseController
     private function get_estimations_by_role($role, $user_info)
     {
         try {
-            switch ($role) {
-                case 'administrator':
-                    return $this->Estimation_model->get_all_estimations_with_details();
-                case 'manager':
-                    $agency_id = $user_info['agency_id'] ?? 1;
-                    return $this->Estimation_model->get_estimations_by_agency($agency_id);
-                default:
-                    $user_post_id = $user_info['user_post_id'] ?? 1;
-                    return $this->Estimation_model->get_estimations_by_agent($user_post_id);
+            if ($role === 'administrator' || ($role === 'manager' && $this->agencyId == null )  ) {
+            return $this->Estimation_model->get_all_estimations_with_details();
+            } elseif ($role === 'manager' && $this->agencyId != null ) {
+            $agency_id = $user_info['agency_id'] ?? 1;
+            return $this->Estimation_model->get_estimations_by_agency($agency_id);
+            } else {
+            $user_post_id = $user_info['user_post_id'] ?? 1;
+            return $this->Estimation_model->get_estimations_by_agent($user_post_id);
             }
         } catch (Exception $e) {
             // En cas d'erreur, retourner un tableau vide
