@@ -1395,7 +1395,7 @@ class Agent_model extends CI_Model {
             p.ID, p.post_title, p.post_status, p.post_type, pm_email.meta_value,
             a.ID, a.post_title, ur.meta_value
         ');
-        $this->wp_db->order_by('p.post_title', 'ASC');
+        $this->wp_db->order_by('pm.post_id', 'ASC');
 
         $query = $this->wp_db->get();
         $agents = $query->result();
