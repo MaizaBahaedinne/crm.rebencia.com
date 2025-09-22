@@ -38,7 +38,7 @@ class Agent extends BaseController {
         
         try {
             // Pour le manager, utiliser une méthode spécifique qui récupère son équipe
-            if ($role === 'manager' && $agency_id != null ) {
+            if ($role === 'manager' && $this->agencyId != null ) {
                 // Récupérer l'ID de l'agence du manager depuis la session
                 $agency_id = $this->session->userdata('agency_id');
                 
