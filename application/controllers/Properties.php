@@ -29,7 +29,7 @@ class Properties extends BaseController {
         
       
 
-        if ($this->role=='manager') {
+        if ($this->role=='manager' && $this->agencyId != null ) {
             $properties = $this->property_model->get_properties_agency($this->agencyId);
         }else {
             // Pour les autres rôles, récupérer toutes les propriétés
