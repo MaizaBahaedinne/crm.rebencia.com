@@ -8,7 +8,8 @@ class Property_model extends CI_Model {
         $this->wp_db = $this->load->database('wordpress', TRUE);
     }
     // Toutes les propriétés (avec filtres)
-    public function get_all_properties($filters = []) {
+    public function get_all_properties($filters = []) 
+    {
     $this->wp_db->from('wp_Hrg8P_posts');
     $this->wp_db->where('post_type', 'property');
     $this->wp_db->where('post_status', 'publish');
@@ -27,6 +28,8 @@ class Property_model extends CI_Model {
     $results = $this->wp_db->get()->result();
     return $results;
     }
+
+    
     // Une propriété
     public function get_property($property_id) {
         return $this->wp_db->where('ID', $property_id)->get('wp_Hrg8P_posts')->row();
