@@ -316,11 +316,8 @@ class Agent_model extends CI_Model {
      * @return object[]
      */
     public function get_agents_by_agency($agency_id) {
-        if (!$agency_id) return [];
         
-        // Récupérer tous les agents HOUZEZ de l'agence via la requête optimisée
-        $houzez_agents = $this->get_all_agents(['agency_id' => $agency_id]);
-        
+    
         // Récupérer aussi les agents CRM de cette agence
         $crm_agents = $this->wp_db->select('*')
             ->from('crm_agents')
@@ -329,49 +326,7 @@ class Agent_model extends CI_Model {
         
         // Fusionner les deux sources : priorité à HOUZEZ, compléter avec CRM
         $all_agents = [];
-        $processed_emails = [];
-        
-        // D'abord ajouter tous les agents HOUZEZ
-        foreach ($houzez_agents as $agent) {
-            if (!empty($agent->agent_email)) {
-                $processed_emails[] = strtolower($agent->agent_email);
-            }
-            $all_agents[] = $agent;
-        }
-        
-        // Ajouter les agents CRM qui ne sont pas déjà dans HOUZEZ
-        foreach ($crm_agents as $crm_agent) {
-            // Extraire l'email selon la structure réelle de la table
-            $email = null;
-            if (isset($crm_agent->email) && !empty($crm_agent->email)) {
-                $email = $crm_agent->email;
-            } elseif (isset($crm_agent->agent_email) && !empty($crm_agent->agent_email)) {
-                $email = $crm_agent->agent_email;
-            } elseif (isset($crm_agent->user_email) && !empty($crm_agent->user_email)) {
-                $email = $crm_agent->user_email;
-            }
-            
-            $email_lower = strtolower($email ?? '');
-            if (!empty($email) && !in_array($email_lower, $processed_emails)) {
-                // Créer un objet agent compatible avec les données CRM
-                $agent = new stdClass();
-                $agent->user_id = null;
-                $agent->user_login = null;
-                $agent->user_email = $email;
-                $agent->agent_id = null;
-                $agent->agent_name = trim(($crm_agent->first_name ?? '') . ' ' . ($crm_agent->last_name ?? '')) ?: 'Agent CRM';
-                $agent->agent_email = $email;
-                $agent->phone = $crm_agent->phone ?? '';
-                $agent->mobile = $crm_agent->mobile ?? '';
-                $agent->position = $crm_agent->position ?? 'Agent immobilier';
-                $agent->agency_id = $agency_id;
-                $agent->agency_name = null; // Sera rempli si nécessaire
-                $agent->crm_id = $crm_agent->id ?? $crm_agent->ID ?? null;
-                $agent->is_crm_only = true;
-                
-                $all_agents[] = $agent;
-            }
-        }
+       
         
         return $all_agents;
     }

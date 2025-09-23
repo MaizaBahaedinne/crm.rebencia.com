@@ -168,8 +168,8 @@
                                             </label>
                                             <select class="form-select filter-select" id="status" name="status">
                                                 <option value="">Tous statuts</option>
-                                                <option value="active" <?php echo ($filters['status'] ?? '') == 'active' ? 'selected' : ''; ?>>Actif</option>
-                                                <option value="inactive" <?php echo ($filters['status'] ?? '') == 'inactive' ? 'selected' : ''; ?>>Inactif</option>
+                                                <option value="publish" <?php echo ($filters['status'] ?? '') == 'publish' ? 'selected' : ''; ?>>Actif</option>
+                                                <option value="not published" <?php echo ($filters['status'] ?? '') == 'not published' ? 'selected' : ''; ?>>Inactif</option>
                                             </select>
                                         </div>
                                     </div>
