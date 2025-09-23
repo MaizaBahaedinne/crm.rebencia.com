@@ -66,8 +66,8 @@ class Agency extends BaseController {
             show_404();
             return;
         }
-        
-        $this->loadViews('dashboard/agency/view', $data, NULL, NULL);
+        echo (json_encode($data['agents']));
+     //   $this->loadViews('dashboard/agency/view', $data, NULL, NULL);
     }
 
     // Voir les agents d'une agence
