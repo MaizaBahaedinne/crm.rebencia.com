@@ -50,7 +50,7 @@ class Estimations extends BaseController
         $this->isLoggedIn();
         $data = $this->global;
         $data['pageTitle'] = 'Résultat Estimation Premium';
-        $data['property'] = $this->estim->get_property($id);
+        $data['property'] = $this->Estimation_model->get_property($id);
         if(!$data['property']) { redirect('estimation'); }
         $this->loadViews('estimation/result_premium', $data, $data, NULL);
     }
