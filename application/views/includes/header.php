@@ -2,7 +2,7 @@
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
 
 
-<!-- Mirrored from themesbrand.com/velzon/html/master/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 26 Aug 2025 21:09:04 GMT -->
+<!-- Mirrored from themesbrand.com/velzon/html/master/<?php echo base_url(); ?> by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 26 Aug 2025 21:09:04 GMT -->
 <head>
 
     <meta charset="utf-8" />
@@ -85,8 +85,8 @@
                             </div>
 
                             <div class="dropdown-item bg-transparent text-wrap">
-                                <a href="index.html" class="btn btn-soft-secondary btn-sm rounded-pill">how to setup <i class="mdi mdi-magnify ms-1"></i></a>
-                                <a href="index.html" class="btn btn-soft-secondary btn-sm rounded-pill">buttons <i class="mdi mdi-magnify ms-1"></i></a>
+                                <a href="<?php echo base_url(); ?>" class="btn btn-soft-secondary btn-sm rounded-pill">how to setup <i class="mdi mdi-magnify ms-1"></i></a>
+                                <a href="<?php echo base_url(); ?>" class="btn btn-soft-secondary btn-sm rounded-pill">buttons <i class="mdi mdi-magnify ms-1"></i></a>
                             </div>
                             <!-- item-->
                             <div class="dropdown-header mt-2">
@@ -632,7 +632,7 @@
             <!-- LOGO -->
             <div class="navbar-brand-box">
                 <!-- Dark Logo-->
-                <a href="index.html" class="logo logo-dark">
+                <a href="<?php echo base_url(); ?>" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="<?php echo base_url() ?>assets/images/logo-sm.png" alt="" height="22">
                     </span>
@@ -641,7 +641,7 @@
                     </span>
                 </a>
                 <!-- Light Logo-->
-                <a href="index.html" class="logo logo-light">
+                <a href="<?php echo base_url(); ?>" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="<?php echo base_url() ?>assets/images/logo-sm.png" alt="" height="22">
                     </span>
