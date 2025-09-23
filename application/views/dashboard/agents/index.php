@@ -156,7 +156,7 @@
                                             <select class="form-select filter-select" id="agency" name="agency">
                                                 <option value="">Toutes les agences</option>
                                                 <?php foreach ($agencies as $agency): ?>
-                                                    <option value="<?= $agency->ID ?>" <?php echo ($filters['agency'] ?? '') == $agency->ID ? 'selected' : ''; ?>><?= $agency->post_title ?></option>
+                                                    <option value="<?= $agency->agency_id ?>" <?php echo ($filters['agency'] ?? '') == $agency->agency_id ? 'selected' : ''; ?>><?= $agency->agency_name ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>

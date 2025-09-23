@@ -52,7 +52,7 @@ class Agent extends BaseController {
                 }
             } else {
                 // Pour les autres rôles (admin, agency_admin), récupérer tous les agents avec rôles et agences
-                $agents = $this->agency_model->get_all_agencies($data['filters']);
+                $agents = $this->agent_model->get_agents_with_roles_and_agencies($data['filters']);
             }
             
             $data['agents'] = $agents;
