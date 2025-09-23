@@ -59,7 +59,7 @@ class Agency extends BaseController {
         $data = $this->global;
         $data['agency'] = $this->agency_model->get_agency_details($agency_id);
         $data['agents'] = $this->agent_model->get_agents_by_agency($agency_id);
-        $data['properties'] = $this->property_model->get_properties_by_agency($agency_id, 5); // Limite 5 pour aperçu
+        $data['properties'] = $this->property_model->get_properties_by_agency($agency_id); // Limite 5 pour aperçu
         $data['stats'] = $this->agency_model->get_agency_stats($agency_id);
         
         if (empty($data['agency'])) {

@@ -29,7 +29,7 @@ class Property_model extends CI_Model {
     return $results;
     }
 
-    
+
     // Une propriété
     public function get_property($property_id) {
         return $this->wp_db->where('ID', $property_id)->get('wp_Hrg8P_posts')->row();
@@ -255,32 +255,29 @@ class Property_model extends CI_Model {
         foreach ($agents as $agent) {
             // Essayer différentes colonnes possibles pour user_id
             $user_id = null;
-            if (!empty($agent->user_id)) {
-                $user_id = $agent->user_id;
-            } elseif (!empty($agent->wp_user_id)) {
-                $user_id = $agent->wp_user_id;
-            } elseif (!empty($agent->id)) {
-                $user_id = $agent->id;
+            if (!empty($agent->agent_post_id)) {
+                $user_id = $agent->agent_post_id;
             }
-            
+
             if ($user_id) {
                 $agent_user_ids[] = $user_id;
             }
         }
-        
+
         if (empty($agent_user_ids)) {
             return [];
         }
         
         // Récupérer les propriétés HOUZEZ de ces agents
-        $this->wp_db->select('p.*, pm1.meta_value as fave_property_price, pm2.meta_value as fave_property_address, pm3.meta_value as fave_property_size');
+        $this->wp_db->select('p.*, pm1.meta_value as fave_property_price, pm2.meta_value as fave_property_address, pm3.meta_value as fave_property_size, pm4.meta_value as fave_agents');
         $this->wp_db->from('wp_Hrg8P_posts p');
         $this->wp_db->join('wp_Hrg8P_postmeta pm1', 'p.ID = pm1.post_id AND pm1.meta_key = "fave_property_price"', 'left');
         $this->wp_db->join('wp_Hrg8P_postmeta pm2', 'p.ID = pm2.post_id AND pm2.meta_key = "fave_property_address"', 'left');
         $this->wp_db->join('wp_Hrg8P_postmeta pm3', 'p.ID = pm3.post_id AND pm3.meta_key = "fave_property_size"', 'left');
+        $this->wp_db->join('wp_Hrg8P_postmeta pm4', 'p.ID = pm4.post_id AND pm4.meta_key = "fave_agents"', 'left');
         $this->wp_db->where('p.post_type', 'property');
         $this->wp_db->where('p.post_status', 'publish');
-        $this->wp_db->where_in('p.post_author', $agent_user_ids);
+        $this->wp_db->where_in('pm4.meta_value', $agent_user_ids);
         $this->wp_db->order_by('p.post_date', 'DESC');
         
         if ($limit) {
