@@ -50,16 +50,7 @@ class Agency extends BaseController {
         $this->loadViews('dashboard/agency/form', $this->global, $data, NULL);
     }
 
-    // CRUD : ajouter, modifier, supprimer (exemples)
-    public function add() {
-        // ... logique ajout agence ...
-    }
-    public function edit($id) {
-        // ... logique modif agence ...
-    }
-    public function delete($id) {
-        // ... logique suppression agence ...
-    }
+  
 
     // Voir les détails d'une agence
     public function view($agency_id) {
