@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fonctions globales
 function viewEstimation(id) {
-    window.location.href = '<?= base_url("estimation/view/") ?>' + id;
+    window.location.href = '<?= base_url("Estimations/view/") ?>' + id;
 }
 
 function showOnMap(id) {
