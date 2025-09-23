@@ -486,7 +486,7 @@
                                                                 </button>
                                                                 <ul class="dropdown-menu">
                                                                     <li>
-                                                                        <a class="dropdown-item" href="<?= base_url('estimation/view/' . $estimation['id']) ?>">
+                                                                        <a class="dropdown-item" href="<?= base_url('Estimations/view/' . $estimation['id']) ?>">
                                                                             <i class="ri-eye-line me-2"></i>Voir détails
                                                                         </a>
                                                                     </li>
@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fonctions globales
 function viewEstimation(id) {
-    window.location.href = '<?= base_url("Estimations/view/") ?>' + id;
+    window.location.href = '<?= base_url("estimation/view/") ?>' + id;
 }
 
 function showOnMap(id) {
