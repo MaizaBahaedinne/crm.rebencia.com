@@ -326,8 +326,6 @@ class Agent_model extends CI_Model {
         
         // Fusionner les deux sources : priorité à HOUZEZ, compléter avec CRM
         
-       
-        
         return $crm_agents;
     }
     
