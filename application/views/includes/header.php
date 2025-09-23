@@ -770,44 +770,28 @@
                                     <i class="ri-building-line"></i> <span>Liste des agences</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('agencies/stats'); ?>">
-                                    <i class="ri-bar-chart-line"></i> <span>Statistiques agences</span>
-                                </a>
-                            </li>
+                          
                             <li class="menu-title"><span>Agents HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('agents'); ?>">
                                     <i class="ri-user-3-line"></i> <span>Liste des agents</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('agents/performance'); ?>">
-                                    <i class="ri-trophy-line"></i> <span>Performance agents</span>
-                                </a>
-                            </li>
+                           
                             <li class="menu-title"><span>Propriétés HOUZEZ</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('properties'); ?>">
                                     <i class="ri-home-4-line"></i> <span>Liste des propriétés</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('properties/status'); ?>">
-                                    <i class="ri-information-line"></i> <span>Statut des biens</span>
-                                </a>
-                            </li>
+                           
                             <li class="menu-title"><span>Estimations des biens</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('estimations'); ?>">
                                     <i class="ri-file-list-3-line"></i> <span>Liste des estimations</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('estimation'); ?>">
-                                    <i class="ri-calculator-line"></i> <span>Nouvelle estimation</span>
-                                </a>
-                            </li>
+                           
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('zones'); ?>">
                                     <i class="ri-map-pin-line"></i> <span>Gestion des zones</span>
@@ -819,32 +803,14 @@
                                     <i class="ri-group-line"></i> <span>Gestion des clients</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('client/add'); ?>">
-                                    <i class="ri-user-add-line"></i> <span>Nouveau client</span>
-                                </a>
-                            </li>
+                            
                             <li class="menu-title"><span>Transactions</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link <?php echo $isTransactionsRoot ? 'active' : ''; ?>" href="<?php echo base_url('transactions'); ?>">
                                     <i class="ri-exchange-dollar-line"></i> <span>Toutes les transactions</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link <?php echo $isSales ? 'active' : ''; ?>" href="<?php echo base_url('transactions/sales'); ?>">
-                                    <i class="ri-shopping-bag-3-line"></i> <span>Ventes</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link <?php echo $isRentals ? 'active' : ''; ?>" href="<?php echo base_url('transactions/rentals'); ?>">
-                                    <i class="ri-key-2-line"></i> <span>Locations</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('transactions/sync/houzez'); ?>">
-                                    <i class="ri-refresh-line"></i> <span>Sync Houzez</span>
-                                </a>
-                            </li>
+                            
                             <li class="menu-title"><span>Rapports</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('reports/sales'); ?>">
@@ -852,19 +818,15 @@
                                 </a>
                             </li>
                             <li class="menu-title"><span>Gestion des Commissions</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('commission/settings'); ?>">
-                                    <i class="ri-settings-3-line"></i> <span>Paramètres Commission</span>
-                                </a>
-                            </li>
+                            
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('commission/calculator'); ?>">
                                     <i class="ri-calculator-line"></i> <span>Calculatrice Commission</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('commission/history'); ?>">
-                                    <i class="ri-history-line"></i> <span>Historique Commission</span>
+                                <a class="nav-link menu-link" href="<?php echo base_url('commission/settings'); ?>">
+                                    <i class="ri-settings-3-line"></i> <span>Paramètres Commission</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -873,14 +835,10 @@
                                 </a>
                             </li>
                             <li class="menu-title"><span>Objectifs & Performance</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('objectives'); ?>">
-                                    <i class="ri-dashboard-3-line"></i> <span>Tableau de Bord Objectifs</span>
-                                </a>
-                            </li>
+                            
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('objectives/set_monthly'); ?>">
-                                    <i class="ri-target-line"></i> <span>Définir Objectifs</span>
+                                     <i class="ri-dashboard-3-line"></i>  <span>Définir Objectifs</span>
                                 </a>
                             </li>
                             <li class="nav-item">
