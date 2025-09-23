@@ -43,6 +43,18 @@ class Estimations extends BaseController
         $this->loadViews("estimations/index", $this->global, $data, NULL);
     }
 
+        /**
+     * Version premium du résultat d'estimation
+     */
+    public function view($id) {
+        $this->isLoggedIn();
+        $data = $this->global;
+        $data['pageTitle'] = 'Résultat Estimation Premium';
+        $data['property'] = $this->estim->get_property($id);
+        if(!$data['property']) { redirect('estimation'); }
+        $this->loadViews('estimation/result_premium', $data, $data, NULL);
+    }
+
     private function get_estimations_by_role($role, $user_info)
     {
         try {
