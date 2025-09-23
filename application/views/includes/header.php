@@ -851,22 +851,7 @@
                                     <i class="ri-file-list-2-line"></i> <span>Objectifs en Masse</span>
                                 </a>
                             </li>
-                            <li class="menu-title"><span>Paramètres</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('settings/roles'); ?>">
-                                    <i class="ri-shield-user-line"></i> <span>Gestion des rôles</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('settings/wordpress'); ?>">
-                                    <i class="ri-wordpress-line"></i> <span>Connexion WordPress</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('settings/crm'); ?>">
-                                    <i class="ri-settings-3-line"></i> <span>Config CRM</span>
-                                </a>
-                            </li>
+                            
                         <?php elseif ($role === 'agency_admin') : ?>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('dashboard'); ?>">
