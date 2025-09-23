@@ -829,28 +829,16 @@
                                     <i class="ri-settings-3-line"></i> <span>Paramètres Commission</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('commission/stats'); ?>">
-                                    <i class="ri-pie-chart-line"></i> <span>Stats Commission</span>
-                                </a>
-                            </li>
+                           
                             <li class="menu-title"><span>Objectifs & Performance</span></li>
                             
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/set_monthly'); ?>">
-                                     <i class="ri-dashboard-3-line"></i>  <span>Définir Objectifs</span>
-                                </a>
-                            </li>
+                            
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="<?php echo base_url('objectives/team'); ?>">
                                     <i class="ri-team-line"></i> <span>Objectifs Équipe</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="<?php echo base_url('objectives/bulk_set'); ?>">
-                                    <i class="ri-file-list-2-line"></i> <span>Objectifs en Masse</span>
-                                </a>
-                            </li>
+                           
                             
                         <?php elseif ($role === 'agency_admin') : ?>
                             <li class="nav-item">
