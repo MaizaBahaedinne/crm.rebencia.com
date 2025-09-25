@@ -34,9 +34,14 @@ class Property_model extends CI_Model {
         return $this->wp_db->where('ID', $property_id)->get('wp_Hrg8P_posts')->row();
     }
     
-    // Métadonnées d'une propriété
+    // Métadonnées d'une propriété sous forme de tableau clé => valeur
     public function get_property_metas($property_id) {
-        return $this->wp_db->where('post_id', $property_id)->get('wp_Hrg8P_postmeta')->result();
+        $metas = $this->wp_db->where('post_id', $property_id)->get('wp_Hrg8P_postmeta')->result();
+        $meta_array = [];
+        foreach ($metas as $meta) {
+            $meta_array[$meta->meta_key] = $meta->meta_value;
+        }
+        return $meta_array;
     }
     
     // Propriétés similaires
