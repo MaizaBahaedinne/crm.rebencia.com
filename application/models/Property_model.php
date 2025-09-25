@@ -10,13 +10,12 @@ class Property_model extends CI_Model {
     // Toutes les propriétés (avec filtres)
     public function get_all_properties($filters = []) 
     {
-    $this->wp_db->from('wp_Hrg8P_posts');
-    $this->wp_db->where('post_type', 'property');
+    $this->wp_db->from('wp_Hrg8P_prop_agen');
     $this->wp_db->where('post_status', 'publish');
 
     // Filtres simples sur les colonnes principales
-    if (!empty($filters['post_author'])) {
-        $this->wp_db->where('post_author', $filters['post_author']);
+    if (!empty($filters['agent'])) {
+        $this->wp_db->where('agent_id', $filters['agent']);
     }
     if (!empty($filters['property_id'])) {
         $this->wp_db->where_in('ID', (array)$filters['property_id']);

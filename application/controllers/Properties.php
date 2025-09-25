@@ -33,7 +33,7 @@ class Properties extends BaseController {
             $properties = $this->property_model->get_properties_agency($this->agencyId);
         }else {
             // Pour les autres rôles, récupérer toutes les propriétés
-            $properties = $this->property_model->get_all_properties();
+            $properties = $this->property_model->get_all_properties($data['filters']);
         }
 
         foreach ($properties as $property) {
