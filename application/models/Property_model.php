@@ -11,7 +11,7 @@ class Property_model extends CI_Model {
     public function get_all_properties($filters = []) 
     {
     $this->wp_db->from('wp_Hrg8P_prop_agen');
-    $this->wp_db->where('post_status', 'publish');
+    $this->wp_db->where('property_status', 'publish');
 
     // Filtres simples sur les colonnes principales
     if (!empty($filters['agent'])) {
