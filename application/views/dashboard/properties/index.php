@@ -46,17 +46,17 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="statut_houzez" class="form-label">Statut</label>
-                                    <select class="form-select" id="statut_houzez" name="statut_houzez">
+                                    <select class="form-select" id="statut_houzez" name="status">
                                         <option value="">Tous statuts</option>
                                         <?php if (isset($property_statuses)) : ?>
                                             <?php foreach ($property_statuses as $status): ?>
-                                                <option value="<?= $status->slug ?>" <?php echo ($filters['statut_houzez'] ?? '') == $status->slug ? 'selected' : ''; ?>><?= $status->name ?></option>
+                                                <option value="<?= $status->slug ?>" <?php echo ($filters['status'] ?? '') == $status->slug ? 'selected' : ''; ?>><?= $status->name ?></option>
                                             <?php endforeach; ?>
                                         <?php else : ?>
-                                            <option value="for-sale" <?php echo ($filters['statut_houzez'] ?? '') == 'for-sale' ? 'selected' : ''; ?>>À vendre</option>
-                                            <option value="for-rent" <?php echo ($filters['statut_houzez'] ?? '') == 'for-rent' ? 'selected' : ''; ?>>À louer</option>
-                                            <option value="sold" <?php echo ($filters['statut_houzez'] ?? '') == 'sold' ? 'selected' : ''; ?>>Vendu</option>
-                                            <option value="rented" <?php echo ($filters['statut_houzez'] ?? '') == 'rented' ? 'selected' : ''; ?>>Loué</option>
+                                            <option value="for-sale" <?php echo ($filters['status'] ?? '') == 'for-sale' ? 'selected' : ''; ?>>À vendre</option>
+                                            <option value="for-rent" <?php echo ($filters['status'] ?? '') == 'for-rent' ? 'selected' : ''; ?>>À louer</option>
+                                            <option value="sold" <?php echo ($filters['status'] ?? '') == 'sold' ? 'selected' : ''; ?>>Vendu</option>
+                                            <option value="rented" <?php echo ($filters['status'] ?? '') == 'rented' ? 'selected' : ''; ?>>Loué</option>
                                         <?php endif; ?>
                                     </select>
                                 </div>
