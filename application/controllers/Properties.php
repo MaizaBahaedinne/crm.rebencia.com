@@ -38,6 +38,7 @@ class Properties extends BaseController {
 
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->property_id);
+            echo(json_encode( $property->metas ));
             $property->status = $this->property_model->get_property_status($property->property_id);
             $property->type = $this->property_model->get_property_type($property->property_id);
             $property->images = $this->property_model->get_property_images($property->property_id);
@@ -51,7 +52,7 @@ class Properties extends BaseController {
         $data['property_types'] = $this->property_model->get_property_types();
         $data['property_cities'] = $this->property_model->get_property_cities();
         
-        $this->loadViews('dashboard/properties/index', $data, $data);
+       // $this->loadViews('dashboard/properties/index', $data, $data);
     }
 
     // Détails d'une propriété
