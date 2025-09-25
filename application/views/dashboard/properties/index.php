@@ -203,7 +203,7 @@
                             <div class="card-body">
                                 <!-- Property Title -->
                                 <h5 class="card-title">
-                                    <a href="<?php echo base_url('properties/view/' . (isset($property->ID) ? $property->ID : (isset($property->property_id) ? $property->property_id : 'unknown'))); ?>" class="text-decoration-none">
+                                    <a href="<?php echo base_url('properties/view/' . (isset($property->property_id) ? $property->property_id : (isset($property->property_id) ? $property->property_id : 'unknown'))); ?>" class="text-decoration-none">
                                         <?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété sans titre')); ?>
                                     </a>
                                 </h5>
@@ -263,7 +263,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         <i class="ri-calendar-line me-1"></i>
-                                        <?php echo date('d/m/Y', strtotime($property->post_date)); ?>
+                                        <?php echo date('d/m/Y', strtotime($property->property_date)); ?>
                                     </small>
                                     <div class="btn-group btn-group-sm">
                                         <a href="<?php echo base_url('properties/view/' . $property->ID); ?>" class="btn btn-outline-primary">
