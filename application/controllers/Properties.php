@@ -37,10 +37,10 @@ class Properties extends BaseController {
         }
 
         foreach ($properties as $property) {
-            $property->metas = $this->property_model->get_property_metas($property->ID);
-            $property->status = $this->property_model->get_property_status($property->ID);
-            $property->type = $this->property_model->get_property_type($property->ID);
-            $property->images = $this->property_model->get_property_images($property->ID);
+            $property->metas = $this->property_model->get_property_metas($property->property_id);
+            $property->status = $this->property_model->get_property_status($property->property_id);
+            $property->type = $this->property_model->get_property_type($property->property_id);
+            $property->images = $this->property_model->get_property_images($property->property_id);
         }
         $data['properties'] = $properties;
         
