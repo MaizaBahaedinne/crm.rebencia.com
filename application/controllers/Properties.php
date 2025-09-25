@@ -44,14 +44,14 @@ class Properties extends BaseController {
         }
         $data['properties'] = $properties;
         
-        
+        echo (json_encode($data['properties']));
 
         // Récupérer les données pour les filtres
         $data['property_statuses'] = $this->property_model->get_property_statuses();
         $data['property_types'] = $this->property_model->get_property_types();
         $data['property_cities'] = $this->property_model->get_property_cities();
         
-        $this->loadViews('dashboard/properties/index', $data, $data);
+       // $this->loadViews('dashboard/properties/index', $data, $data);
     }
 
     // Détails d'une propriété
