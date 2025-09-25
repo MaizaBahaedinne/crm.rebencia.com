@@ -191,10 +191,10 @@
                                     </span>
                                 </div>
                                 <!-- Price Badge -->
-                                <?php if (!empty($property->fave_property_price) && is_numeric($property->fave_property_price)) : ?>
+                                <?php if (!empty($property->metas->fave_property_price) && is_numeric($property->metas->fave_property_price)) : ?>
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <span class="badge bg-primary fs-6">
-                                        <?php echo number_format($property->fave_property_price, 0, ',', ' '); ?> TND
+                                        <?php echo number_format($property->metas->fave_property_price, 0, ',', ' '); ?> TND
                                     </span>
                                 </div>
                                 <?php endif; ?>
@@ -240,19 +240,19 @@
 
                                 <!-- Property Features -->
                                 <div class="d-flex flex-wrap gap-2 mb-3">
-                                    <?php if (!empty($property->fave_property_bedrooms)) : ?>
+                                    <?php if (!empty($property->metas->fave_property_bedrooms)) : ?>
                                     <span class="badge bg-light text-dark">
-                                        <i class="ri-hotel-bed-line me-1"></i><?php echo $property->fave_property_bedrooms; ?> ch.
+                                        <i class="ri-hotel-bed-line me-1"></i><?php echo $property->metas->fave_property_bedrooms; ?> ch.
                                     </span>
                                     <?php endif; ?>
-                                    <?php if (!empty($property->fave_property_bathrooms)) : ?>
+                                    <?php if (!empty($property->metas->fave_property_bathrooms)) : ?>
                                     <span class="badge bg-light text-dark">
-                                        <i class="ri-drop-line me-1"></i><?php echo $property->fave_property_bathrooms; ?> sdb
+                                        <i class="ri-drop-line me-1"></i><?php echo $property->metas->fave_property_bathrooms; ?> sdb
                                     </span>
                                     <?php endif; ?>
-                                    <?php if (!empty($property->fave_property_garage)) : ?>
+                                    <?php if (!empty($property->metas->fave_property_garage)) : ?>
                                     <span class="badge bg-light text-dark">
-                                        <i class="ri-car-line me-1"></i><?php echo $property->fave_property_garage; ?> gar.
+                                        <i class="ri-car-line me-1"></i><?php echo $property->metas->fave_property_garage; ?> gar.
                                     </span>
                                     <?php endif; ?>
                                 </div>
