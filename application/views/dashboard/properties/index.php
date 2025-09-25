@@ -266,7 +266,7 @@
                                         <?php echo date('d/m/Y', strtotime($property->property_date)); ?>
                                     </small>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="<?php echo base_url('properties/view/' . $property->ID); ?>" class="btn btn-outline-primary">
+                                        <a href="<?php echo base_url('properties/view/' . $property->property_id); ?>" class="btn btn-outline-primary">
                                             <i class="ri-eye-line"></i>
                                         </a>
                                         <div class="dropdown">
@@ -274,7 +274,7 @@
                                                 <i class="ri-more-line"></i>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="<?php echo base_url('properties/view/' . $property->ID); ?>"><i class="ri-eye-line me-2"></i>Voir détails</a></li>
+                                                <li><a class="dropdown-item" href="<?php echo base_url('properties/view/' . $property->property_id); ?>"><i class="ri-eye-line me-2"></i>Voir détails</a></li>
                                                 <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Modifier</a></li>
                                                 <li><a class="dropdown-item" href="#"><i class="ri-share-line me-2"></i>Partager</a></li>
                                                 <li><hr class="dropdown-divider"></li>
