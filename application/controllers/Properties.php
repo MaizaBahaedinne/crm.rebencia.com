@@ -38,14 +38,14 @@ class Properties extends BaseController {
 
         foreach ($properties as $property) {
             $property->metas = $this->property_model->get_property_metas($property->property_id);
-            echo(json_encode( $property->metas ));
+            
             $property->status = $this->property_model->get_property_status($property->property_id);
             $property->type = $this->property_model->get_property_type($property->property_id);
             $property->images = $this->property_model->get_property_images($property->property_id);
         }
         $data['properties'] = $properties;
         
-        
+        echo (json_encode($data['properties']));
 
         // Récupérer les données pour les filtres
         $data['property_statuses'] = $this->property_model->get_property_statuses();
