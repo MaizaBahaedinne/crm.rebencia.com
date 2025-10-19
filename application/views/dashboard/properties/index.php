@@ -178,13 +178,46 @@
                                                     <h6 class="mb-1"><a href="<?php echo base_url('properties/view/' . ($property->property_id ?? $property->ID ?? '')); ?>" class="text-decoration-none"><?php echo htmlspecialchars($property->property_title ?? $property->post_title ?? 'Propriété sans titre'); ?></a></h6>
                                                     <small class="text-muted"><?php echo date('d/m/Y', strtotime($property->property_date ?? $property->post_date ?? '')); ?></small>
                                                 </div>
-                                                <p class="mb-1 text-muted small">
-                                                    <?php echo htmlspecialchars($property->metas->fave_property_map_address ?? $property->metas->fave_property_address ?? ($property->zone_nom ?? 'Adresse non fournie')); ?>
-                                                </p>
-                                                <div class="d-flex gap-2 align-items-center">
-                                                    <strong><?php echo !empty($property->metas->fave_property_price) ? number_format($property->metas->fave_property_price,0,',',' ') . ' TND' : '—'; ?></strong>
+                                                <?php
+                                                    // helper to read metas whether array or object
+                                                    $get_meta = function($k) use ($property) {
+                                                        if (empty($property->metas)) return null;
+                                                        if (is_array($property->metas)) return $property->metas[$k] ?? null;
+                                                        if (is_object($property->metas)) return $property->metas->{$k} ?? null;
+                                                        return null;
+                                                    };
+
+                                                    $address = $get_meta('fave_property_map_address') ?? $get_meta('fave_property_address') ?? ($property->zone_nom ?? 'Adresse non fournie');
+                                                    $price = $get_meta('fave_property_price') ?? $get_meta('fave_property_price');
+                                                    $size = $get_meta('fave_property_size') ?? ($property->surface_habitable ?? null);
+                                                    $bedrooms = $get_meta('fave_property_bedrooms');
+                                                    $bathrooms = $get_meta('fave_property_bathrooms');
+                                                    $land = $get_meta('fave_property_land');
+                                                    $garage = $get_meta('fave_property_garage');
+                                                    $year = $get_meta('fave_property_year');
+                                                    $typeName = $property->type->name ?? $property->type ?? '';
+                                                    $statusName = $property->status->name ?? $property->status ?? '';
+                                                ?>
+
+                                                <p class="mb-1 text-muted small"><?php echo htmlspecialchars($address); ?></p>
+
+                                                <div class="d-flex gap-2 align-items-center mb-1">
+                                                    <strong><?php echo $price !== null && $price !== '' ? number_format((float)$price,0,',',' ') . ' TND' : '—'; ?></strong>
                                                     <small class="text-muted">·</small>
-                                                    <small class="text-muted"><?php echo !empty($property->metas->fave_property_size) ? $property->metas->fave_property_size . ' m²' : (isset($property->surface_habitable) ? $property->surface_habitable . ' m²' : '—'); ?></small>
+                                                    <small class="text-muted"><?php echo $size ? htmlspecialchars($size . ' m²') : '—'; ?></small>
+                                                </div>
+
+                                                <div class="d-flex gap-2 align-items-center mb-2 small text-muted">
+                                                    <?php if ($bedrooms) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($bedrooms) ?> ch.</span><?php endif; ?>
+                                                    <?php if ($bathrooms) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($bathrooms) ?> s.d.e.</span><?php endif; ?>
+                                                    <?php if ($land) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($land) ?> m² terrain</span><?php endif; ?>
+                                                    <?php if ($garage) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($garage) ?> gar.</span><?php endif; ?>
+                                                    <?php if ($year) : ?><span class="badge bg-light text-dark">Année <?= htmlspecialchars($year) ?></span><?php endif; ?>
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <?php if (!empty($typeName)): ?><span class="badge bg-primary me-1"><?= htmlspecialchars($typeName) ?></span><?php endif; ?>
+                                                    <?php if (!empty($statusName)): ?><span class="badge bg-success"><?= htmlspecialchars($statusName) ?></span><?php endif; ?>
                                                 </div>
                                                 <div class="mt-2 d-flex align-items-center">
                                                     <img src="<?php echo htmlspecialchars($property->agent_photo ?? ''); ?>" alt="" class="rounded-circle me-2" style="width:36px;height:36px;object-fit:cover;">
