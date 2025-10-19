@@ -343,53 +343,74 @@ document.addEventListener('DOMContentLoaded', function() {
             if (type) {
                 const t = (prop.type && (prop.type.slug||prop.type.name)) ? (prop.type.slug||prop.type.name) : '';
                 if (String(t) !== String(type)) match = false;
-                                                <div class="card mb-3 property-card property-card-modern" data-prop-id="<?php echo $pid; ?>" data-lat="<?php echo htmlspecialchars($lat); ?>" data-lng="<?php echo htmlspecialchars($lng); ?>">
-                                                    <div class="row g-0 h-100">
-                                                        <div class="col-5 position-relative">
-                                                            <?php if (!empty($property->images['thumbnail'])) : ?>
-                                                                <img src="<?php echo $property->images['thumbnail']; ?>" class="img-fluid rounded-start card-img-left" style="height:100%;object-fit:cover;" alt="<?php echo htmlspecialchars($property->property_title ?? $property->post_title ?? 'Propriété'); ?>">
-                                                            <?php else: ?>
-                                                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:100%;min-height:120px;"><i class="ri-home-line fs-2 text-muted"></i></div>
-                                                            <?php endif; ?>
-                                                            <div class="price-badge position-absolute">
-                                                                <?php echo $price !== null && $price !== '' ? '<span class="h6 mb-0 text-white fw-bold">' . number_format((float)$price,0,',',' ') . ' TND</span>' : '<span class="text-white">Prix sur demande</span>'; ?>
-                                                            </div>
-                                                            <div class="type-status-overlay position-absolute">
-                                                                <?php if (!empty($typeName)): ?><span class="badge bg-primary me-1"><?= htmlspecialchars($typeName) ?></span><?php endif; ?>
-                                                                <?php if (!empty($statusName)): ?><span class="badge bg-success"><?= htmlspecialchars($statusName) ?></span><?php endif; ?>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-7 d-flex">
-                                                            <div class="card-body py-2 flex-fill d-flex flex-column">
-                                                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                                                    <h6 class="mb-0"><a href="<?php echo base_url('properties/view/' . ($property->property_id ?? $property->ID ?? '')); ?>" class="text-decoration-none text-dark small fw-semibold"><?php echo htmlspecialchars($property->property_title ?? $property->post_title ?? 'Propriété sans titre'); ?></a></h6>
-                                                                    <small class="text-muted small"><?php echo date('d/m/Y', strtotime($property->property_date ?? $property->post_date ?? '')); ?></small>
-                                                                </div>
-                                                                <p class="mb-2 text-muted small"><?php echo htmlspecialchars($address); ?></p>
+            }
+            // status
+            if (status) {
+                const s = (prop.status && (prop.status.slug||prop.status.name)) ? (prop.status.slug||prop.status.name) : '';
+                if (String(s) !== String(status)) match = false;
+            }
+            // price range
+            const price = prop.metas && prop.metas.fave_property_price ? parseFloat(prop.metas.fave_property_price) : null;
+            if (prixMin !== null && price !== null && price < prixMin) match = false;
+            if (prixMax !== null && price !== null && price > prixMax) match = false;
 
-                                                                <div class="d-flex align-items-center gap-3 mb-2 meta-row">
-                                                                    <?php if ($bedrooms) : ?><div class="meta-pill"><i class="ri-stack-line"></i> <small><?= htmlspecialchars($bedrooms) ?></small></div><?php endif; ?>
-                                                                    <?php if ($bathrooms) : ?><div class="meta-pill"><i class="ri-shower-line"></i> <small><?= htmlspecialchars($bathrooms) ?></small></div><?php endif; ?>
-                                                                    <?php if ($size) : ?><div class="meta-pill"><i class="ri-arrows-left-right-line"></i> <small><?= htmlspecialchars($size) ?> m²</small></div><?php endif; ?>
-                                                                    <?php if ($land) : ?><div class="meta-pill"><i class="ri-map-pin-line"></i> <small><?= htmlspecialchars($land) ?> m²</small></div><?php endif; ?>
-                                                                </div>
+            // toggle card
+            if (match) {
+                card.style.display = '';
+                // show marker
+                if (markers[pid]) {
+                    try { markers[pid].addTo(map); visibleLatLngs.push(markers[pid].getLatLng()); } catch(e){}
+                }
+            } else {
+                card.style.display = 'none';
+                // remove marker
+                if (markers[pid] && map.hasLayer(markers[pid])) { try { map.removeLayer(markers[pid]); } catch(e){} }
+            }
+        });
 
-                                                                <div class="mt-auto d-flex align-items-center justify-content-between">
-                                                                    <div class="d-flex align-items-center">
-                                                                        <img src="<?php echo htmlspecialchars($property->agent_photo ?? ''); ?>" alt="" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
-                                                                        <div>
-                                                                            <div class="small fw-medium"><?php echo htmlspecialchars($property->agent_name ?? 'Agent'); ?></div>
-                                                                            <small class="text-muted"><?php echo htmlspecialchars($property->agency_name ?? 'Agence'); ?></small>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div>
-                                                                        <a href="<?php echo base_url('properties/view/' . ($property->property_id ?? $property->ID ?? '')); ?>" class="btn btn-sm btn-outline-primary">Voir</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+        // fit bounds to visible markers
+        if (visibleLatLngs.length > 0) {
+            const group = L.featureGroup(visibleLatLngs.map(ll=>L.marker([ll.lat,ll.lng])));
+            map.fitBounds(group.getBounds().pad(0.15));
+        }
+    }
+
+    // Clicking card centres map on marker
+    document.querySelectorAll('#propertiesList .property-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            const pid = this.getAttribute('data-prop-id');
+            if (markers[pid]) {
+                map.setView(markers[pid].getLatLng(), 15);
+                markers[pid].openPopup();
+            }
+        });
+    });
+
+    // Gallery modal handling (single reusable modal)
+    const galleryModal = document.getElementById('propertyGalleryModal');
+    const galleryTitle = document.getElementById('propertyGalleryTitle');
+    const galleryBody = document.getElementById('propertyGalleryItems');
+
+    document.querySelectorAll('.property-card').forEach(card => {
+        const pid = card.getAttribute('data-prop-id');
+        const galleryBtn = card.querySelector('[data-bs-target]');
+        if (galleryBtn) {
+            galleryBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const prop = <?php echo json_encode($properties); ?>.find(p => (p.property_id == pid || p.ID == pid));
+                if (!prop) return;
+                galleryTitle.innerText = (prop.property_title || prop.post_title || 'Galerie');
+                galleryBody.innerHTML = '';
+                const gallery = (prop.images && prop.images.gallery) ? prop.images.gallery.slice() : [];
+                if (prop.images && prop.images.thumbnail) gallery.unshift(prop.images.thumbnail);
+                if (gallery.length === 0) galleryBody.innerHTML = '<div class="col-12 text-center text-muted">Aucune image.</div>';
+                gallery.forEach(img => {
+                    const col = document.createElement('div'); col.className='col-6 mb-2';
+                    col.innerHTML = '<a href="'+img+'" target="_blank"><img src="'+img+'" class="img-fluid rounded"></a>';
+                    galleryBody.appendChild(col);
+                });
+                var modal = new bootstrap.Modal(galleryModal);
+                modal.show();
             });
         }
     });
