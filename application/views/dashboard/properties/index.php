@@ -113,279 +113,174 @@
                 </div>
             </div>
 
-            <!-- Properties Grid -->
-            <div class="row" id="propertiesContainer">
-                <?php if (!empty($properties)) : ?>
-                    <?php foreach ($properties as $property) : ?>
-                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4 property-card">
-                        <div class="card border-0 shadow-sm h-100">
-                            <!-- Property Image -->
-                            <div class="position-relative">
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <?php if (!empty($property->images['thumbnail'])) : ?>
-                                        <img src="<?php echo $property->images['thumbnail']; ?>" alt="<?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété')); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
-                                    <?php elseif (!empty($property->images['gallery']) && count($property->images['gallery']) > 0) : ?>
-                                        <img src="<?php echo $property->images['gallery'][0]; ?>" alt="<?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété')); ?>" class="img-fluid rounded-top" style="width: 100%; height: 100%; object-fit: cover;">
-                                    <?php else : ?>
-                                        <div class="text-center text-muted">
-                                            <i class="ri-home-line fs-1"></i>
-                                            <p class="mb-0">Aucune image</p>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                                
-                                <!-- Images Count Badge -->
-                                <?php 
-                                $total_images = 0;
-                                if (!empty($property->images['thumbnail'])) $total_images++;
-                                if (!empty($property->images['gallery'])) $total_images += count($property->images['gallery']);
-                                if ($total_images > 1) : ?>
-                                <div class="position-absolute bottom-0 start-0 m-2">
-                                    <span class="badge bg-dark bg-opacity-75">
-                                        <i class="ri-camera-line me-1"></i><?php echo $total_images; ?>
-                                    </span>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <!-- Status Badge -->
-                                <div class="position-absolute top-0 start-0 m-2">
-                                    <?php 
-                                    $status_name = 'Non défini';
-                                    $status_color = 'secondary';
-                                    
-                                    if (isset($property->status) && $property->status && isset($property->status->name)) {
-                                        $status_name = $property->status->name;
-                                        // Couleurs basées sur le slug du statut
-                                        if (isset($property->status->slug)) {
-                                            switch(strtolower($property->status->slug)) {
-                                                case 'for-sale':
-                                                case 'a-vendre':
-                                                    $status_color = 'warning'; 
-                                                    break;
-                                                case 'for-rent':
-                                                case 'a-louer':
-                                                    $status_color = 'info'; 
-                                                    break;
-                                                case 'sold':
-                                                case 'vendu':
-                                                    $status_color = 'success'; 
-                                                    break;
-                                                case 'rented':
-                                                case 'loue':
-                                                    $status_color = 'dark'; 
-                                                    break;
-                                                default: 
-                                                    $status_color = 'secondary'; 
-                                                    break;
-                                            }
-                                        } else {
-                                            $status_color = 'secondary';
-                                        }
-                                    } else {
-                                        $status_name = 'Statut inconnu';
-                                        $status_color = 'secondary';
-                                    }
-                                    ?>
-                                    <span class="badge bg-<?php echo $status_color; ?>">
-                                        <?php echo htmlspecialchars($status_name); ?>
-                                    </span>
-                                </div>
-                                <!-- Price Badge -->
-                                <?php if (!empty($property->metas->fave_property_price) && is_numeric($property->metas->fave_property_price)) : ?>
-                                <div class="position-absolute top-0 end-0 m-2">
-                                    <span class="badge bg-primary fs-6">
-                                        <?php echo number_format($property->metas->fave_property_price, 0, ',', ' '); ?> TND
-                                    </span>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="card-body">
-                                <!-- Property Title -->
-                                <h5 class="card-title">
-                                    <a href="<?php echo base_url('properties/view/' . (isset($property->property_id) ? $property->property_id : (isset($property->property_id) ? $property->property_id : 'unknown'))); ?>" class="text-decoration-none">
-                                        <?php echo htmlspecialchars(isset($property->post_title) ? $property->post_title : (isset($property->property_title) ? $property->property_title : 'Propriété sans titre')); ?>
-                                    </a>
-                                </h5>
-
-                                <!-- Property Details -->
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <small class="text-muted">Type:</small><br>
-                                        <span class="fw-medium">
-                                            <?php 
-                                            if (isset($property->type) && $property->type) {
-                                                echo htmlspecialchars($property->type->name);
-                                            } else {
-                                                echo htmlspecialchars($property->type_bien ?: 'Non spécifié'); 
-                                            }
-                                            ?>
-                                        </span>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Surface:</small><br>
-                                        <span class="fw-medium">
-                                            <?php echo isset($property->surface_habitable) && $property->surface_habitable ? $property->surface_habitable . ' m²' : 'Non spécifiée'; ?>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Property Address -->
-                                <div class="d-flex align-items-start mb-3">
-                                    <i class="ri-map-pin-line text-muted me-2 mt-1"></i>
-                                    <small class="text-muted">
-                                        <?php echo htmlspecialchars(isset($property->zone_nom) && $property->zone_nom ? $property->zone_nom : 'Adresse non fournie'); ?>
-                                    </small>
-                                </div>
-
-                                <!-- Property Features -->
-                                <div class="d-flex flex-wrap gap-2 mb-3">
-                                    <?php if (!empty($property->metas->fave_property_bedrooms)) : ?>
-                                    <span class="badge bg-light text-dark">
-                                        <i class="ri-hotel-bed-line me-1"></i><?php echo $property->metas->fave_property_bedrooms; ?> ch.
-                                    </span>
-                                    <?php endif; ?>
-                                    <?php if (!empty($property->metas->fave_property_bathrooms)) : ?>
-                                    <span class="badge bg-light text-dark">
-                                        <i class="ri-drop-line me-1"></i><?php echo $property->metas->fave_property_bathrooms; ?> sdb
-                                    </span>
-                                    <?php endif; ?>
-                                    <?php if (!empty($property->metas->fave_property_garage)) : ?>
-                                    <span class="badge bg-light text-dark">
-                                        <i class="ri-car-line me-1"></i><?php echo $property->metas->fave_property_garage; ?> gar.
-                                    </span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Card Footer -->
-                            <div class="card-footer bg-transparent border-top-0">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
-                                        <i class="ri-calendar-line me-1"></i>
-                                        <?php echo date('d/m/Y', strtotime($property->property_date)); ?>
-                                    </small>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="<?php echo base_url('properties/view/' . $property->property_id); ?>" class="btn btn-outline-primary">
-                                            <i class="ri-eye-line"></i>
-                                        </a>
-                                        <div class="dropdown">
-                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                <i class="ri-more-line"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="<?php echo base_url('properties/view/' . $property->property_id); ?>"><i class="ri-eye-line me-2"></i>Voir détails</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Modifier</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="ri-share-line me-2"></i>Partager</a></li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-danger" href="#"><i class="ri-delete-bin-line me-2"></i>Supprimer</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                <?php else : ?>
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <div class="avatar-xl mx-auto mb-4">
-                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-24">
-                                    <i class="ri-home-line"></i>
-                                </div>
-                            </div>
-                            <h5 class="mb-3">Aucune propriété trouvée</h5>
-                            <p class="text-muted mb-4">Aucune propriété ne correspond aux critères de recherche sélectionnés.</p>
-                            <a href="<?php echo base_url('properties'); ?>" class="btn btn-primary">
-                                <i class="ri-refresh-line me-1"></i>Réinitialiser les filtres
-                            </a>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Pagination -->
-            <?php if (!empty($properties) && count($properties) >= 20) : ?>
+            <!-- Half-map layout: list (left) + map (right) -->
             <div class="row">
-                <div class="col-12">
-                    <nav aria-label="Properties pagination">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Précédent</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Suivant</a>
-                            </li>
-                        </ul>
-                    </nav>
+                <div class="col-lg-6">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><?php echo count($properties); ?> propriété(s)</h6>
+                        <small class="text-muted">Cliquer sur une carte ou sur un marqueur pour centrer</small>
+                    </div>
+
+                    <div id="propertiesList" style="max-height:75vh; overflow:auto;">
+                        <?php if (!empty($properties)) : ?>
+                            <?php foreach ($properties as $property) : ?>
+                                <div class="card mb-3 property-card" data-prop-id="<?php echo $property->property_id ?? $property->ID ?? ''; ?>" data-lat="<?php echo htmlspecialchars($property->metas->houzez_geolocation_lat ?? ''); ?>" data-lng="<?php echo htmlspecialchars($property->metas->houzez_geolocation_long ?? ''); ?>">
+                                    <div class="row g-0">
+                                        <div class="col-5">
+                                            <?php if (!empty($property->images['thumbnail'])) : ?>
+                                                <img src="<?php echo $property->images['thumbnail']; ?>" class="img-fluid rounded-start" style="height:100%;object-fit:cover;" alt="<?php echo htmlspecialchars($property->property_title ?? $property->post_title ?? 'Propriété'); ?>">
+                                            <?php else: ?>
+                                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:100%;min-height:120px;"><i class="ri-home-line fs-2 text-muted"></i></div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="col-7">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <h6 class="mb-1"><a href="<?php echo base_url('properties/view/' . ($property->property_id ?? $property->ID ?? '')); ?>" class="text-decoration-none"><?php echo htmlspecialchars($property->property_title ?? $property->post_title ?? 'Propriété sans titre'); ?></a></h6>
+                                                    <small class="text-muted"><?php echo date('d/m/Y', strtotime($property->property_date ?? $property->post_date ?? '')); ?></small>
+                                                </div>
+                                                <p class="mb-1 text-muted small">
+                                                    <?php echo htmlspecialchars($property->metas->fave_property_map_address ?? $property->metas->fave_property_address ?? ($property->zone_nom ?? 'Adresse non fournie')); ?>
+                                                </p>
+                                                <div class="d-flex gap-2 align-items-center">
+                                                    <strong><?php echo !empty($property->metas->fave_property_price) ? number_format($property->metas->fave_property_price,0,',',' ') . ' TND' : '—'; ?></strong>
+                                                    <small class="text-muted">·</small>
+                                                    <small class="text-muted"><?php echo !empty($property->metas->fave_property_size) ? $property->metas->fave_property_size . ' m²' : (isset($property->surface_habitable) ? $property->surface_habitable . ' m²' : '—'); ?></small>
+                                                </div>
+                                                <div class="mt-2 d-flex align-items-center">
+                                                    <img src="<?php echo htmlspecialchars($property->agent_photo ?? ''); ?>" alt="" class="rounded-circle me-2" style="width:36px;height:36px;object-fit:cover;">
+                                                    <div>
+                                                        <div class="small fw-medium"><?php echo htmlspecialchars($property->agent_name ?? 'Agent'); ?></div>
+                                                        <small class="text-muted"><?php echo htmlspecialchars($property->agency_name ?? 'Agence'); ?></small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="text-center py-5">
+                                <h5>Aucune propriété trouvée</h5>
+                                <p class="text-muted">Essayez d'élargir vos filtres.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div id="map" style="width:100%;height:80vh;border-radius:8px;overflow:hidden;"></div>
                 </div>
             </div>
-            <?php endif; ?>
+
+            <!-- Single reusable Gallery Modal -->
+            <div class="modal fade" id="propertyGalleryModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="propertyGalleryTitle">Galerie</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body" id="propertyGalleryBody">
+                            <div class="row g-2" id="propertyGalleryItems"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2C2JbT8Vf6k1qYqv1qjM+Y6lNfG6kG8f2GZlYhk=" crossorigin=""/>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-QVj8Q+Zx6k6/tjqT+6pWq2w1L6Q1Zx9s1g6Qk3x0b2k=" crossorigin=""></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle between grid and list view
-    const gridView = document.getElementById('gridView');
-    const listView = document.getElementById('listView');
-    const container = document.getElementById('propertiesContainer');
-
-    listView.addEventListener('change', function() {
-        if (this.checked) {
-            container.className = 'row list-view';
-            document.querySelectorAll('.property-card').forEach(card => {
-                card.className = 'col-12 mb-3 property-card';
-            });
-        }
-    });
-
-    gridView.addEventListener('change', function() {
-        if (this.checked) {
-            container.className = 'row';
-            document.querySelectorAll('.property-card').forEach(card => {
-                card.className = 'col-xl-4 col-lg-6 col-md-6 mb-4 property-card';
-            });
-        }
-    });
-
     // Auto-submit form on filter change
-    document.getElementById('filtersForm').addEventListener('change', function() {
-        this.submit();
+    const filtersForm = document.getElementById('filtersForm');
+    if (filtersForm) filtersForm.addEventListener('change', function() { this.submit(); });
+
+    // Prepare properties for map
+    const listEl = document.getElementById('propertiesList');
+    const propertyCards = document.querySelectorAll('#propertiesList .property-card');
+    const markers = {};
+
+    // Initialize map
+    const map = L.map('map', { scrollWheelZoom: false }).setView([36.8, 10.2], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add markers
+    propertyCards.forEach(card => {
+        const lat = card.getAttribute('data-lat');
+        const lng = card.getAttribute('data-lng');
+        const pid = card.getAttribute('data-prop-id');
+        if (!lat || !lng) return;
+        const title = card.querySelector('h6') ? card.querySelector('h6').innerText : 'Propriété';
+
+        const marker = L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map).bindPopup(title);
+        markers[pid] = marker;
+
+        // Clicking marker highlights card
+        marker.on('click', function() {
+            document.querySelectorAll('#propertiesList .property-card').forEach(c=>c.classList.remove('border-primary'));
+            const target = document.querySelector('#propertiesList .property-card[data-prop-id="'+pid+'"]');
+            if (target) {
+                target.classList.add('border', 'border-primary');
+                target.scrollIntoView({behavior:'smooth', block:'center'});
+            }
+        });
+    });
+
+    // Clicking card centres map on marker
+    document.querySelectorAll('#propertiesList .property-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            const pid = this.getAttribute('data-prop-id');
+            if (markers[pid]) {
+                map.setView(markers[pid].getLatLng(), 15);
+                markers[pid].openPopup();
+            }
+        });
+    });
+
+    // Gallery modal handling (single reusable modal)
+    const galleryModal = document.getElementById('propertyGalleryModal');
+    const galleryTitle = document.getElementById('propertyGalleryTitle');
+    const galleryBody = document.getElementById('propertyGalleryItems');
+
+    document.querySelectorAll('.property-card').forEach(card => {
+        const pid = card.getAttribute('data-prop-id');
+        const galleryBtn = card.querySelector('[data-bs-target]');
+        if (galleryBtn) {
+            galleryBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const prop = <?php echo json_encode($properties); ?>.find(p => (p.property_id == pid || p.ID == pid));
+                if (!prop) return;
+                galleryTitle.innerText = (prop.property_title || prop.post_title || 'Galerie');
+                galleryBody.innerHTML = '';
+                const gallery = (prop.images && prop.images.gallery) ? prop.images.gallery.slice() : [];
+                if (prop.images && prop.images.thumbnail) gallery.unshift(prop.images.thumbnail);
+                if (gallery.length === 0) galleryBody.innerHTML = '<div class="col-12 text-center text-muted">Aucune image.</div>';
+                gallery.forEach(img => {
+                    const col = document.createElement('div'); col.className='col-6 mb-2';
+                    col.innerHTML = '<a href="'+img+'" target="_blank"><img src="'+img+'" class="img-fluid rounded"></a>';
+                    galleryBody.appendChild(col);
+                });
+                var modal = new bootstrap.Modal(galleryModal);
+                modal.show();
+            });
+        }
     });
 });
 </script>
 
 <style>
-.list-view .card {
-    flex-direction: row;
-}
-
-.list-view .card-img-top {
-    width: 200px;
-    height: 150px;
-    flex-shrink: 0;
-}
-
-.list-view .card-body {
-    flex: 1;
-}
-
-.property-card:hover {
-    transform: translateY(-2px);
-    transition: transform 0.2s ease-in-out;
-}
-
-.property-card .card {
-    transition: all 0.2s ease-in-out;
-}
-
-.property-card:hover .card {
-    box-shadow: 0 8px 25px rgba(0,0,0,.15) !important;
-}
+/* Half map styles */
+#propertiesList { padding-right:8px; }
+.property-card { cursor:pointer; }
+.property-card.border-primary { box-shadow: 0 6px 18px rgba(0,123,255,.12); }
+@media (max-width: 991px) { #map { height: 50vh !important; } }
 </style>
