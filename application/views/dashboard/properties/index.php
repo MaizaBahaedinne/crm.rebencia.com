@@ -198,9 +198,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit form on filter change
+    // Client-side filtering: use server filters if user submits; otherwise react on change
     const filtersForm = document.getElementById('filtersForm');
-    if (filtersForm) filtersForm.addEventListener('change', function() { this.submit(); });
+    // Properties JSON (for client-side filtering)
+    const propertiesData = <?php echo json_encode($properties); ?>;
+
+    const submitOnServer = false; // change to true to fallback to server-side
+    if (filtersForm) {
+        filtersForm.addEventListener('submit', function(e){
+            if (!submitOnServer) { e.preventDefault(); applyFiltersJS(); }
+        });
+        // react on change
+        filtersForm.addEventListener('change', function(e){ if (!submitOnServer) applyFiltersJS(); });
+    }
 
     // Prepare properties for map
     const listEl = document.getElementById('propertiesList');
@@ -238,6 +248,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Apply filters JS: hide/show list cards and markers
+    function applyFiltersJS() {
+        const q = (document.getElementById('search') ? document.getElementById('search').value.trim().toLowerCase() : '');
+        const type = (document.getElementById('type_bien') ? document.getElementById('type_bien').value : '');
+        const status = (document.getElementById('statut_houzez') ? document.getElementById('statut_houzez').value : '');
+        const prixMin = parseFloat(document.getElementById('prix_min') ? document.getElementById('prix_min').value : '') || null;
+        const prixMax = parseFloat(document.getElementById('prix_max') ? document.getElementById('prix_max').value : '') || null;
+
+        const visibleLatLngs = [];
+
+        propertyCards.forEach(card => {
+            const pid = card.getAttribute('data-prop-id');
+            const prop = propertiesData.find(p => (p.property_id == pid || p.ID == pid));
+            if (!prop) return;
+
+            // match filters
+            let match = true;
+            // search in title/address
+            if (q) {
+                const hay = ((prop.property_title||prop.post_title||'') + ' ' + (prop.metas && (prop.metas.fave_property_map_address||prop.metas.fave_property_address) || '')).toLowerCase();
+                if (hay.indexOf(q) === -1) match = false;
+            }
+            // type filter (check slug or name)
+            if (type) {
+                const t = (prop.type && (prop.type.slug||prop.type.name)) ? (prop.type.slug||prop.type.name) : '';
+                if (String(t) !== String(type)) match = false;
+            }
+            // status
+            if (status) {
+                const s = (prop.status && (prop.status.slug||prop.status.name)) ? (prop.status.slug||prop.status.name) : '';
+                if (String(s) !== String(status)) match = false;
+            }
+            // price range
+            const price = prop.metas && prop.metas.fave_property_price ? parseFloat(prop.metas.fave_property_price) : null;
+            if (prixMin !== null && price !== null && price < prixMin) match = false;
+            if (prixMax !== null && price !== null && price > prixMax) match = false;
+
+            // toggle card
+            if (match) {
+                card.style.display = '';
+                // show marker
+                if (markers[pid]) {
+                    try { markers[pid].addTo(map); visibleLatLngs.push(markers[pid].getLatLng()); } catch(e){}
+                }
+            } else {
+                card.style.display = 'none';
+                // remove marker
+                if (markers[pid] && map.hasLayer(markers[pid])) { try { map.removeLayer(markers[pid]); } catch(e){} }
+            }
+        });
+
+        // fit bounds to visible markers
+        if (visibleLatLngs.length > 0) {
+            const group = L.featureGroup(visibleLatLngs.map(ll=>L.marker([ll.lat,ll.lng])));
+            map.fitBounds(group.getBounds().pad(0.15));
+        }
+    }
 
     // Clicking card centres map on marker
     document.querySelectorAll('#propertiesList .property-card').forEach(card => {
