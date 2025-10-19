@@ -19,7 +19,7 @@ class Properties extends BaseController {
     }
 
     // Liste des propriétés
-    public function index() {
+    public function index($affichage = null ) {
         $this->isLoggedIn();
         
         // Préparer les données pour la vue
@@ -54,7 +54,13 @@ class Properties extends BaseController {
         
        // echo json_encode($data['properties']);
 
-       $this->loadViews('dashboard/properties/index', $data, $data);
+    if ($affichage === null) {
+        $this->loadViews('dashboard/properties/index', $data, $data);
+    } else {
+        header('Content-Type: application/json');
+        echo json_encode($data['properties']);
+        exit;
+    }
     }
 
     // Détails d'une propriété
