@@ -19,14 +19,14 @@ class Properties extends BaseController {
     }
 
     // Liste des propriétés
-    public function index($affichage = null ) {
+    public function index( ) {
         $this->isLoggedIn();
         
         // Préparer les données pour la vue
         $data = $this->global;
         $data['pageTitle'] = 'Liste des propriétés';
         $data['filters'] = $_GET; // Récupérer les filtres de l'URL
-        
+        $affichage = $this->input->get('affichage', TRUE);
       
 
         if ($this->role=='manager' && $this->agencyId != null ) {
