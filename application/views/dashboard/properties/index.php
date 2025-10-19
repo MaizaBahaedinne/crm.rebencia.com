@@ -128,7 +128,42 @@
                     <div id="propertiesList" style="max-height:75vh; overflow:auto;">
                         <?php if (!empty($properties)) : ?>
                             <?php foreach ($properties as $property) : ?>
-                                <div class="card mb-3 property-card" data-prop-id="<?php echo $property->property_id ?? $property->ID ?? ''; ?>" data-lat="<?php echo htmlspecialchars($property->metas->houzez_geolocation_lat ?? ''); ?>" data-lng="<?php echo htmlspecialchars($property->metas->houzez_geolocation_long ?? ''); ?>">
+                                <?php
+                                    // prepare property id and coordinates with multiple fallbacks
+                                    $pid = $property->property_id ?? $property->ID ?? '';
+                                    $lat = '';
+                                    $lng = '';
+
+                                    // metas may be object or array
+                                    if (!empty($property->metas)) {
+                                        if (is_array($property->metas)) {
+                                            $lat = $property->metas['houzez_geolocation_lat'] ?? $property->metas['houzez_geolocation_lat'] ?? ($property->metas['fave_property_location'] ?? '');
+                                            $lng = $property->metas['houzez_geolocation_long'] ?? $property->metas['houzez_geolocation_long'] ?? '';
+                                        } elseif (is_object($property->metas)) {
+                                            $lat = $property->metas->houzez_geolocation_lat ?? $property->metas->houzez_geolocation_lat ?? ($property->metas->fave_property_location ?? '');
+                                            $lng = $property->metas->houzez_geolocation_long ?? $property->metas->houzez_geolocation_long ?? '';
+                                        }
+                                    }
+
+                                    // If fave_property_location exists as "lat,lng,..." parse it
+                                    if ((empty($lat) || empty($lng)) && !empty($property->metas)) {
+                                        $loc = '';
+                                        if (is_array($property->metas)) $loc = $property->metas['fave_property_location'] ?? '';
+                                        if (empty($loc) && is_object($property->metas)) $loc = $property->metas->fave_property_location ?? '';
+                                        if ($loc) {
+                                            $parts = preg_split('/\s*,\s*/', $loc);
+                                            if (count($parts) >= 2) {
+                                                $lat = $parts[0];
+                                                $lng = $parts[1];
+                                            }
+                                        }
+                                    }
+
+                                    // Last-chance fallbacks
+                                    $lat = trim((string)$lat);
+                                    $lng = trim((string)$lng);
+                                ?>
+                                <div class="card mb-3 property-card" data-prop-id="<?php echo $pid; ?>" data-lat="<?php echo htmlspecialchars($lat); ?>" data-lng="<?php echo htmlspecialchars($lng); ?>">
                                     <div class="row g-0">
                                         <div class="col-5">
                                             <?php if (!empty($property->images['thumbnail'])) : ?>
