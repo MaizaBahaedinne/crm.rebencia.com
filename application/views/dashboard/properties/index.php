@@ -113,8 +113,12 @@
                 </div>
             </div>
 
-            <!-- Half-map layout: list (left) + map (right) -->
+            <!-- Half-map layout: map (left) + list (right) -->
             <div class="row">
+                <div class="col-lg-6">
+                    <div id="map" style="width:100%;height:80vh;border-radius:8px;overflow:hidden;"></div>
+                </div>
+
                 <div class="col-lg-6">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0"><?php echo count($properties); ?> propriété(s)</h6>
@@ -166,10 +170,6 @@
                             </div>
                         <?php endif; ?>
                     </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div id="map" style="width:100%;height:80vh;border-radius:8px;overflow:hidden;"></div>
                 </div>
             </div>
 
