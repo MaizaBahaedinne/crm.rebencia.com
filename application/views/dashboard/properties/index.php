@@ -192,9 +192,9 @@
 </div>
 
 <!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2C2JbT8Vf6k1qYqv1qjM+Y6lNfG6kG8f2GZlYhk=" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-QVj8Q+Zx6k6/tjqT+6pWq2w1L6Q1Zx9s1g6Qk3x0b2k=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -212,6 +212,10 @@ document.addEventListener('DOMContentLoaded', function() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+
+    // Force redraw in case container size wasn't available on init (common in flex layouts)
+    setTimeout(function() { try { map.invalidateSize(); } catch(e) { console.warn('Leaflet invalidateSize failed', e); } }, 200);
+    window.addEventListener('resize', function(){ try { map.invalidateSize(); } catch(e){} });
 
     // Add markers
     propertyCards.forEach(card => {
