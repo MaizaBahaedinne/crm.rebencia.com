@@ -18,7 +18,8 @@ class Property_model extends CI_Model {
         $this->wp_db->where('agent_id', $filters['agent']);
     }
     if (!empty($filters['property_id'])) {
-        $this->wp_db->where_in('ID', (array)$filters['property_id']);
+    // the view wp_Hrg8P_prop_agen exposes property_id (not ID)
+    $this->wp_db->where_in('property_id', (array)$filters['property_id']);
     }
     if (!empty($filters['post_date_gmt'])) {
         $this->wp_db->where('post_date_gmt', $filters['post_date_gmt']);
