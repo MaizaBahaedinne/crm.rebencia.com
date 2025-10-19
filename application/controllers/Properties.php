@@ -29,9 +29,10 @@ class Properties extends BaseController {
         $affichage = $this->input->get('affichage', TRUE);
       
 
-        if ($this->role=='manager' && $this->agencyId != null ) {
+        if ((($this->role === 'manager' || $this->role === 'agent') ) && $this->agencyId != null) {
             $properties = $this->property_model->get_properties_agency($this->agencyId);
-        }else {
+        }
+        else {
             // Pour les autres rôles, récupérer toutes les propriétés
             $properties = $this->property_model->get_all_properties($data['filters']);
         }
