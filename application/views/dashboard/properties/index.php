@@ -257,17 +257,42 @@
                                                 <p class="mb-1 text-muted small"><?php echo htmlspecialchars($address); ?></p>
 
                                                 <div class="d-flex gap-2 align-items-center mb-1">
-                                                    <strong><?php echo $price !== null && $price !== '' ? number_format((float)$price,0,',',' ') . ' TND' : '—'; ?></strong>
+                                                    <strong class="price-display"><?php echo $price !== null && $price !== '' ? number_format((float)$price,0,',',' ') . ' TND' : '—'; ?></strong>
                                                     <small class="text-muted">·</small>
                                                     <small class="text-muted"><?php echo $size ? htmlspecialchars($size . ' m²') : '—'; ?></small>
                                                 </div>
 
-                                                <div class="d-flex gap-2 align-items-center mb-2 small text-muted">
-                                                    <?php if ($bedrooms) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($bedrooms) ?> ch.</span><?php endif; ?>
-                                                    <?php if ($bathrooms) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($bathrooms) ?> s.d.e.</span><?php endif; ?>
-                                                    <?php if ($land) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($land) ?> m² terrain</span><?php endif; ?>
-                                                    <?php if ($garage) : ?><span class="badge bg-light text-dark"><?= htmlspecialchars($garage) ?> gar.</span><?php endif; ?>
-                                                    <?php if ($year) : ?><span class="badge bg-light text-dark">Année <?= htmlspecialchars($year) ?></span><?php endif; ?>
+                                                <?php
+                                                    $views_total = $get_meta('houzez_total_property_views') ?? null;
+                                                    $recent_viewed = $get_meta('houzez_recently_viewed') ?? null;
+
+                                                    if (!function_exists('time_ago_fr')) {
+                                                        function time_ago_fr($datetime) {
+                                                            $ts = strtotime($datetime);
+                                                            if (!$ts) return '';
+                                                            $diff = time() - $ts;
+                                                            if ($diff < 60) return "à l'instant";
+                                                            if ($diff < 3600) { $m = floor($diff/60); return 'il y a ' . $m . ' min' . ($m>1?'s':''); }
+                                                            if ($diff < 86400) { $h = floor($diff/3600); return 'il y a ' . $h . ' heure' . ($h>1?'s':''); }
+                                                            if ($diff < 2592000) { $d = floor($diff/86400); return 'il y a ' . $d . ' jour' . ($d>1?'s':''); }
+                                                            return date('d/m/Y', $ts);
+                                                        }
+                                                    }
+                                                    $last_view_text = $recent_viewed ? time_ago_fr($recent_viewed) : '';
+                                                ?>
+
+                                                <div class="meta-icons d-flex align-items-center gap-3 mb-2 text-muted small">
+                                                    <?php if ($bedrooms) : ?><div class="d-flex align-items-center"><i class="ri-hotel-bed-line me-1"></i><small><?= htmlspecialchars($bedrooms) ?></small></div><?php endif; ?>
+                                                    <?php if ($bathrooms) : ?><div class="d-flex align-items-center"><i class="ri-shower-line me-1"></i><small><?= htmlspecialchars($bathrooms) ?></small></div><?php endif; ?>
+                                                    <?php if ($size) : ?><div class="d-flex align-items-center"><i class="ri-arrows-left-right-line me-1"></i><small><?= htmlspecialchars($size) ?> m²</small></div><?php endif; ?>
+                                                    <?php if ($land) : ?><div class="d-flex align-items-center"><i class="ri-map-pin-line me-1"></i><small><?= htmlspecialchars($land) ?> m²</small></div><?php endif; ?>
+                                                    <?php if ($garage) : ?><div class="d-flex align-items-center"><i class="ri-car-line me-1"></i><small><?= htmlspecialchars($garage) ?></small></div><?php endif; ?>
+                                                    <?php if ($year) : ?><div class="d-flex align-items-center"><i class="ri-calendar-line me-1"></i><small><?= htmlspecialchars($year) ?></small></div><?php endif; ?>
+                                                </div>
+
+                                                <div class="d-flex align-items-center justify-content-start small text-muted">
+                                                    <div class="me-3"><i class="ri-eye-line me-1"></i> <strong><?php echo $views_total ? htmlspecialchars($views_total) : '0'; ?></strong> vues</div>
+                                                    <?php if ($last_view_text) : ?><div class="text-muted">· vue <?php echo htmlspecialchars($last_view_text); ?></div><?php endif; ?>
                                                 </div>
 
                                                 <div class="mb-2">
