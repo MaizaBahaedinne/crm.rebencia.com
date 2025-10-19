@@ -52,7 +52,9 @@ class Properties extends BaseController {
         $data['property_types'] = $this->property_model->get_property_types();
         $data['property_cities'] = $this->property_model->get_property_cities();
         
-        $this->loadViews('dashboard/properties/index', $data, $data);
+        echo json_encode($data['properties']);
+
+       // $this->loadViews('dashboard/properties/index', $data, $data);
     }
 
     // Détails d'une propriété
