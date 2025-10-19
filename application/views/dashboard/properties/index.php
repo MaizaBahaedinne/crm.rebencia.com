@@ -81,6 +81,61 @@
                 </div>
             </div>
 
+            <!-- Advanced metas filters -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label">Chambres (min)</label>
+                                    <input type="number" id="filter_bedrooms" class="form-control" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">S.d.e. (min)</label>
+                                    <input type="number" id="filter_bathrooms" class="form-control" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Surface min (m²)</label>
+                                    <input type="number" id="filter_size_min" class="form-control" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Surface max (m²)</label>
+                                    <input type="number" id="filter_size_max" class="form-control" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Terrain min (m²)</label>
+                                    <input type="number" id="filter_land_min" class="form-control" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Garage (min)</label>
+                                    <input type="number" id="filter_garage" class="form-control" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Année (min)</label>
+                                    <input type="number" id="filter_year" class="form-control" min="1900" max="2100">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Featured</label>
+                                    <select id="filter_featured" class="form-select">
+                                        <option value="">Tous</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Classe énergie</label>
+                                    <input type="text" id="filter_energy" class="form-control" placeholder="B, A, C...">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Code postal</label>
+                                    <input type="text" id="filter_zip" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Results Header -->
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -325,6 +380,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const prixMin = parseFloat(document.getElementById('prix_min') ? document.getElementById('prix_min').value : '') || null;
         const prixMax = parseFloat(document.getElementById('prix_max') ? document.getElementById('prix_max').value : '') || null;
 
+        // advanced filters
+        const f_bed = parseInt(document.getElementById('filter_bedrooms') ? document.getElementById('filter_bedrooms').value : '') || null;
+        const f_bath = parseInt(document.getElementById('filter_bathrooms') ? document.getElementById('filter_bathrooms').value : '') || null;
+        const f_size_min = parseFloat(document.getElementById('filter_size_min') ? document.getElementById('filter_size_min').value : '') || null;
+        const f_size_max = parseFloat(document.getElementById('filter_size_max') ? document.getElementById('filter_size_max').value : '') || null;
+        const f_land = parseFloat(document.getElementById('filter_land_min') ? document.getElementById('filter_land_min').value : '') || null;
+        const f_garage = parseInt(document.getElementById('filter_garage') ? document.getElementById('filter_garage').value : '') || null;
+        const f_year = parseInt(document.getElementById('filter_year') ? document.getElementById('filter_year').value : '') || null;
+        const f_featured = (document.getElementById('filter_featured') ? document.getElementById('filter_featured').value : '');
+        const f_energy = (document.getElementById('filter_energy') ? document.getElementById('filter_energy').value.trim().toLowerCase() : '');
+        const f_zip = (document.getElementById('filter_zip') ? document.getElementById('filter_zip').value.trim() : '');
+
         const visibleLatLngs = [];
 
         propertyCards.forEach(card => {
@@ -332,14 +399,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const prop = propertiesData.find(p => (p.property_id == pid || p.ID == pid));
             if (!prop) return;
 
+            // helper to read metas safely
+            const getMeta = (k) => {
+                if (!prop.metas) return null;
+                if (Array.isArray(prop.metas)) return prop.metas[k] ?? null;
+                if (typeof prop.metas === 'object') return prop.metas[k] ?? prop.metas[k] ?? null;
+                return null;
+            };
+
             // match filters
             let match = true;
             // search in title/address
             if (q) {
-                const hay = ((prop.property_title||prop.post_title||'') + ' ' + (prop.metas && (prop.metas.fave_property_map_address||prop.metas.fave_property_address) || '')).toLowerCase();
+                const hay = ((prop.property_title||prop.post_title||'') + ' ' + ((getMeta('fave_property_map_address')||getMeta('fave_property_address')) || '')).toLowerCase();
                 if (hay.indexOf(q) === -1) match = false;
             }
-            // type filter (check slug or name)
+            // type filter
             if (type) {
                 const t = (prop.type && (prop.type.slug||prop.type.name)) ? (prop.type.slug||prop.type.name) : '';
                 if (String(t) !== String(type)) match = false;
@@ -349,26 +424,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 const s = (prop.status && (prop.status.slug||prop.status.name)) ? (prop.status.slug||prop.status.name) : '';
                 if (String(s) !== String(status)) match = false;
             }
-            // price range
-            const price = prop.metas && prop.metas.fave_property_price ? parseFloat(prop.metas.fave_property_price) : null;
+
+            const price = parseFloat(getMeta('fave_property_price')) || null;
             if (prixMin !== null && price !== null && price < prixMin) match = false;
             if (prixMax !== null && price !== null && price > prixMax) match = false;
 
-            // toggle card
+            // bedrooms
+            const bedrooms = parseInt(getMeta('fave_property_bedrooms')) || null;
+            if (f_bed !== null && bedrooms !== null && bedrooms < f_bed) match = false;
+            // bathrooms
+            const bathrooms = parseInt(getMeta('fave_property_bathrooms')) || null;
+            if (f_bath !== null && bathrooms !== null && bathrooms < f_bath) match = false;
+            // size
+            const size = parseFloat(getMeta('fave_property_size')) || null;
+            if (f_size_min !== null && size !== null && size < f_size_min) match = false;
+            if (f_size_max !== null && size !== null && size > f_size_max) match = false;
+            // land
+            const land = parseFloat(getMeta('fave_property_land')) || null;
+            if (f_land !== null && land !== null && land < f_land) match = false;
+            // garage
+            const garage = parseInt(getMeta('fave_property_garage')) || null;
+            if (f_garage !== null && garage !== null && garage < f_garage) match = false;
+            // year
+            const year = parseInt(getMeta('fave_property_year')) || null;
+            if (f_year !== null && year !== null && year < f_year) match = false;
+            // featured
+            const featured = getMeta('fave_featured');
+            if (f_featured !== '' && String(featured) !== String(f_featured)) match = false;
+            // energy
+            const energy = (getMeta('fave_energy_class') || '').toLowerCase();
+            if (f_energy && energy.indexOf(f_energy) === -1) match = false;
+            // zip
+            const zip = (getMeta('fave_property_zip') || '');
+            if (f_zip && zip.indexOf(f_zip) === -1) match = false;
+
+            // toggle card and marker
             if (match) {
                 card.style.display = '';
-                // show marker
                 if (markers[pid]) {
                     try { markers[pid].addTo(map); visibleLatLngs.push(markers[pid].getLatLng()); } catch(e){}
                 }
             } else {
                 card.style.display = 'none';
-                // remove marker
                 if (markers[pid] && map.hasLayer(markers[pid])) { try { map.removeLayer(markers[pid]); } catch(e){} }
             }
         });
 
-        // fit bounds to visible markers
         if (visibleLatLngs.length > 0) {
             const group = L.featureGroup(visibleLatLngs.map(ll=>L.marker([ll.lat,ll.lng])));
             map.fitBounds(group.getBounds().pad(0.15));
